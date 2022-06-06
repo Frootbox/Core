@@ -1,0 +1,26 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{% if manufacturers.getCount == 0 %}
+    <div class="message warning">Es wurden noch keine Datenblätter erstellt.</div>
+{% else %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+
+            {% for manufacturer in manufacturers %}
+                <tr class="ajax {% if manufacturer.getId == data.highlight %}highlighted{% endif %}" data-href="{{ data.plugin.getAdminUri('Manufacturers', 'details', { manufacturerId: manufacturer.getId() }) }}">
+                    <td>{{ manufacturer.getTitle() }}</td>
+                    <td class="text-right">
+                        <a class="ajax" data-confirm="Soll dieser Hersteller wirklich gelöscht werden?" href="{{ data.plugin.getAdminUri('Manufacturers', 'ajaxDelete', { manufacturerId: manufacturer.getId() }) }}"><i class="fa fa-times"></i></a>
+                    </td>
+                </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+{% endif %}

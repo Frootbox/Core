@@ -1,0 +1,155 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<h2>
+    Image-Map
+
+    <span class="headoptions">
+        <!--<a data-modal href="{{ v.getUri('Page', 'ajaxModalContentCompose', { 'pageId' : page.getId(), 'socket' : socket.socket } ) }}" data-title="Inhalt hinzufügen"><i class="fa fa-plus-circle"></i></a>-->
+
+        <span class="dropdown">
+            <i class="far fa-bars dropdown-toggle" data-toggle="dropdown"></i>
+
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <a class="dropdown-item ajax" data-confirm="Soll diese Referenz wirklich dupliziert werden?" href="{{ plugin.getAdminUri('Reference', 'ajaxClone', { referenceId: reference.getId() }) }}"><i class="far fa-fw fa-copy"></i>Referenz duplizieren</a>
+                <a class="dropdown-item" title="Referenz verschieben" data-modal href="{{ plugin.getAdminUri('Reference', 'ajaxModalMove', { referenceId: reference.getId() }) }}"><i class="far fa-fw fa-code-branch"></i>Referenz verschieben</a>
+            </div>
+        </span>
+    </span>
+</h2>
+
+<p><a class="ajax" href="{{ plugin.getAdminUri('Reference', 'details', { referenceId: imageMap.getParentId() }) }}"><i class="fa fa-chevron-circle-left"></i> zurück</a></p>
+
+
+
+<div class="row">
+    <div class="col">
+
+        <div class="card">
+            <div class="card-body">
+
+                <form method="post" class="ajax" action="{{ plugin.getAdminUri('ImageMap', 'ajaxUpdate', { imageMapId: imageMap.getId() }) }}">
+
+                    <div class="form-group">
+                        <label for="title">Titel</label>
+                        <input type="text" class="form-control" id="title" name="title" value="{{ imageMap.getTitle() }}">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Speichern</button>
+
+                </form>
+
+                <h2>Bild-Datei</h2>
+
+                {{ v.injectPartial('\\Frootbox\\Ext\\Core\\FileManager\\Admin\\Partials\\FileManager', {
+                    uid: imageMap.getUid('image'),
+                    multiple: false
+                }) | raw }}
+
+                <h2>Image-Map bearbeiten</h2>
+
+                {% set file = imageMap.getFileByUid('image') %}
+
+                {% if file %}
+
+                    <script>
+                        $(function ( ) {
+
+                            $('#image').click(function ( event ) {
+
+                                event.preventDefault();
+
+                                // Get clicked ccordinates
+                                var posX = parseInt(event.pageX - $(this).offset().left);
+                                var posY = parseInt(event.pageY - $(this).offset().top);
+
+                                // Compute physical coordinates
+                                var factor = $(this)[0].naturalWidth / $(this).width();
+
+                                posX = Math.round(posX * factor);
+                                posY = Math.round(posY * factor);
+
+
+                                $.ajax({
+                                    url: '{{ plugin.getAdminUri('Point', 'ajaxCreate', { imageMapId: imageMap.getId() }) | raw }}',
+                                    data: {
+                                        posX: posX,
+                                        posY: posY
+                                    },
+                                    dataType: 'json',
+                                    success: function ( response ) {
+
+                                        $('.image-wrapper').append('<a data-point="' + response.point.id + '" href="' + response.editUrl + '" data-modal data-title="Punkt bearbeiten" class="point" data-posx="' + posX + '" data-posy="' + posY + '"></a>');
+                                        $(window).trigger('resize');
+                                    }
+                                });
+                            });
+                        });
+                    </script>
+
+                    <style>
+                        .image-wrapper {
+                            position: relative;
+                        }
+
+                        .point {
+                            position: absolute;
+                            z-index: 9999;
+
+                            display: block;
+                            width: 8px;
+                            height: 8px;
+                            border-radius: 50%;
+                            border: double 16px rgba(255,255,255,0.7);
+                            background: rgba(255,255,255,0.7);
+                            background-clip: padding-box;
+                        }
+
+                        .point:hover {
+                            border: double 15px rgba(255,255,255,1);
+                        }
+                    </style>
+
+                    <div class="image-wrapper">
+                        <img id="image" class="img-fluid" src="{{ file.getUriThumbnail({ width: 1600 }) }}" alt="" />
+
+                        {% for point in imageMap.getPoints() %}
+                            <a {% if point.getTitle() %}data-toggle="tooltip" title="{{ point.getTitle() }}"{% endif %} data-point="{{ point.getId() }}" href="{{ plugin.getAdminUri('Point', 'ajaxModalEdit', { pointId: point.getId() }) }}" data-modal data-title="Punkt bearbeiten" class="point" data-posx="{{ point.getConfig('position.x') }}" data-posy="{{ point.getConfig('position.y') }}"></a>
+                        {% endfor %}
+                    </div>
+
+                    <script>
+                        $(function ( ) {
+
+                            $(window).off('resize');
+                            $(window).resize(function ( ) {
+
+                                var factor = $('#image')[0].naturalWidth / $('#image').width();
+
+                                $('.image-wrapper .point').each(function ( ) {
+
+                                    var x = $(this).data('posx');
+                                    var y = $(this).data('posy');
+
+                                    $(this).css('left', Math.floor(x / factor) - 14);
+                                    $(this).css('top', Math.floor(y / factor) - 14);
+                                });
+                            });
+
+                            var tmpImg = new Image() ;
+                            tmpImg.src = $('#image').attr('src') ;
+                            tmpImg.onload = function() {
+
+                                $(window).trigger('resize');
+                            };
+
+
+                        });
+                    </script>
+
+                {% endif %}
+
+            </div>
+        </div>
+
+    </div>
+</div>

@@ -1,0 +1,75 @@
+{# config
+
+title: Kacheln
+variables:
+    img_width:
+        type: int
+        label: Bildbreite
+        default: 500
+    img_height:
+        type: int
+        label: Bildhöhe
+        default: 500
+    columns:
+        type: int
+        label: Spalten
+        default: 2
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+{% set children = i.getPages() %}
+
+{% if variables.columns == 1 %}
+    {% set colClass = "col-12" %}
+{% elseif variables.columns == 2 %}
+    {% set colClass = "col-6" %}
+{% elseif variables.columns == 3 %}
+    {% set colClass = "col-md-4" %}
+{% elseif variables.columns >= 4 %}
+    {% set colClass = "col-3" %}
+{% endif %}
+
+<div class="row">
+    <div class="col-12 plugin Core Navigation SubNavigation Index06">
+
+
+        {% if plugin.isFirst %}
+            <h1 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h1>
+        {% else %}
+            <h2 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+        {% endif %}
+
+        <div data-editable data-uid="{{ plugin.getUid('text') }}"></div>
+
+        <div class="row justify-content-md-center">
+
+            {% for child in children %}
+
+                <div class="{{ colClass }} teaser" data-href>
+                    <div class="row">
+                        <div class="col-4">
+
+                            <picture class="fluid round" data-editable data-uid="{{ child.getUid('image')}}">
+                                <img width="{{ variables.img_width }}" height="{{ variables.img_height }}" src="{{ i.getDummyImage({ width: variables.img_width, height: variables.img_height }) }}" alt="" />
+                            </picture>
+
+                        </div>
+                        <div class="col-8">
+
+                            <h4><a href="{{ child.getUri }}">{{ child.getTitle }}</a></h4>
+
+                            <div data-nowidgets data-editable data-uid="{{ child.getUid('teaser-text') }}"></div>
+
+                        </div>
+                    </div>
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+        <div data-editable data-uid="{{ plugin.getUid('text-below') }}"></div>
+
+    </div>
+</div>

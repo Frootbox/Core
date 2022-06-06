@@ -1,0 +1,62 @@
+{% set b = view.getViewhelper('Breadcrumb', { singleton: true }) %}
+
+{{ b.addSection(reference.getTitle(), reference.getUri()) }}
+
+
+<param name="cloak" value="1" />
+<param name="layout" value="Default" />
+
+{{ view.set('overrideImageUid', reference.getUid('image')) }}
+{{ view.set({ pagedata: { title: reference.getTitle() } }) }}
+
+{{ view.addBreadcrumb(reference.getTitle(), reference.getUri()) }}
+
+{{ page.setIndexable(false) }}
+
+<div class="plugin Core Images References Request01">
+
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+
+                <h2 class="first main-title" data-editable data-uid="{{ reference.getUid('title') }}">{{ reference.getTitle }}</h2>
+
+                <p><a class="back" href="{{ reference.getUri() }}">zurück zum Objekt</a></p>
+
+                <div class="row">
+                    <div class="col-md-6">
+
+                        <div class="teaser-text" data-editable data-uid="{{ reference.getUid('teaser') }}"></div>
+                        <div data-editable data-uid="{{ reference.getUid('text') }}"></div>
+
+                    </div>
+                    <div class="col-md-6">
+
+                        {% if plugin.getConfig('formId') %}
+
+                            {% set formRenderer = view.getViewhelper('Ext/Core/ContactForms/FormRenderer', {   }) %}
+
+                            {{ formRenderer.render({
+                                formId: plugin.getConfig('formId'),
+                                options: {
+                                    editable: true,
+                                },
+                                payload: {
+                                    'Objekt': reference.getTitle(),
+                                    'URL': reference.getUri({ absolute: true }),
+                                }
+                            }) | raw }}
+
+                        {% endif %}
+
+
+
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+</div>

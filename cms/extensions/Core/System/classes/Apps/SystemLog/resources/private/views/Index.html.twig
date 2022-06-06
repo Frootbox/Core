@@ -1,0 +1,47 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+{% set t = view.getViewhelper('\\Frootbox\\Admin\\Viewhelper\\Translator') %}
+
+{{ front.addTab('System Log', app.getUri('index')) }}
+
+<script>
+	{% if get.get('query') %}
+		$(function ( ) {
+
+			$('#searchForm').trigger('submit');
+
+		});
+	{% endif %}
+</script>
+
+<div class="row">
+	<div class="col-md-12">
+
+		<h2>
+			System Log
+		</h2>
+
+		<table class="table">
+			<thead>
+				<tr>
+					<th>Datum</th>
+					<th>Benutzer</th>
+					<th>Aktion</th>
+				</tr>
+			</thead>
+			<tbody>
+
+				{% for log in logs %}
+					<tr>
+						<td>{{ log.getDate() | date('d.m.Y H:i') }} Uhr</td>
+						<td>{{ log.getUser().getName() }}</td>
+						<td>
+							{{ t.translate(log.getCode(), log.getLogData()) | raw }}
+						</td>
+					</tr>
+				{% endfor %}
+
+			</tbody>
+		</table>
+
+	</div>
+</div>

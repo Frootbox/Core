@@ -1,0 +1,69 @@
+{# config
+
+title: Standard
+
+/config #}
+
+{% set v = view.getViewhelper('View') %}
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set p = view.getViewhelper('Partials', { plugin: plugin }) %}
+{% set a = view.getViewhelper('Assets', {   }) %}
+
+{{ v.asset('EXT:Core/ShopSystem/icons/css/all.css') | raw }}
+
+<div class="plugin Core ShopSystem Account Account01">
+    <div class="container">
+
+        <div class="row">
+            <div class="col-12">
+                <div class="inner-wrapper">
+
+                    {% if plugin.isFirst %}
+                        <h1 data-editable data-uid="{{ plugin.getUid('title-orders') }}">Bestellungen</h1>
+                    {% else %}
+                        <h2 data-editable data-uid="{{ plugin.getUid('title-orders') }}">Bestellungen</h2>
+                    {% endif %}
+
+                    <br /><br />
+
+                    <div class="row">
+                        <div class="col-md-4">
+
+                            {{ p.renderPartial('Menu', { plugin: plugin }) | raw }}
+
+                        </div>
+                        <div class="col-md-8">
+
+                            {% if orders | length == 0 %}
+                                <div class="message">Es wurden noch keine Bestellungen getätigt.</div>
+                            {% else %}
+                                <table class="table">
+                                    <tbody>
+
+                                    {% for booking in orders %}
+                                        <tr>
+                                            <td>
+                                                <a href="{{ plugin.getActionUri('order', { orderId: booking.getId() }) }}">{{ booking.getDate() | date('d.m.Y H:i') }} Uhr</a>
+                                            </td>
+                                            <td class="text-right">
+                                                {{ booking.getTotal() | number_format(2, ',', '.') }} €
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+
+                                    </tbody>
+                                </table>
+                            {% endif %}
+
+                        </div>
+                    </div>
+
+
+                    <br /><br /><br /><br /><br />
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

@@ -1,0 +1,27 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    'frame' : false,
+}) }}
+
+<form method="post" class="ajax" action="{{ v.getUri('NavigationBars', 'ajaxUpdate', { navigationId:navigation.getId() }) }}">
+
+    <div class="modal-body">
+
+        <div class="form-group">
+            <label for="title">Titel</label>
+            <input type="text" class="form-control" id="title" name="title" aria-describedby="titleHelp" value="{{ navigation.getTitle() }}">
+            <small id="titleHelp" class="form-text text-muted">Der Titel dient nur zur Orientierung für dich und wird normalerweise nicht im Frontend verwendet.</small>
+        </div>
+        <div class="form-group">
+            <label for="navId">Nav-ID</label>
+            <input type="text" required class="form-control" id="navId" name="navId" aria-describedby="navIdHelp" value="{{ navigation.getNavId() }}">
+            <small id="navIdHelp" class="form-text text-muted">Die Nav-ID wird zum Einbinden in die Seite benutzt und muss eindeutig sein.</small>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Speichern</button>
+    </div>
+
+</form>

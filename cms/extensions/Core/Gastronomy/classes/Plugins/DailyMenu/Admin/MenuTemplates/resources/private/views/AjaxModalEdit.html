@@ -1,0 +1,29 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    'frame' : false,
+}) }}
+
+<form method="post" class="ajax" action="{{ plugin.getAdminUri('MenuTemplates', 'ajaxUpdate', { menuTemplateId: menuTemplate.getId() }) }}">
+
+    <div class="modal-body">
+
+        <div class="form-group">
+            <label for="title">Titel</label>
+            <input type="text" class="form-control" name="title" required id="title" placeholder="Titel" value="{{ menuTemplate.getTitle() }}">
+        </div>
+        <div class="form-group">
+            <label for="addition">Zusatz</label>
+            <input type="text" class="form-control" name="addition" id="addition" placeholder="Zusatz" value="{{ menuTemplate.getConfig('addition') }}">
+        </div>
+        <div class="form-group">
+            <label for="price">Preis</label>
+            <input type="number" step="0.01" class="form-control" name="price" id="price" placeholder="Preis" value="{{ menuTemplate.getConfig('price') }}">
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Speichern</button>
+    </div>
+
+</form>

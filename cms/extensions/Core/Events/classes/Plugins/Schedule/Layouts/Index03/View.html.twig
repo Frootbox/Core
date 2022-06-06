@@ -1,0 +1,68 @@
+{# config
+
+title: nach Kategorien
+variables:
+    withPrice:
+        type: bool
+        label: mit Preisangabe
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+{% set t = i.getTranslator() %}
+
+{% set categories = i.getCategoriesTop() %}
+
+<div class="row">
+    <div class="col-12 plugin Core Events Schedule Index03">
+
+        {% for category in categories %}
+            <h3 data-editable data-uid="{{ category.getUid('title') }}">{{ category.getTitle() }}</h3>
+
+            <div data-editable data-uid="{{ category.getUid('text') }}"></div>
+
+            {% set events = category.getItems() %}
+
+            {% if events.getCount() > 0 %}
+
+                <div data-editable data-uid="{{ category.getUid('text-conditional') }}"></div>
+
+                <table class="table table-responsive-md events">
+                    <tbody>
+
+                        {% for event in events %}
+                            <tr>
+                                <td>
+                                    {{ event.getTitle() }}
+                                </td>
+                                <td>
+                                    {{ t.translate(event.getDateStart.format('Weekday%u')) }}
+
+                                    {% set venue = event.getVenue() %}
+
+                                    {% if venue %}
+                                        <span class="subtitle">{{ venue.getTitle() }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {{ event.getDateStart().format('%d.%m.%Y') }}
+                                    <span class="subtitle">{{ event.getDateStart().format('%H:%M') }}–{{ event.getDateEnd().format('%H:%M') }} Uhr</span>
+                                </td>
+
+                                {% if variables.withPrice %}
+                                    <td class="text-right">
+                                        {{ event.getConfig('bookable.price') | number_format(2, ',', '.') }} EUR
+                                    </td>
+                                {% endif %}
+                            </tr>
+                        {% endfor %}
+
+                    </tbody>
+                </table>
+            {% endif %}
+
+        {% endfor %}
+
+    </div>
+</div>

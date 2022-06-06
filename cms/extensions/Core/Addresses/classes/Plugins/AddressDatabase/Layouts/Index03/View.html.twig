@@ -1,0 +1,87 @@
+{# config
+
+title: Standard
+variables:
+    columns:
+        type: int
+        label: Spalten
+        default: 3
+    image_width:
+        type: int
+        label: Bildbreite
+        default: 500
+    image_height:
+        type: int
+        label: Bildhöhe
+        default: 250
+    withLayoutContainer:
+        type: bool
+        label: mit Layout-Container
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+
+{% if variables.columns == 1 %}
+    {% set colClass = "col-12" %}
+{% elseif variables.columns == 2 %}
+    {% set colClass = "col-md-6" %}
+{% elseif variables.columns == 3 %}
+    {% set colClass = "col-md-4" %}
+{% elseif variables.columns >= 4 %}
+    {% set colClass = "col-md-3" %}
+{% endif %}
+
+<div class="plugin Core Addresses AddressDatabase Index03">
+
+    {% if variables.withLayoutContainer %}<div class="container">{% endif %}
+
+        <div class="row">
+            <div class="col-12">
+
+                {% if plugin.isFirst %}
+                    <h1 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h1>
+                {% else %}
+                    <h2 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+                {% endif %}
+
+                <div data-editable data-uid="{{ plugin.getUid('teaser') }}"></div>
+
+
+                {% set addresses = i.getAddresses() %}
+
+                <div class="row justify-content-center addresses">
+
+                    {% for address in addresses %}
+                        <div class="{{ colClass }} address-teaser h-card vcard" data-href>
+
+                            <h4 class="p-name">{{ address.getTitle() }}</h4>
+
+                            <p class="address adr">
+                                {% if address.getAddition() %}<span>{{ address.getAddition() }}</span><br />{% endif %}
+                                <span class="street-address">{{ address.getStreet() }} {{ address.getStreetNumber() }}</span><br />
+                                <span class="postal-code">{{ address.getZipcode() }}</span> <span class="p-locality">{{ address.getCity() }}</span><br />
+                                <span class="country-name">{{ address.getCountry() }}</span>
+                            </p>
+
+                            <p>
+                                <a href="tel:{{ address.getPhone() }}">Telefon <span class="tel">{{ address.getPhone() }}</span></a>
+                            </p>
+                            <p>
+                                <a href="mailto:{{ address.getEmail() }}">{{ address.getEmail() }}</a><br />
+                                <a href="{{ address.getUrlExtern() }}">{{ address.getUrlDisplay() }}</a><br />
+                            </p>
+
+                            <div data-nowidgets data-editable data-uid="{{ address.getUid('teaser') }}"></div>
+
+
+                        </div>
+                    {% endfor %}
+
+                </div>
+
+            </div>
+        </div>
+    {% if variables.withLayoutContainer %}</div>{% endif %}
+</div>

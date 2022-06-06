@@ -1,0 +1,56 @@
+{% set p = view.getViewhelper('Partials', { plugin: plugin }) %}
+{% set i = view.getViewhelper('Delegator', { object: page }) %}
+
+
+<div class="modal fade" id="shopcartProductAddModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Artikel in den Warenkorb gelegt</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+
+                <p style="margin: 0; padding: 0;">Der Artikel wurde Ihrem Warenkorb hinzugefügt.</p>
+
+            </div>
+
+            {%  set recommendations = product.getRecommendations() %}
+
+            {%  if recommendations | length > 0 %}
+                <div class="modal-body" style="border-top: 1px solid #dee2e6;">
+
+                    <p>Diese Artikel könnten Sie auch interessieren:</p>
+
+                    <div class="row">
+                        {% for recommendation in recommendations %}
+                            <div class="col-md-6">
+                                {{ p.renderPartial('/Frootbox/Ext/Core/ShopSystem/Plugins/ShopSystem/ProductTeaser', { product: recommendation.product, i: i }) | raw }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+
+            <div class="modal-footer">
+                <a href="#" class="btn btn-secondary" data-dismiss="modal">weiter einkaufen</a>
+                <a href="{{ proceedUrl }}" class="btn btn-primary">zum Warenkorb</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    gtag('event', 'add_to_cart', {
+        "items": [
+            {
+                "id": "{{ product.getItemNumber() | default(product.getId()) }}",
+                "name": "{{ product.getTitle() }}",
+                {% if category %}"category": "{{ category.getTitle() }}",{% endif %}
+                "price": "{{ product.getPriceGross() | number_format(2, '.') }}"
+            }
+        ]
+    });
+</script>

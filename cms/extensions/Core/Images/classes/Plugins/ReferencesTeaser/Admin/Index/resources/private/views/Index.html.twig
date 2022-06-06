@@ -1,0 +1,51 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<h2>
+    Referenzen-Teaser
+
+    {#
+    <span class="headoptions">
+		<a data-toggle="tooltip" data-modal data-title="neue Formulargruppe hinzufügen" href="{{ plugin.getAdminUri('Group', 'ajaxModalCompose') }}"><i class="fa fa-plus-circle"></i></a>
+	</span>
+    #}
+</h2>
+
+<p><a class="ajax" href="{{ v.getUri('Page', 'ajaxPanelContent', { pageId: plugin.getPageId() }) }}"><i class="fa fa-chevron-circle-left"></i> zurück</a></p>
+
+<div class="row">
+    <div class="col">
+
+        <div class="card">
+            <div class="card-body">
+
+                <form method="post" class="ajax" action="{{ plugin.getAdminUri('Index', 'ajaxUpdate') }}">
+
+
+                    {{ v.injectPartial('\\Frootbox\\Admin\\View\\Partials\\Input\\Tags', {
+                        tags: plugin.getConfig('tags')
+                    }) | raw }}
+
+                    <div class="form-group">
+                        <label for="limit">Anzahl</label>
+                        <input type="number" class="form-control" name="limit" id="limit" value="{{ plugin.getConfig('limit') }}" />
+                    </div>
+                    <div class="form-group">
+                        <label for="order">Sortierung</label>
+                        <select size="1" class="form-control" name="order" id="order">
+                            <option value="">bitte wählen ...</option>
+                            <option value="manualOrder" {% if plugin.getConfig('order') == 'manualOrder' %}selected{% endif %}>manuelle Sortierung</option>
+                            <option value="newestFirst" {% if plugin.getConfig('order') == 'newestFirst' %}selected{% endif %}>Neueste zuerst</option>
+                            <option value="random" {% if plugin.getConfig('order') == 'random' %}selected{% endif %}>zufällig</option>
+                        </select>
+
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Speichern</button>
+
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+</div>

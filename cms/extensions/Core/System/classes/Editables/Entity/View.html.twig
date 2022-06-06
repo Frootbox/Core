@@ -1,0 +1,67 @@
+<script>
+    $(function ( ) {
+
+        /**
+         * Show "entity edit" buttons
+         */
+        $(document).on('mouseover', '[data-editable-entity][data-uid] [data-property]', function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            // $('.popover').popover('hide');
+
+            // Find parent entity
+            var parent = $(this).parents('[data-editable-entity]').first();
+            var uid = parent.attr('data-uid') + '----' + $(this).attr('data-property');
+
+            $(this).attr('data-content', '<span class="options edit-mode">' +
+                '<a class="entity-property-edit" href="#' + uid + '"><i class="far fa-pencil"><\/i><\/a>&nbsp;&nbsp;&nbsp;' +
+                '|&nbsp;&nbsp;&nbsp;' +
+                '<a class="popover-dismiss" href="#"><i class="far fa-times"><\/i><\/a>' +
+                '<\/span>'
+            );
+
+            $(this).popover({
+                placement: 'top',
+                html: true
+            });
+
+            $(this).popover('show');
+        });
+
+
+        /**
+         *
+         */
+        $(document).on('click', 'a.entity-property-edit', function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            // Extract uid from href="#uid"
+            var uid = $(this).attr('href').substr(1);
+
+            var element = $('[data-uid="' + uid + '"]');
+
+            fbxEditorOpenGenericModal();
+
+            $.ajax({
+                url: "{{ settings.serverpath }}cms/admin/Editor/callEditable",
+                data: {
+                    method: 'ajaxModalEdit',
+                    editable: 'Frootbox/Ext/Core/System/Editables/Entity',
+                    uid: uid,
+                    content: element.html()
+                },
+                success: function ( html ) {
+
+                    $('#fbxEditorGenericModal .modal-content').html(html);
+
+                }
+            });
+
+        });
+    });
+
+</script>

@@ -1,0 +1,26 @@
+<form method="post" action="{{ app.getUri('ajaxFileUpdate', { fileId : file.getId } ) }}" class="ajax">
+
+    <div class="form-group">
+        <label for="title">Titel</label>
+        <input type="text" class="form-control" name="title" id="title" placeholder="Titel" value="{{ file.getTitle() }}">
+    </div>
+    <div class="form-group">
+        <label for="name">Dateiname</label>
+        <input type="text" class="form-control" name="name" required id="name" placeholder="Dateiname" value="{{ file.getName() }}">
+    </div>
+    <div class="form-group">
+        <label for="copyright">Copyright</label>
+        <input type="text" class="form-control" name="copyright" id="copyright" placeholder="Copyright" value="{{ file.getCopyright() }}">
+    </div>
+    <div class="form-group">
+        <label for="caption">Bildunterschrift</label>
+        <textarea rows="8" class="form-control" name="caption" id="caption" placeholder="Bildunterschrift">{{ file.getConfig('caption') }}</textarea>
+    </div>
+    <div class="form-group">
+        <label for="alt">ALT</label>
+        <input type="text" class="form-control" name="alt" id="alt" placeholder="ALT" value="{{ file.getConfig('alt') }}">
+    </div>
+
+    <button type="submit" class="btn btn-primary">Speichern</button>
+
+</form>

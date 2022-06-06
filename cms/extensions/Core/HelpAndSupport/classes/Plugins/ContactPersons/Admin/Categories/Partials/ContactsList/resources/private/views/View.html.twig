@@ -1,0 +1,42 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{% if data.category.getContacts() | length > 0 %}
+
+    <table class="table" data-sort="{{ data.plugin.getAdminUri('Categories', 'ajaxSort', { categoryId: category.getId() }) }}">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Vorname</th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+
+            {% for contact in data.category.getContacts() %}
+                <tr id="row-{{ contact.getConnId() }}" class="{% if data.highlight == contact.getId() %}highlighted{% endif %}" data-title="Ansprechperson bearbeiten" data-modal="{{ data.plugin.getAdminUri('Contact', 'ajaxModalEdit', { contactId: contact.getId(), connId: contact.getConnId() }) }}">
+                    <td>{{ contact.getFirstName() }}</td>
+                    <td>{{ contact.getLastName() }}</td>
+                    <td class="handle">
+                        <i class="fa fa-grip-lines"></i>
+                    </td>
+                    <td class="text-right">
+                        <a href="{{ data.plugin.getAdminUri('Categories', 'ajaxContactDisconnect', { categoryId: data.category.getId(), contactId: contact.getId() }) }}" class="ajax"><i class="fa fa-times"></i></a>
+                    </td>
+                </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+
+{% else %}
+
+    <div class="card">
+        <div class="card-body">
+
+            Es wurden noch keine Ansprechpersonen mit dieser Kategorie verknüpft.
+
+        </div>
+    </div>
+
+{% endif %}

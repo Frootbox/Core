@@ -1,0 +1,34 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+{% set d = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\Delegator', { object: data.category}) %}
+
+{% set products = d.getProducts({ options: { ignoreVisibility: true } }) %}
+
+
+{% if products.getCount() == 0 %}
+    <div class="message warning">Es wurden noch keine Produkte erstellt.</div>
+{% else %}
+
+    <table class="table" data-xxsortsort="{{ data.plugin.getAdminUri('Categories', 'ajaxSort', { categoryId: data.category.getId() }) }}">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+
+            {% for product in products %}
+                <tr id="{{ product.getId() }}" class="ajax {% if product.getId == data.highlight %}highlighted{% endif %}" data-href="{{ data.plugin.getAdminUri('Products', 'details', { productId: product.getId(), categoryId: data.category.getId() }) }}">
+                    <td>{{ product.getTitle() }}</td>
+                    <td class="handle"><i class="fa fa-grip-lines"></i></td>
+                    <td class="text-right">
+                        <a class="ajax" href="{{ data.plugin.getAdminUri('Products', 'ajaxSwitchVisible', { productId: product.getId() } ) }}"><i data-product="{{ product.getId() }}" class="fa fa-lightbulb visibility {{ product.getVisibilityString() }} icon"></i></a>
+                        <a class="ajax" href="{{ data.plugin.getAdminUri('Categories', 'ajaxProductDisconnect', { productId: product.getId(), categoryId: data.category.getId() }) }}"><i class="fa fa-unlink icon"></i></a>
+                    </td>
+                </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+{% endif %}

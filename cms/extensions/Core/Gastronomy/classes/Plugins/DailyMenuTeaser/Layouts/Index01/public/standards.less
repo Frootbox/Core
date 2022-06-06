@@ -1,0 +1,51 @@
+.plugin.Core.Gastronomy.DailyMenuTeaser.Index01 {
+
+  .col-12 {
+    margin-top: 30px;
+  }
+
+  .menupanel {
+    padding: 10px;
+
+    background: #404040;
+    border: 10px solid #565656;
+
+    color: #FFF;
+    text-align: center;
+
+    h5 {
+      padding: 10px 0;
+      font-size: 32px;
+
+      .subtitle {
+        font-size: 18px;
+        color: #FFF;
+      }
+
+    }
+
+    div.menu {
+    @include condensed;
+
+      margin: 20px 0;
+
+      font-weight: bold;
+
+      em {
+        display: block;
+        font-style: normal;
+        color: $colorSpot1;
+
+      }
+    }
+  }
+
+  @media (min-width: 992px) {
+
+    .col-lg-20 {
+      -ms-flex: 0 0 20%;
+      flex: 0 0 20%;
+      max-width: 20%;
+    }
+  }
+}

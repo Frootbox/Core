@@ -1,0 +1,71 @@
+{# config
+
+title: Standard
+variables:
+    withContainer:
+        label: mit Container
+        type: bool
+        default: false
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set p = view.getViewhelper('Partials', { plugin: plugin }) %}
+
+
+
+<div class="plugin Core ShopSystem Checkout Login01">
+
+    {% if variables.withContainer %}<div class="container">{% endif %}
+
+        <div class="row">
+            <div class="col-12">
+
+                <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+
+                <div data-editable data-uid="{{ plugin.getUid('teaser') }}"></div>
+
+                <div class="row">
+                    <div class="col-md-6">
+
+                        <h3>Mit Benutzer-Login</h3>
+
+                        <p>Sie haben bereits einen Zugang:</p>
+
+
+
+                        <form action="{{ plugin.getUriAjax('login') }}" method="post">
+
+                            <div class="form-group">
+                                <label for="username">E-Mail</label>
+                                <input type="email" class="form-control" id="username" name="username">
+                            </div>
+                            <div class="form-group">
+                                <label for="password">Password</label>
+                                <input type="password" class="form-control" id="password" name="password">
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">Anmelden</button>
+
+                        </form>
+
+                    </div>
+                    <div class="col-md-6">
+
+                        <h3>Als Gast einkaufen</h3>
+
+                        <p>Sie können sich später entscheiden, ob Sie einen Account anlegen möchten oder nicht.</p>
+
+                        <a class="btn btn-primary" href="{{ plugin.getActionUri('checkout') }}">weiter als Gast</a>
+
+                    </div>
+                </div>
+
+
+
+            </div>
+        </div>
+
+        {% if variables.withContainer %}</div>{% endif %}
+
+</div>

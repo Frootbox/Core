@@ -1,0 +1,77 @@
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/TableDnD/0.9.1/jquery.tablednd.js" integrity="sha256-d3rtug+Hg1GZPB7Y/yTcRixO/wlI78+2m08tosoRn7A=" crossorigin="anonymous"></script>
+
+<script>
+    $(function ( ) {
+
+        $('#blockstable').tableDnD({
+            dragHandle: '.handle',
+            serializeParamName: 'row',
+            onDragClass: 'dragging',
+            onDrop: function (table, row) {
+
+                $.ajax({
+                    url: "{{ controller.getActionUri('ajaxSort', { uid: get.get('uid') }) | raw }}",
+                    data: $.tableDnD.serialize(),
+                    success: function ( response ) {
+
+                        $('[data-blocks][data-uid="' + response.uid + '"] [data-editable-block]').remove();
+                        $('[data-blocks][data-uid="' + response.uid + '"] .editable-navbar').after(response.html);
+                    }
+                });
+
+            }
+        });
+
+        /**
+         *
+         */
+        $('a.block-delete').click(function ( event ) {
+
+            event.preventDefault();
+
+            $.ajax({
+                url: $(this).attr('href'),
+                success: function ( response ) {
+                    $('[data-blocks][data-uid="' + response.uid + '"]  .blocks-content' ).html(response.html);
+                    $('#blockstable tr[data-block="' + response.blockId + '"]').fadeOut();
+                }
+            });
+        });
+
+    });
+</script>
+
+<div class="modal-header">
+    <h5 class="modal-title">Blöcke sortieren</h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+
+{% if blocks | length == 0 %}
+    <div class="modal-body">
+
+        <p>Es wurden noch keine Blöcke erstellt.</p>
+
+    </div>
+{% else %}
+
+    <table class="table" id="blockstable">
+        <tbody>
+
+        {% for block in blocks %}
+            <tr id="row-{{ block.getId() }}" data-block="{{ block.getId() }}">
+                <td>{{ block.getTitle() | default(block.getBlockId()) }}</td>
+                <td class="handle"><a href="#"><i class="fa fa-grip-lines"></i></a></td>
+                <td class="text-right">
+                    <a class="block-delete" href="{{ controller.getActionUri('ajaxBlockDelete', { blockId: block.getId() }) }}"><i class="fa fa-times"></i></a>
+                </td>
+            </tr>
+        {% endfor %}
+
+        </tbody>
+    </table>
+
+{% endif %}

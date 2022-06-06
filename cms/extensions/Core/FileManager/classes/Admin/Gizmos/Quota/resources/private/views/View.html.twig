@@ -1,0 +1,15 @@
+<style>
+    .Gizmo.Core.FileManager.Quota {
+        min-height: 140px;
+        text-align: center;
+    }
+
+    .Gizmo.Core.FileManager.Quota progress {
+        width: 100%;
+    }
+</style>
+
+<h4>Speicherplatzverbrauch</h4>
+
+{{ value }} G / {{ max }} G <br />
+<progress max="{{ max }}" value="{{ value }}"></progress>

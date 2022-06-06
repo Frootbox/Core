@@ -1,0 +1,12 @@
+<div class="form-group">
+
+    <label class="control-label d-block">{{ field.getLabel }}{% if field.isRequired %}*{% endif %}</label>
+
+    {% for option in field.getOptions() %}
+        <div class="custom-control custom-checkbox custom-control-inline">
+            <input name="fields[{{ field.getId() }}][{{ loop.index0 }}]" type="checkbox" class="custom-control-input" id="fieldHelp_{{ field.getId() }}_{{ loop.index }}">
+            <label class="custom-control-label" for="fieldHelp_{{ field.getId() }}_{{ loop.index }}">{{ option.label }}</label>
+        </div>
+    {% endfor %}
+
+</div>

@@ -1,0 +1,33 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+'frame' : false,
+}) }}
+
+<form method="post" class="ajax" action="{{ plugin.getAdminUri('Products', 'ajaxEquipmentUpdate', { equipmentId: equipment.productId, productId: equipment.orgId }) }}">
+
+    <div class="modal-body">
+
+        <div class="form-group">
+            <label for="amount">Anzahl</label>
+            <input type="number" class="form-control" name="amount" id="amount" placeholder="Anzahl" value="{{ equipment.amount }}">
+        </div>
+        <div class="form-group form-check">
+            <input {% if equipment.autoAddToCart %}checked{% endif %} type="checkbox" class="form-check-input" id="autoAddToCart" name="autoAddToCart">
+            <label class="form-check-label" for="autoAddToCart">automatisch auch zum Warenkorb hinzufügen</label>
+        </div>
+        <div class="form-group form-check">
+            <input {% if equipment.forceAmount %}checked{% endif %} type="checkbox" class="form-check-input" id="forceAmount" name="forceAmount">
+            <label class="form-check-label" for="forceAmount">immer gleiche Menge wie Hauptprodukt</label>
+        </div>
+        <div class="form-group form-check">
+            <input {% if equipment.noExtraCharge %}checked{% endif %} type="checkbox" class="form-check-input" id="noExtraCharge" name="noExtraCharge">
+            <label class="form-check-label" for="noExtraCharge">ohne Aufpreis</label>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Speichern</button>
+    </div>
+
+</form>

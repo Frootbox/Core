@@ -1,0 +1,18 @@
+
+{% set contacts = data.category.getContacts() %}
+
+{% if contacts.getCount() > 0 %}
+
+    <div class="row">
+
+        {% for contact in contacts %}
+            <div class="col-6 vcard">
+                <b>{{ contact.getName() }}</b><br />
+                {{ contact.getCity() }}<br />
+                {{ contact.getPosition() }}
+            </div>
+        {% endfor %}
+
+    </div>
+
+{% endif %}

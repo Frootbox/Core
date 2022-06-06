@@ -1,0 +1,32 @@
+{# config
+
+title: tabellarisch
+
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+{% set questions = i.getQuestions() %}
+
+{% if plugin.isFirst %}
+    <h1 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h1>
+{% else %}
+    <h2 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+{% endif %}
+
+<div data-editable data-uid="{{ plugin.getUid('teaser') }}"></div>
+
+<table class="table">
+    <tbody>
+
+        {% for question in questions %}
+            <tr>
+                <td>
+                    <a href="{{ question.getUri() }}">{{ question.getTitle() }}</a>
+                </td>
+            </tr>
+        {% endfor %}
+
+    </tbody>
+</table>

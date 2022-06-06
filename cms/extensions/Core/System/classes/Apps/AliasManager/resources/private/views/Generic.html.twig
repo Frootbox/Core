@@ -1,0 +1,33 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ front.addTab('Alias-Verwaltung', app.getUri('index')) }}
+{{ front.addTab('generische Aliase') }}
+
+<h2>
+    generische Aliase
+</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Alias</th>
+            <th>Status</th>
+            <th>Ziel</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+
+    {% for alias in aliases %}
+        <tr data-alias="{{ alias.getId() }}" data-title="Alias bearbeiten" data-href="{{ app.getUri('details', { aliasId: alias.getId() }) }}">
+            <td>{{ alias.getAlias() }}</td>
+            <td>{{ alias.getStatus() }}</td>
+            <td>{{ alias.getConfig('target') }}</td>
+            <td class="text-right">
+                <a class="ajax" data-confirm="Soll dieser Alias wirklich gelöscht werden?" href="{{ app.getUri('ajaxDelete', { aliasId: alias.getId() }) }}"><i class="fa fa-times"></i></a>
+            </td>
+        </tr>
+    {% endfor %}
+
+    </tbody>
+</table>

@@ -1,0 +1,29 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    'frame' : false,
+}) }}
+
+<form method="post" class="ajax" action="{{ plugin.getAdminUri('MenuTemplates', 'ajaxCreate') }}">
+
+    <div class="modal-body">
+
+        <div class="form-group">
+            <label for="title">Titel</label>
+            <input type="text" class="form-control" name="title" required id="title" placeholder="Titel">
+        </div>
+        <div class="form-group">
+            <label for="addition">Zusatz</label>
+            <input type="text" class="form-control" name="addition" id="addition" placeholder="Zusatz">
+        </div>
+        <div class="form-group">
+            <label for="price">Preis</label>
+            <input type="number" step="0.01" class="form-control" name="price" id="price" placeholder="Preis">
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Menü-Vorlage erstellen</button>
+    </div>
+
+</form>

@@ -1,0 +1,39 @@
+{# config
+
+title: Standard
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+<div class="row">
+    <div class="col-12 plugin Core HelpAndSupport JobsTeaser Index01">
+    
+        {% if plugin.isFirst %}
+            <h1 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h1>
+        {% else %}
+            <h2 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+        {% endif %}
+        
+        <div data-editable data-uid="{{ plugin.getUid('teaser') }}"></div>
+
+        {% set jobs = i.getJobs() %}
+
+        {% if jobs | length > 0 %}
+
+            <table class="jobs-teaser table">
+                <tbody>
+
+                    {% for job in jobs %}
+                        <tr data-href>
+                            <td><a href="{{ job.getUri() }}" class="read-more">{{ job.getTitle() }}</a></td>
+                        </tr>
+                    {% endfor %}
+
+                </tbody>
+            </table>
+        {% endif %}
+
+    </div>
+</div>
+

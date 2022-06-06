@@ -1,0 +1,47 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<script src="{{ serverpath }}cms/admin/resources/public/libs/jquery/upload/js/vendor/jquery.ui.widget.js"></script>
+<script src="{{ serverpath }}cms/admin/resources/public/libs/jquery/upload/js/jquery.iframe-transport.js"></script>
+<script src="{{ serverpath }}cms/admin/resources/public/libs/jquery/upload/js/jquery.fileupload.js"></script>
+
+{% set partialId = "FileUpload" ~ random(10000, 99999) %}
+
+<script>
+	$(function () {
+
+		$('#{{ partialId }}').fileupload({
+			dataType: 'json',
+			done: function (e, data) {
+
+				if (typeof toastr != 'undefined') {
+					toastr.success('Datei wurde erfolgreich hochgeladen.');
+				}
+				else {
+					alert('Datei wurde erfolgreich hochgeladen.');
+				}
+
+				$('#{{ data.receiver }}').html(data.result.html);
+
+				{% if data.callback %}
+					{{ data.callback.function }}({{ data.callback.parameters | json_encode | raw}});
+				{% endif %}
+			},
+			error : function ( xhr ) {
+
+				if (typeof toastr != 'undefined') {
+					toastr.error(xhr.responseText);
+				}
+				else {
+					alert(xhr.responseText);
+				}
+			}
+		});
+	});
+</script>
+
+<div class="custom-file">
+	<input name="file{{ partialId }}" type="file" class="custom-file-input" id="{{ partialId }}" data-url="{{ v.getUri('Editor/File', 'ajaxUpload', { inputName: "file" ~ partialId, 'uid' : data.uid, multiple: data.multiple | default(false) }) }}">
+	<label class="custom-file-label" for="{{ partialId }}" data-browse="Dateien durchsuchen">Datei wählen ...</label>
+</div>
+
+<small id="emailHelp" class="form-text text-muted">maximale Größe: {{ maxSize }}</small>

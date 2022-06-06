@@ -1,0 +1,46 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<h2>
+    Frage bearbeiten
+    <span class="headoptions">
+        <a data-toggle="tooltip" ata-title="Frage bearbeiten" target="edit-question-{{ question.getId() }}" href="{{ question.getUriEdit() }}"><i class="fa fa-pencil"></i></a>
+        <!--<a href="{{ plugin.getAdminUri('Article', 'details', { articleId: article.getId(), target: 'next' }) }}" class="ajax"><i class="fa fa-chevron-double-right"></i></a>-->
+    </span>
+</h2>
+
+<p><a class="ajax" href="{{ plugin.getAdminUri('Index', 'index') }}"><i class="fa fa-chevron-circle-left"></i> zurück</a></p>
+
+<div class="card">
+    <div class="card-body">
+
+        <form method="post" class="ajax" action="{{ plugin.getAdminUri('Question', 'ajaxUpdate', { questionId: question.getId() }) }}">
+
+            <div class="form-group">
+                <label for="title">Titel</label>
+                <input type="text" class="form-control" id="title" name="title" placeholder="Titel" value="{{ question.getTitle() }}">
+            </div>
+            <div class="form-group">
+                <label for="link">Link</label>
+                <input type="text" class="form-control" id="link" name="link" placeholder="Link" value="{{ question.getConfig('link') }}">
+            </div>
+
+            <button type="submit" class="btn btn-primary">Speichern</button>
+
+        </form>
+
+    </div>
+</div>
+
+<h3>
+    „siehe auch“
+    <span class="headoptions">
+		<a data-toggle="tooltip" data-modal data-title="„siehe auch“ Verknüpfung hinzufügen" href="{{ plugin.getAdminUri('Question', 'ajaxModalConnectionCompose', { questionId: question.getId() }) }}"><i class="fa fa-plus-circle"></i></a>
+	</span>
+</h3>
+
+<div id="seeAlsoReceiver">
+    {{ v.injectPartial('/Frootbox/Ext/Core/HelpAndSupport/Plugins/FAQ/Admin/Question/Partials/ListSeeAlso', {
+        question: question,
+        plugin: plugin
+    }) | raw }}
+</div>

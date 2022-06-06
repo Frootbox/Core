@@ -1,0 +1,29 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{% if menuTemplates.getCount == 0 %}
+	<div class="message warning">Es wurden noch keine Menü-Vorlagen erstellt.</div>
+{% else %}
+
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Titel</th>
+				<th class="text-right">Preis</th>
+			</tr>
+		</thead>
+		<tbody>
+
+			{% for menuTemplate in menuTemplates %}
+				<tr class="{% if data.highlight == menuTemplate.getId() %}highlighted{% endif %}" data-modal="{{ plugin.getAdminUri('MenuTemplates', 'ajaxModalEdit', { menuTemplateId: menuTemplate.getId() }) }}">
+					<td>
+						<b>{{ menuTemplate.getTitle() }}</b><br />
+						{{ menuTemplate.getConfig('addition') }}
+					</td>
+					<td class="text-right">{{ menuTemplate.getConfig('price') | number_format(2, ',', '.') }} EUR</td>
+				</tr>
+			{% endfor %}
+
+		</tbody>
+	</table>
+
+{% endif %}

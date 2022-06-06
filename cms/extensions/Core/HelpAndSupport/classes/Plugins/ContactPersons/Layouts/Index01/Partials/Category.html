@@ -1,0 +1,52 @@
+{% set icons = view.getViewhelper('Ext/HerrUndFrauPixelExt/Icons/Icons', { createDummyOnFail: true  }) %}
+
+{% set contacts = data.category.getContacts() %}
+
+{% if variables.withPositions %}
+    {% set colWidth = "25%" %}
+{% else %}
+    {% set colWidth = "33%" %}
+{% endif %}
+
+{% if contacts.getCount() > 0 %}
+    <table class="table contact-persons">
+
+        {% if variables.withHeader %}
+            <thead>
+                <tr>
+                    <th><span data-editable-element data-uid="{{ plugin.getUid('th-name') }}">Name</span></th>
+                    <th><span data-editable-element data-uid="{{ plugin.getUid('th-position') }}">Position</span></th>
+                    <th><span data-editable-element data-uid="{{ plugin.getUid('th-phone') }}">Telefon</span></th>
+                    <th><span data-editable-element data-uid="{{ plugin.getUid('th-email') }}">E-Mail</span></th>
+                </tr>
+            </thead>
+        {% endif %}
+
+        <tbody>
+
+            {% for contact in contacts %}
+                <tr>
+                    <td width="{{ colWidth }}">{{ contact.getName() }}</td>
+
+                    {% if variables.withPositions %}
+                        <td width="{{ colWidth }}">
+                            {{ contact.getPosition() }}
+                        </td>
+                    {% endif %}
+
+                    <td width="{{ colWidth }}">
+                        {% if contact.getPhone() %}
+                            <a href="tel:{{ contact.getPhone() }}">{{ icons.render('phone') | raw }}{{ contact.getPhone() }}</a>
+                        {% endif %}
+                    </td>
+                    <td width="{{ colWidth }}">
+                        {% if contact.getEmail() %}
+                        <a href="mailto:{{ contact.getEmail() }}">{{ icons.render('envelope') | raw }}E-Mail senden</a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+{% endif %}

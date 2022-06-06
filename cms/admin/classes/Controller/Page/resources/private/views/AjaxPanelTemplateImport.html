@@ -1,0 +1,32 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    'frame' : false,
+}) }}
+
+<h2>
+    Inhalte bearbeiten „{{ page.getTitle }}“
+</h2>
+
+<div class="row">
+    <div class="col">
+
+        <div class="card">
+            <div class="card-body afterDeleteReceiver">
+
+                <form method="post" class="ajax" action="{{ v.getUri('Page', 'ajaxTemplateImport', { pageId: get.get('pageId') } ) }}">
+
+                    <div class="form-group">
+                        <label for="template">Vorlage</label>
+                        <textarea class="form-control" id="template" name="template" rows="10"></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Vorlage importieren</button>
+
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+</div>

@@ -1,0 +1,35 @@
+{# config
+
+title: Kacheln
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+<div class="row">
+    <div class="col-12 plugin Core Addresses AddressTeaser Index02">
+
+        {% if plugin.isFirst %}
+            <h1 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h1>
+        {% else %}
+            <h2 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+        {% endif %}
+
+        <div data-editable data-uid="{{ plugin.getUid('teaser') }}"></div>
+
+        {% set addresses = i.getAddresses({ order: 'RAND()' }) %}
+
+        <div class="row">
+
+            {% for address in addresses %}
+                <div class="address col-2">
+                    <picture class="fluid" data-editable data-skipempty="1" data-uid="{{ address.getUid('image')}}">
+                        <img width="{{ variables.image_width }}" height="{{ variables.image_height }}" src="{{ i.getDummyImage({ width: variables.image_width, height: variables.image_height | default(300) }) }}" alt="" />
+                    </picture>
+                </div>
+            {% endfor %}
+
+        </div>
+
+    </div>
+</div>

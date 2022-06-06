@@ -1,0 +1,43 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    'frame' : false,
+}) }}
+
+<form method="post" class="ajax" action="{{ plugin.getAdminUri('Coupons', 'ajaxUpdate', { couponId: coupon.getId() }) }}">
+
+    <div class="modal-body">
+
+        <div class="form-group">
+            <label for="title">Titel *</label>
+            <input type="text" required class="form-control" name="title" id="title" placeholder="Titel" value="{{ coupon.getTitle() }}">
+        </div>
+
+        <div class="form-row">
+            <div class="form-group col-6">
+                <label for="code">Code *</label>
+                <input type="text" required class="form-control" name="code" id="code" placeholder="Code" value="{{ coupon.getUidRaw() }}">
+            </div>
+            <div class="form-group col-6">
+                <label for="amount">Menge *</label>
+                <input type="number" step="1" required class="form-control" name="amount" id="amount" placeholder="Menge" value="{{ coupon.getConfig('amount') }}">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group col-6">
+                <label for="value">Wert (EUR) *</label>
+                <input type="text" class="form-control" name="value" id="value" placeholder="Wert (EUR)" value="{{ coupon.getConfig('value') }}">
+            </div>
+            <div class="form-group col-6">
+                <label for="valuePercent">Wert (%) *</label>
+                <input type="text" class="form-control" name="valuePercent" id="valuePercent" placeholder="Wert (%)" value="{{ coupon.getConfig('valuePercent') }}">
+            </div>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Speichern</button>
+    </div>
+
+</form>

@@ -1,0 +1,58 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    'frame' : false,
+}) }}
+
+<form method="post" class="ajax" action="{{ app.getUri('ajaxFieldUpdate', { fieldId: field.getId() }) }}">
+
+    <div class="modal-body">
+
+        <div class="row">
+            <div class="col-md-5">
+
+                <div class="form-group">
+                    <label for="title">Titel</label>
+                    <input type="text" class="form-control" name="title" required id="title" placeholder="Titel" value="{{ field.getTitle() }}">
+                </div>
+                <div class="form-group">
+                    <label for="type">Typ</label>
+                    <select size="1" name="type" id="type" class="form-control">
+                        <option value="">bitte wählen ...</option>
+
+                        {% for xfield in availableFields %}
+                            <option {% if field.getConfig('type') == xfield.fieldType %}selected{% endif %} value="{{ xfield.fieldType }}">{{ xfield.title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group form-check">
+                    <input type="checkbox" class="form-check-input" id="mandatory" name="mandatory" {% if field.getMandatory() %}checked{% endif %}>
+                    <label class="form-check-label" for="mandatory">Pflichtfeld</label>
+                </div>
+                <div class="form-group">
+                    <label for="helpText">Hinweis-Text</label>
+                    <input type="text" class="form-control" name="helpText" id="helpText" placeholder="Hinweis-Text" value="{{ field.getConfig('helpText') }}">
+                </div>
+                <div class="form-group">
+                    <label for="placeholder">Platzhalter</label>
+                    <input type="text" class="form-control" name="placeholder" id="placeholder" placeholder="Platzhalter" value="{{ field.getConfig('placeholder') }}">
+                </div>
+
+            </div>
+            <div class="col-md-7">
+
+                <div id="optionsReceiver">
+
+                    {{ optionsHtml | raw }}
+
+                </div>
+
+            </div>
+        </div>
+
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Speichern</button>
+    </div>
+</form>

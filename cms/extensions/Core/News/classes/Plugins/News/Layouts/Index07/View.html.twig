@@ -1,0 +1,65 @@
+{# config
+
+title: Standard
+variables:
+    withContainer:
+        label: mit Layout-Container
+        type: bool
+        default: false
+    imageWidth:
+        label: Bild-Breite
+        type: int
+        default: 600
+    imageHeight:
+        label: Bild-Höhe
+        type: int
+        default: 300
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+<div class="plugin Core News News Index07">
+
+    {% if variables.withContainer %}<div class="container">{% endif %}
+
+        <div class="row">
+            <div class="col-12">
+
+                <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+
+                <div data-editable data-uid="{{ plugin.getUid('teaser-text') }}"></div>
+
+                {% set articles = i.getArticles() %}
+
+                {% for article in articles %}
+
+                    <div class="article-wrapper">
+                        <div class="row" data-href="{{ article.getUri() }}">
+                            <div class="col-md-4">
+                                <picture class="fluid" {% if variables.noImageDummy %}data-skipempty="1"{% endif %} data-editable data-uid="{{ article.getUid('image')}}">
+                                    <img width="{{ variables.imageWidth }}" height="{{ variables.imageHeight }}" src="{{ i.getDummyImage({ width: variables.imageWidth, height: variables.imageHeight }) }}" alt="" />
+                                </picture>
+                            </div>
+                            <div class="col-md-8">
+
+                                <h3 class="first" data-editable data-uid="{{ article.getUid('title') }}">{{ article.getTitle }}</h3>
+
+                                <div data-nowidgets data-editable data-uid="{{ article.getUid('teaser') }}"></div>
+
+                                {% if article.showReadMore() %}
+                                    <p><a href="{{ article.getUri() }}">weiterlesen ...</a></p>
+                                {% endif %}
+
+                            </div>
+                        </div>
+                    </div>
+
+                {% endfor %}
+
+            </div>
+        </div>
+
+    {% if variables.withContainer %}</div>{% endif %}
+
+</div>

@@ -1,0 +1,18 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<h2>
+    Gutscheine
+    <span class="headoptions">
+		<a data-toggle="tooltip" data-modal data-title="neuen Gutschein hinzufügen" href="{{ plugin.getAdminUri('Coupons', 'ajaxModalCompose') }}"><i class="fa fa-plus-circle"></i></a>
+	</span>
+</h2>
+
+<p><a class="ajax" href="{{ plugin.getAdminUri('Index', 'index') }}"><i class="fa fa-chevron-circle-left"></i> zurück</a></p>
+
+<div id="couponsReceiver">
+
+    {{ v.injectPartial('\\Frootbox\\Ext\\Core\\ShopSystem\\Plugins\\ShopSystem\\Admin\\Coupons\\Partials\\CouponsList', {
+        plugin: plugin
+    }) | raw }}
+
+</div>

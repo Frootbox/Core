@@ -1,0 +1,47 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{% if teasers.getCount == 0 %}
+	<div class="message warning">Es wurden noch keine Teaser erstellt.</div>
+{% else %}
+
+	<table data-sort="{{ plugin.getAdminUri('Index', 'ajaxSort') }}" class="table">
+		<thead>
+			<tr>
+				<th>Titel</th>
+				<th></th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+
+			{% for teaser in teasers %}
+
+				<tr id="row-{{ teaser.getId() }}" class="{% if data.highlight == teaser.getId() %}highlighted{% endif %}">
+					<td>
+						<a data-modal href="{{ plugin.getAdminUri('Index', 'ajaxModalDetails', { teaserId: teaser.getId() }) }}">
+
+							{% if teaser.getConfig('linkageDeactivated') %}
+								<i class="far fa-fw fa-unlink"></i>
+							{% elseif teaser.getConfig('redirect.target') %}
+								<i class="far fa-fw fa-link"></i>
+							{% else %}
+								<i class="far fa-fw fa-file"></i>
+							{% endif %}
+
+							{{ teaser.getTitle() | default('kein Titel') }}
+						</a>
+					</td>
+					<td class="handle"><i class="fa fa-grip-lines"></i></td>
+					<td class="text-right">
+						<a href="{{ teaser.getUri() }}" target="_blank"><i class="fa fa-link icon"></i></a>
+						<a class="ajax" href="{{ v.getUri('Assets', 'ajaxSwitchVisibility', { assetId: teaser.getId() } ) }}"><i data-asset="{{ teaser.getId() }}" class="fa fa-lightbulb visibility {{ teaser.getVisibilityString() }} icon"></i></a>
+						<a class="ajax" data-confirm="Soll dieser Datensatz wirklich gelöscht werden?" href="{{ plugin.getAdminUri('Index', 'ajaxDelete', { teaserId: teaser.getId() }) }}"><i class="fa fa-times icon"></i></a>
+					</td>
+				</tr>
+
+			{% endfor %}
+
+		</tbody>
+	</table>
+
+{% endif %}

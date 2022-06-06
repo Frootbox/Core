@@ -1,0 +1,81 @@
+{# config
+
+title: Event-Buchung
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set p = view.getViewhelper('Partials') %}
+
+{% set t = i.getTranslator() %}
+
+{% set events = i.getEvents() %}
+
+<param name="cloak" value="1" />
+
+{{ view.set('hideGlobalBlocks', true) }}
+
+<div class="plugin Core Events Schedule Booking01">
+
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+
+                {% if plugin.isFirst %}
+                    <h1 class="first" data-editable data-uid="{{ event.getUid('title') }}">{{ event.getTitle }}</h1>
+                {% else %}
+                    <h2 class="first" data-editable data-uid="{{ event.getUid('title') }}">{{ event.getTitle }}</h2>
+                {% endif %}
+
+                <p class="text-center"><a href="{{ page.getUri() }}">zurück zur Übersicht</a></p>
+
+                <div data-editable data-uid="{{ plugin.getUid('teaser-text') }}"></div>
+
+                <div class="row">
+                    <div class="col-md-6">
+
+                        <h3>Veranstaltung</h3>
+
+                        <div data-editable data-uid="{{ event.getUid('text') }}"></div>
+
+                        {% if event.getPrice() %}
+                            <div class="price">
+                                <p class="price-tag">{{ event.getPrice() | number_format(2, ',', '.') }} EUR</p>
+
+                                <div class="annotation" data-editable data-uid="{{ event.getUid('price-annotation') }}"></div>
+                            </div>
+                        {% endif %}
+
+                    </div>
+                    <div class="col-md-6">
+
+                        {% if plugin.getConfig('formId') %}
+                            <div class="sticky-top">
+
+                                <h3>Anmeldung</h3>
+
+                                {% set formRenderer = view.getViewhelper('Ext/Core/ContactForms/FormRenderer', {   }) %}
+
+                                {{ formRenderer.render({
+                                    formId: plugin.getConfig('formId'),
+                                    options: {
+
+                                    },
+                                    payload: {
+                                        'Veranstaltung': event.getTitle(),
+                                        'Datum': event.getDateStart() | date('d.m.Y H:i')
+                                    }
+                                }) | raw }}
+
+                            </div>
+                        {% endif %}
+
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+</div>

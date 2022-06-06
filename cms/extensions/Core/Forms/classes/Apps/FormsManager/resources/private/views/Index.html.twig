@@ -1,0 +1,42 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ front.addTab('Speicher-Verwaltung', app.getUri('index')) }}
+
+
+<h2>
+	Formular-Verwaltung
+</h2>
+
+
+<table class="table">
+	<thead>
+		<tr>
+			<th>Formular</th>
+			<th></th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for item in plugins %}
+			<tr>
+				<td>
+
+					<a target="_blank" href="{{ serverpath }}cms/admin/Sitemap/index#plugin:{{ item.plugin.getPage().getId() }}:{{ item.plugin.getId() }}:Index:index">{{ item.plugin.getTitle() }}</a><br />
+					<span style="color: #CCC; font-size: 11px;">
+						{% for page in item.plugin.getPage().getTrace() %}
+							{% if not loop.first %}<i class="far fa-angle-right"></i>{% endif %}
+							<a href="#">{{ page.getTitle() }}</a>
+						{% endfor %}
+					</span>
+				</td>
+				<td>
+					<i class="far fa-shield-alt"></i>
+				</td>
+				<td class="text-right">
+					<a target="_blank" href="{{ item.plugin.getPage().getUri() }}"><i class="fa fa-external-link"></i></a>
+				</td>
+			</tr>
+		{% endfor %}
+
+	</tbody>
+</table>

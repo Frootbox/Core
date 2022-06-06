@@ -1,0 +1,27 @@
+{% verbatim %}{# config
+
+title: Standard
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+<div class="plugin {% endverbatim %}{{ extension.getVendorId() }}{% verbatim %} {% endverbatim %}{{ extension.getExtensionId() }}{% verbatim %} {% endverbatim %}{{ pluginId }}{% verbatim %} Index01">
+
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="inner-wrapper">
+
+                    <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+
+                    <div data-editable data-uid="{{ plugin.getUid('teaser') }}"></div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% endverbatim %}

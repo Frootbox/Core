@@ -1,0 +1,61 @@
+<?php
+/**
+ *
+ */
+
+{% if type == 'Template' %}
+$VENDOR_DIR = dirname(__FILE__) . '/';
+{% endif %}
+
+return [
+    'id' => '{{ extensionId }}',
+    'name' => '{{ title }}',
+    'vendor' => [
+        'id' => '{{ vendorId }}',
+        'name' => 'Frootbox'
+    ],
+    'version' => '0.0.1',
+    'requires' => [
+        'Core/Navigation' => '0.0.1',
+        'HerrUndFrauPixelExt/Icons' => '0.0.1',
+        'HerrUndFrauPixelExt/GoogleFonts' => '0.0.1',
+        'HerrUndFrauPixelExt/BlocksLibrary' => '0.0.1',
+        'HerrUndFrauPixelExt/CookieConsentTool' => '0.0.1',
+    ],
+    {% if type == 'Template' %}
+    'autoinstall' => [
+        'config' => [
+            'layoutRootFolder' => $VENDOR_DIR . 'layouts/',
+            'pageRootFolder' => $VENDOR_DIR . 'pages/',
+            'pluginsRootFolder' => $VENDOR_DIR . 'plugins/',
+            'partialsRootFolder' => $VENDOR_DIR . 'partials/',
+            'mail' => [
+                #  'defaultMailFrom' => 'info@tischlerei-schepers.de',
+                #  'login' => 'info@tischlerei-schepers.de',
+                #  'password' => 'DyQuoacgicMiac5'
+            ],
+            'icons' => [
+                '{{ vendorId }}-{{ extensionId }}-Icons' => [
+                    'path' => dirname(__FILE__) . '/resources/public/icons/',
+                    'priority' => 100,
+                ],
+            ],
+            'Ext' => [
+                'Core' => [
+                    'Navigation' => [
+                        'NavigationsViewFolders' => [
+                            $VENDOR_DIR . 'navigations/',
+                        ],
+                    ],
+                ],
+            ],
+        ],
+    ],
+    {% else %}
+    'autoinstall' => [
+        'apps' => [
+            // \Frootbox\Ext\{{ vendorId }}\{{ extensionId }}\Apps\SampleAppName\App::class,
+        ],
+    ],
+    {% endif %}
+];

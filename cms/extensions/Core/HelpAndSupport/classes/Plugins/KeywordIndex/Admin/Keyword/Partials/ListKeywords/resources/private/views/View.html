@@ -1,0 +1,29 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{% if keywords.getCount > 0 %}
+
+	<table class="table" data-sort="{{ plugin.getAdminUri('Question', 'ajaxSort') }}">
+		<thead>
+			<tr>
+				<th>Schlagwort</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+
+			{% for keyword in keywords %}
+
+				<tr id="row-{{ question.getId }}" class="{% if data.highlight == keyword.getId() %}highlighted{% endif %} ajax" data-href="{{ plugin.getAdminUri('Question', 'details', { questionId: keyword.getId() }) }}">
+					<td>{{ keyword.getTitle() }}</td>
+					<!--<td class="handle"><i class="fa fa-grip-lines"></i></td>-->
+					<td class="text-right">
+						<a class="ajax" data-confirm="Soll dieses Schlagwort wirklich gelöscht werden?" href="{{ data.plugin.getAdminUri('Keyword', 'ajaxDelete', { keywordId: keyword.getId() }) }}"><i class="fa fa-times"></i></a>
+					</td>
+				</tr>
+
+			{% endfor %}
+
+		</tbody>
+	</table>
+
+{% endif %}

@@ -1,0 +1,335 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+{% set l = view.getViewHelper('\\Frootbox\\Admin\\Controller\\Page\\Viewhelper\\Page') %}
+
+{{ view.set({
+	'frame' : false,
+}) }}
+
+<h2>Seite „{{ page.getTitle }}“ konfigurieren</h2>
+
+<div class="row">
+    <div class="col">
+
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Details</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="layout-tab" data-toggle="tab" href="#layout" role="tab" aria-controls="layout" aria-selected="false">Einstellungen</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="config-tab" data-toggle="tab" href="#config" role="tab" aria-controls="config" aria-selected="false">Zusatz-Konfiguration</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="security-tab" data-toggle="tab" href="#security" role="tab" aria-controls="security" aria-selected="false">Sicherheit</a>
+            </li>
+
+            <!--
+                <li class="nav-item">
+                    <a class="nav-link" id="children-tab" data-toggle="tab" href="#children" role="tab" aria-controls="children" aria-selected="false">Unterseiten</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="seo-tab" data-toggle="tab" href="#seo" role="tab" aria-controls="seo" aria-selected="false">SEO</a>
+                </li>
+            -->
+        </ul>
+        <div class="tab-content" id="myTabContent">
+            <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+
+                <div class="card">
+                    <div class="card-body">
+
+                        <form method="post" class="ajax" action="{{ v.getUri('Page', 'ajaxUpdate', { pageId: page.getId() } ) }}">
+
+                            {% if not configuration.get('i18n.multiAliasMode') %}
+
+                                <script>
+                                    $(function() {
+
+                                        /**
+                                         *
+                                         */
+                                        $('a.toggle-forced-alias').click(function(event) {
+
+                                            event.preventDefault();
+
+                                            $('#aliasForced').prop('disabled', !$('#aliasForced').prop('disabled'));
+                                            $('#aliasForced').parents('.form-group').toggleClass('forced');
+                                        });
+
+                                        {% if page.getConfig('aliasForced') %}
+                                            $('a.toggle-forced-alias').trigger('click');
+                                        {% endif %}
+
+                                    });
+                                </script>
+
+                                <style>
+                                    .form-group.forced label.force-alias .fa-pencil {
+                                        display: none;
+                                    }
+
+                                    .form-group.forced label.force-alias .fa-times {
+                                        display: inline;
+                                    }
+
+                                    .form-group label.force-alias .fa-times {
+                                        display: none;
+                                    }
+                                </style>
+
+                                <div class="form-group">
+                                    <label for="title">Titel</label>
+                                    <input type="text" class="form-control" id="title" name="title" placeholder="Titel" value="{{ page.getTitle() }}">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="aliasForced" class="force-alias">Alias
+
+                                        <a class="toggle-forced-alias" href="#">
+                                            <i class="fa fa-pencil"></i>
+                                            <i class="fa fa-times"></i>
+                                        </a>
+
+                                    </label>
+                                    <input type="text" disabled class="form-control" id="aliasForced" name="aliasForced" placeholder="Alias" value="{{ page.getAlias() }}">
+                                </div>
+                            {% else %}
+                                {% for language in configuration.get('i18n.languages') %}
+
+                                    <div class="form-group">
+                                        <label for="title_{{ loop.index }}">Titel ({{ language }}){% if settings.default_language == language %}*{% endif %}</label>
+                                        <input type="text" {% if settings.default_language == language %}required{% endif %} class="form-control" id="title_{{ loop.index }}" name="titles[{{ language }}]" placeholder="Titel ({{ language }})" value="{{ page.getTitleWithoutFallback(language) }}">
+                                    </div>
+
+                                {% endfor %}
+                            {% endif %}
+
+
+
+                            <script>
+                                $(function ( ) {
+
+                                    $('#type').change(function ( ) {
+
+                                       $('.type-options').hide();
+                                        $('.type-options[data-type="' + $(this).val() + '"]').show();
+                                    });
+
+                                    $('#type').trigger('change');
+                                });
+                            </script>
+
+                            <div class="form-group">
+                                <label for="type">Seitenverhalten</label>
+                                <select class="form-control" id="type" name="type">
+                                    <option value="">bitte wählen ...</option>
+                                    <option {% if page.getPageType == 'Default' %}selected{% endif %} value="Default">Standardseite</option>
+                                    <option {% if page.getPageType == 'Redirect' %}selected{% endif %} value="Redirect">Weiterleitung</option>
+                                    <option {% if page.getPageType == 'Frame' %}selected{% endif %} value="Frame">Frameset</option>
+                                    <option {% if page.getPageType == 'Error404' %}selected{% endif %} value="Error404">404-Fehlerseite</option>
+                                </select>
+                            </div>
+                            <div class="type-options form-group" data-type="Redirect">
+                                <label for="target">Weiterleitungs-Ziel</label>
+                                <input type="text" class="form-control" id="target" name="target" placeholder="Weiterleitungs-Ziel" value="{{ page.getConfig('redirect.target') }}">
+                            </div>
+                            <div class="type-options form-group" data-type="Frame">
+                                <label for="source">Frame-Quelle</label>
+                                <input type="text" class="form-control" id="source" name="source" placeholder="Frame-Quelle" value="{{ page.getConfig('frame.source') }}">
+                            </div>
+                            <div class="type-options form-group form-check" data-type="Frame">
+                                <input type="checkbox" class="form-check-input" id="forceBlankWindow" name="forceBlankWindow" {% if page.getConfig('frame.forceBlankWindow') %}checked{% endif %}>
+                                <label class="form-check-label" for="forceBlankWindow">in neuem Fenster öffnen</label>
+                            </div>
+
+                            <script>
+                                $(function ( ) {
+
+                                    $("#target").on("drop", function( event ) {
+
+                                        window.setTimeout(function ( ) {
+                                            var found = $("#target").val().match(/ajaxPanelContent\?pageId=([0-9]{1,})(\&+)$/i);
+                                            $('#target').val('fbx://page:' + found[1]);
+                                        }, 300);
+                                    });
+                                });
+                            </script>
+                            <div class="form-group">
+                                <label for="visibility">Sichtbarkeit</label>
+                                <select class="form-control" id="visibility" name="visibility">
+                                    <option {% if page.getVisibility == 'Public' %}selected{% endif %} value="Public">öffentlich</option>
+                                    <option {% if page.getVisibility == 'Hidden' %}selected{% endif %} value="Hidden">unsichtbar</option>
+                                    <option {% if page.getVisibility == 'Moderated' %}selected{% endif %} value="Moderated">privat</option>
+                                    <option {% if page.getVisibility == 'Locked' %}selected{% endif %} value="Locked">deaktiviert</option>
+                                </select>
+                            </div>
+                            <div class="form-group form-check">
+                                <input {% if page.getConfig('seo.preventIndexing') %}checked{% endif %} type="checkbox" class="form-check-input" id="preventIndexing" name="preventIndexing">
+                                <label class="form-check-label" for="preventIndexing">Seite nicht von Suchmaschinen-Bots indexieren lassen</label>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">Speichern</button>
+
+                        </form>
+
+                    </div>
+                </div>
+
+
+
+            </div>
+            <div class="tab-pane fade" id="layout" role="tabpanel" aria-labelledby="layout-tab">
+
+                <div class="card">
+                    <div class="card-body">
+
+                        <form method="post" class="ajax" action="{{ v.getUri('Page', 'ajaxUpdateLayout', { 'pageId' : page.getId() } ) }}">
+
+                            <div class="form-group">
+                                <label for="layout">Seiten-Vorlage</label>
+                                <select class="form-control" id="layout" name="layout">
+                                    <option value="">bitte wählen ...</option>
+
+                                    {% for layout in l.getLayouts() %}
+                                        <option {% if page.getLayout() == layout.fileName %}selected{% endif %} value="{{ layout.fileName }}">{{ layout.name }}</option>
+                                    {% endfor %}
+
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="language">Sprache</label>
+                                <select class="form-control" id="language" name="language">
+
+                                    {% for xlang in availableLanguages %}
+                                        <option {% if page.getLanguage() == xlang %}selected{% endif %} value="{{ xlang }}">{{ xlang }}</option>
+                                    {% endfor %}
+
+                                </select>
+                            </div>
+
+                            <div class="form-group form-check">
+                                <input type="checkbox" class="form-check-input" id="inheritConfig" name="inheritConfig">
+                                <label class="form-check-label" for="inheritConfig">auch für alle Unterseiten übernehmen</label>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">Speichern</button>
+
+                        </form>
+
+                    </div>
+                </div>
+
+
+            </div>
+            <div class="tab-pane fade" id="config" role="tabpanel" aria-labelledby="config-tab">
+
+                <div class="card">
+                    <div class="card-body">
+
+                        <form method="post" class="ajax" action="{{ v.getUri('Page', 'ajaxUpdateAdditionalConfig', { pageId: page.getId() } ) }}">
+
+                            {% for variable in pageConfig.variables %}
+
+                                {% if variable.type == 'bool' %}
+                                    <div class="form-group form-check">
+                                        <input {% if variable.value %}checked{% endif %} name="variables[{{ variable.name }}]" type="checkbox" class="form-check-input" id="var__{{ variable.name }}">
+                                        <label class="form-check-label" for="var__{{ variable.name }}">{{ variable.label }}</label>
+                                    </div>
+                                {% elseif variable.type == 'list' %}
+                                    <div class="form-group">
+                                        <label for="var__{{ variable.name }}">{{ variable.label }}</label>
+                                        <select class="form-control" id="var__{{ variable.name }}" name="variables[{{ variable.name }}]">
+                                            {% for value,label in variable.options %}
+                                                <option {% if variable.value == value %}selected{% endif %} value="{{ value }}">{{ label }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                {% elseif variable.type == 'int' %}
+                                    <div class="form-group">
+                                        <label for="var__{{ variable.name }}">{{ variable.label }}</label>
+                                        <input type="number" class="form-control" value="{{ variable.value }}" name="variables[{{ variable.name }}]" id="var__{{ variable.name }}" placeholder="{{ variable.label }}">
+                                        {#<small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>#}
+                                    </div>
+                                {% else %}
+                                    <div class="form-group">
+                                        <label for="var__{{ variable.name }}">{{ variable.label }}</label>
+                                        <input type="text" class="form-control" value="{{ variable.value }}" name="variables[{{ variable.name }}]" id="var__{{ variable.name }}" placeholder="{{ variable.label }}">
+                                        {#<small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>#}
+                                    </div>
+                                {% endif %}
+
+                            {% endfor %}
+
+                            <div class="form-group form-check">
+                                <input type="checkbox" class="form-check-input" id="inheritVariables" name="inheritVariables">
+                                <label class="form-check-label" for="inheritVariables">auch für alle Unterseiten übernehmen</label>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">Speichern</button>
+
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="seo" role="tabpanel" aria-labelledby="seo-tab">
+
+                <div class="card">
+                    <div class="card-body">
+
+                        <form method="post" class="ajax" action="{{ v.getUri('Page', 'ajaxUpdateSeo', { pageId: page.getId() } ) }}">
+
+                            <div class="form-group">
+                                <label for="seoTitle">expliziter Titel</label>
+                                <input type="text" class="form-control" id="seoTitle" name="seo[title]" placeholder="expliziter Titel" value="{{ page.getConfig('seo.title') }}">
+                            </div>
+                            <div class="form-group">
+                                <label for="seoKeywords">Meta-Keywords</label>
+                                <textarea rows="5" class="form-control" id="seoKeywords" name="seo[keywords]" placeholder="Meta-Keywords">{{ page.getConfig('seo.keywords') }}</textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="seoDescription">Meta-Beschreibung</label>
+                                <textarea rows="5" class="form-control" id="seoDescription" name="seo[description]" placeholder="Meta-Beschreibung">{{ page.getConfig('seo.description') }}</textarea>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">Speichern</button>
+
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="security" role="tabpanel" aria-labelledby="security-tab">
+
+                <div class="card">
+                    <div class="card-body">
+
+                        <form method="post" class="ajax" action="{{ v.getUri('Page', 'ajaxUpdateSecurity', { pageId: page.getId() } ) }}">
+
+                            <div class="form-group">
+                                <label for="securityPassword">Passwort</label>
+                                <input type="text" class="form-control" id="securityPassword" name="security[password]" placeholder="Passwort" value="{{ page.getConfig('security.password') }}">
+                            </div>
+                            <div class="form-group form-check">
+                                <input {% if page.getConfig('security.internal') %}checked{% endif %} type="checkbox" class="form-check-input" id="internal" name="security[internal]">
+                                <label class="form-check-label" for="internal">nur für angemeldete Benutzer</label>
+                            </div>
+
+
+                            <button type="submit" class="btn btn-primary">Speichern</button>
+
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+
+
+    </div>
+</div>

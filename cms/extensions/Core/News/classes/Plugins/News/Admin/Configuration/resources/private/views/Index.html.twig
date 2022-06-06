@@ -1,0 +1,35 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<h2>Konfiguration</h2>
+
+<p><a class="ajax" href="{{ plugin.getAdminUri('Index', 'index') }}"><i class="fa fa-chevron-circle-left"></i> zurück</a></p>
+
+<div class="row">
+    <div class="col">
+
+        <div class="card">
+            <div class="card-body">
+
+                <form method="post" class="ajax" action="{{ plugin.getAdminUri('Configuration', 'ajaxUpdate') }}">
+
+                    <div class="form-group form-check">
+                        <input {% if plugin.getConfig('noArticleDetailPage') %}checked{% endif %} type="checkbox" class="form-check-input" id="noArticleDetailPage" name="noArticleDetailPage">
+                        <label class="form-check-label" for="noArticleDetailPage">keine Detailseite für Newsartikel</label>
+                    </div>
+                    <div class="form-group">
+                        <label for="sorting">Sortierung</label>
+                        <select class="form-control" name="sorting" id="sorting">
+                            <option {% if plugin.getConfig('sorting') == 'DateStartDesc' %}selected{% endif %} value="DateStartDesc">Datum, absteigend</option>
+                            <option {% if plugin.getConfig('sorting') == 'DateStartAsc' %}selected{% endif %} value="DateStartAsc">Datum, aufsteigend</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Speichern</button>
+
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+</div>

@@ -1,0 +1,56 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ front.addTab('Datenbankverwaltung', app.getUri('index')) }}
+
+<h2>
+	Migrationsassistent
+</h2>
+
+<table class="table">
+	<tbody>
+	<tr>
+		<td>aktuelle Version</td>
+		<td>{{ version }}</td>
+	</tr>
+	</tbody>
+</table>
+
+<style>
+
+	table.table.versions tr td.completed {
+		text-decoration: line-through;
+	}
+</style>
+
+<table class="table versions">
+	<thead>
+		<tr>
+			<th>Version</th>
+			<th>Steps</th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody>
+
+		{% for step in steps %}
+			<tr>
+				<td class="{% if step.completed %}completed{% endif %}">
+					{{ step.version }}
+				</td>
+				<td>
+
+					{% for stp in step.steps %}
+						- {{ stp }}<br />
+					{% endfor %}
+
+				</td>
+				<td>
+					{% if step.next %}
+						<a href="{{ v.getUri('App', 'index', { a: 'migrate', appId: app.getId(), version: step.version }) }}" class="ajax btn btn-primary">Update</a>
+					{% endif %}
+				</td>
+			</tr>
+		{% endfor %}
+
+	</tbody>
+</table>

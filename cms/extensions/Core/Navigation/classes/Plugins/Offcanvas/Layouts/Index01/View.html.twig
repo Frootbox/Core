@@ -1,0 +1,46 @@
+{# config
+
+title: Standard
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set v = view.getViewhelper('View') %}
+
+<script>
+    $(function () {
+
+        /**
+         *
+         */
+        $('a.offcanvas.bars').click(function ( event ) {
+
+            event.preventDefault();
+
+            $('.offcanvas.plane').toggleClass('d-none');
+        });
+    });
+</script>
+
+<a class="offcanvas bars d-md-none" href="#"><i class="fa fa-bars"></i></a>
+
+<div class="offcanvas plane d-md-none d-none">
+
+    <nav>
+        <a href="{{ v.link('') }}">Startseite</a>
+
+        {% for npage in pages %}
+            <a href="{{ npage.getUri() }}">{{ npage.getTitle() }}</a>
+
+            {% if npage.hasChildren() %}
+                <div class="children">
+                    {% for child in npage.getChildrenVisible() %}
+                        <a class="level-2" href="{{ child.getUri() }}">{{ child.getTitle() }}</a>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+        {% endfor %}
+    </nav>
+
+</div>

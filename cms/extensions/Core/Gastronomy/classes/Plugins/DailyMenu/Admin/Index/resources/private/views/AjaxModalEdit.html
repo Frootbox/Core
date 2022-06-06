@@ -1,0 +1,19 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    'frame' : false,
+}) }}
+
+<form method="post" class="ajax" action="{{ plugin.getAdminUri('Index', 'ajaxUpdate', { menuItemId: menuItem.getId() }) }}">
+
+    <div class="modal-body">
+
+
+
+    </div>
+    <div class="modal-footer">
+        <a class="btn btn-danger mr-auto ajax" data-confirm="Soll dieser Menü-Punkt wirklich gelöscht werden?" href="{{ plugin.getAdminUri('Index', 'ajaxDelete', { menuItemId: menuItem.getId() }) }}">Menü-Punkt löschen</a>
+        <button type="submit" class="btn btn-primary">Speichern</button>
+    </div>
+
+</form>

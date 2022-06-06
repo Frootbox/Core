@@ -1,0 +1,47 @@
+{# config
+
+title: Standard
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set formRenderer = view.getViewhelper('Ext/Core/ContactForms/FormRenderer', {  }) %}
+
+<div class="plugin Core ContactForms FormTeaser Index01">
+
+    <div class="container">
+
+        <div class="row">
+            <div class="col-12">
+                <div class="inner-wrapper">
+
+                    <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+
+                    <div class="row">
+                        <div class="col-md-6 xcol order-md-2">
+
+                            <div data-editable data-uid="{{ plugin.getUid('text-1') }}"></div>
+
+                        </div>
+                        <div class="col-md-6 xcol order-md-1">
+
+                            {{ formRenderer.render({
+                                plugin: plugin,
+                                formId: plugin.getConfig('formId'),
+                                payload: {
+
+                                }
+                            }) | raw }}
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>

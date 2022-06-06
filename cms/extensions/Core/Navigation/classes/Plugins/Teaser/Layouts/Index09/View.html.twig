@@ -1,0 +1,86 @@
+{# config
+
+title: mit Bild
+variables:
+    img_width:
+        type: int
+        label: Bildbreite
+        default: 500
+    img_height:
+        type: int
+        label: Bildhöhe
+        default: 500
+    columns:
+        type: int
+        label: Spalten
+        default: 2
+    skipHeadline:
+        type: bool
+        label: ohne Überschrift
+        default: false
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+{% set teasers = i.getTeasers() %}
+
+{% if variables.columns == 1 %}
+    {% set colClass = "col-12" %}
+{% elseif variables.columns == 2 %}
+    {% set colClass = "col-md-6" %}
+{% elseif variables.columns == 3 %}
+    {% set colClass = "col-md-4" %}
+{% elseif variables.columns >= 4 %}
+    {% set colClass = "col-md-3" %}
+{% endif %}
+
+
+
+<div class="row">
+    <div class="col-12 plugin Core Navigation Teaser Index09 {% if variables.skipHeadline %}skipped-headline{% endif %} {% if variables.img_width != variables.img_height %}rect{% endif %}">
+
+        {% if not variables.skipHeadline %}
+            {% if plugin.isFirst %}
+                <h1 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h1>
+            {% else %}
+                <h2 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+            {% endif %}
+        {% endif %}
+
+        <div data-editable data-uid="{{ plugin.getUid('text') }}"></div>
+
+        <div class="row justify-content-md-center teasers">
+
+            {% for teaser in teasers %}
+
+                <div class="{{ colClass }} teaser" data-href id="teaser-{{ teaser.getId() }}">
+                    <div class="row">
+                        <div class="col-4">
+
+                            <picture class="fluid round" data-editable data-uid="{{ teaser.getUid('image')}}">
+                                <img width="{{ variables.img_width }}" height="{{ variables.img_height }}" src="{{ i.getDummyImage({ width: variables.img_width, height: variables.img_height }) }}" alt="" />
+                            </picture>
+
+                        </div>
+                        <div class="col-8">
+
+                            <h4>{{ teaser.getTitle }}</h4>
+
+                            <div data-editable data-uid="{{ teaser.getUid('teaser-text') }}"></div>
+
+                            {% if not teaser.isLinkDeactivated() %}
+                                <p><a href="{{ teaser.getUri() }}">mehr erfahren</a></p>
+                            {% endif %}
+
+                        </div>
+                    </div>
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+        <div data-editable data-uid="{{ plugin.getUid('text-below') }}"></div>
+
+    </div>
+</div>

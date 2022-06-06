@@ -1,0 +1,86 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{% set partialId = 'partial' ~ random(100000, 999999) %}
+
+<script>
+    $(function ( ) {
+
+
+
+        $('#{{ partialId }}').keyup(function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            if ($(this).attr('data-cooldown')) {
+                window.clearTimeout($(this).attr('data-cooldown'));
+            }
+
+            var input = $(this);
+
+            var cooldown = window.setTimeout(function ( ) {
+
+                $('#siteSearchResultsFlyer').remove();
+
+                $.ajax({
+                    url : "{{ partial.getActionUri('ajaxSearch') | raw }}",
+                    type : 'GET',
+                    headers: {
+                        Accept: "application/json; charset=utf-8",
+                    },
+                    data : {
+                        q : input.val()
+                    },
+                    success : function ( response ) {
+
+                        input.after('<div id="siteSearchResultsFlyer">');
+
+                        $.each(response.result, function ( index, result ) {
+
+                            $('#siteSearchResultsFlyer').append('<a data-article="' + result.articleId + '" href="{{ serverpath }}' + result.alias + '">' + result.label + '</a>');
+                        });
+
+                        $('#siteSearchResultsFlyer a').click(function ( event ) {
+
+                            event.preventDefault();
+                            event.stopImmediatePropagation();
+
+                            $('#{{ partialId }}Value').val($(this).attr('data-article'));
+
+                            input.val($(this).html());
+
+                            $('#siteSearchResultsFlyer').fadeOut();
+
+                            input.focus();
+                        })
+                    }
+                });
+
+            }, 500);
+
+            $(this).attr('data-cooldown', cooldown);
+        });
+
+    });
+</script>
+
+<style>
+    #siteSearchResultsFlyer {
+        position: absolute;
+        z-index: 10000;
+        background: #FFF;
+    }
+
+    #siteSearchResultsFlyer a {
+        display: block;
+        padding: 3px 10px;
+        border-bottom: 1px solid #CCC;
+    }
+</style>
+
+<div class="form-group">
+    <label for="{{ partialId }}">{{ data.label | default('News-Artikel') }}</label>
+    <input autocomplete="off" type="text" class="form-control" id="{{ partialId }}" name="articleTitle" aria-describedby="emailHelp" placeholder="Suchwort eingeben ..." value="{{ data.valueTitle }}">
+    <input type="hidden" value="{{ data.value }}" name="{{ data.targetInput | default('articleId') }}" id="{{ partialId }}Value" />
+    {# <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small> #}
+</div>

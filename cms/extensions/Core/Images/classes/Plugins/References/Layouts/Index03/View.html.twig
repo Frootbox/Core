@@ -1,0 +1,105 @@
+{# config
+
+title: Kacheln
+variables:
+    image_width:
+        type: int
+        label: Bildbreite
+        default: 535
+    image_height:
+        type: int
+        label: Bildhöhe
+        default: 300
+    skipDetailsPage:
+        type: bool
+        label: keine Detailseite
+    withMagnifier:
+        type: bool
+        label: mit Lupenfunktion
+    withContainer:
+        type: bool
+        label: mit Layout-Container
+    fullWidth:
+        type: bool
+        label: volle Breite
+    withReferenceTitle:
+        type: bool
+        label: mit Titel an den Referenzen
+    skipReadmore:
+        type: bool
+        label: kein "weiterlesen"
+    skipHeadline:
+        type: bool
+        label: ohne Überschrift
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set f = view.getViewhelper('Files') %}
+
+{% if variables.columns == 1 %}
+    {% set colClass = "col-12" %}
+{% elseif variables.columns == 2 %}
+    {% set colClass = "col-md-6" %}
+{% elseif variables.columns == 3 %}
+    {% set colClass = "col-md-4" %}
+{% elseif variables.columns >= 4 %}
+    {% set colClass = "col-md-3" %}
+{% endif %}
+
+{% if variables.withMagnifier %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+    <script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+{% endif %}
+
+<div class="plugin Core Images References Index03">
+
+    {% if variables.withContainer %}
+        {% if variables.fullWidth %}
+            <div class="container-fluid">
+        {% else %}
+            <div class="container">
+        {% endif %}
+    {% endif %}
+
+        <div class="row">
+            <div class="col-12 ">
+
+                <div class="inner-wrapper">
+
+                    {% if not variables.skipHeadline %}
+                        <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+                    {% endif %}
+
+                    <div data-editable data-uid="{{ plugin.getUid('text') }}"></div>
+
+                    <div class="row references">
+                        {% for reference in i.getReferences() %}
+                            <div class="reference col-md-4" data-href>
+
+                                {% if variables.withMagnifier %}<a href="{{ f.getFileByUid(reference.getUid('image')).getUriThumbnail() }}" data-fancybox="references-{{ plugin.getId() }}">{% endif %}
+                                    <picture class="fluid" data-editable {% if variables.noImageDummy %}data-skipempty="1"{% endif %} data-uid="{{ reference.getUid('image') }}">
+                                            <img width="{{ variables.image_width }}" height="{{ variables.image_height }}" src="{{ i.getDummyImage({ width: variables.image_width, height: variables.image_height | default(300) }) }}" alt="" />
+                                    </picture>
+                                {% if variables.withMagnifier %}</a>{% endif %}
+
+                                {% if variables.withReferenceTitle %}
+                                    <h4 class="" data-editable data-uid="{{ reference.getUid('title') }}">{{ reference.getTitle }}</h4>
+                                {% endif %}
+
+                                {% if not variables.skipReadmore and not variables.skipDetailsPage %}
+                                    <p class="read-more-container"><a class="read-more" href="{{ reference.getUri() }}"><span>weiterlesen</span></a></p>
+                                {% endif %}
+
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+    {% if variables.withContainer %}</div>{% endif %}
+
+</div>

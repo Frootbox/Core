@@ -1,0 +1,40 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    'frame' : false,
+}) }}
+
+<script>
+    $(function ( ) {
+
+        $('a.create-multi').click(function ( event ) {
+
+            event.preventDefault();
+
+            $('.form-group.single').remove();
+
+            $('.form-group.d-none textarea').prop('disabled', false);
+            $('.form-group.d-none').removeClass('d-none');
+        });
+    });
+</script>
+<form method="post" class="ajax" action="{{ plugin.getAdminUri('Index', 'ajaxCreate') }}">
+
+    <div class="modal-body">
+
+        <div class="form-group single">
+            <label for="title">Titel</label>
+            <input type="text" class="form-control" name="title" required id="title" placeholder="Titel">
+            <small id="emailHelp" class="form-text text-muted"><a class="create-multi" href="#">mehrere Teaser gleichzeitig erstellen</a></small>
+        </div>
+        <div class="form-group d-none">
+            <label for="multiple">Titel</label>
+            <textarea rows="10" disabled class="form-control" name="multiple" required id="multiple" placeholder="Titel"></textarea>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Teaser erstellen</button>
+    </div>
+
+</form>

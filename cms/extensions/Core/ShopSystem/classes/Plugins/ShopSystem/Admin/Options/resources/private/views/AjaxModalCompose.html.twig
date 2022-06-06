@@ -1,0 +1,21 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    'frame' : false,
+}) }}
+
+<form method="post" class="ajax" action="{{ plugin.getAdminUri('Options', 'ajaxCreate', { productId: product.getId(), groupId: get.get('groupId') }) }}">
+
+    <div class="modal-body">
+
+        <div class="form-group">
+            <label for="title">Titel *</label>
+            <input type="text" required class="form-control" name="title" id="title" placeholder="Titel">
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">neuen Option erstellen</button>
+    </div>
+
+</form>

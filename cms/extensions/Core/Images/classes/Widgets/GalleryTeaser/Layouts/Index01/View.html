@@ -1,0 +1,30 @@
+{% set i = view.getViewhelper('Delegator', { object: widget }) %}
+
+{% set category = i.getCategory() %}
+
+{% if category %}
+
+    {% set d = view.getViewhelper('Delegator', { object: category }) %}
+
+    {% set images = d.getImages({ limit: 4 }) %}
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+    <script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+
+    <div class="row">
+        {% for file in images %}
+            <div class="col">
+                <a href="{{ file.getUriThumbnail() }}" data-fancybox="gallery">
+                    <picture class="fluid">
+                        <img src="{{ file.getUriThumbnail({ width: 600, height: 400 }) }}" alt="" />
+                    </picture>
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+
+    {% if images.getCount() < images.getTotal() %}
+        <p style="margin-top: 10px;"><a href="{{ category.getUri() }}"><i class="fa fa-chevron-circle-right"></i> mehr Bilder</a></p>
+    {% endif %}
+
+{% endif %}

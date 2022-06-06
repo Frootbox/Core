@@ -1,0 +1,85 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    'frame' : false,
+}) }}
+
+<style>
+    .col-md-x7 {
+        -ms-flex: 0 0 14.2857%;
+        flex: 0 0 14.2857%;
+        max-width: 14.2857%;
+    }
+</style>
+<form method="post" class="ajax" action="{{ plugin.getAdminUri('Address', 'ajaxOpeningTimeCreate', { addressId: address.getId() }) }}">
+
+    <div class="modal-body">
+
+        <div class="row">
+            <div class="col-md-2 col-md-x7">
+                <div class="form-group">
+                    <label for="day1">Mo.</label>
+                    <input type="checkbox" class="form-control" name="days[1]" id="day1" value="1" />
+                </div>
+            </div>
+            <div class="col-md-2 col-md-x7">
+                <div class="form-group">
+                    <label for="day2">Di.</label>
+                    <input type="checkbox" class="form-control" name="days[2]" id="day2" value="1" />
+                </div>
+            </div>
+            <div class="col-md-2 col-md-x7">
+                <div class="form-group">
+                    <label for="day3">Mi.</label>
+                    <input type="checkbox" class="form-control" name="days[3]" id="day3" value="1" />
+                </div>
+            </div>
+            <div class="col-md-2 col-md-x7">
+                <div class="form-group">
+                    <label for="day4">Do.</label>
+                    <input type="checkbox" class="form-control" name="days[4]" id="day4" value="1" />
+                </div>
+            </div>
+            <div class="col-md-2 col-md-x7">
+                <div class="form-group">
+                    <label for="day5">Fr.</label>
+                    <input type="checkbox" class="form-control" name="days[5]" id="day5" value="1" />
+                </div>
+            </div>
+            <div class="col-md-2 col-md-x7">
+                <div class="form-group">
+                    <label for="day6">Sa.</label>
+                    <input type="checkbox" class="form-control" name="days[6]" id="day6" value="1" />
+                </div>
+            </div>
+            <div class="col-md-2 col-md-x7">
+                <div class="form-group">
+                    <label for="day7">So.</label>
+                    <input type="checkbox" class="form-control" name="days[7]" id="day7" value="1" />
+                </div>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="timeFrom">Zeit von</label>
+                    <input type="time" class="form-control" name="timeFrom" id="timeFrom" />
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="timeTo">Zeit bis</label>
+                    <input type="time" class="form-control" name="timeTo" id="timeTo" />
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">neue Öffnungszeit hinzufügen</button>
+    </div>
+
+</form>

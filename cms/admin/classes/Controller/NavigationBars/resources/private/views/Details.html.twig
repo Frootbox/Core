@@ -1,0 +1,30 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    'title' : 'Sitemap',
+}) }}
+
+{{ front.addTab('Navigationen', front.getUri('NavigationBars')) }}
+{{ front.addTab(navigation.getTitle(), front.getUri('NavigationBars', 'details', { navigationId: navigation.getId() })) }}
+
+<h2>
+    Navigation „{{ navigation.getTitle() }}“
+    <span class="headoptions">
+        <a data-modal href="{{ v.getUri('NavigationBars', 'ajaxModalEdit', { navigationId: navigation.getId(), language: get.get('language') }) }}" data-title="Navigation bearbeiten"><i class="fa fa-pencil"></i></a>
+        <a href="{{ v.getUri('NavigationBars', 'sort', { navigationId: navigation.getId(), language: get.get('language') } ) }}"><i class="fa fa-sort-alt"></i></a>
+        <a data-modal href="{{ v.getUri('NavigationBars', 'ajaxModalComposeItem', { navigationId: navigation.getId(), language: get.get('language') }) }}" data-title="Navigations-Punkt erstellen"><i class="fa fa-plus-circle"></i></a>
+    </span>
+</h2>
+
+<div class="row">
+    <div class="col-12">
+
+        <div id="navItemsReceiver">
+            {{ v.injectPartial('\\Frootbox\\Admin\\Controller\\NavigationBars\\Partials\\ListNavigationItems\\Partial', {
+                language: get.get('language'),
+                navigation: navigation
+            }) | raw }}
+        </div>
+
+    </div>
+</div>

@@ -1,0 +1,220 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<h2>
+    Adresse bearbeiten
+</h2>
+
+<p><a class="ajax" href="{{ plugin.getAdminUri('Index', 'index', { highlight: address.getId() }) }}"><i class="fa fa-chevron-circle-left"></i> zurück</a></p>
+
+<nav>
+    <div class="nav nav-tabs" id="nav-tab" role="tablist">
+        <a class="nav-item nav-link active" id="nav-basedata-tab" data-toggle="tab" href="#nav-basedata" role="tab" aria-controls="nav-basedata" aria-selected="true">Stammdaten</a>
+        <a class="nav-item nav-link" id="nav-openingtimes-tab" data-toggle="tab" href="#nav-openingtimes" role="tab" aria-controls="nav-openingtimes">Öffnungszeiten</a>
+        <a class="nav-item nav-link" id="nav-location-tab" data-toggle="tab" href="#nav-location" role="tab" aria-controls="nav-location">Geo-Koordinaten</a>
+        <a class="nav-item nav-link" id="nav-user-tab" data-toggle="tab" href="#nav-user" role="tab" aria-controls="nav-user">Benutzer</a>
+    </div>
+</nav>
+<div class="tab-content" id="nav-tabContent">
+    <div class="tab-pane fade show active" id="nav-basedata" role="tabpanel" aria-labelledby="nav-basedata-tab">
+
+        <div class="card">
+            <div class="card-body">
+
+                <form method="post" class="ajax" action="{{ plugin.getAdminUri('Address', 'ajaxUpdate', { addressId: address.getId() }) }}">
+
+                    <script>
+                        $(function ( ) {
+                            $('#title').focus();
+                        });
+                    </script>
+
+                    <div class="row">
+                        <div class="col-md-6">
+
+                            <div class="form-group">
+                                <label for="title">Titel</label>
+                                <input type="text" class="form-control" id="title" name="title" placeholder="Titel" value="{{ address.getTitle() }}">
+                            </div>
+
+                            {{ v.injectPartial('\\Frootbox\\Admin\\View\\Partials\\Input\\Tags', {
+                                object: address
+                            }) | raw }}
+
+                        </div>
+                        <div class="col-md-6">
+
+                            <div class="form-group">
+                                <label for="addition">Adresszusatz</label>
+                                <input type="text" class="form-control" id="addition" name="addition" placeholder="Adresszusatz" value="{{ address.getAddition() }}">
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group col-sm-8">
+                                    <label for="title">Straße</label>
+                                    <input type="street" class="form-control" id="street" name="street" placeholder="Straße" value="{{ address.getStreet() }}">
+                                </div>
+                                <div class="form-group col-sm-4">
+                                    <label for="streetNumber">Nr.</label>
+                                    <input type="text" class="form-control" id="streetNumber" name="streetNumber" placeholder="Nr." value="{{ address.getStreetNumber() }}">
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group col-sm-4">
+                                    <label for="zipcode">PLZ</label>
+                                    <input type="street" class="form-control" id="zipcode" name="zipcode" placeholder="PLZ" value="{{ address.getZipcode() }}">
+                                </div>
+                                <div class="form-group col-sm-8">
+                                    <label for="city">Ort</label>
+                                    <input type="text" class="form-control" id="city" name="city" placeholder="Ort" value="{{ address.getCity() }}">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="country">Land</label>
+                                <input type="text" class="form-control" id="country" name="country" placeholder="Land" value="{{ address.getCountry() }}">
+                            </div>
+
+                        </div>
+                    </div>
+
+
+
+
+                    <div class="form-group">
+                        <label for="phone">Telefon</label>
+                        <input type="text" class="form-control" id="phone" name="phone" placeholder="Telefon" value="{{ address.getPhone() }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="mobile">Mobil</label>
+                        <input type="text" class="form-control" id="mobile" name="mobile" placeholder="Mobil" value="{{ address.getMobile() }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="fax">Fax</label>
+                        <input type="text" class="form-control" id="fax" name="fax" placeholder="Fax" value="{{ address.getFax() }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">E-Mail</label>
+                        <input type="email" class="form-control" id="email" name="email" placeholder="E-Mail" value="{{ address.getEmail() }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="url">URL</label>
+                        <input type="text" class="form-control" id="url" name="url" placeholder="URL" value="{{ address.getUrl() }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="url">Instagram</label>
+                        <input type="text" class="form-control" id="instagram" name="instagram" placeholder="Instagram" value="{{ address.getInstagram() }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="facebook">Facebook</label>
+                        <input type="text" class="form-control" id="facebook" name="facebook" placeholder="Facebook" value="{{ address.getFacebook() }}">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Speichern</button>
+
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="tab-pane fade" id="nav-openingtimes" role="tabpanel" aria-labelledby="nav-openingtimes-tab">
+        <div class="card">
+            <div class="card-body">
+
+                <h3>
+                    Öffnungszeiten
+                    <span class="headoptions">
+		                <a data-toggle="tooltip" data-modal data-title="neue Öffnungszeit hinzufügen" href="{{ plugin.getAdminUri('Address', 'ajaxModalComposeOpeningTime', { addressId: address.getId() }) }}"><i class="fa fa-plus-circle"></i></a>
+	                </span>
+                </h3>
+
+                <div id="openingtimesReceiver">
+                    {{ v.injectPartial('\\Frootbox\\Ext\\Core\\Addresses\\Plugins\\AddressDatabase\\Admin\\Address\\Partials\\ListOpeningtimes', {
+                        plugin: plugin,
+                        address: address,
+                    }) | raw }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-pane fade" id="nav-location" role="tabpanel" aria-labelledby="nav-location-tab">
+        <div class="card">
+            <div class="card-body">
+
+                <form method="post" class="ajax" action="{{ plugin.getAdminUri('Address', 'ajaxUpdateLocation', { addressId: address.getId() }) }}">
+
+
+
+                    <script>
+                        $(function ( ) {
+
+                            $('a.refresh-geolocation').click(function (event) {
+
+                                $.ajax({
+                                    url: "https://maps.googleapis.com/maps/api/geocode/json",
+                                    data: {
+                                        address: $('#zipcode').val() + " " + $('#city').val() + ", " + $('#street').val() + " " + $('#streetNumber').val(),
+                                        key: "{{ config.get('addresses.google.geolocation.apiKey') | raw }}"
+                                    },
+                                    success: function (response) {
+
+                                        $('#lat').val(response.results[0].geometry.location.lat);
+                                        $('#lng').val(response.results[0].geometry.location.lng);
+                                    }
+                                });
+                            });
+                        });
+                    </script>
+
+
+
+
+                    <div class="form-group">
+                        <label for="lng">Längengrad (Longitude)</label>
+                        <input type="text" class="form-control" id="lng" name="lng" placeholder="Längengrad" value="{{ address.getLng() }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="lat">Breitengrad (Latitude)</label>
+                        <input type="text" class="form-control" id="lat" name="lat" placeholder="Breitengrad" value="{{ address.getLat() }}">
+                        <small id="emailHelp" class="form-text text-muted refresh-geolocation"><a class="refresh-geolocation" href="#">aktualisieren</a></small>
+
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Speichern</button>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+    <div class="tab-pane fade" id="nav-user" role="tabpanel" aria-labelledby="nav-user-tab">
+
+        <div class="card">
+            <div class="card-body">
+
+                <h3>
+                    verknüpfte Benutzer
+                    <span class="headoptions">
+		                <a data-toggle="tooltip" data-modal data-title="neuen Benutzer verknüpfen" href="{{ plugin.getAdminUri('Address', 'ajaxModalComposeUserConnection', { addressId: address.getId() }) }}"><i class="fa fa-plus-circle"></i></a>
+	                </span>
+                </h3>
+
+
+                <div id="userReceiver">
+                    {{ v.injectPartial('\\Frootbox\\Ext\\Core\\Addresses\\Plugins\\AddressDatabase\\Admin\\Address\\Partials\\ListUsers', {
+                        address: address,
+                        plugin: plugin,
+                    }) | raw }}
+                </div>
+
+
+
+            </div>
+        </div>
+
+    </div>
+</div>

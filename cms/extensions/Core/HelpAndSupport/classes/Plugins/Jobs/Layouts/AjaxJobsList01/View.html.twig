@@ -1,0 +1,55 @@
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set t = i.getTranslator() %}
+
+<table class="table jobs">
+    <thead>
+    <tr>
+        <th>{{ t.translate('JobOffer') }}</th>
+        <th class="d-none d-md-table-cell">{{ t.translate('City') }}</th>
+        <th class="d-none d-md-table-cell">{{ t.translate('Type') }}</th>
+        <th class="d-none d-md-table-cell">{{ t.translate('Start') }}</th>
+    </tr>
+    </thead>
+    <tbody>
+
+    {% for job in jobs %}
+        <tr data-href>
+            <td>
+                <a href="{{ job.getUri() }}">
+                    {{ job.getTitle(globalLanguage) }}
+
+                    <span class="subtitle">
+                                                    {{ job.getLocation().getCity() }}{% if job.getConfig('type') %}, {{ job.getConfig('type') }}{% endif %}{% if job.getConfig('start') %}, {{ job.getConfig('start') }}{% endif %}
+                                                </span>
+                </a>
+            </td>
+            <td class="d-none d-md-table-cell" nowrap>
+                {{ job.getLocation().getCity() }}
+                {% if variables.showCountry and job.getLocation().getCountry() %}
+                    / {{ job.getLocation().getCountry() }}
+                {% endif %}
+            </td>
+            <td class="d-none d-md-table-cell" nowrap>
+
+                {% if job.getConfig('typeId') %}
+                    {{ t.translate('Type' ~ job.getConfig('typeId')) }}
+                {% else %}
+                    {{ job.getConfig('type') }}
+                {% endif %}
+
+            </td>
+            <td class="d-none d-md-table-cell" nowrap>
+
+                {% if job.getConfig('asSoonAsPossible') %}
+                    {{ t.translate('asSoonAsPossible') }}
+                {% elseif job.getConfig('start') %}
+                    {{ job.getConfig('start') }}
+                {% elseif job.getDateStart() %}
+                    {{ job.getDateStart() }}
+                {% endif %}
+
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

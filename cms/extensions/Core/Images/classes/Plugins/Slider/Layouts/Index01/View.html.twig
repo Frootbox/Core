@@ -1,0 +1,142 @@
+{# config
+
+title: Standard
+variables:
+    image_width:
+        label: Bild-Breite
+        default: 1400
+        type: int
+    image_height:
+        label: Bild-Höhe
+        default: 300
+        type: int
+    noGrid:
+        type: bool
+        default: false
+        label: kein Grid
+    noArrowNavigation:
+        type: bool
+        default: false
+        label: keine Pfeilnavigation
+    cloak:
+        type: bool
+        default: false
+        label: andere Plugins verdrängen
+    crossfade:
+        type: bool
+        default: false
+        label: Übergang als Cross-Fade
+    elementMaxHeight:
+        default:
+        type: int
+        label: maximale Höhe des Elements
+    elementMaxWidth:
+        type: int
+        label: maximale Breite des Elements
+    withContainer:
+        type: bool
+        label: mit Layout-Container
+
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+{% set images = i.getImages({ overrideUid: view.get('overrideImageUid'), overrideFilePath: view.get('overrideImageFile') }) %}
+
+{% if variables.cloak %}
+    <param name="cloak" value="true" />
+{% endif %}
+
+    {% if variables.image_width == "" and variables.image_height == "" %}
+
+        {% set imageSize = images.current().getDimensions() %}
+
+        {% set variables = variables | merge({ image_width: imageSize.width }) %}
+        {% set variables = variables | merge({ image_height: imageSize.height }) %}
+
+    {% endif %}
+
+
+    <style>
+        {% for file in images %}
+            .slide-background-{{ file.getId() }} {
+                background-image: url({{ file.getUri({ width: variables.image_width, height: variables.image_height }) | raw }});
+                background-repeat: no-repeat;
+            }
+        {% endfor %}
+
+        {% if variables.elementMaxHeight %}
+            .plugin.Core.Images.Slider.Index01 {
+                max-height: {{ variables.elementMaxHeight }}px;
+                overflow: hidden;
+            }
+        {% endif %}
+
+        {% if variables.elementMaxWidth %}
+            .plugin.Core.Images.Slider.Index01 {
+                margin-right: auto;
+                margin-left: auto;
+                max-width: {{ variables.elementMaxWidth }}px;
+            }
+        {% endif %}
+    </style>
+
+
+<div class="{% if variables.noGrid %}plugin Core Images Slider Index01 {% if plugin.isFirst %}first{% endif %}{% endif %}">
+
+    {% if not variables.noGrid %}
+        {% if variables.withContainer %}<div class="container">{% endif %}
+        <div class="row">
+            <div class="col-12 ">
+    {% endif %}
+
+
+        {% if editing and view.get('overrideImageUid') %}
+            <div class="carousel">
+                <picture class="fluid" data-editable data-uid="{{ view.get('overrideImageUid') }}">
+                    <img width="{{ variables.image_width }}" height="{{ variables.image_height }}" src="{{ i.getDummyImage({ width: variables.image_width, height: variables.image_height }) }}" alt="" />
+                </picture>
+            </div>
+        {% else %}
+
+            <style>
+                #slider{{ plugin.getId }} .carousel-item .image {
+                    padding-top: {{ plugin.getAspectRatio(variables.image_width, variables.image_height) }}%;
+                }
+            </style>
+
+            <div id="slider{{ plugin.getId }}" class="carousel files-count-{{ images.getCount() }} {% if variables.crossfade %}carousel-fade{% endif %} slide" data-ride="carousel">
+                <div class="carousel-inner">
+
+                    {% for file in images %}
+                        <div class="carousel-item {% if loop.index == 1 %}active{% endif %}">
+                            <div class="image catch-lazy-background" data-backgroundclass="slide-background-{{ file.getId() }}" data-copyright="{{ file.getCopyright() }}" style="background-position: center; background-size: cover; width: 100%;">
+                            </div>
+                        </div>
+                    {% endfor %}
+
+                </div>
+
+                {% if not variables.noArrowNavigation and images | length > 1 %}
+                    <a class="carousel-control-prev _skipsearch" data-norewrite="1" href="#slider{{ plugin.getId }}" role="button" data-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                    <a class="carousel-control-next _skipsearch" data-norewrite="1" href="#slider{{ plugin.getId }}" role="button" data-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                {% endif %}
+
+            </div>
+        {% endif %}
+
+
+    {% if not variables.noGrid %}
+            </div>
+        </div>
+        {% if variables.withContainer %}</div>{% endif %}
+    {% endif %}
+
+</div>

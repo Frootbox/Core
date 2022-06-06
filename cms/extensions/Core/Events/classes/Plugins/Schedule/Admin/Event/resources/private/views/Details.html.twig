@@ -1,0 +1,221 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+{% set i = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\Delegator', { object: controller }) %}
+
+<h2>
+    Veranstaltung bearbeiten
+
+    <span class="headoptions">
+        <a data-toggle="tooltip" data-modal data-title="gleiche Veranstaltung erstellen" href="{{ plugin.getAdminUri('Event', 'ajaxModalCompose', { cloneFrom: event.getId() }) }}"><i class="fa fa-plus-circle"></i></a>
+        <a data-toggle="tooltip" ata-title="Veranstaltung bearbeiten" target="edit-event-{{ event.getId() }}" href="{{ event.getUriEdit() }}"><i class="fa fa-pencil"></i></a>
+
+        <!--
+        <span class="dropdown">
+            <i class="far fa-bars dropdown-toggle" data-toggle="dropdown"></i>
+
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <a class="dropdown-item" href="{{ v.getUri('Page', 'sort') }}">Seiten sortieren</a>
+                <a class="dropdown-item" href="{{ v.getUri('Sitemap', 'print') }}">druckbare Checkliste</a>
+            </div>
+        </span>
+        -->
+    </span>
+</h2>
+
+<p><a class="ajax" href="{{ plugin.getAdminUri('Archive', 'index') }}"><i class="fa fa-chevron-circle-left"></i> zurück</a></p>
+
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+    <li class="nav-item">
+        <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Details</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="booking-tab" data-toggle="tab" href="#booking" role="tab" aria-controls="layout" aria-selected="false">Buchbarkeit</a>
+    </li>
+
+    {% if categories.getCount() > 0 %}
+        <li class="nav-item">
+            <a class="nav-link" id="categories-tab" data-toggle="tab" href="#categories" role="tab" aria-controls="layout" aria-selected="false">Kategorien</a>
+        </li>
+    {% endif %}
+</ul>
+
+<div class="tab-content" id="myTabContent">
+    <div class="tab-pane show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+
+
+
+        <div class="card">
+            <div class="card-body">
+
+                <form method="post" class="ajax" action="{{ plugin.getAdminUri('Event', 'ajaxUpdate', { eventId : event.getId() }) }}">
+
+                    {% if not configuration.get('i18n.multiAliasMode') %}
+                        <div class="form-group">
+                            <label for="title">Titel</label>
+                            <input type="text" class="form-control" id="title" name="title" placeholder="Titel" value="{{ event.getTitle() }}">
+                        </div>
+                    {% else %}
+                        {% for language in configuration.get('i18n.languages') %}
+
+                            <div class="form-group">
+                                <label for="title_{{ loop.index }}">Titel ({{ language }}){% if settings.default_language == language %}*{% endif %}</label>
+                                <input type="text" {% if settings.default_language == language %}required{% endif %} class="form-control" id="title_{{ loop.index }}" name="titles[{{ language }}]" placeholder="Titel ({{ language }})" value="{{ event.getTitleWithoutFallback(language) }}">
+                            </div>
+
+                        {% endfor %}
+                    {% endif %}
+
+                    {{ v.injectPartial('\\Frootbox\\Admin\\View\\Partials\\Input\\Daterange', {
+                        startDate : event.getDateStart().format('%d.%m.%y %H:%M'),
+                        endDate : event.getDateEnd().format('%d.%m.%y %H:%M')
+                    }) | raw }}
+
+                    <div class="row">
+                        <div class="col-md-6">
+
+                            {% if v.isExtensionInstalled('Core', 'Addresses') %}
+                                <div class="form-group">
+                                    <label for="venueId">Veranstaltungsort</label>
+                                    <select class="form-control" id="venueId" name="venueId">
+                                        <option value="">bitte wählen ...</option>
+
+                                        {% for venue in i.getAddresses() %}
+                                            <option {% if event.getParentId == venue.getId %}selected{% endif %} value="{{ venue.getId }}">{{ venue.getTitle }}</option>
+                                        {% endfor %}
+
+                                    </select>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+
+                            <div class="form-group form-check">
+                                <input {% if event.getConfig('onlineOnly') %}checked{% endif %} type="checkbox" class="form-check-input" id="onlineOnly" name="onlineOnly">
+                                <label class="form-check-label" for="onlineOnly">Veranstaltung ist nur online</label>
+                            </div>
+                            <div class="form-group">
+                                <label for="onlineStream">Stream-URL</label>
+                                <input type="text" class="form-control" id="onlineStream" name="onlineStream" placeholder="Stream-URL" value="{{ event.getConfig('onlineStream') }}">
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                    {{ v.injectPartial('\\Frootbox\\Admin\\View\\Partials\\Input\\Tags', {
+                        object: event
+                    }) | raw }}
+
+                    <div class="form-group">
+                        <label for="link">direkte Verlinkung</label>
+                        <input type="text" class="form-control" id="link" name="link" placeholder="URL" value="{{ event.getLink() }}" aria-describedby="linkHelp">
+                        <small id="linkHelp" class="form-text text-muted">Beim Setzen einer direkten Verlinkung hat die Veranstaltung keine Detailseite und ist direkt mit der URL verlinkt.</small>
+                    </div>
+                    <div class="form-group form-check">
+                        <input {% if event.getConfig('noIndividualDetailPage') %}checked{% endif %} type="checkbox" class="form-check-input" id="noIndividualDetailPage" name="noIndividualDetailPage">
+                        <label class="form-check-label" for="noIndividualDetailPage">keine Verlinkung oder Detailseite an diesem Event</label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Speichern</button>
+
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+    <div class="tab-pane show" id="booking" role="tabpanel" aria-labelledby="booking-tab">
+
+        <div class="card">
+            <div class="card-body">
+
+                <form method="post" class="ajax" action="{{ plugin.getAdminUri('Event', 'ajaxUpdateBookable', { eventId: event.getId() }) }}">
+
+                    <div class="row">
+                        <div class="col-6">
+
+                            <div class="form-group">
+                                <label for="seats">Plätze max.</label>
+                                <input type="number" class="form-control" id="seats" name="bookable[seats]" placeholder="Plätze" value="{{ event.getConfig('bookable.seats') }}">
+                            </div>
+
+                        </div>
+                        <div class="col-6">
+
+                            <div class="form-group">
+                                <label for="price">Preis</label>
+                                <input type="number" step="0.01" class="form-control" id="price" name="bookable[price]" placeholder="Preis" value="{{ event.getConfig('bookable.price') }}">
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Speichern</button>
+
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+    <div class="tab-pane show" id="categories" role="tabpanel" aria-labelledby="categories-tab">
+
+        <script>
+            $(function ( ) {
+
+                $('input.category-switcher').on('change', function ( ) {
+
+                    $.ajax({
+                        url: "{{ plugin.getAdminUri('Event', 'ajaxCategorySet', { eventId: event.getId() }) | raw }}",
+                        data : {
+                            state: ($(this).is(':checked') ? 1 : 0),
+                            categoryId: $(this).attr('data-category')
+                        },
+                        success: function ( event ) {
+
+                            toastr.success('Die Änderungen wurden gespeichert.');
+                        }
+                    });
+                });
+            });
+        </script>
+
+        <table class="table">
+            <tbody>
+
+                {% for category in categories %}
+                    <tr>
+                        <td class="level-{{ category.getLevel() }}">
+                            <label>
+                                <input class="category-switcher" type="checkbox" {% if category.hasItem(event) %}checked{% endif %} data-category="{{ category.getId() }}" />&nbsp;&nbsp;{{ category.getTitle() }}
+                            </label>
+                        </td>
+                    </tr>
+                {% endfor %}
+
+            </tbody>
+        </table>
+
+
+    </div>
+</div>
+
+{% if bookings.getCount > 0 %}
+
+    <h2>Buchungen</h2>
+
+    <table class="table">
+        <tbody>
+
+            {% for booking in bookings %}
+                <tr class="ajax" data-href="{{ plugin.getAdminUri('Event', 'booking', { bookingId: booking.getId() }) }}">
+                    <td>#{{ booking.getId() }}</td>
+                    <td>{{ booking.getDate() | date('d.m.Y H:i') }} Uhr</td>
+                    <td><i class="fa fa-user"></i> {{ booking.getConfig('persons') }}</td>
+                    <td>{{ booking.getConfig('owner.email') }}</td>
+                </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+
+{% endif %}

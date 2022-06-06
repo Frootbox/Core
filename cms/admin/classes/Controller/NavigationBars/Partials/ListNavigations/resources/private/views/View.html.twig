@@ -1,0 +1,46 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{% if navigations.getCount() == 0 %}
+
+	<div class="message warning">Es wurden noch keine Navigationen erstellt.</div>
+
+{% else %}
+
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Titel</th>
+
+				{% if config.get('i18n.languages') | length > 0 %}
+					<th>Sprache</th>
+				{% endif %}
+			</tr>
+		</thead>
+		<tbody>
+
+			{% for navigation in navigations %}
+				 <tr class="{% if data.highlight == navigation.getId() %}highlighted{% endif %}">
+					 <td>
+						 <a href="{{ v.getUri('NavigationBars', 'details', { navigationId: navigation.getId() } ) }}">{{ navigation.getTitle() }}</a>
+					 </td>
+
+					 {% if config.get('i18n.languages') | length > 0 %}
+					 	<td>
+
+							{% for language in config.get('i18n.languages') %}
+								<a href="{{ v.getUri('NavigationBars', 'details', { navigationId: navigation.getId(), language: language } ) }}">{{ language }}</a>
+							{% endfor %}
+
+						</td>
+					 {% endif %}
+					 {#
+					 <td class="text-right">
+						 <a class="ajax" href="{{ v.getUri('NavigationBars', 'ajaxSwitchVisibility', { assetId: teaser.getId() } ) }}"><i data-asset="{{ teaser.getId() }}" class="fa fa-lightbulb visibility {{ navigation.getVisibilityString() }} icon"></i></a>
+					 </td>
+					 #}
+				 </tr>
+			{% endfor %}
+
+		</tbody>
+	</table>
+{% endif %}

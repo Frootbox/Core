@@ -1,0 +1,25 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ front.addTab('Kreateur', app.getUri('index')) }}
+
+<h2>
+	API-Verwaltung
+</h2>
+
+
+<div class="card">
+	<div class="card-body">
+
+		<form method="post" class="ajax" action="{{ app.getUri('ajaxUpdate') }}">
+
+			<div class="form-group">
+				<label for="token">API-Token</label>
+				<input type="text" class="form-control" id="token" name="token" placeholder="API-Token" value="{{ configuration.get('api.token') }}">
+			</div>
+
+			<button type="submit" class="btn btn-primary">Speichern</button>
+
+		</form>
+
+	</div>
+</div>

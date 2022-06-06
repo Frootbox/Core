@@ -1,0 +1,66 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<script>
+    $(function ( ) {
+
+        {% if not data.skipAutoOpen %}
+
+            var da = window.location.href.split('#plugin:');
+
+            if (da[1]) {
+
+                var components = da[1].split(':');
+
+                var path = "{{ v.getUri('Plugin', 'ajaxPanelAction') }}?pageId=" + components[0] + "&pluginId=" + components[1] + "&controller=" + components[2] + "&action=" + components[3] + "";
+
+                $('body').append('<a class="ajax" id="tmpLink" href="' + path + '">xxx</a>');
+                $('#tmpLink').trigger('click');
+                $('#tmpLink').remove();
+
+                // Mark sitemap entry active
+                $('table.sitemap tr[data-page="' + components[0] + '"]').addClass('active');
+            }
+        {% endif %}
+    });
+</script>
+
+<style>
+    table.sitemap tr td.Visibility-Hidden a, table.sitemap tr td.Visibility-Moderated a {
+        color: #CCC;
+    }
+</style>
+
+<table class="table table-hover sitemap">
+    <tbody>
+
+    {% for page in tree %}
+        <tr data-page="{{ page.getId() }}" class="ajax {% if data.highlight == page.getId() %}table-info{% endif %} {% if data.active == page.getId() %}active{% endif %}" data-href="{{ v.getUri('Page', 'ajaxPanelContent', { pageId: page.getId() }) }}">
+            <td class="level-{{ page.getLevel() }} Visibility-{{ page.getVisibility }}">
+                <a class="ajax" href="{{ v.getUri('Page', 'ajaxPanelContent', { pageId: page.getId() }) }}" title="ID: {{ page.getId() }}">
+                    {% if page.getVisibility == "Hidden" %}<i class="fa fa-eye-slash"></i>{% endif %}
+                    {% if page.getVisibility == "Moderated" %}<i class="fa fa-lock"></i>{% endif %}
+                    {{ page.getTitle() }}
+                </a>
+            </td>
+            <td class="text-right">
+
+                <div class="dropdown">
+                    <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fa fa-bars"></i>
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <a data-title="neue Unterseite erstellen" class="dropdown-item" data-modal href="{{ v.getUri('Page', 'ajaxModalCompose', { 'pageId' : page.getId() }) }}"><i class="fa fa-plus fa-fw"></i> neue Unterseite erstellen</a>
+                        <a data-preservestate class="dropdown-item ajax" href="{{ v.getUri('Page', 'ajaxPanelConfig', { 'pageId' : page.getId() }) }}"><i class="fa fa-cog fa-fw"></i> Einstellungen</a>
+                        <a class="dropdown-item ajax" href="{{ v.getUri('Page', 'ajaxPanelDelete', { 'pageId' : page.getId() } ) }}"><i class="fa fa-times fa-fw"></i> Seite löschen</a></a>
+                        <div class="dropdown-divider"></div>
+                        <a target="view" class="dropdown-item" href="{{ page.getUri({ absolute: true }) }}"><i class="fa fa-external-link fa-fw"></i> Seite besuchen</a>
+                        <a target="edit" class="dropdown-item" href="{{ page.getUriEdit }}"><i class="fa fa-pencil fa-fw"></i> Seite bearbeiten</a>
+                    </div>
+                </div>
+
+            </td>
+        </tr>
+    {% endfor %}
+
+    </tbody>
+</table>

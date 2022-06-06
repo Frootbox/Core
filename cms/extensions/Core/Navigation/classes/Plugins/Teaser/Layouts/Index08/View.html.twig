@@ -1,0 +1,120 @@
+{# config
+
+title: Carousel
+variables:
+    image_width:
+        default: 1400
+        type: int
+    image_height:
+        default: 300
+        type: int
+    image_ratio:
+        default:
+        type: float
+        label: Bilder-Seitenverhältnis (Höhe/Breite)
+    noGrid:
+        type: bool
+        default: false
+        label: kein Grid
+    noTeaserText:
+        type: bool
+        default: false
+        label: keine Teaser Texte
+    noNavArrows:
+        type: bool
+        default: false
+        label: keine vor/zurück Pfeile
+    cloak:
+        type: bool
+        default: false
+        label: andere Plugins verdrängen
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+{% set teasers = i.getTeasers() %}
+
+{% if variables.cloak %}
+    <param name="cloak" value="true" />
+{% endif %}
+
+{% if not variables.noGrid %}
+    <div class="row">
+        <div class="col-12 plugin Core Navigation Teaser Index08">
+{% else %}
+    <div class="plugin Core Navigation Teaser Index08">
+{% endif %}
+
+{% if not variables.image_ratio %}
+    {% set variables = variables|merge({'image_ratio': variables.image_height / variables.image_width }) %}
+{% endif %}
+
+    <div id="carousel{{ plugin.getId() }}" class="carousel slide carousel-fade" {% if not editing %}data-ride="carousel"{% endif %}>
+
+        {% if teasers.getCount() > 1 %}
+            <ol class="carousel-indicators">
+                {% for teaser in teasers %}
+                <li data-target="#carousel{{ plugin.getId() }}" data-slide-to="{{ loop.index0 }}" class="{% if loop.index == 1 %}active{% endif %}"></li>
+                {% endfor %}
+            </ol>
+        {% endif %}
+
+        <div class="carousel-inner">
+
+
+            {% for teaser in teasers %}
+                <div class="carousel-item {% if loop.index == 1 %}active{% endif %}">
+                    <div {% if not teaser.getConfig('linkageDeactivated') and teaser.getUri() != "#" %}data-href="{{ teaser.getUri() }}"{% endif %} data-type="Images/Background" data-width="{{ variables.image_width }}" data-uid="{{ teaser.getUid('background') }}" data-default="{{ i.getDummyImage({ width: variables.image_width, height: variables.image_height }) }}">
+                        <div class="ext-wrapper"></div>
+                        <div class="outer-wrapper" style="padding-top: {{ ((variables.image_ratio * 100) | round ) }}%;">
+                            <div class="inner-wrapper">
+                                <div class="container h-100">
+                                    <div class="row h-100 align-items-center justify-content-center">
+
+                                        {% if not variables.noTeaserText %}
+                                            <div class="col-12">
+                                                <div class="text-wrapper">
+                                                    <div class="subtext" data-editable data-nowidgets data-uid="{{ teaser.getUid('teaser-subtext') }}"></div>
+                                                    <h3 data-editable data-uid="{{ teaser.getUid('title') }}">{{ teaser.getTitle }}</h3>
+                                                    <div data-nowidgets data-editable data-uid="{{ teaser.getUid('teaser-text') }}"></div>
+
+                                                    {% if not teaser.isLinkDeactivated() %}
+                                                        <p class="read-more-container"><a class="read-more" data-editable-element data-uid="{{ teaser.getUid('link-button') }}" href="{{ teaser.getUri() }}">mehr lesen</a></p>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        {% endif %}
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+
+        </div>
+
+
+
+        {% if not variables.noNavArrows and teasers.getCount() > 1 %}
+            <a class="carousel-control-prev" data-norewrite="true" href="#carousel{{ plugin.getId() }}" role="button" data-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="sr-only">Previous</span>
+            </a>
+            <a class="carousel-control-next" data-norewrite="true" href="#carousel{{ plugin.getId() }}" role="button" data-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="sr-only">Next</span>
+            </a>
+        {% endif %}
+
+    </div>
+
+
+{% if not variables.noGrid %}
+        </div>
+    </div>
+{% else %}
+    </div>
+{% endif %}

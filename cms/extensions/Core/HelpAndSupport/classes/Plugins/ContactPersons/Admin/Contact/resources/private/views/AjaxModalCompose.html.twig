@@ -1,0 +1,94 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    'frame' : false,
+}) }}
+
+<script>
+    $(function ( ) {
+
+        $('#firstName').on('paste', function ( event ) {
+
+            if ($(this).val().length > 0) {
+                return;
+            }
+
+            var pastedData = event.originalEvent.clipboardData.getData('text');
+
+            var match = pastedData.match(/^(.*?) (.*?)\s*$/);
+
+            if (match) {
+
+                $('#firstName').val(match[1]);
+                $('#lastName').val(match[2]);
+
+                event.preventDefault(); 
+
+                $('#submitForm').focus();
+            }
+        });
+
+        /**
+         *
+         */
+        $('a.generate-random-name').click(function ( event ) {
+
+            event.preventDefault();
+
+
+            $.ajax({
+                url: 'https://randomuser.me/api/',
+                dataType: 'json',
+                success: function(data) {
+
+                    var randomUser = data.results[0];
+
+                    $('#firstName').val(randomUser.name.first);
+                    $('#lastName').val(randomUser.name.last);
+                }
+            });
+        });
+    });
+</script>
+
+<form method="post" class="ajax" action="{{ plugin.getAdminUri('Contact', 'ajaxCreate', { categoryId: get.get('categoryId') }) }}">
+
+    <div class="modal-body">
+
+        <div class="row">
+            <div class="col-6">
+
+                <div class="form-group">
+                    <label for="firstName">Vorname</label>
+
+
+                    <div class="input-group mb-2">
+                        <input type="text" class="form-control" name="firstName" id="firstName" placeholder="Vorname">
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <a href="{{ plugin.getAdminUri('Contact', 'ajaxGenerateRandomName') }}" class="generate-random-name" data-toggle="tooltip" title="sdfsdfsdf">
+                                    <i class="fa fa-random"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+            <div class="col-6">
+
+                <div class="form-group">
+                    <label for="lastName">Nachname</label>
+                    <input type="text" class="form-control" name="lastName" id="lastName" placeholder="Nachname">
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" id="submitForm" class="btn btn-primary">Ansprechpartner erstellen</button>
+    </div>
+
+</form>

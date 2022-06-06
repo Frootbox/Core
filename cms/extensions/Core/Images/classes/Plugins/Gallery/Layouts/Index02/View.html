@@ -1,0 +1,51 @@
+{# config
+
+title: Standard
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+<script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+
+<div class="row">
+    <div class="col-12 plugin Core Images Gallery Index02">
+
+        {% if plugin.isFirst %}
+            <h1 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h1>
+        {% else %}
+            <h2 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+        {% endif %}
+
+        <div data-editable data-uid="{{ plugin.getUid('teaser') }}"></div>
+
+        {% for category in i.getTopCategories %}
+
+            <div class="category">
+
+                <h3 data-editable data-uid="{{ category.getUid('title') }}">{{ category.getTitle() }}</h3>
+
+                <div data-editable data-uid="{{ category.getUid('text') }}"></div>
+
+                <div class="row">
+
+                    {% set categoryAdapter = view.getViewhelper('Delegator', { object: category }) %}
+
+                    {% for file in categoryAdapter.getImages() %}
+                        <div class="col-3">
+                            <a href="{{ file.getUriThumbnail() }}" data-fancybox="gallery">
+                                <picture class="fluid">
+                                    <img src="{{ file.getUriThumbnail({ width: 600, height: 400 }) }}" alt="" />
+                                </picture>
+                            </a>
+                        </div>
+                    {% endfor %}
+
+                </div>
+            </div>
+
+        {% endfor %}
+
+    </div>
+</div>

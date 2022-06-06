@@ -1,0 +1,59 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+{% set i = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\Delegator', { object: controller }) %}
+
+<h2>
+    Konfiguration
+    {#
+    <span class="headoptions">
+		<a data-toggle="tooltip" data-modal data-title="neue Ansprechperson hinzufügen" href="{{ plugin.getAdminUri('Contact', 'ajaxModalCompose') }}"><i class="fa fa-plus-circle"></i></a>
+	</span>
+    #}
+</h2>
+
+<p><a class="ajax" href="{{ plugin.getAdminUri('Index', 'index') }}"><i class="fa fa-chevron-circle-left"></i> zurück</a></p>
+
+
+<div class="row">
+    <div class="col">
+
+        <div class="card">
+            <div class="card-body">
+
+                <form method="post" class="ajax" action="{{ plugin.getAdminUri('Configuration', 'ajaxUpdate') }}">
+
+                    <div class="form-group form-check">
+                        <input {% if plugin.getConfig('noEventsDetailPage') %}checked{% endif %} type="checkbox" class="form-check-input" id="noEventsDetailPage" name="noEventsDetailPage">
+                        <label class="form-check-label" for="noEventsDetailPage">keine Detailseite für Veranstaltungen</label>
+                    </div>
+
+                    {% if v.isExtensionInstalled('Core', 'ContactForms') %}
+                        <div class="form-group">
+                            <label for="formId">Anfrageformular</label>
+                            <select class="form-control" id="formId" name="formId">
+                                <option value="">kein Anfrageformular</option>
+                                {% for form in i.getForms() %}
+                                    <option {% if plugin.getConfig('formId') == form.getId %}selected{% endif %} value="{{ form.getId }}">{{ form.getTitle() }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    {% endif %}
+
+                    <div class="form-group">
+                        <label for="bookingPluginId">Buchungs-Plugin</label>
+                        <select class="form-control" id="bookingPluginId" name="bookingPluginId">
+                            <option value="">keine Direkt-Buchung</option>
+                            {% for xplugin in bookingPlugins %}
+                                <option {% if plugin.getConfig('bookingPluginId') == xplugin.getId %}selected{% endif %} value="{{ xplugin.getId }}">{{ xplugin.getPage().getTitle() }} / {{ xplugin.getTitle() }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Speichern</button>
+
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+</div>

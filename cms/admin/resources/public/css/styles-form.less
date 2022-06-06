@@ -1,0 +1,36 @@
+@import "global.less";
+
+.btn-primary {
+  background: @colorSpot2;
+  border-color: @colorSpot2;
+
+  &:hover {
+    background: darken(@colorSpot2, 10%);
+    border-color: darken(@colorSpot2, 10%);
+  }
+}
+
+.btn-danger {
+  background: @colorSpot1;
+  border-color: @colorSpot1;
+
+  color: #FFF;
+
+  &:hover {
+    background: darken(@colorSpot1, 10%);
+    border-color: darken(@colorSpot1, 10%);
+  }
+}
+
+.form-group {
+
+  &.form-check {
+
+    padding-left: 20px;
+
+    .form-check-input {
+      margin-top: 2px;
+      margin-left: -20px;
+    }
+  }
+}

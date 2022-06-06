@@ -1,0 +1,89 @@
+.Core.Forms.Field.File {
+
+  margin: 0 0 20px 0;
+
+  .droppable {
+    border: 3px dashed #CCC;
+    margin: 0 0 5px 0;
+    padding: 20px;
+
+    text-align: center;
+    color: #CCC;
+    font-weight: bold;
+
+    p {
+      margin: 0;
+      padding: 0;
+    }
+  }
+
+  .annotation {
+    font-size: 14px;
+    color: #CCC;
+  }
+
+  .dz-drag-hover {
+
+    .droppable {
+      border-color: orange;
+      background: orange;
+
+      color: #FFF;
+    }
+  }
+
+  .dz-preview {
+    min-height: 120px;
+    margin-bottom: 30px;
+
+    background: #F0F0F0;
+
+    &.dz-success {
+      background: #8ec200;
+      color: #FFF;
+
+      .dz-progress {
+        .dz-upload {
+          background: #FFF;
+        }
+      }
+    }
+
+    &.dz-error {
+      background: red;
+    }
+
+    .dz-image {
+      float: left;
+      width: 120px;
+      margin: 0;
+    }
+
+    .dz-progress {
+      margin: 0 0 0 120px;
+      padding: 0 15px;
+
+      .dz-upload {
+        display: block;
+        height: 10px;
+
+        background: #2c68ff;
+        border-radius: 3px;
+      }
+    }
+
+    .dz-error-message {
+      margin: 0 0 0 120px;
+      padding: 0 15px;
+    }
+
+    .dz-details {
+      margin: 0 0 0 120px;
+      padding: 15px;
+    }
+
+    .dz-success-mark, .dz-error-mark {
+      display: none;
+    }
+  }
+}

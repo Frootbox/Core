@@ -1,0 +1,71 @@
+{# config
+
+title: Carousel volle Höhe
+variables:
+    textColumns:
+        label: Breite Text
+        default: 6
+        type: int
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set teasers = i.getTeasers() %}
+
+
+{% if teasers | length %}
+    <div class="plugin Core Navigation Teaser Index11">
+
+        <div id="carouselExampleIndicators" class="carousel carousel-fade slide" data-ride="carousel">
+
+            {% if pages > 1 %}
+                <ol class="carousel-indicators">
+                    {% for i in 1..pages %}
+                        <li data-target="#carouselExampleIndicators" data-slide-to="{{ loop.index0 }}" class="{% if loop.index == 1 %}active{% endif %}"></li>
+                    {% endfor %}
+                </ol>
+            {% endif %}
+
+            <div class="carousel-inner">
+
+                {% for teaser in teasers %}
+
+                    <div class="carousel-item {% if loop.index == 1 %}active{% endif %}">
+
+                        <div class="teaser" {% if not teaser.getConfig('linkageDeactivated') and teaser.getUri() != "#" %}data-href="{{ teaser.getUri() }}"{% endif %} data-type="Images/Background" data-width="1600" data-height="900" data-uid="{{ teaser.getUid('background') }}">
+                            <div class="inner-wrapper h-100">
+
+                                <div class="container h-100">
+                                    <div class="row h-100 align-items-end align-items-md-center">
+                                        <div class="col-md-{{ variables.textColumns }}">
+
+                                            <h3 data-editable data-uid="{{ teaser.getUid('title') }}">{{ teaser.title }}</h3>
+
+                                            <div data-editable data-nowidgets data-uid="{{ teaser.getUid('teaser') }}"></div>
+
+
+                                            {% if not teaser.isLinkDeactivated() %}
+                                                <p class="read-more">
+                                                    <a class="read-more" data-editable-element data-uid="{{ teaser.getUid('link-text') }}" class="pill" href="{{ teaser.getUri() }}">mehr erfahren</a>
+                                                </p>
+                                            {%  endif %}
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+
+
+
+    </div>
+{% endif %}

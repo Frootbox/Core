@@ -1,0 +1,103 @@
+{# config
+
+title: Standard
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set p = view.getViewhelper('Partials', { plugin: plugin }) %}
+
+<div class="row">
+    <div class="col-12 plugin Core ShopSystem ShopSystem Index02">
+
+        {% if plugin.isFirst %}
+            <h1 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h1>
+        {% else %}
+            <h2 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+        {% endif %}
+
+        <div class="row">
+            <div class="col-md-4">
+
+                <script>
+                    $(function ( ) {
+
+                        /**
+                         *
+                         */
+                        $('a.toggle-categories').click(function ( event ) {
+
+                            event.preventDefault();
+
+                            $('.show-categories').toggleClass('d-none');
+
+                        });
+
+                    });
+                </script>
+
+                <p class="d-md-none"><a class="toggle-categories btn btn-block btn-primary" href="#">Kategorien einblenden</a></p>
+
+                <div class="show-categories d-none d-md-block">
+
+                    <h3>Kategorien</h3>
+
+                    <ul class="categories">
+                        {% for category in i.getTopCategories() %}
+                            {% set categoryDelegator = view.getViewhelper('Delegator', { object: category }) %}
+
+                            <li>
+                                <a href="{{ category.getUri() }}">{{ category.getTitle() }}</a>
+
+                                {% set children = categoryDelegator.getChildrenVisible() %}
+
+                                {% if children.getCount() > 0 %}
+                                    <ul>
+
+                                        {% for child in children %}
+                                            <li><a href="{{ child.getUri() }}">{{ child.getTitle() }}</a></li>
+                                        {% endfor %}
+
+                                    </ul>
+                                {% endif %}
+
+                            </li>
+
+                        {% endfor %}
+                    </ul>
+                </div>
+
+            </div>
+            <div class="col-md-8">
+
+                {{ p.renderPartial('\\Frootbox\\Ext\\Core\\ShopSystem\\Plugins\\ShopSystem\\Partials\\Filter') | raw }}
+
+                {% set recommendations = i.getProductsByTags([ 'empfehlung' ]) %}
+
+                {% if recommendations.getCount() > 0 %}
+                    <h3>Unsere Empfehlungen</h3>
+
+                    <div class="row products">
+
+                        {% for product in recommendations %}
+                            <div class="col-6 col-md-3 product">
+                                <a href="{{ product.getUri() }}">
+                                    <picture class="fluid" data-editable data-uid="{{ product.getUid('image')}}">
+                                        <img width="350" height="450" src="{{ i.getDummyImage({ width: 350, height: 450 }) }}" alt="" />
+                                    </picture>
+
+                                    <em>{{ product.getTitle() }}</em>
+                                    <span>{{ product.getPriceGross() | number_format(2, ',', '.') }} EUR</span>
+                                </a>
+                            </div>
+                        {% endfor %}
+
+                    </div>
+                {% endif %}
+
+            </div>
+        </div>
+
+
+    </div>
+</div>

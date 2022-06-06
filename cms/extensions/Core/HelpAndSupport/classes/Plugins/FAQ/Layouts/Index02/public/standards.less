@@ -1,0 +1,53 @@
+$colorSpot2: $colorSpot1 !default;
+
+.plugin.Core.HelpAndSupport.FAQ.Index02 {
+
+  .accordion {
+    margin-top: 50px;
+  }
+
+  .card {
+
+    .card-header {
+
+      h3 {
+
+        cursor: pointer;
+
+        span {
+
+          span.icons {
+            float: right;
+
+            i {
+              color: $colorSpot2;
+            }
+
+            i.down {
+              display: none;
+            }
+
+            i.up {
+              display: inline-block;
+            }
+          }
+
+          &.collapsed {
+
+            span.icons {
+
+              i.down {
+                display: inline-block;
+              }
+
+              i.up {
+                display: none;
+              }
+            }
+          }
+
+        }
+      }
+    }
+  }
+}

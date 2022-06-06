@@ -1,0 +1,18 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<h4>
+    {{ category.getTitle }}
+    <span class="headoptions">
+        <span class="dropdown">
+            <i class="far fa-bars dropdown-toggle" data-toggle="dropdown"></i>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <a class="dropdown-item" data-modal href="{{ plugin.getAdminUri('Import', 'ajaxModalCompose', { categoryId: category.getId() }) }}">Bilder importieren</a>
+            </div>
+        </span>
+    </span>
+</h4>
+
+{{ v.injectPartial('\\Frootbox\\Ext\\Core\\FileManager\\Admin\\Partials\\FileManager', {
+    uid : category.getUid('images'),
+    multiple : true
+}) | raw }}

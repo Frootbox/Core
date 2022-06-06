@@ -1,0 +1,44 @@
+{# config
+
+title: Teaser-Blöcke
+variables:
+    columns:
+        label: Spalten
+        type: list
+        options:
+            2: 2 Spalten
+            3: 3 Spalten
+            4: 4 Spalten
+        default: 4
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+{% set children = i.getPages() %}
+
+{% if variables.columns == 2 %}
+    {% set colClass = 'col-lg-6' %}
+{% elseif variables.columns == 3 %}
+    {% set colClass = 'col-lg-4' %}
+{% else%}
+    {% set colClass = 'col-lg-3' %}
+{% endif %}
+
+<div class="row">
+    <div class="col-12 plugin Core Navigation SubNavigation Index03">
+
+        <div class="row justify-content-md-center">
+
+            {% for child in children %}
+                <div class="col-12 {{ colClass }} teaser">
+                    <a href="{{ child.getUri }}">
+                        {{ child.getTitle }}
+                    </a>
+                </div>
+            {% endfor %}
+
+        </div>
+
+    </div>
+</div>

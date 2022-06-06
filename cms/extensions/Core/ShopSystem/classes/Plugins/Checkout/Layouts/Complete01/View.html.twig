@@ -1,0 +1,165 @@
+{# config
+
+title: Standard
+variables:
+    withContainer:
+        label: mit Container
+        type: bool
+        default: false
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+<script>
+    $(function ( ) {
+        localStorage.setItem('fbxShopCartItemCount', null);
+        $('.fbxShopCartItemCounter').hide();
+    });
+
+    gtag('event', 'purchase', {
+        "transaction_id": "{{ booking.getConfig('orderNumber') }}",
+        "value": {{ booking.getTotal() | number_format(2, ".") }},
+        "currency": "EUR",
+        "tax": {{ booking.getTax() }},
+        "shipping": {{ booking.getShipping() | number_format(2, ".") }},
+        "items": [
+            {% for item in booking.getItems() %}
+
+                {% if not loop.first %},{% endif %}{
+                "id": "{{ item.getItemNumber() | default(item.getProductId()) }}",
+                "name": "{{ item.getTitle() }}",
+                "quantity": {{ item.getAmount() }},
+                "price": '{{ item.priceGross() | number_format(2, ".") }}'
+            }
+            {% endfor %}
+        ]
+    });
+</script>
+
+
+<div class="plugin Core ShopSystem Checkout Complete01">
+
+    {% if variables.withContainer %}<div class="container">{% endif %}
+
+    <div class="row">
+        <div class="col-12">
+
+            <h1 data-editable data-uid="{{ plugin.getUid('titleCompleted') }}">Bestellung abgeschlossen</h1>
+
+            {% if not plugin.getAttribute('mailSent') %}
+                <div style="margin: 20px 0; padding: 15px; border: 1px solid red; color: red;">Die E-Mail bestätigung konnte nicht gesendet werden. Die Bestellung ist trotzdem bei uns eingegangen. Notieren Sie für Rückfragen bitte die Bestell-ID {{ plugin.getAttribute('bookingId') }}.</div>
+            {% endif %}
+
+            <div data-editable data-uid="{{ plugin.getUid('text-complete') }}"><p>Ihre Buchung ist abgeschlossen. Sie haben eine Zusammenfassung der bestellten Artikel per E-Mail erhalten.</p><p>Wir bedanken uns für Ihr Interesse.</p></div>
+
+            <h3 data-editable data-uid="{{ plugin.getUid('titleCompletedBooking') }}">Ihre Bestellung</h3>
+
+            <p class="text-center">Bestellnummer: {{ booking.getConfig('orderNumber') }}</p>
+
+
+            {% if booking.getConfig('shipping.type') %}
+
+                <br />
+
+                <iframe src="https://maps.google.com/maps?q={{ booking.getConfig('personal.street') }} {{ booking.getConfig('personal.streetNumber') }}, {{ booking.getConfig('personal.postalCode') }} {{ booking.getConfig('personal.city') }}&output=embed" width="100%" height="250" frameborder="0" style="border:0;" allowfullscreen="" aria-hidden="false" tabindex="0"></iframe>
+
+                <br /><br />
+
+                <div class="text-center">
+                    <p><b>Lieferadresse</b><p>
+
+                    <p>
+                        {{ booking.getConfig('personal.firstname') }} {{ booking.getConfig('personal.lastname') }}<br />
+                        {{ booking.getConfig('personal.street') }} {{ booking.getConfig('personal.streetNumber') }}, {{ booking.getConfig('personal.postalCode') }} {{ booking.getConfig('personal.city') }}
+                    </p>
+                </div>
+            {% endif %}
+
+            <br />
+
+            <h3>Artikel</h3>
+
+            <br />
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Artikel</th>
+                        <th class="text-right">Menge</th>
+                        <th class="text-right">Preis</th>
+                        <th class="text-right">Summe</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    {% for item in booking.getItems() %}
+                        <tr>
+                            <td>
+                                {{ item.getTitle() }}
+
+                                {% for equipment in item.getEquipment() %}
+                                    <br />+ {{ equipment.title }}
+                                {% endfor %}
+
+                                {% for option in item.getFieldOptions() %}
+                                    <br />- {{ option.option }}{% if option.surcharge %} (+ {{ option.surcharge | number_format(2, ",", ".") }} &euro;){% endif %}
+                                {% endfor %}
+
+                                {% if item.getCustomNote() %}
+                                    <br />{{ item.getCustomNote() | nl2br }}
+                                {% endif %}
+
+                                {% if item.getAdditionalText() %}
+                                    <br />{{ item.getAdditionalText() | nl2br }}
+                                {% endif %}
+                            </td>
+                            <td class="text-right">{{ item.getAmount() }} x</td>
+                            <td class="text-right">{{ item.priceGross() | number_format(2, ",") }} EUR</td>
+                            <td class="text-right">{{ item.getTotal() | number_format(2, ",") }} EUR</td>
+                        </tr>
+                    {% endfor %}
+
+                </tbody>
+                <tfoot>
+                    <tr style="border-top: 3px solid #ccc;">
+                        <td class="text-right" colspan="3">Versand &amp; Bearbeitung</td>
+                        <td width="160" class="text-right">{{ booking.getShipping() | number_format(2, ",") }} EUR</td>
+                    </tr>
+
+                    {% for section in booking.getTaxSections() %}
+                        <tr>
+                            <td class="text-right" colspan="3">inkl. {{ section.taxrate }} % MwSt. auf {{ section.total | number_format(2, ",") }} EUR</td>
+                            <td class="text-right" nowrap>{{ section.tax | number_format(2, ",") }} EUR</td>
+                        </tr>
+                    {% endfor %}
+
+                    {% for couponData in booking.getCoupons() %}
+                        <tr>
+                            <td class="text-right" colspan="3">Coupon {{ couponData.code }}</td>
+                            <td class="text-right" nowrap>-{{ couponData.redeemedValue | number_format(2, ",") }} EUR</td>
+                        </tr>
+                    {% endfor %}
+
+
+                    <tr>
+                        <td class="text-right" colspan="3"><b>Summe</b></td>
+                        <td class="text-right" nowrap><b>{{ booking.getTotal() | number_format(2, ",") }} EUR</b></td>
+                    </tr>
+                </tfoot>
+            </table>
+
+
+
+            {#
+            <pre>
+                {{ dump(booking.getItems()) }}
+            </pre>
+            #}
+
+        </div>
+    </div>
+
+    {% if variables.withContainer %}</div>{% endif %}
+
+</div>

@@ -1,0 +1,19 @@
+{% verbatim %}{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ front.addTab('{% endverbatim %}{{ appTitle }}{% verbatim %}', app.getUri('index')) }}
+
+<h2>
+	{% endverbatim %}{{ appTitle }}{% verbatim %}
+
+	<span class="headoptions">
+		<span class="dropdown">
+			<i class="far fa-bars dropdown-toggle" data-toggle="dropdown"></i>
+
+			<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+				<a class="dropdown-item ajax" href="{{ app.getUri('ajaxAction') }}">Option</a>
+			</div>
+		</span>
+	</span>
+</h2>
+
+{% endverbatim %}

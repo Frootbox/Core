@@ -1,0 +1,33 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ front.addTab('Entwickler-Tools', app.getUri('index')) }}
+{{ front.addTab('Google-Fonts Downloader', app.getUri('index')) }}
+
+<h2>
+	Google-Fonts Downloader
+</h2>
+
+
+<div class="row">
+	<div class="col-6">
+
+		<div class="card">
+			<div class="card-body">
+
+				<form method="post" class="ajax" action="{{ v.getUri('App', 'index', { a: 'ajaxImport', appId: app.getId() }) }}">
+
+					<div class="form-group">
+						<label for="fontData">Example textarea</label>
+						<textarea class="form-control" id="fontData" name="fontData" rows="3"></textarea>
+					</div>
+
+					<button type="submit" class="btn btn-primary">Schriftart importieren</button>
+
+				</form>
+
+			</div>
+		</div>
+
+
+	</div>
+</div>

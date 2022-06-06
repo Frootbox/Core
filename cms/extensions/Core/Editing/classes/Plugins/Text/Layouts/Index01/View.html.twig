@@ -1,0 +1,111 @@
+{# config
+
+title: Standard
+variables:
+    noHeadline:
+        type: bool
+        label: keine Überschrift
+    columns:
+        type: int
+        label: Spalten
+        default: 1
+    width:
+        type: list
+        label: Breite
+        options:
+            1: 1 Spalte
+            2: 2 Spalten
+            3: 3 Spalten
+            4: 4 Spalten
+            5: 5 Spalten
+            6: 6 Spalten
+            7: 7 Spalten
+            8: 8 Spalten
+            9: 9 Spalten
+            10: 10 Spalten
+            11: 11 Spalten
+            12: 12 Spalten
+        default: 12
+    centered:
+        type: bool
+        label: Inhalt zentriert
+        default: false
+    withContainer:
+        type: bool
+        label: mit Layout-Container
+
+/config #}
+
+<div class="plugin Core Editing Text Index01">
+
+    {% if variables.withContainer %}<div class="container">{% endif %}
+
+        <div class="row {% if variables.centered %}justify-content-center{% endif %}">
+            <div class="col-md-{{ variables.width }} {% if variables.centered %}centered{% endif %} {% if variables.noHeadline %}no-headline{% endif %} {{ variables.systemVariables.cssClasses }}">
+
+                <div class="inner-wrapper">
+
+                    {% if not variables.noHeadline %}
+                        <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+                    {% endif %}
+
+                    {% if variables.columns == 3 %}
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div data-editable data-uid="{{ plugin.getUid('text') }}"></div>
+                            </div>
+                            <div class="col-md-4">
+                                <div data-editable data-uid="{{ plugin.getUid('text-2') }}"></div>
+                            </div>
+                            <div class="col-md-4">
+                                <div data-editable data-uid="{{ plugin.getUid('text-3') }}"></div>
+                            </div>
+                        </div>
+                    {% elseif variables.columns == 2 %}
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div data-editable data-uid="{{ plugin.getUid('text') }}"></div>
+                            </div>
+                            <div class="col-md-6">
+                                <div data-editable data-uid="{{ plugin.getUid('text-2') }}"></div>
+                            </div>
+                        </div>
+                    {% elseif variables.columns == 3 %}
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div data-editable data-uid="{{ plugin.getUid('text') }}"></div>
+                            </div>
+                            <div class="col-md-4">
+                                <div data-editable data-uid="{{ plugin.getUid('text-2') }}"></div>
+                            </div>
+                            <div class="col-md-4">
+                                <div data-editable data-uid="{{ plugin.getUid('text-3') }}"></div>
+                            </div>
+                        </div>
+                    {% elseif variables.columns == 4 %}
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div data-editable data-uid="{{ plugin.getUid('text') }}"></div>
+                            </div>
+                            <div class="col-md-3">
+                                <div data-editable data-uid="{{ plugin.getUid('text-2') }}"></div>
+                            </div>
+                            <div class="col-md-3">
+                                <div data-editable data-uid="{{ plugin.getUid('text-3') }}"></div>
+                            </div>
+                            <div class="col-md-3">
+                                <div data-editable data-uid="{{ plugin.getUid('text-4') }}"></div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div data-editable data-uid="{{ plugin.getUid('text') }}"></div>
+                    {% endif %}
+
+                </div>
+
+            </div>
+        </div>
+
+    {% if variables.withContainer %}</div>{% endif %}
+
+</div>

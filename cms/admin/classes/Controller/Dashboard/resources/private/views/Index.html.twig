@@ -1,0 +1,84 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    title: 'Dashboard',
+}) }}
+
+{% if get.get('error') %}
+    <div class="message warning">
+        {{ get.get('error') }}
+    </div>
+{% endif%}
+
+{% if devmode %}
+    <div class="message warning">Dieses System befindet sich im Entwicklungs-Modus.</div>
+{% endif %}
+
+<div class="panels-container">
+
+    <div class="row">
+        {% for panel in panels %}
+            <div class="col-md-4">
+                {{ v.injectPartial('\\Frootbox\\Admin\\Controller\\Dashboard\\Partials\\Panel', { panel: panel } ) | raw }}
+            </div>
+        {% endfor %}
+    </div>
+
+</div>
+
+<p><a data-modal data-title="Panel hinzufügen" href="{{ v.getUri('Dashboard', 'ajaxModalPanelCompose' ) }}"><i class="fa fa-plus-circle"></i> Panel hinzufügen</a></p>
+
+{% if gizmos | length > 0 %}
+
+    <div class="row gizmo-board">
+        <div class="col-4">
+
+            {% set threshold = ((gizmos | length) / 3) | round(0, 'floor') %}
+            {% if threshold == 0 %}
+                {% set threshold = 1 %}
+            {% endif %}
+
+            {% for gizmoHtml in gizmos %}
+
+                {{ gizmoHtml | raw }}
+
+                {% if loop.index % threshold == 0 %}
+                    </div>
+                    <div class="col-4">
+                {% endif %}
+
+            {% endfor %}
+
+        </div>
+    </div>
+
+{% endif %}
+
+
+{% if user.getType == 'SuperAdmin' %}
+    <h2>
+        Daten-Container hinzufügen
+
+        <span class="headoptions">
+            <a data-modal href="{{ v.getUri('Plugin', 'ajaxModalContainerCompose' ) }}" data-title="Daten-Container hinzufügen"><i class="fa fa-plus-circle"></i></a>
+        </span>
+    </h2>
+{% endif %}
+
+{% if containerPlugins | length  %}
+
+    {% set links = [ ] %}
+
+    {% for containerPlugin in containerPlugins %}
+        {% set links = links | merge([
+            {
+                url : v.getUri('Plugin', 'container', { pluginId: containerPlugin.getId() }),
+                icon : containerPlugin.getIcon(),
+                title : containerPlugin.getTitle(),
+                type : 'xx'
+            }
+        ]) %}
+    {% endfor %}
+
+    {{ v.injectPartial('\\Frootbox\\Admin\\View\\Partials\\Navigation\\Buttons', { links:  links }) | raw }}
+{% endif %}

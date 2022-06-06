@@ -1,0 +1,88 @@
+{# config
+
+title: Menü-Karte
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set p = view.getViewhelper('Partials') %}
+
+{% set t = i.getTranslator() %}
+
+{% set events = i.getEvents() %}
+
+{% set bookingPlugin = plugin.getBookingPlugin() %}
+
+<div class="plugin Core Events Schedule Index06">
+
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+
+                {% if plugin.isFirst %}
+                    <h1 class="first" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h1>
+                {% else %}
+                    <h2 class="first" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+                {% endif %}
+
+                <div data-editable data-uid="{{ plugin.getUid('teaser-text') }}"></div>
+
+                <div class="row justify-content-center">
+                    <div class="col-md-8 events">
+
+                        {% for event in events %}
+
+                            <div class="event">
+
+                                <div class="date">
+                                    {% if not event.hasOneDay() %}ab{% endif %}
+
+
+
+                                    {% if event.hasOneDay() %}
+                                        {{ event.getDateStart.format('%d.')}} {{ t.translate(event.getDateStart.format('Month%m')) }},
+                                    {% else %}
+                                        {{ event.getDateStart.format('%d.%m.') }}–{{ event.getDateEnd.format('%d.%m.') }},
+                                    {% endif %}
+
+                                    {{ event.getDateStart.format('%H:%M') }} Uhr
+                                </div>
+
+                                <h4 class="first" data-editable data-uid="{{ event.getUid('title') }}">{{ event.getTitle }}</h4>
+
+                                <div data-editable data-uid="{{ event.getUid('text') }}"></div>
+
+                                {% if event.getPrice() %}
+                                    <div class="price">
+                                        <p class="price-tag">{{ event.getPrice() | number_format(2, ',', '.') }} EUR</p>
+
+                                        <div class="annotation" data-editable data-uid="{{ event.getUid('price-annotation') }}"></div>
+                                    </div>
+                                {% endif %}
+
+
+                                {% if plugin.getConfig('formId') and event.isBookable() %}
+                                    <br />
+                                    <p><a class="btn btn-primary" href="{{ plugin.getActionUri('booking', { eventId: event.getId() }) }}">zur Anfrage</a></p>
+                                {% elseif bookingPlugin and event.isBookable() %}
+                                    <br />
+                                    <p><a class="btn btn-primary" href="{{ bookingPlugin.getActionUri('index', { eventId: event.getId() }) }}">zur Buchung</a></p>
+                                {% endif %}
+
+                            </div>
+
+
+
+
+                        {% endfor %}
+
+
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+</div>

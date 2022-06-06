@@ -1,0 +1,45 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    'frame' : false,
+}) }}
+
+<form method="post" class="ajax" action="{{ v.getUri('Assets/Categories', 'ajaxUpdate', { 'categoryId' : category.getId() }) }}">
+
+    <div class="modal-body">
+
+
+
+        {% if not configuration.get('i18n.multiAliasMode') %}
+            <div class="form-group">
+                <label for="title">Titel</label>
+                <input type="text" class="form-control" name="title" required id="title" placeholder="Titel" value="{{ category.getTitle() }}">
+            </div>
+        {% else %}
+            {% for language in configuration.get('i18n.languages') %}
+
+                <div class="form-group">
+                    <label for="title_{{ loop.index }}">Titel ({{ language }}){% if settings.default_language == language %}*{% endif %}</label>
+                    <input type="text" {% if settings.default_language == language %}required{% endif %} class="form-control" id="title_{{ loop.index }}" name="titles[{{ language }}]" placeholder="Titel ({{ language }})" value="{{ category.getTitleWithoutFallback(language) }}">
+                </div>
+
+            {% endfor %}
+        {% endif %}
+
+
+
+        <div class="form-group">
+            <label for="visibility">Sichtbarkeit</label>
+            <select class="form-control" id="visibility" name="visibility" size="1">
+                <option {% if category.getVisibility() == 0 %}selected{% endif %} value="0">unsichtbar</option>
+                <option {% if category.getVisibility() == 1 %}selected{% endif %} value="1">privat</option>
+                <option {% if category.getVisibility() == 2 %}selected{% endif %} value="2">sichtbar</option>
+            </select>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Speichern</button>
+    </div>
+
+</form>

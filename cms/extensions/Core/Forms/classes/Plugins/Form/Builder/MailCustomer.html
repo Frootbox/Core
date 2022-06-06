@@ -1,0 +1,89 @@
+<html>
+    <head>
+
+        <style>
+            body {
+                font-family: Arial;
+            }
+        </style>
+    </head>
+    <body>
+
+        <table width="100%">
+            <tr>
+                <td align="center">
+
+                    <table width="600">
+                        <tr>
+                            <td>
+
+                                <img src="{{ serverpath }}static/Ext/Core/Images/Email/serve/qs/EXT/{{ baseVendor }}:{{ baseExtension }}:images/f/logo-email.png" alt="" />
+
+                                <br /><br /><br />
+
+                                {% if plugin.getConfig('customSubject') %}
+                                    <p>
+                                        <b>{{ plugin.getConfig('customSubject') }}</b>
+                                    </p>
+                                {% else %}
+                                    <p>
+                                        <b>{{ plugin.getTitle }}</b>
+                                    </p>
+                                {% endif %}
+
+                                {% if plugin.getConfig('textAboveMail') %}
+                                    <p>{{ plugin.getConfig('textAboveMail') | nl2br }}</p>
+                                {% else %}
+                                    <p>
+                                        Sie haben uns folgende Daten gesendet:
+                                    </p>
+                                {% endif %}
+
+                                <table cellpadding="0" cellspacing="0" style="margin: 30px 0;">
+                                    {% for group in formlog.getLogData.formData %}
+                                        <thead>
+                                            <tr>
+                                                <th style="text-align: left; padding-top: 10px; padding-bottom: 10px;" colspan="2">{{ group.title }}</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+
+                                            {% for field in group.fields %}
+                                                <tr>
+                                                    <td style="padding-right: 15px;">{{ field.title }}</td>
+                                                    <td>
+                                                        {% if field.type == 'File' %}
+                                                            {% for file in formlog.getFiles(field) %}
+                                                                {{ file.getName() }}<br />
+                                                            {% endfor %}
+                                                        {% else %}
+                                                            {{ field.valueDisplay | nl2br }}
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+
+                                        </tbody>
+                                    {% endfor %}
+                                </table>
+
+                                <br />
+
+                                {% if plugin.getConfig('textBelowMail') %}
+                                    <p>{{ plugin.getConfig('textBelowMail') | nl2br }}</p>
+                                {% else %}
+                                    <p>Danke für Ihr Interesse, wir bearbeiten Ihre Anfrage in Kürze.</p>
+                                {% endif %}
+
+                            </td>
+                        </tr>
+                    </table>
+
+                </td>
+            </tr>
+        </table>
+
+
+
+    </body>
+</html>

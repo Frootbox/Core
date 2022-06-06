@@ -1,0 +1,43 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<h4>
+    verknüpfte Ansprechpersonen
+    <span class="headoptions">
+		<a data-toggle="tooltip" data-modal data-title="neue Ansprechperson hinzufügen" href="{{ plugin.getAdminUri('Contact', 'ajaxModalCompose', { categoryId: category.getId() }) }}"><i class="fa fa-plus-circle"></i></a>
+	</span>
+</h4>
+
+<div id="contactsCategoryListReceiver">
+
+    {{ v.injectPartial('\\Frootbox\\Ext\\Core\\HelpAndSupport\\Plugins\\ContactPersons\\Admin\\Categories\\Partials\\ContactsList', {
+        'category' : category,
+        'plugin' : plugin
+    }) | raw }}
+
+</div>
+
+<h4>Ansprechperson hinzufügen</h4>
+
+<div class="card">
+    <div class="card-body">
+
+        <form class="ajax" method="post" action="{{ plugin.getAdminUri('Categories', 'ajaxContactAdd', { categoryId : category.getId() }) }}">
+
+            <div class="form-group">
+                <label for="contactId">neue Ansprechperson</label>
+                <select class="form-control" id="contactId" name="contactId">
+                    <option value="">bitte wählen ...</option>
+
+                    {% for contact in contacts %}
+                        <option value="{{ contact.getId() }}">{{ contact.getName() }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Ansprechperson verknüpfen</button>
+
+        </form>
+
+
+    </div>
+</div>

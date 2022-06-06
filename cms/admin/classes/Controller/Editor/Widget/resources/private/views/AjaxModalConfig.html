@@ -1,0 +1,180 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<script>
+
+    var widgetId = {{ widget.getId() }};
+
+    $(function ( ) {
+
+        /**
+         *
+         */
+        $(document).on('submit', '#updateForm', function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            var form = $(this);
+
+            $.ajax({
+                url : $(this).attr('action'),
+                data : $(this).serialize(),
+                type : 'POST',
+                headers: {
+                    Accept: "application/json; charset=utf-8",
+                },
+                success : function ( response ) {
+
+                    $('#fbxEditorGenericModal').modal('hide');
+
+                    $('figure[data-id="' + response.widget.id + '"]').replaceWith(response.widget.html);
+                },
+                error : function ( xhr ) {
+
+                    alert(xhr.responseText);
+                }
+            });
+        });
+
+        $('#widthChanger').change(function( event ) {
+
+            var figure = $('figure[data-id="' + widgetId + '"]');
+
+            // figure.removeClass('widget-left widget-right widget-center widget-justify');
+            figure.removeClass('col-1 col-2 col-3 col-4 col-5 col-6 col-7 col-8 col-9 col-10 col-11 col-12');
+
+            figure.addClass('col-' + $(this).val());
+        });
+
+        $('#widgetClass').change(function( event ) {
+
+            $.ajax({
+                url: "{{ v.getUri('Editor/Widget', 'ajaxGetLayouts') }}",
+                data: {
+                    widgetClass: $(this).val(),
+                    widgetId: widgetId
+                },
+                type: 'GET',
+                headers: {
+                    Accept: "application/json; charset=utf-8",
+                },
+                success: function (response) {
+
+                    $('#layoutId').find('option').remove();
+
+                    $.each(response.templates, function ( index, template ) {
+
+                        console.log(template.active ? 'selected' : 'not');
+
+                        $('#layoutId').append('<option ' + (template.active ? 'selected' : '') + ' value="' + template.templateId + '">' + template.title + '</option>');
+
+                    });
+
+
+                }
+            });
+        });
+
+        $('#widgetClass').trigger('change');
+
+    });
+</script>
+
+<form id="updateForm" action="{{ v.getUri('Editor/Widget', 'ajaxUpdateConfig', { widgetId: widget.getId() }) }}" method="post">
+
+    <div class="modal-header">
+        <h5 class="modal-title">Widget konfigurieren <a style="padding: 0 0 0 10px; font-size: 14px;" href="#" title="Widget #{{ widget.getId() }}"><i class="fa fa-info"></i></a></h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+
+        <div class="form-group">
+            <label for="width">Breite wählen</label>
+            <select id="widthChanger" class="form-control" id="width" name="width">
+                <option value="">bitte wählen ...</option>
+                <option {% if widget.getWidth() == 1 %}selected{% endif %} value="1">1/12</option>
+                <option {% if widget.getWidth() == 2 %}selected{% endif %} value="2">2/12</option>
+                <option {% if widget.getWidth() == 3 %}selected{% endif %} value="3">3/12</option>
+                <option {% if widget.getWidth() == 4 %}selected{% endif %} value="4">4/12</option>
+                <option {% if widget.getWidth() == 5 %}selected{% endif %} value="5">5/12</option>
+                <option {% if widget.getWidth() == 6 %}selected{% endif %} value="6">6/12</option>
+                <option {% if widget.getWidth() == 7 %}selected{% endif %} value="7">7/12</option>
+                <option {% if widget.getWidth() == 8 %}selected{% endif %} value="8">8/12</option>
+                <option {% if widget.getWidth() == 9 %}selected{% endif %} value="9">9/12</option>
+                <option {% if widget.getWidth() == 10 %}selected{% endif %} value="10">10/12</option>
+                <option {% if widget.getWidth() == 11 %}selected{% endif %} value="11">11/12</option>
+                <option {% if widget.getWidth() == 12 %}selected{% endif %} value="12">12/12</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="widgetClass">Widget-Typ wählen</label>
+            <select class="form-control" id="widgetClass" name="widgetClass">
+                <option value="">bitte wählen ...</option>
+
+                {% for extension in extensions %}
+
+                    {% set d = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\Delegator', { object: extension }) %}
+
+                    {% for xwidget in d.getWidgets %}
+                        <option {% if widget.getClassName() == xwidget.className %}selected{% endif %} value="{{ xwidget.className }}">{{ xwidget.title }}</option>
+                    {% endfor %}
+                {% endfor %}
+
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="layoutId">Layout wählen</label>
+            <select class="form-control" id="layoutId" name="layoutId">
+                <option value="">bitte wählen ...</option>
+            </select>
+        </div>
+
+        <label>Abstand</label>
+
+        <div class="form-row">
+            <div class="form-group col-md-3">
+                <label for="marginTop">oben</label>
+                <div class="input-group mb-2">
+                    <input type="number" class="form-control" id="marginTop" name="margin[top]" placeholder="oben" value="{{ widget.getConfig('margin.top') }}">
+                    <div class="input-group-append">
+                        <div class="input-group-text">px</div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group col-md-3">
+                <label for="marginRight">rechts</label>
+                <div class="input-group mb-2">
+                    <input type="number" class="form-control" id="marginRight" name="margin[right]" placeholder="rechts" value="{{ widget.getConfig('margin.right') }}">
+                    <div class="input-group-append">
+                        <div class="input-group-text">px</div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group col-md-3">
+                <label for="marginBottom">unten</label>
+                <div class="input-group mb-2">
+                    <input type="number" class="form-control" id="marginBottom" name="margin[bottom]" placeholder="unten" value="{{ widget.getConfig('margin.bottom') }}">
+                    <div class="input-group-append">
+                        <div class="input-group-text">px</div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group col-md-3">
+                <label for="marginLeft">links</label>
+                <div class="input-group mb-2">
+                    <input type="number" class="form-control" id="marginLeft" name="margin[left]" placeholder="links" value="{{ widget.getConfig('margin.left') }}">
+                    <div class="input-group-append">
+                        <div class="input-group-text">px</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Speichern</button>
+    </div>
+
+</form>

@@ -1,0 +1,94 @@
+<script>
+    $(function ( ) {
+
+
+        /**
+         * Show "picture rollover edit" buttons
+         */
+        $(document).on('mouseover', 'picture[data-editable-rollover][data-uid]', function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            // $('.popover').popover('hide');
+
+            var uid = $(this).attr('data-uid');
+
+            $(this).attr('data-content', '<span class="options edit-mode">Rollover-Bild' +
+                '&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;' +
+                '<a class="picture-rollover-edit" href="#' + uid + '"><i class="far fa-pencil"><\/i><\/a>&nbsp;&nbsp;&nbsp;' +
+                '|&nbsp;&nbsp;&nbsp;' +
+                '<a class="picture-delete" href="#' + uid + '"><i class="far fa-trash"><\/i><\/a>&nbsp;&nbsp;&nbsp;' +
+                '|&nbsp;&nbsp;&nbsp;' +
+                '<a class="popover-dismiss" href="#"><i class="far fa-times"><\/i><\/a>' +
+                '</span>'
+            );
+
+            $(this).popover({
+                placement: 'top',
+                html: true
+            });
+
+            $(this).popover('show');
+        });
+
+        /**
+         *
+         */
+        $(document).on('click', 'a.picture-delete', function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            if (!confirm('Soll dieses Bild wirklich gelöscht werden?')) {
+                return;
+            }
+
+            // Extract uid from href="#uid"
+            var uid = $(this).attr('href').substr(1);
+
+            var img = $('picture[data-uid="' + uid + '"] img');
+
+            $.ajax({
+                url: editorconfig.urls.pictures.delete,
+                data: {
+                    uid: uid
+                },
+                success: function ( response ) {
+
+                    img.attr('src', img.attr('data-default'));
+                }
+            });
+        });
+
+        /**
+         *
+         */
+        $(document).on('click', 'a.picture-rollover-edit', function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            // Extract uid from href="#uid"
+            var uid = $(this).attr('href').substr(1);
+
+            fbxEditorOpenGenericModal();
+
+            $.ajax({
+                url: "{{ settings.serverpath }}cms/admin/Editor/callEditable",
+                data: {
+                    method: 'ajaxModalEdit',
+                    editable: 'Frootbox/Ext/Core/Images/Editables/ImageRollover',
+                    uid: uid
+                },
+                success: function ( html ) {
+
+                    $('#fbxEditorGenericModal .modal-content').html(html);
+
+                }
+            });
+
+        });
+
+    });
+</script>

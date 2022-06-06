@@ -1,0 +1,32 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{% if groups | length == 0 %}
+    <div class="message warning">Dieses Datenblatt hat derzeit noch keine Optionsgruppen.</div>
+{% else %}
+
+    <table class="table" data-sort="{{ plugin.getAdminUri('Datasheets', 'ajaxGroupSort', { datasheetId: data.datasheet.getId() }) }}">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th width="50"></th>
+                <th width="50"></th>
+            </tr>
+        </thead>
+        <tbody>
+
+            {% for group in groups %}
+                <tr id="row-{{ group.getId() }}" data-title="Optionsgruppe bearbeiten" class="ajax {% if group.getId() == data.highlight %}highlighted{% endif %}" data-modal="{{ data.plugin.getAdminUri('Datasheets', 'ajaxModalGroupDetails', { groupId: group.getId() }) }}">
+                    <td>{{ group.getTitle() }}</td>
+                    <td class="handle">
+                        <i class="fa fa-grip-lines"></i>
+                    </td>
+                    <td class="text-right">
+                        <a class="ajax" data-confirm="Soll diese Gruppe wirklich gelöscht werden?" href="{{ data.plugin.getAdminUri('Datasheets', 'ajaxGroupDelete', { groupId: group.getId() }) }}"><i class="fa fa-times"></i></a>
+                    </td>
+                </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+
+{% endif %}

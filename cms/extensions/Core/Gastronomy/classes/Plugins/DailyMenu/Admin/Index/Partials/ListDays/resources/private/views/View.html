@@ -1,0 +1,30 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<div class="row">
+
+	{% for day in days %}
+		<div class="col-2">
+
+			<h4>
+				{{ day.date | date('d.m.') }}
+				<span class="headoptions">
+					<a data-toggle="tooltip" data-modal data-title="neuen Menü-Punkt hinzufügen" href="{{ data.plugin.getAdminUri('Index', 'ajaxModalCompose', { date: day.date }) }}"><i class="fa fa-plus-circle"></i></a>
+				</span>
+			</h4>
+
+			<table class="table">
+				<tbod>
+
+					{% for menuItem in day.items %}
+						<tr data-modal="{{ data.plugin.getAdminUri('Index', 'ajaxModalEdit', { menuItemId: menuItem.getId() }) }}">
+							<td>{{ menuItem.getTitle() }}</td>
+						</tr>
+					{% endfor %}
+
+				</tbod>
+			</table>
+
+		</div>
+	{% endfor %}
+
+</div>

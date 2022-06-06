@@ -1,0 +1,141 @@
+{# config
+
+title: Standard
+variables:
+    showCountry:
+        type: bool
+        label: Land anzeigen
+        default: false
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set t = i.getTranslator() %}
+
+<div class="plugin Core HelpAndSupport Jobs Index05">
+
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+
+                <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+
+                <div data-editable data-uid="{{ plugin.getUid('teaser') }}"></div>
+
+                <div class="row">
+                    <div class="col-md-6">
+
+                        <h2 data-editable data-uid="{{ plugin.getUid('title-1') }}">Überschrift</h2>
+                        <div data-editable data-uid="{{ plugin.getUid('text-1') }}"></div>
+
+                    </div>
+                    <div class="col-md-6">
+
+                        <h2 data-editable data-uid="{{ plugin.getUid('title-2') }}">Überschrift</h2>
+                        <div data-editable data-uid="{{ plugin.getUid('text-2') }}"></div>
+
+                        {% if jobs.getCount() == 0 %}
+                            <p>Es gibt derzeit keine offenen Stellenangebote.</p>
+                        {% else %}
+
+                            {% set locations = plugin.getLocationsAvailable() %}
+
+                            {% if locations | length > 1 %}
+                                <form class="refresh-jobs-form" method="post" action="{{ plugin.getUriAjax('JobsList') }}">
+
+                                    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                                        <a class="navbar-brand" href="#">Filtern</a>
+                                        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                                            <span class="navbar-toggler-icon"></span>
+                                        </button>
+
+                                        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                                            <ul class="navbar-nav mr-auto">
+
+
+
+                                                <li class="nav-item dropdown">
+                                                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-expanded="false">
+                                                        Standort
+                                                    </a>
+                                                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                                        {% for location in locations %}
+                                                            <label class="dropdown-item">
+                                                                <input name="locations[]" value="{{ location.getId() }}" type="checkbox" />
+                                                                {{ location.getTitle() }} ({{ location.getJobsCount() }})
+                                                            </label>
+                                                        {% endfor %}
+                                                    </div>
+                                                </li>
+
+                                            </ul>
+
+                                            <!--
+                                            <form class="form-inline my-2 my-lg-0">
+                                                <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+                                                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                                            </form>
+                                            -->
+
+                                        </div>
+                                    </nav>
+
+                                </form>
+                            {% endif %}
+
+                            <div id="jobsReceiver">
+
+                                <table class="table jobs">
+                                    <thead>
+                                    <tr>
+                                        <th>{{ t.translate('JobOffer') }}</th>
+                                        <th class="d-none d-md-table-cell">{{ t.translate('Start') }}</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+
+                                    {% for job in jobs %}
+                                        <tr data-href>
+                                            <td>
+                                                <a href="{{ job.getUri() }}">
+                                                    {{ job.getTitle(globalLanguage) }}
+                                                    <span class="subtitle">
+                                                        {% if job.getConfig('typeId') %}
+                                                            {{ t.translate('Type' ~ job.getConfig('typeId')) }}
+                                                        {% else %}
+                                                            {{ job.getConfig('type') }}
+                                                        {% endif %}
+
+                                                        in {{ job.getLocation().getCity() }}{% if job.getConfig('type') %}, {{ job.getConfig('type') }}{% endif %}{% if job.getConfig('start') %}, {{ job.getConfig('start') }}{% endif %}
+                                                    </span>
+                                                </a>
+                                            </td>
+                                            <td class="d-none d-md-table-cell" nowrap>
+
+                                                {% if job.getConfig('asSoonAsPossible') %}
+                                                    {{ t.translate('asSoonAsPossible') }}
+                                                {% elseif job.getConfig('start') %}
+                                                    {{ job.getConfig('start') }}
+                                                {% elseif job.getDateStart() %}
+                                                    {{ job.getDateStart() }}
+                                                {% endif %}
+
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% endif %}
+
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+</div>
+

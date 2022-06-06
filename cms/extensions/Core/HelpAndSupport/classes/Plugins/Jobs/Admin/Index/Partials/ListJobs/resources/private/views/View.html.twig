@@ -1,0 +1,39 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{% if jobs.getCount == 0 %}
+	<div class="message warning">Es wurden noch keine Jobangebote erstellt.</div>
+{% else %}
+
+	<table class="table" data-sort="{{ plugin.getAdminUri('Job', 'ajaxSort') }}">
+		<thead>
+			<tr>
+				<th>Jobangebot</th>
+				<th></th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+
+			{% for job in jobs %}
+
+				<tr id="row-{{ job.getId }}" class="{% if data.highlight == job.getId() %}highlighted{% endif %} ajax" data-href="{{ plugin.getAdminUri('Job', 'details', { jobId: job.getId() }) }}">
+					<td>
+						{{ job.getTitle() }}
+
+						{% for tag in job.getTags() %}
+							<span class="badge badge-info">{{ tag.getTag() }}</span>
+						{% endfor %}
+					</td>
+					<td class="handle"><i class="fa fa-grip-lines"></i></td>
+					<td class="text-right">
+						<a class="ajax" href="{{ v.getUri('Assets', 'ajaxSwitchVisibility', { assetId: job.getId() } ) }}"><i data-asset="{{ job.getId() }}" class="fa fa-lightbulb visibility {{ job.getVisibilityString() }} icon"></i></a>
+						<a class="ajax" data-confirm="Soll dieses Jobangebot wirklich gelöscht werden?" href="{{ data.plugin.getAdminUri('Index', 'ajaxDelete', { jobId: job.getId() }) }}"><i class="fa fa-times icon"></i></a>
+					</td>
+				</tr>
+
+			{% endfor %}
+
+		</tbody>
+	</table>
+
+{% endif %}

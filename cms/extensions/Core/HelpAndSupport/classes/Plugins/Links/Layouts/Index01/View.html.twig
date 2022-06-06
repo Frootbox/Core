@@ -1,0 +1,58 @@
+{# config
+
+title: Standard
+variables:
+    withDescription:
+        type: bool
+        label: mit Beschreibungstext
+    withContainer:
+        type: bool
+        label: mit Layout-Container
+    skipHeadline:
+        type: bool
+        label: ohne Überschrift
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+{% if variables.withContainer %}<div class="container">{% endif %}
+
+<div class="row">
+    <div class="col-12 plugin Core HelpAndSupport Links Index01">
+
+        <div class="inner-wrapper">
+
+            {% if not variables.skipHeadline %}
+                <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+            {% endif %}
+
+            <div data-editable data-uid="{{ plugin.getUid('teaser') }}"></div>
+
+            <table class="table">
+                <tbody>
+
+                    {% for link in i.getLinks() %}
+                        <tr>
+                            <td nowrap>
+                                <a target="_blank" href="{{ link.getConfig('url') }}">{{ link.getTitle }}</a>
+                            </td>
+
+                            {% if variables.withDescription %}
+                                <td>
+                                    <div data-editable data-uid="{{ link.getUid('text')}}"></div>
+                                </td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+
+                </tbody>
+            </table>
+
+            <div data-editable data-uid="{{ plugin.getUid('text-below') }}"></div>
+        </div>
+
+    </div>
+</div>
+
+{% if variables.withContainer %}</div>{% endif %}

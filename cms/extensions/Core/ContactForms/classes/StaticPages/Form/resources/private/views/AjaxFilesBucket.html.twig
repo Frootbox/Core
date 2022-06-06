@@ -1,0 +1,26 @@
+{% set f = view.getViewhelper('Files') %}
+
+{% if files | length > 0 %}
+
+    <script>
+        $(function ( ) {
+
+        });
+    </script>
+
+    <table class="table">
+        <tbody>
+
+        {% for file in files %}
+            <tr data-file="{{ file.getId() }}">
+                <td>{{ file.getName() }}</td>
+                <td class="text-right" nowrap>{{ f.parseFileSize(file.getSize()) }}</td>
+                <td class="text-right">
+                    <a class="drop-uploaded-file" data-field="{{ field.getId() }}" data-file="{{ file.getId() }}" href="{{ settings.serverpath }}static/Ext/Core/ContactForms/Form/ajaxFileRemove?fieldId={{ field.getId() }}&fileId={{ file.getId() }}">X</a>
+                </td>
+            </tr>
+        {% endfor %}
+
+        </tbody>
+    </table>
+{% endif %}

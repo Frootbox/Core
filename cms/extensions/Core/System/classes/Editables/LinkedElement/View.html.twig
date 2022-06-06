@@ -1,0 +1,79 @@
+<script>
+    $(function ( ) {
+        /**
+         * Show "simple eleabbo
+         * ment edit" buttons
+         */
+        $(document).on('mouseover', '[data-editable-link][data-uid]', function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            // $('.popover').popover('hide');
+
+            var uid = $(this).attr('data-uid');
+
+            $(this).attr('data-content', '<span class="options edit-mode">Link' +
+                '&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;' +
+                '<a class="linked-element-edit" href="#' + uid + '"><i class="far fa-pencil"><\/i><\/a>&nbsp;&nbsp;&nbsp;' +
+                '|&nbsp;&nbsp;&nbsp;' +
+                '<a class="popover-dismiss" href="#"><i class="far fa-times"><\/i><\/a>' +
+                ($(this).attr('data-href') ? '&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;<a class="follow-parent-href" href="' + $(this).attr('data-href') + '"><i class="far fa-link"><\/i><\/a>' : '') +
+                '<\/span>'
+            );
+
+            $(this).popover({
+                placement: 'top',
+                html: true
+            });
+
+            $(this).popover('show');
+        });
+
+
+        /**
+         *
+         */
+        $(document).on('click', 'a.linked-element-edit', function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            $('.popover').popover('hide');
+
+            // Extract uid from href="#uid"
+            var uid = $(this).attr('href').substr(1);
+
+            var element = $('[data-uid="' + uid + '"]');
+
+            fbxEditorOpenGenericModal();
+
+            var data = {};
+
+            $.each(element.data(), function (index, value) {
+
+                if (typeof value != 'string') {
+                    return;
+                }
+
+                data[index] = value;
+            });
+
+            $.ajax({
+                url: "{{ settings.serverpath }}cms/admin/Editor/callEditable",
+                data: {
+                    method: 'ajaxModalEdit',
+                    editable: 'Frootbox/Ext/Core/System/Editables/LinkedElement',
+                    uid: uid,
+                    attributes: data
+                },
+                success: function ( html ) {
+
+                    $('#fbxEditorGenericModal .modal-content').html(html);
+                }
+            });
+
+        });
+    });
+
+</script>

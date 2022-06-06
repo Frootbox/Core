@@ -1,0 +1,13 @@
+<div class="{{ data.colClass }} Partial ShopSystem ShopSystem ProductTeaser">
+
+    <a href="{{ data.product.getUri() }}">
+
+        <picture class="fluid" data-editable data-uid="{{ data.product.getUid('image')}}">
+            <img width="{{ variables.imageWidth | default(350) }}" height="{{ variables.imageHeight | default(450) }}" src="{{ data.i.getDummyImage({ width: variables.imageWidth | default(350) , height: variables.imageHeight | default(450) }) }}" alt="" />
+        </picture>
+
+        <em>{{ data.product.getTitle() }}</em>
+        <span>{{ data.product.getPriceGross() | number_format(2, ',', '.') }} EUR</span>
+    </a>
+</div>
+

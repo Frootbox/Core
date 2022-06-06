@@ -1,0 +1,11 @@
+<div class="row main-navigation plugin Core Navigation MainNavigation Index01">
+    <div class="col-12">
+        <nav>
+            {% for npage in pages %}
+                <a class="{% if npage.getIsActive() %}active{% endif %} link-{{ loop.index }}" href="{{ npage.getUri() }}">
+                    <span>{{ npage.getTitle }}</span>
+                </a>
+            {% endfor %}
+        </nav>
+    </div>
+</div>

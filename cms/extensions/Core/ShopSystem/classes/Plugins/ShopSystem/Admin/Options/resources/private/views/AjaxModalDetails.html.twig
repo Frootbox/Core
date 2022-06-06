@@ -1,0 +1,25 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    'frame' : false,
+}) }}
+
+<form method="post" class="ajax" action="{{ plugin.getAdminUri('Options', 'ajaxUpdate', { optionId: option.getId() }) }}">
+
+    <div class="modal-body">
+
+        <div class="form-group">
+            <label for="title">Titel *</label>
+            <input type="text" required class="form-control" name="title" id="title" placeholder="Titel" value="{{ option.getTitle() }}">
+        </div>
+        <div class="form-group">
+            <label for="surcharge">Aufpreis</label>
+            <input type="number" step="0.01" class="form-control" name="surcharge" id="surcharge" placeholder="Aufpreis" value="{{ option.getSurcharge() }}">
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Speichern</button>
+    </div>
+
+</form>

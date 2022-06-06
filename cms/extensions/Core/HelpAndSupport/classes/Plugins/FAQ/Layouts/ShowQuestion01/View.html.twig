@@ -1,0 +1,37 @@
+{# config
+
+title: Standard
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set b = view.getViewhelper('Breadcrumb', { singleton: true }) %}
+
+{{ b.addSection(question.getTitle(), question.getUri()) }}
+
+{{ view.set({ pagedata: { title: question.getTitle() } }) }}
+
+<param name="cloak" value="1" />
+
+<div class="row">
+    <div class="col-12 plugin Core HelpAndSupport FAQ ShowQuestion01">
+
+        {% if plugin.isFirst %}
+            <h1 data-editable data-uid="{{ question.getUid('title') }}">{{ question.getTitle }}</h1>
+        {% else %}
+            <h2 data-editable data-uid="{{ question.getUid('title') }}">{{ question.getTitle }}</h2>
+        {% endif %}
+
+        {% set seeAlso = question.getSeeAlso() %}
+
+        {% if seeAlso | length > 0 %}
+            <p>Siehe auch: {% for xquestion in seeAlso %}{% if loop.index > 1 %}, {% endif %}<a href="{{ xquestion.getUri() }}">{{ xquestion.getTitle() }}</a>{% endfor %}</p>
+        {% endif %}
+
+        <div class="teaser" data-editable data-uid="{{ question.getUid('teaser') }}"></div>
+
+        <div data-blocks data-uid="{{ question.getUid('block-content') }}"></div>
+
+    </div>
+</div>
+

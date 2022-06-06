@@ -1,0 +1,101 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<h2>
+    Referenz Details
+
+    <span class="headoptions">
+        <!--<a data-modal href="{{ v.getUri('Page', 'ajaxModalContentCompose', { 'pageId' : page.getId(), 'socket' : socket.socket } ) }}" data-title="Inhalt hinzufügen"><i class="fa fa-plus-circle"></i></a>-->
+
+        <span class="dropdown">
+            <i class="far fa-bars dropdown-toggle" data-toggle="dropdown"></i>
+
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <a class="dropdown-item ajax" data-confirm="Soll diese Referenz wirklich dupliziert werden?" href="{{ plugin.getAdminUri('Reference', 'ajaxClone', { referenceId: reference.getId() }) }}"><i class="far fa-fw fa-copy"></i>Referenz duplizieren</a>
+                <a class="dropdown-item" title="Referenz verschieben" data-modal href="{{ plugin.getAdminUri('Reference', 'ajaxModalMove', { referenceId: reference.getId() }) }}"><i class="far fa-fw fa-code-branch"></i>Referenz verschieben</a>
+                <a class="dropdown-item" target="edit-reference-{{ reference.getId() }}" href="{{ reference.getUriEdit() }}"><i class="far fa-fw fa-pencil"></i>Referenz bearbeiten</a>
+            </div>
+        </span>
+    </span>
+</h2>
+
+<p><a class="ajax" href="{{ plugin.getAdminUri('Index', 'index') }}"><i class="fa fa-chevron-circle-left"></i> zurück</a></p>
+
+
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+    <li class="nav-item">
+        <a class="nav-link active" id="info-tab" data-toggle="tab" href="#info" role="tab" aria-controls="info" aria-selected="true">Info</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="imageMap-tab" data-toggle="tab" href="#imageMap" role="tab" aria-controls="imageMap">Image-Map</a>
+    </li>
+</ul>
+<div class="tab-content" id="myTabContent">
+    <div class="tab-pane fade show active" id="info" role="tabpanel" aria-labelledby="info-tab">
+
+        <div class="card">
+            <div class="card-body">
+
+                <form method="post" class="ajax" action="{{ plugin.getAdminUri('Reference', 'ajaxUpdate', { referenceId: reference.getId() }) }}">
+
+                    {% if not configuration.get('i18n.multiAliasMode') %}
+                        <div class="form-group">
+                            <label for="title">Titel</label>
+                            <input type="text" class="form-control" id="title" name="title" placeholder="Titel" value="{{ reference.getTitle() }}">
+                        </div>
+                    {% else %}
+                        {% for language in configuration.get('i18n.languages') %}
+
+                            <div class="form-group">
+                                <label for="title_{{ loop.index }}">Titel ({{ language }}){% if settings.default_language == language %}*{% endif %}</label>
+                                <input type="text" {% if settings.default_language == language %}required{% endif %} class="form-control" id="title_{{ loop.index }}" name="titles[{{ language }}]" placeholder="Titel ({{ language }})" value="{{ reference.getTitleWithoutFallback(language) }}">
+                            </div>
+
+                        {% endfor %}
+                    {% endif %}
+
+                    <div class="form-group">
+                        <label for="url">URL</label>
+                        <input type="text" class="form-control" id="url" name="url" placeholder="URL" value="{{ reference.getConfig('url') }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="dateStart">Datum</label>
+                        <input type="date" class="form-control" id="dateStart" name="dateStart" placeholder="Datum" value="{% if reference.getDateStart() %}{{ reference.getDateStart() | date('Y-m-d') }}{% endif %}">
+                    </div>
+
+                    {{ v.injectPartial('\\Frootbox\\Admin\\View\\Partials\\Input\\Tags', {
+                        object: reference
+                    }) | raw }}
+
+                    <button type="submit" class="btn btn-primary">Speichern</button>
+
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+    <div class="tab-pane fade show" id="imageMap" role="tabpanel" aria-labelledby="imageMap-tab">
+
+        <div class="card">
+            <div class="card-body">
+
+                <h4>
+                    Image-Maps
+                    <span class="headoptions">
+				        <a data-toggle="tooltip" data-modal data-title="Image-Map hinzufügen" href="{{ plugin.getAdminUri('ImageMap', 'ajaxModalCompose', { referenceId: reference.getId() }) }}"><i class="fa fa-plus-circle"></i></a>
+                    </span>
+                </h4>
+
+                <div id="imageMapsReceiver">
+                    {{ v.injectPartial('/Frootbox/Ext/Core/Images/Plugins/References/Admin/ImageMap/Partials/ListImageMaps', {
+                        plugin: plugin,
+                        reference: reference
+                    }) | raw }}
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>

@@ -1,0 +1,38 @@
+{# config
+
+title: Bestätigung
+variables:
+    withContainer:
+        type: bool
+        label: mit Layout-Container
+
+/config #}
+
+<div class="plugin Core Events Booking Completed01">
+
+    {% if variables.withContainer %}<div class="container">{% endif %}
+
+    <div class="row">
+        <div class="col-12">
+
+            <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title-completed') }}">Buchung abgeschlossen</h2>
+
+            {% if plugin.getAttribute('mailNotSent', false) %}
+                <div style="border: 1px solid #FFF; padding: 10px 0; text-align: center; margin: 20px 0;">
+                    Die E-Mail Benachrichtigung an {{ booking.getConfig('owner.email') }} konnte nicht gesendet werden.<br />
+                    Die Buchung wurde trotzdem erfolgreich verarbeitet.<br />
+                    Bei Rückfragen geben Sie die Buchungsnummer #{{ booking.getId() }} an.
+                </div>
+            {% endif %}
+
+            <div data-editable data-uid="{{ plugin.getUid('text-completed') }}">
+                <p>Ihre Buchung wurde erfolgreich abgeschlossen.</p>
+                <p>Sie bekommen in Kürze eine E-Mail mit allen wichtigen Informationen.</p>
+            </div>
+
+        </div>
+    </div>
+
+    {% if variables.withContainer %}</div>{% endif %}
+
+</div>

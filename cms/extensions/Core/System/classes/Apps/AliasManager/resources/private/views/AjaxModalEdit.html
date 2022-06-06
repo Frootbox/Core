@@ -1,0 +1,25 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+'frame' : false,
+}) }}
+
+
+<form method="post" class="ajax" action="{{ app.getUri('ajaxUpdate', { aliasId: alias.getId() }) }}">
+
+    <div class="modal-body">
+
+        <div class="form-group">
+            <label for="alias">Alias</label>
+            <input type="text" class="form-control" name="alias" required id="alias" placeholder="Alias" value="{{ alias.getAlias() }}">
+        </div>
+        <div class="form-group">
+            <label for="target">Ziel</label>
+            <input type="text" class="form-control" name="target" id="target" placeholder="Alias" value="{{ alias.getConfig('target') }}">
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Alias erstellen</button>
+    </div>
+</form>

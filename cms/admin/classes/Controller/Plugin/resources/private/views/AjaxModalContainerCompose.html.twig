@@ -1,0 +1,50 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    frame: false,
+}) }}
+
+{% set pluginFound = false %}
+
+<div class="modal-body">
+
+    <form method="post" class="ajax plugins-selector" action="{{ v.getUri('Plugin', 'ajaxContainerCreate') }}">
+
+        <div class="form-group">
+            <label for="plugin">Plugin</label>
+            <select size="1" class="form-control" name="plugin" id="plugin">
+                {% for extension in extensions %}
+
+                    {% set plugins = extension.getExtensionController().getPlugins({ onlyContainer: true }) %}
+
+                    {% if plugins | length  > 0 %}
+
+                        {% set pluginFound = true %}
+
+                        <optgroup label="{{ extension.getVendorId() }}/{{ extension.getExtensionId() }}">
+                            {% for plugin in plugins %}
+                                <option value="{{ plugin.id }}">{{ plugin.title }}</option>
+                            {% endfor %}
+                        </optgroup>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+
+        <button id="addTextButton" type="submit" class="btn btn-primary">Container-Plugin hinzufügen</button>
+
+    </form>
+
+
+    {% if not pluginFound %}
+        <style>
+            .plugins-selector {
+                display: none;
+            }
+        </style>
+
+        <div class="message warning">Es sind keine Container-fähigen Plugins vorhanden.</div>
+    {% endif %}
+
+
+</div>

@@ -1,0 +1,28 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<h2>
+    Untermenü bearbeiten
+</h2>
+
+<p><a class="ajax" href="{{ v.getUri('Page', 'ajaxPanelContent', { 'pageId' : plugin.getPageId() }) }}"><i class="fa fa-chevron-circle-left"></i> zurück</a></p>
+
+<div class="card">
+    <div class="card-body">
+
+        <form method="post" class="ajax" action="{{ plugin.getAdminUri('Index', 'ajaxUpdate') }}">
+
+            <div class="form-group form-check">
+                <input type="checkbox" class="form-check-input" id="showParentLink" name="showParentLink" {% if plugin.getConfig('showParentLink') %}checked{% endif %}>
+                <label class="form-check-label" for="showParentLink">mit Link zur übergeordneten Seite</label>
+            </div>
+
+            {{ v.injectPartial('\\Frootbox\\Admin\\Controller\\Search\\Partials\\Input\\Page', {
+
+            }) | raw }}
+
+            <button type="submit" class="btn btn-primary">Speichern</button>
+
+        </form>
+
+    </div>
+</div>

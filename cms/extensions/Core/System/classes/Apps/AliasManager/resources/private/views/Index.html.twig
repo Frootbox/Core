@@ -1,0 +1,41 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ front.addTab('Alias-Verwaltung', app.getUri('index')) }}
+
+
+<h2>
+	Alias-Verwaltung
+</h2>
+
+{{ v.injectPartial('\\Frootbox\\Admin\\View\\Partials\\Navigation\\Buttons', { links: [
+	{
+		url: app.getUri('manual'),
+		icon: 'far fa-link',
+		title: 'manuelle Aliase',
+		type: 'none'
+	},
+	{
+		url: app.getUri('generic'),
+		icon: 'far fa-link',
+		title: 'generische Aliase',
+		type: 'none'
+	},
+	{
+		url: app.getUri('redirect301'),
+		icon: 'far fa-unlink',
+		title: '301 Umleitungen',
+		type: 'none'
+	},
+	{
+		url: app.getUri('import'),
+		icon: 'far fa-file-import',
+		title: 'Importieren',
+		type: 'none'
+	},
+	{
+		url: app.getUri('fix'),
+		icon: 'far fa-wrench',
+		title: 'Aufräumen',
+		type: 'none'
+	}
+]}) | raw }}

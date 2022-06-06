@@ -1,0 +1,88 @@
+
+{% set i = view.getViewhelper('Delegator', { object: field }) %}
+{% set t = view.getViewhelper('Translator') %}
+
+{% set v = view.getViewhelper('View') %}
+{% set f = view.getViewhelper('Files') %}
+{% set a = view.getViewhelper('Assets', {   }) %}
+
+{{ v.asset('EXT:Core/ContactForms/css/File.less') | raw }}
+{{ a.import('https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.2/min/dropzone.min.js') | raw }}
+
+<script>
+    $(function ( ) {
+
+        $("#fileupload_{{ field.getId() }}").dropzone({
+            url: "{{ settings.serverpath }}static/Ext/Core/ContactForms/Form/ajaxUpload?fieldId={{ field.getid() }}",
+            clickable: '#fileupload_{{ field.getId() }} .droppable.clickable',
+            queuecomplete: function ( ) {
+
+                $('.dz-preview.dz-success.dz-complete').fadeOut();
+
+                previewFiles({{ field.getId() }});
+            }
+        });
+
+        function previewFiles(fieldId) {
+
+            $.ajax({
+                url: "{{ settings.serverpath }}static/Ext/Core/ContactForms/Form/ajaxFilesBucket?fieldId=" + fieldId,
+                success: function ( html ) {
+
+                    $('div.filesReceiver[data-field="' + fieldId + '"]').html(html);
+                }
+            });
+        }
+
+        previewFiles({{ field.getId() }});
+
+        /**
+         *
+         */
+        $(document).on('click', 'a.drop-uploaded-file', function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            if (!confirm('{{ t.translate('ConfirmFileRemoval') }}')) {
+                return;
+            }
+
+            var fileId = $(this).attr('data-file');
+
+            $.ajax({
+                url: $(this).attr('href'),
+                success: function ( response ) {
+
+                    $('[data-file="' + fileId + '"').fadeOut();
+
+                }
+            });
+        });
+    });
+
+
+</script>
+
+<div class="Core Forms Field File">
+
+    <label for="field-{{ field.getId() }}">
+        <span {% if renderer.options.editable %}data-editable-element data-uid="{{ field.getUid('title') }}"{% endif %}>{{ field.getTitle() }}</span><!--
+        -->{% if field.getMandatory() %}<span class="mandatory">*</span>{% endif %}
+    </label>
+
+
+    <div id="fileupload_{{ field.getId() }}">
+        <div class="droppable clickable">
+            <p><i class="fa fa-upload"></i> {{ t.translate('PlaceFilesToUploadHere') }}</p>
+        </div>
+    </div>
+
+    <p class="annotation">maximal {{ field.getMaxSize() }} MB</p>
+
+    <div class="filesReceiver" data-field="{{ field.getId() }}">
+
+    </div>
+
+</div>
+

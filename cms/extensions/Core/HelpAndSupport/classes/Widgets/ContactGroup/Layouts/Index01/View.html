@@ -1,0 +1,24 @@
+{% set i = view.getViewhelper('Delegator', { object: widget }) %}
+{% set format = view.getViewhelper('Formatter') %}
+
+<table class="table">
+    <tbody>
+
+        {% for contact in i.getCategory().getContacts() %}
+            <tr>
+                <td>{{ contact.getName() }}</td>
+                <td>
+                    {% if contact.getPhone() %}
+                        <a href="tel:{{ format.phoneClean(contact.getPhone()) }}"><i class="fa fa-phone"></i> {{ contact.getPhone() }}</a>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if contact.getEmail() %}
+                    <a href="tel:{{ format.phoneClean(contact.getPhone()) }}"><i class="fa fa-envelope"></i> {{ contact.getEmail() }}</a>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+
+    </tbody>
+</table>

@@ -1,0 +1,18 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<h2>
+    Menü-Vorlagen
+
+    <span class="headoptions">
+		<a data-toggle="tooltip" data-modal data-title="neue Menü-Vorlage hinzufügen" href="{{ plugin.getAdminUri('MenuTemplates', 'ajaxModalCompose') }}"><i class="fa fa-plus-circle"></i></a>
+	</span>
+
+</h2>
+
+<p><a class="ajax" href="{{ plugin.getAdminUri('Index', 'index') }}"><i class="fa fa-chevron-circle-left"></i> zurück</a></p>
+
+<div id="menuTemplatesReceiver">
+    {{ v.injectPartial('\\Frootbox\\Ext\\Core\\Gastronomy\\Plugins\\DailyMenu\\Admin\\MenuTemplates\\Partials\\ListMenuTemplates', {
+        plugin : plugin
+    }) | raw }}
+</div>

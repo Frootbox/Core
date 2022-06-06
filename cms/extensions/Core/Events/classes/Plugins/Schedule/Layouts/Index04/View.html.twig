@@ -1,0 +1,80 @@
+{# config
+
+title: tabellarisch
+variables:
+    withVenue:
+        type: bool
+        label: mit Veranstaltungsort
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set p = view.getViewhelper('Partials') %}
+
+{% set t = i.getTranslator() %}
+
+{% set events = i.getEvents() %}
+
+<div class="row">
+    <div class="col-12 plugin Core Events Schedule Index04">
+
+        {% if plugin.isFirst %}
+            <h1 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h1>
+        {% else %}
+            <h2 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+        {% endif %}
+
+        <div data-editable data-uid="{{ plugin.getUid('teaser-text') }}"></div>
+
+        <div class="table-responsive">
+            <table class="table">
+                <tbody>
+
+                    {% for event in events %}
+                        <tr>
+                            <td>
+                                {% if not event.hasOneDay() %}ab{% endif %}
+                                {{ t.translate(event.getDateStart.format('Weekday%u')) }}
+                            </td>
+                            <td>
+                                {% if event.hasOneDay() %}
+                                    {{ event.getDateStart.format('%d.%m.%Y') }}
+                                {% else %}
+                                    {{ event.getDateStart.format('%d.%m.') }}–{{ event.getDateEnd.format('%d.%m.') }}
+                                {% endif %}
+                            </td>
+                            <td nowrap>
+
+                                {% if event.getDateStart.format('%H:%M') != "00:00" %}
+                                    {% if not event.hasOneDay() %}
+                                        {{ event.getDateStart.format('%H:%M') }} Uhr
+                                    {% else %}
+                                        {% if event.getDateStart.format('%H:%M') == event.getDateEnd.format('%H:%M') %}
+                                            {{ event.getDateStart.format('%H:%M') }} Uhr
+                                        {% else %}
+                                            {{ event.getDateStart.format('%H:%M') }}–{{ event.getDateEnd.format('%H:%M') }} Uhr
+                                        {% endif %}
+                                    {% endif %}
+                                {% endif %}
+
+                            </td>
+
+                            {% if variables.withVenue %}
+                                <td>{{ event.getVenue.getTitle(globalLanguage) }}</td>
+                            {% endif %}
+
+                            <td>
+                                <p><b>{{ event.getTitle(globalLanguage) }}</b></p>
+
+                                <div data-editable data-uid="{{ event.getUid('teaser') }}"></div>
+
+                            </td>
+                        </tr>
+                    {% endfor %}
+
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>

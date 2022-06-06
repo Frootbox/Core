@@ -1,0 +1,51 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ front.addTab('Text-Verwaltung', app.getUri('index')) }}
+
+
+
+
+<script>
+	{% if get.get('query') %}
+		$(function ( ) {
+
+			$('#searchForm').trigger('submit');
+
+		});
+	{% endif %}
+</script>
+
+<div class="row">
+	<div class="col-md-6">
+
+		<h2>
+			Text-Verwaltung
+		</h2>
+
+		<form method="post" action="{{ app.getUri('ajaxSearch', { highlight: get.get('highlight') }) }}" class="ajax" id="searchForm">
+
+			<div class="form-row">
+				<div class="col-md-8">
+					<input type="text" name="q" id="q" class="form-control" placeholder="Suchwort eingeben ..." value="{{ get.get('query') }}" />
+				</div>
+				<div class="col-md-4">
+					<button class="btn btn-block btn-primary">Suchen</button>
+				</div>
+			</div>
+
+		</form>
+
+
+		<br />
+
+		<div id="resultReceiver"></div>
+
+	</div>
+	<div class="col-md-6">
+
+		<div id="detailsReceiver" class="sticky-top"></div>
+
+	</div>
+</div>
+
+

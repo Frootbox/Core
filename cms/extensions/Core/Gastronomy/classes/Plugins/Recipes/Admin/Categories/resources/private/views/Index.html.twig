@@ -1,0 +1,54 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<h2>
+    Kategories
+</h2>
+
+<p><a class="ajax" href="{{ plugin.getAdminUri('Index', 'index') }}"><i class="fa fa-chevron-circle-left"></i> zurück</a></p>
+
+<div class="row">
+    <div class="col-6">
+
+        <h4>Kategorien</h4>
+
+        <script>
+            $(function ( ) {
+
+                $(document).on('click', '#categoriesTreeReceiver tr[data-cat]', function ( event ) {
+
+                    event.preventDefault();
+                    event.stopImmediatePropagation();
+
+                    $('#categoriesTreeReceiver tr[data-cat]').removeClass('highlighted');
+                    $(this).addClass('highlighted');
+
+                    $.ajax({
+                        url: "{{ plugin.getAdminUri('Categories', 'ajaxPanelListRecipes') | raw }}",
+                        data: {
+                            categoryId: $(this).attr('data-cat')
+                        },
+                        success: function ( html ) {
+
+                            $('#contactsReceiver').html(html);
+
+                        }
+                    });
+                });
+            });
+        </script>
+
+        {{ v.injectPartial('\\Frootbox\\Admin\\Controller\\Assets\\Categories\\Partials\\CategoriesManager', {
+            uid: plugin.getUid('categories'),
+            plugin: plugin,
+            className : 'Frootbox\\Ext\\Core\\Gastronomy\\Plugins\\Recipes\\Persistence\\Category'
+        }) | raw }}
+
+    </div>
+    <div class="col-6">
+
+        <div id="contactsReceiver">
+
+        </div>
+
+    </div>
+</div>

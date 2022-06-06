@@ -1,0 +1,19 @@
+{% set v =  view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<!DOCTYPE html>
+<html>
+    <head>
+        	    
+        {{ v.injectPartial('\\Frootbox\\Admin\\View\\Partials\\Head\\Partial')|raw }}
+        
+        {{ v.inject('standalone.less')|raw }}
+                                
+    </head>
+    <body>
+        
+    	{{ controllerHtml|raw }}
+    	
+    	{{ v.injectPartial('\\Frootbox\\Admin\\View\\Partials\\Footer\\Partial')|raw }}
+				            
+    </body>
+</html>

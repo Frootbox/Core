@@ -1,0 +1,60 @@
+<style>
+    .file {
+        margin-bottom: 30px;
+
+
+    }
+
+    .file a {
+        display: block;
+        padding: 10px;
+        background: rgba(0, 0, 0, .05);
+        color: #333;
+        font-size: 10px;
+    }
+
+    .file a:hover {
+        text-decoration: none;
+        background: rgba(0, 0, 0, .1);
+    }
+
+    .file img {
+        margin-bottom: 5px;
+    }
+</style>
+
+<div class="row">
+        <div class="col-md-8">
+
+                <div class="row">
+                        {% for file in folder.getFiles() %}
+                                <div class="col-md-3">
+                                    <div class="file">
+
+                                        <a href="{{ app.getUri('ajaxFileDetails', { fileId : file.getId } ) }}" class="ajax">
+                                            {% if file.isImage() %}
+                                                <img class="img-fluid" width="200" height="200" src="{{ file.getUriThumbnail({ width: 200, height: 200 }) }}" /><br />
+                                            {% endif %}
+
+                                            {{ file.getName() }}
+                                        </a>
+
+                                    </div>
+                                </div>
+                        {% endfor %}
+                </div>
+
+        </div>
+    <div class="col-md-4">
+
+        <div class="sticky-top">
+
+            <br /><br /><br /><br />
+
+            <div class="file-editor">
+
+            </div>
+        </div>
+
+    </div>
+</div>

@@ -1,0 +1,91 @@
+{# config
+
+title: Standard
+variables:
+    withLayoutContainer:
+        type: bool
+        label: mit Layout-Container
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+
+<script>
+    $(function() {
+
+        /**
+         *
+         */
+        $(document).on('submit', '#requestForm', function(event) {
+
+            event.preventDefault();
+
+            $.ajax({
+                url: $(this).attr('action'),
+                dataType: 'json',
+                type: 'POST',
+                data: $(this).serialize(),
+                success: function(response) {
+
+                    if (typeof response.redirect != "undefined") {
+                        window.location.href = response.redirect;
+                    }
+
+                },
+                error: function(xhr, status, error) {
+
+                    if (xhr.responseText.charAt(0) == '{') {
+                        var response = $.parseJSON(xhr.responseText);
+                        alert(response.error);
+                    }
+                    else {
+                        alert(xhr.responseText);
+                    }
+                }
+            });
+
+        });
+    });
+</script>
+
+<div class="plugin Core System Login PasswordReset01">
+
+    {% if variables.withLayoutContainer %}<div class="container">{% endif %}
+
+    <div class="row">
+        <div class="col-12">
+            <div class="inner-wrapper">
+
+                <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('passwordreset-title') }}">Passwort zurücksetzen</h2>
+
+                <div data-editable data-uid="{{ plugin.getUid('passwordreset-teaser') }}"></div>
+
+                <div class="row">
+                    <div class="col-md-6">
+
+                        <form id="requestForm" method="post" action="{{ plugin.getUriAjax('passwordReset', { token: plugin.getAttribute('token'), login: plugin.getAttribute('login') }) }}">
+
+                            <div class="form-group">
+                                <label for="pw1">Passwort</label>
+                                <input type="password" name="pw1" id="pw1" class="form-control" />
+                            </div>
+                            <div class="form-group">
+                                <label for="pw2">wiederholen</label>
+                                <input type="password" name="pw2" id="pw2" class="form-control" />
+                            </div>
+
+                            <button class="btn btn-primary" type="submit">Passwort zurücksetzen</button>
+
+                        </form>
+
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+    {% if variables.withLayoutContainer %}</div>{% endif %}
+
+</div>

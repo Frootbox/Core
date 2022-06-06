@@ -1,0 +1,44 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<h2>
+    Video bearbeiten
+</h2>
+
+<p><a class="ajax" href="{{ plugin.getAdminUri('Index', 'index', { highlight: video.getId() }) }}"><i class="fa fa-chevron-circle-left"></i> zurück</a></p>
+
+<div class="card">
+    <div class="card-body">
+
+        <form method="post" class="ajax" action="{{ plugin.getAdminUri('Video', 'ajaxUpdate', { videoId: video.getId() }) }}">
+
+            <div class="form-group">
+                <label for="title">Titel</label>
+                <input type="text" class="form-control" id="title" name="title" placeholder="Titel" value="{{ video.getTitle() }}">
+            </div>
+
+            <div class="form-group">
+                <label for="url">URL</label>
+                <input type="text" class="form-control" id="url" name="url" placeholder="URL" value="{{ video.getConfig('url') }}">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="dateStart">Datum</label>
+                    <input type="date" class="form-control" id="dateStart" name="dateStart" placeholder="Datum" value="{{ video.getDate() | date("Y-m-d") }}">
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="timeStart">Uhrzeit</label>
+                    <input type="text" class="form-control" id="timeStart" name="timeStart" placeholder="Uhrzeit" value="{{ video.getDate() | date("H:i:s") }}">
+                </div>
+            </div>
+
+            {{ v.injectPartial('\\Frootbox\\Admin\\View\\Partials\\Input\\Tags', {
+                object: article
+            }) | raw }}
+
+            <button type="submit" class="btn btn-primary">Speichern</button>
+
+        </form>
+
+    </div>
+</div>

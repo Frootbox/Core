@@ -1,0 +1,18 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<h2>
+    Hersteller
+
+    <span class="headoptions">
+		<a data-toggle="tooltip" data-modal data-title="neuen Hersteller hinzufügen" href="{{ plugin.getAdminUri('Manufacturers', 'ajaxModalCompose') }}"><i class="fa fa-plus-circle"></i></a>
+	</span>
+
+</h2>
+
+<p><a class="ajax" href="{{ plugin.getAdminUri('Index', 'index') }}"><i class="fa fa-chevron-circle-left"></i> zurück</a></p>
+
+<div id="manufacturersReceiver">
+    {{ v.injectPartial('\\Frootbox\\Ext\\Core\\ShopSystem\\Plugins\\ShopSystem\\Admin\\Manufacturers\\Partials\\ManufacturersList', {
+        'plugin' : plugin
+    }) | raw }}
+</div>

@@ -1,0 +1,106 @@
+{{ view.set({
+    'title' : 'Anmeldung',
+    'wrapper' : 'IndexStandalone'
+}) }}
+
+<script>
+	$(function ( ) {
+
+		/**
+		 * Dismiss javascript block
+		 */
+		$('.javascript-block').hide();
+
+		/*
+		if (window.navigator.userAgent.indexOf("Edg") > -1 || window.navigator.userAgent.indexOf("MSIE") > -1) {
+			$('#ieBlock').show();
+		}
+		else {
+			$('#login').show();
+		}
+		*/
+
+		$('#login').show();
+
+		$('a.password-lost').click(function ( ) {
+
+			let href = $(this).attr('href') + '?login=' + $('#login').val();
+
+			$(this).attr('href', href);
+		});
+	});
+</script>
+
+<style>
+	.card.hidden {
+		display: none;
+	}
+</style>
+
+<div class="container">
+	<div class="row justify-content-center">
+        <div class="col-5">
+        
+        	
+        	<br /><br /><br /><br />
+        	
+        	<h1>frootbox::cms</h1>
+
+        	<br /><br />
+
+			<div class="message notice javascript-block">Bitte aktivieren Sie Javascript für Benutzung des CMS.</div>
+
+			<div class="card hidden" id="ieBlock">
+				<div class="card-body">
+					<p>Bitte benutzen Sie Chrome oder Safari für das Backend des CMS.</p>
+				</div>
+			</div>
+
+			<div class="card hidden" id="login">
+
+				<div class="card-body">
+
+					<div>
+
+						<form class="ajax" method="post" action="{{ controller.getUri('ajaxLogin', { 'redirect' : get.get('redirect') } ) }}">
+
+							<div class="form-group">
+								<label for="login">Benutzername</label>
+								<div class="input-group">
+									<div class="input-group-prepend">
+										<div class="input-group-text"><i class="far fa-envelope"></i></div>
+									</div>
+									<input type="email" class="form-control" id="login" name="login" placeholder="E-Mail">
+								</div>
+							</div>
+
+							<div class="form-group">
+								<label for="password">Passwort</label>
+								<div class="input-group">
+									<div class="input-group-prepend">
+										<div class="input-group-text"><i class="far fa-lock"></i></div>
+									</div>
+									<input type="password" class="form-control" id="password" name="password" placeholder="Passwort">
+								</div>
+							</div>
+
+							<div class="form-group form-check">
+								<input type="checkbox" class="form-check-input" id="stayLoggedIn" name="stayLoggedIn">
+								<label class="form-check-label" for="stayLoggedIn">angemeldet bleiben</label>
+							</div>
+
+							<button type="submit" class="btn btn-primary">Anmelden</button>
+
+							<a href="{{ controller.getUri('passwordLost') }}" class="password-lost btn btn-outline-secondary btn-sm float-right">Passwort vergessen</a>
+
+						</form>
+
+					</div>
+
+				</div>
+			</div>
+        	
+        </div>
+    </div>
+</div>
+

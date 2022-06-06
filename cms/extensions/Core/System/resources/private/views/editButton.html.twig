@@ -1,0 +1,166 @@
+<script>
+
+    var frootboxOnPageAliasId = "{{ alias.getId() }}";
+    var frootboxOnPagePageId = "{{ page.getId() }}";
+
+    $(function ( ) {
+
+        /**
+         *
+         */
+        $(document).on('click', '.frootbox-raise-tooltips', function ( event ) {
+
+            event.preventDefault();
+
+            $(this).toggleClass('active');
+
+            let active = $(this).hasClass('active');
+
+            if (!active) {
+                $('.popover').popover('hide');
+            }
+            else {
+                $('[data-editable],[data-editable-headline],[data-editable-element],[data-editables]').trigger('mouseenter');
+            }
+        });
+
+        /**
+         *
+         */
+        $(document).on('click', '.frootbox-raise-config-panel', function ( event ) {
+
+            event.preventDefault();
+
+            $('.popover').popover('hide');
+
+            $('#frootboxOnPageConfigModal').modal('show');
+
+            $.ajax({
+                data: {
+                  pageId: frootboxOnPagePageId,
+                  aliasId: frootboxOnPageAliasId
+                },
+                url: '{{ settings.serverpath }}cms/admin/Editor/OnPage/ajaxIndex',
+                success: function ( response ) {
+
+                    $('#frootboxOnPageConfigModalLabel').html(response.title);
+                    $('#frootboxOnPageConfigModal .modal-body-wrapper').html(response.html);
+                }
+            });
+        });
+
+        /**
+         *
+         */
+        $(document).on('click', '#frootboxOnPageConfigModal a.ajax', function ( event ) {
+
+            event.preventDefault();
+
+            $('.popover').popover('hide');
+
+            $.ajax({
+                data: {
+                    pageId: frootboxOnPagePageId,
+                    aliasId: frootboxOnPageAliasId
+                },
+                url: $(this).attr('href'),
+                success: function ( response ) {
+
+                    $('#frootboxOnPageConfigModalLabel').html(response.title);
+                    $('#frootboxOnPageConfigModal .modal-body-wrapper').html(response.html);
+                },
+                error: function ( xhr, textStatus ) {
+                    $('#frootboxOnPageConfigModal .modal-body-wrapper').html(xhr.responseText);
+                }
+            });
+        });
+
+        /**
+         *
+         */
+        $(document).on('submit', '#frootboxOnPageConfigModal form.ajax', function ( event ) {
+
+            event.preventDefault();
+
+            var action = new URL($(this).attr('action'));
+
+            action.searchParams.append('pageId', frootboxOnPagePageId);
+            action.searchParams.append('aliasId', frootboxOnPageAliasId);
+
+            $.ajax({
+                data: $(this).serialize(),
+                url:  action.toString(),
+                method: 'POST',
+                success: function ( response ) {
+
+                    if (typeof response.success != 'undefined') {
+                        alert(response.success);
+                    }
+
+                    if (typeof response.title != 'undefined') {
+                        $('#frootboxOnPageConfigModalLabel').html(response.title);
+                    }
+
+                    if (typeof response.html != 'undefined') {
+                        $('#frootboxOnPageConfigModal .modal-body-wrapper').html(response.html);
+                    }
+                },
+                error: function ( xhr, textStatus ) {
+                    $('#frootboxOnPageConfigModal .modal-body-wrapper').html(xhr.responseText);
+                }
+            });
+        });
+
+    });
+</script>
+
+<style>
+    #fbxConfigButton {
+        left: 16px;
+        position: fixed;
+        top: 20px;
+        z-index: 1051;
+
+        width: 48px;
+        text-align: center;
+    }
+
+    #fbxConfigButton a {
+        display: inline-block;
+        width: 38px;
+        height: 38px;
+
+        margin-bottom: 10px;
+
+        background: #2980b9;
+        border-radius: 50%;
+
+        line-height: 40px;
+        color: #FFF;
+    }
+
+    #fbxConfigButton a.active {
+        background: red;
+    }
+
+    #fbxConfigButton a.spinner:hover i {
+        -webkit-animation:spin 7s linear infinite;
+        -moz-animation:spin 7s linear infinite;
+        animation:spin 7s linear infinite;
+    }
+
+    @-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }
+    @-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
+    @keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
+
+    #frootboxOnPageConfigModal {
+        font-size: 16px;
+        line-height: 20px;
+        font-family: Arial;
+    }
+</style>
+
+<div id="fbxConfigButton">
+
+    <a href="edit/{{ alias.getAlias() }}{% if query %}?{{ query }}{% elseif get.get('forceLanguage') %}?forceLanguage={{ get.get('forceLanguage') }}{% endif %}" class=""><i class="fa fa-pencil"></i></a>
+</div>

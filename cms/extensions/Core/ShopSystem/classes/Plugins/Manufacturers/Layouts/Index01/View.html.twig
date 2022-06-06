@@ -1,0 +1,66 @@
+{# config
+
+title: Standard
+variables:
+    columns:
+        type: int
+        label: Spalten
+        default: 3
+    image_width:
+        type: int
+        label: Bildbreite
+        default: 600
+    image_height:
+        type: int
+        label: Bildhöhe
+        default:
+    noTeaserText:
+        type: bool
+        label: ohne Teaser-Text
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+{% if variables.columns == 1 %}
+    {% set colClass = "col-12" %}
+{% elseif variables.columns == 2 %}
+    {% set colClass = "col-6" %}
+{% elseif variables.columns == 3 %}
+    {% set colClass = "col-4" %}
+{% elseif variables.columns >= 4 %}
+    {% set colClass = "col-3" %}
+{% endif %}
+
+<div class="row">
+    <div class="col-12 plugin Core ShopSystem Manufacturers Index01">
+
+        {% if plugin.isFirst %}
+            <h1 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h1>
+        {% else %}
+            <h2 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+        {% endif %}
+
+        <div data-editable data-uid="{{ plugin.getUid('teaser') }}"></div>
+
+        <div class="row teasers">
+            {% for manufacturer in manufacturers %}
+                <div class="{{ colClass }} teaser" data-href="{{ manufacturer.getUri() }}">
+                    <picture class="fluid" data-skipempty="true" data-editable data-uid="{{ manufacturer.getUid('image')}}">
+                        <img width="600" height="350" src="{{ i.getDummyImage({ width: 600, height: 350}) }}" alt="" />
+                    </picture>
+
+                    <h4 data-editable data-uid="{{ manufacturer.getUid('title') }}">{{ manufacturer.getTitle }}</h4>
+
+                    {% if not variables.noTeaserText %}
+                        <div data-nowidgets data-editable data-uid="{{ manufacturer.getUid('teaser') }}"></div>
+
+                        <p><a class="read-more" href="{{ manufacturer.getUri() }}">weiterlesen</a></p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+
+    </div>
+</div>
+

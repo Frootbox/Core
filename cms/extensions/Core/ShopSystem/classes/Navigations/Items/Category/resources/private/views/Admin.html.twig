@@ -1,0 +1,8 @@
+<div class="form-group">
+    <label for="categoryId">Kategorie</label>
+    <select required class="form-control" id="categoryId" name="categoryId">
+        {% for category in item.getCategories() %}
+            <option {% if category.getId() == item.getConfig('categoryId') %}selected{% endif %} value="{{ category.getId() }}">{{ category.getTitle() }}</option>
+        {% endfor %}
+    </select>
+</div>

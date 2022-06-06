@@ -1,0 +1,153 @@
+{# config
+
+title: Standard
+variables:
+    withContainer:
+        type: bool
+        label: mit Layout-Container
+    showProducts:
+        type: bool
+        default: true
+        label: Artikel direkt auflisten
+    imageWidth:
+        default: 600
+        type: int
+    imageHeight:
+        default: 300
+        type: int
+    columns:
+        type: int
+        label: Spalten
+        default: 3
+    withPackagingSize:
+        type: bool
+        label: Verpackungsgröße anzeigen
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set p = view.getViewhelper('Partials', { basePath: viewFolder }) %}
+
+{% set t = i.getTranslator() %}
+
+{% if variables.columns == 1 %}
+    {% set colClass = "col-12" %}
+{% elseif variables.columns == 2 %}
+    {% set colClass = "col-md-6" %}
+{% elseif variables.columns == 3 %}
+    {% set colClass = "col-md-4" %}
+{% elseif variables.columns >= 4 %}
+    {% set colClass = "col-md-3" %}
+{% endif %}
+
+<div class="plugin Core ShopSystem ShopSystem Index01">
+
+    {% if variables.withContainer %}<div class="container">{% endif %}
+
+    <div class="row">
+        <div class="col-12">
+
+            <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+
+            {% if variables.showProducts %}
+
+                {% set categories = i.getTopCategories() %}
+
+                {% if categories | length == 0 %}
+
+                    {% set categoryDelegator = view.getViewhelper('Delegator', { object: i.getRootCategory() }) %}
+
+                    <div class="category">
+
+                        <div class="row">
+                            {% for product in categoryDelegator.getProducts() %}
+                                {{ p.renderPartial('/Frootbox/Ext/Core/ShopSystem/Plugins/ShopSystem/ProductTeaser', { product: product, colClass: colClass, i: i }) | raw }}
+                            {% endfor %}
+                        </div>
+
+                    </div>
+
+                {% else %}
+
+                    {% for category in i.getTopCategories() %}
+                        {% set categoryDelegator = view.getViewhelper('Delegator', { object: category }) %}
+
+                        <div class="category">
+
+                            <h3 data-editable data-uid="{{ category.getUid('title') }}">{{ category.getTitle() }}</h3>
+
+                            <div class="row">
+
+                                {% for product in categoryDelegator.getProducts() %}
+
+                                    {{ p.renderPartial('/Frootbox/Ext/Core/ShopSystem/Plugins/ShopSystem/ProductTeaser', { product: product, i: i, colClass: colClass }) | raw }}
+
+
+                                    {#
+                                    <div class="{{ colClass }}">
+                                        <div class="product" data-href>
+
+                                            <picture class="fluid" data-editable data-uid="{{ product.getUid('image')}}">
+                                                <img width="{{ variables.imageWidth }}" height="{{ variables.imageHeight }}" src="{{ i.getDummyImage({ width: variables.imageWidth, height: variables.imageHeight }) }}" alt="" />
+                                            </picture>
+
+                                            <p class="title"><a href="{{ product.getUri() }}">{{ product.getTitle() }}</a></p>
+
+                                            <div class="row">
+                                                <div class="col-md-8">
+
+                                                    <div data-editable data-nowidgets data-uid="{{ product.getUid('teaser') }}"></div>
+
+                                                    {% if variables.withPackagingSize and product.getPackagingSize() > 0 %}
+                                                        Inhalt {{ product.getPackagingSize() | replace({ '.': ',' }) }} {{ t.translate('Unit' ~product.getPackagingUnit()) }}
+                                                    {% endif %}
+
+                                                </div>
+                                                <div class="col-md-4 price">
+                                                    {{ product.getPriceGross() | number_format(2, ',', '.') }} €
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    #}
+                                {% endfor %}
+
+                            </div>
+                        </div>
+
+                    {% endfor %}
+                {% endif %}
+
+            {% else %}
+
+                <div class="category-teasers">
+                    <div class="row">
+
+                        {% for category in i.getTopCategories() %}
+                            <div class="{{ colClass }}">
+                                <div class="category-teaser" data-href>
+
+                                    <picture class="fluid" data-editable data-uid="{{ category.getUid('image')}}">
+                                        <img width="{{ variables.imageWidth }}" height="{{ variables.imageHeight }}" src="{{ i.getDummyImage({ width: variables.imageWidth, height: variables.imageHeight }) }}" alt="" />
+                                    </picture>
+
+                                    <h3 data-uid="{{ category.getUid('title') }}" data-editable>{{ category.getTitle() }}</h3>
+
+                                    <p class="read-more"><a href="{{ category.getUri() }}">zu den Produkten</a></p>
+                                </div>
+                            </div>
+                        {% endfor %}
+
+                    </div>
+                </div>
+
+
+            {% endif %}
+
+        </div>
+    </div>
+
+    {% if variables.withContainer %}</div>{% endif %}
+
+</div>

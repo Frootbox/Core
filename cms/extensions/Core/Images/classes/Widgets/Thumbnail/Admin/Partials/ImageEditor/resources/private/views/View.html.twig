@@ -1,0 +1,113 @@
+<link  href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.5/cropper.min.css" rel="stylesheet">
+
+<style>
+    img#image {
+        max-width: 100%; /* This rule is very important, please do not ignore this! */
+    }
+</style>
+
+<div style="margin: 0 0 10px 0;">
+    <img id="image" src="{{ data.file.getUri({ width: 'original', height: 'original' }) }}">
+</div>
+
+
+<script>
+
+    var cropper;
+
+    $(function ( ) {
+
+        $.ajax({
+            url: 'https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.5/cropper.min.js',
+            dataType: "script",
+            success: function ( ) {
+
+                {% if data.widget.getConfig('crop.x') %}
+
+                    window.setTimeout(function ( ) {
+
+                        initCropper();
+
+                        window.setTimeout(function ( ) {
+
+                            cropper.setData({
+                                x: {{ data.widget.getConfig('crop.x') }},
+                                y: {{ data.widget.getConfig('crop.y') }},
+                                width: {{ data.widget.getConfig('crop.width') }},
+                                height: {{ data.widget.getConfig('crop.height') }}
+                            });
+
+                        }, 1500);
+
+                    });
+
+                {% endif %}
+
+            }
+        });
+
+
+        /**
+         *
+         */
+        $('#cropNow').click(function ( event ) {
+
+            event.preventDefault();
+
+            initCropper();
+
+            $('#cropNot').toggleClass('d-none');
+            $('#cropNow').toggleClass('d-none');
+        });
+
+
+        /**
+         *
+         */
+        $('#cropNot').click(function ( event ) {
+
+            event.preventDefault();
+
+            $('#cropX').val('');
+            $('#cropY').val('');
+
+            $('#cropWidth').val('');
+            $('#cropHeight').val('');
+
+            cropper.destroy();
+
+            $('#cropNot').toggleClass('d-none');
+            $('#cropNow').toggleClass('d-none');
+        });
+    });
+
+
+    function initCropper ( ) {
+
+        image = document.getElementById('image');
+        cropper = new Cropper(image, {
+            scalable: false,
+            rotatable: false,
+            zoomable: false,
+            crop(event) {
+
+                $('#cropX').val(event.detail.x);
+                $('#cropY').val(event.detail.y);
+
+                $('#cropWidth').val(event.detail.width);
+                $('#cropHeight').val(event.detail.height);
+            },
+        });
+    }
+</script>
+
+<a class="btn btn-secondary btn-sm" id="cropNow" href="#">Bildausschnitt wählen</a>
+<a class="btn btn-secondary btn-sm" href="{{ data.file.getUriDownload() }}"><i class="fa fa-download"></i></a>
+<a class="btn btn-secondary btn-sm d-none" id="cropNot" href="#">Abbrechen</a>
+
+<hr />
+
+<input type="hidden" name="crop[x]" id="cropX" value="" />
+<input type="hidden" name="crop[y]" id="cropY" value="" />
+<input type="hidden" name="crop[width]" id="cropWidth" value="" />
+<input type="hidden" name="crop[height]" id="cropHeight" value="" />

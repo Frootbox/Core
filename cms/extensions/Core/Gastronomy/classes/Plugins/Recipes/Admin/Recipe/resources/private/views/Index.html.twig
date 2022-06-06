@@ -1,0 +1,34 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<h2>
+    Rezept-Datenbank
+
+    {#
+    <span class="headoptions">
+		<a data-toggle="tooltip" data-modal data-title="neue Formulargruppe hinzufügen" href="{{ plugin.getAdminUri('Group', 'ajaxModalCompose') }}"><i class="fa fa-plus-circle"></i></a>
+	</span>
+    #}
+</h2>
+
+<p><a class="ajax" href="{{ plugin.getAdminUri('Index', 'index') }}"><i class="fa fa-chevron-circle-left"></i> zurück</a></p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Titel</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+
+        {% for recipe in recipes %}
+            <tr data-recipe="{{ recipe.getId() }}">
+                <td>{{ recipe.getTitle() }}</td>
+                <td class="text-right">
+                    <a data-toggle="tooltip" title="Rezept löschen" data-confirm="Soll dieses Rezept wirklich gelöscht werden?" href="{{ plugin.getAdminUri('Recipe', 'ajaxDelete', { recipeId: recipe.getId() }) }}" class="ajax"><i class="fa fa-times"></i></a>
+                </td>
+            </tr>
+        {% endfor %}
+
+    </tbody>
+</table>

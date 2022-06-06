@@ -1,0 +1,31 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{% if xusers.getCount == 0 %}
+	<div class="message warning">Es wurden noch keine Benutzer verknüpft erstellt.</div>
+{% else %}
+
+	<table class="table" data-sort="{{ plugin.getAdminUri('Address', 'ajaxSort') }}">
+		<thead>
+			<tr>
+				<th>Benutzer</th>
+				<th></th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+
+			{% for xuser in xusers %}
+				<tr id="row-{{ address.getId() }}" data-address="{{ address.getId() }}" class="ajax {% if data.highlight == xuser.getConnectionId() %}highlighted{% endif %}" data-href="{{ data.plugin.getAdminUri('Address', 'details', { addressId: address.getId() }) }}">
+					<td>{{ xuser.getName() }}</td>
+					<td class="handle"><i class="fa fa-grip-lines"></i></td>
+					<td class="text-right">
+						<a class="ajax" href="{{ v.getUri('Assets', 'ajaxSwitchVisibility', { assetId: xuser.getConnectionId(), repository: '\\Frootbox\\Persistence\\Repositories\\ItemConnections' }) }}"><i data-asset="{{ xuser.getConnectionId() }}" class="fa fa-lightbulb visibility visibility-{{ xuser.getConnectionVisibility() }} icon"></i></a>
+						<a class="ajax" data-confirm="Soll diese Verknüpfung wirklich gelöst werden?" href="{{ data.plugin.getAdminUri('Address', 'ajaxUserConnectionDelete', { addressId: data.address.getId(), connectionId: xuser.getConnectionId() }) }}"><i class="fa fa-times icon"></i></a>
+					</td>
+				</tr>
+			{% endfor %}
+
+		</tbody>
+	</table>
+
+{% endif %}

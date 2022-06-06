@@ -1,0 +1,73 @@
+{# config
+
+title: Standard
+variables:
+    withContainer:
+        type: bool
+        label: mit Layout-Container
+    imageWidth:
+        default: 600
+        type: int
+    imageHeight:
+        default: 300
+        type: int
+    columns:
+        type: int
+        label: Spalten
+        default: 3
+    hideProductsInMainCategory:
+        type: bool
+        label: keine Produkte in Hauptkategorie zeigen
+    showSubCategories:
+        type: bool
+        label: zeige Unterkategorien
+
+/config #}
+
+{% set sp = view.getViewhelper('StaticPages') %}
+{% set p = view.getViewhelper('Partials', { plugin: plugin }) %}
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+{% if variables.columns == 1 %}
+    {% set colClass = "col-12" %}
+{% elseif variables.columns == 2 %}
+    {% set colClass = "col-md-6" %}
+{% elseif variables.columns == 3 %}
+    {% set colClass = "col-md-4" %}
+{% elseif variables.columns >= 4 %}
+    {% set colClass = "col-md-3" %}
+{% endif %}
+
+<div class="plugin Core ShopSystem Category Index01">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+
+                <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+
+                <div data-editable data-uid="{{ plugin.getUid('teaser') }}"></div>
+
+                {% if not variables.hideProductsInMainCategory %}
+                    <div class="row">
+                        {% for product in category.getItems() %}
+                            {{ p.renderPartial('/Frootbox/Ext/Core/ShopSystem/Plugins/ShopSystem/ProductTeaser', { product: product, i: i, colClass: colClass }) | raw }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {% if variables.showSubCategories %}
+                    {% for child in category.getChildren %}
+                        <h3>{{ child.getTitle() }}</h3>
+
+                        <div class="row">
+                            {% for product in child.getItems() %}
+                                {{ p.renderPartial('/Frootbox/Ext/Core/ShopSystem/Plugins/ShopSystem/ProductTeaser', { product: product, i: i, colClass: colClass }) | raw }}
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+</div>

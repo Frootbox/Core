@@ -1,0 +1,58 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<script>
+    $(function ( ) {
+
+        $('#updateForm').submit(function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            $.ajax({
+                url: $(this).attr('action'),
+                data: $(this).serialize(),
+                type: 'POST',
+                headers: {
+                    Accept: "application/json; charset=utf-8",
+                },
+                success: function ( response ) {
+
+                    $('figure[data-id="' + response.widget.id + '"]').replaceWith(response.widget.html);
+
+                    $('#fbxEditorGenericModal').modal('hide');
+                },
+                error: function ( xhr ) {
+                    alert(xhr.responseText);
+                }
+            });
+
+        });
+    });
+</script>
+
+
+<form id="updateForm" action="{{ widgetController.getAdminUrl('ajaxUpdate') }}" method="post">
+
+    <div class="modal-header">
+        <h5 class="modal-title">Call-To-Action Button</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+
+        <div class="form-group">
+            <label for="link">Link</label>
+            <input class="form-control" id="link" name="link" placeholder="Link" value="{{ widget.getConfig('link') }}" />
+        </div>
+        <div class="form-group">
+            <label for="label">Link-Beschriftung</label>
+            <input class="form-control" id="label" name="label" placeholder="Link-Beschriftung" value="{{ widget.getConfig('label') }}" />
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Speichern</button>
+    </div>
+
+</form>

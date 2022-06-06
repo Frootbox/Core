@@ -1,0 +1,47 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{% if links.getCount() == 0 %}
+	<div class="message warning">Es wurden noch keine Links erstellt.</div>
+{% else %}
+	<table class="table" data-sort="{{ plugin.getAdminUri('Link', 'ajaxSort') }}">
+		<thead>
+			<tr>
+				<th>Titel</th>
+
+				{% if data.plugin.getConfig('sorting') %}
+					<th></th>
+				{% endif %}
+
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+
+			{% for link in links %}
+				<tr id="row-{{ link.getId }}" data-title="Link bearbeiten" class="ajax {% if data.highlight == link.getId %}highlighted{% endif %}" data-modal="{{ data.plugin.getAdminUri('Link', 'ajaxModalEdit', { linkId: link.getId() }) }}">
+					<td>
+						{{ link.getTitle }}
+
+						{% for tag in link.getTags() %}
+						<span class="badge badge-secondary">{{ tag.getTag() }}</span>
+						{% endfor %}
+					</td>
+
+					{% if data.plugin.getConfig('sorting') %}
+						<td class="handle"><i class="fa fa-grip-lines"></i></td>
+					{% endif %}
+
+					<td class="text-right">
+
+						{% if link.getConfig('url') != "#" %}
+							<a target="_blank" href="{{ link.getConfig('url') }}"><i class="fa fa-link icon"></i></a>
+						{% endif %}
+
+						<a class="ajax" data-confirm="Soll dieser Link wirklich gelöscht werden?" href="{{ data.plugin.getAdminUri('Link', 'ajaxDelete', { linkId: link.getId() }) }}"><i class="fa fa-times icon"></i></a>
+					</td>
+				</tr>
+			{% endfor %}
+
+		</tbody>
+	</table>
+{% endif %}

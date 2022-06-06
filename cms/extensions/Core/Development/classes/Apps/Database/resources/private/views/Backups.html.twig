@@ -1,0 +1,33 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ front.addTab('Datenbankverwaltung', app.getUri('index')) }}
+{{ front.addTab('Backups', app.getUri('index')) }}
+
+<h2>
+    Datenbank Backups
+</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Datum</th>
+            <th>Datei</th>
+            <th>Größe</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+
+        {% for backup in backups %}
+            <tr>
+                <td>{{ backup.date | date('d.m.Y H:i') }} Uhr</td>
+                <td>{{ backup.filename }}</td>
+                <td class="text-left">{{ (backup.size / 1000 / 1000) | round(2) }} MB</td>
+                <td class="text-right">
+                    <a href="{{ v.getUri('App', 'index', { a: 'serveBackup', appId: app.getId(), file: backup.filename }) }}"><i class="far fa-download"></i></a>
+                </td>
+            </tr>
+        {% endfor %}
+
+    </tbody>
+</table>

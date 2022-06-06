@@ -1,0 +1,17 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<h4>
+    Rezepte
+    <span class="headoptions">
+		<a data-toggle="tooltip" data-modal data-title="neues Rezept hinzufügen" href="{{ plugin.getAdminUri('Recipe', 'ajaxModalCompose', { categoryId: category.getId() }) }}"><i class="fa fa-plus-circle"></i></a>
+	</span>
+</h4>
+
+<div id="listEntriesCategoryListReceiver">
+
+    {{ v.injectPartial('\\Frootbox\\Ext\\Core\\Gastronomy\\Plugins\\Recipes\\Admin\\Categories\\Partials\\ListRecipes', {
+        category: category,
+        plugin: plugin,
+    }) | raw }}
+
+</div>

@@ -1,0 +1,50 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{% if not data.skipFrame %}
+    <div id="categoriesTreeReceiver">
+{% endif %}
+
+    {% if data.categoryId %}
+        <script>
+            $(function ( ) {
+                $('tr[data-cat="{{ data.categoryId }}"]').trigger('click');
+            });
+        </script>
+    {% endif %}
+
+    <table class="table">
+        <tbody>
+
+            {% for category in tree %}
+                <tr data-cat="{{ category.getId() }}" class="{% if not category.getVisibility %}inactive{% endif %}">
+                    <td class="level-{{ category.getLevel }}">
+                        {% if not category.getVisibility %}<i class="fa fa-eye-slash"></i>{% endif %}
+                        {{ category.getTitle }}
+                    </td>
+                    <td class="text-right">
+
+                        <a class="ajax" href="{{ v.getUri('Assets/Categories', 'ajaxSwitchVisibility', { categoryId: category.getId() } ) }}"><i data-asset="{{ category.getId() }}" class="fa fa-lightbulb visibility {{ category.getVisibilityString() }} icon"></i></a>
+
+                        <span class="dropdown">
+                            <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fa fa-bars icon"></i>
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <a class="dropdown-item" data-modal data-title="neue Unterkategorie erstellen" href="{{ v.getUri('Assets/Categories', 'ajaxModalCompose', { 'categoryId' : category.getId(), pluginId: data.plugin.getId() }) }}"><i class="fa fa-plus fa-fw"></i> neue Unterkategorie erstellen</a>
+                                <!-- <div class="dropdown-divider"></div> -->
+                                <a class="dropdown-item" data-modal data-title="Kategorie bearbeiten „{{ category.getTitle() }}“ (#{{ category.getId() }})" href="{{ v.getUri('Assets/Categories', 'ajaxModalEdit', { 'categoryId' : category.getId(), pluginId: data.plugin.getId() }) }}"><i class="fa fa-pencil fa-fw"></i> Kategorie bearbeiten</a>
+                                <a class="dropdown-item ajax" data-confirm="Soll diese Kategorie wirklich gelöscht werden?" href="{{ v.getUri('Assets/Categories', 'ajaxDelete', { 'categoryId' : category.getId(), pluginId: data.plugin.getId() }) }}"><i class="fa fa-times fa-fw"></i> Kategorie löschen</a>
+                                <a class="dropdown-item" href="{{ v.getUri('Assets/Categories', 'sort', { 'categoryId' : category.getId(), pluginId: data.plugin.getId() }) }}"><i class="fa fa-sort fa-fw"></i> Kategorien sortieren</a>
+                            </div>
+                        </span>
+
+                    </td>
+                </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+
+{% if not data.skipFrame %}
+    </div>
+{% endif %}

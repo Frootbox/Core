@@ -1,0 +1,80 @@
+{# config
+
+title: Seitenhöhe
+variables:
+    cloak:
+        type: bool
+        default: false
+        label: andere Plugins verdrängen
+    crossfade:
+        type: bool
+        default: false
+        label: Übergang als Cross-Fade
+    positionFixed:
+        type: bool
+        label: an Position fixiert
+    withCtaButton:
+        type: bool
+        label: mit Call-To-Action Button
+    withHeadline:
+        type: bool
+        label: mit zentraler Headline
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+{% set images = i.getImages({ overrideUid: view.get('overrideImageUid') }) %}
+
+{% if variables.cloak %}
+    <param name="cloak" value="true" />
+{% endif %}
+
+<script>
+    $(function ( ) {
+
+        $(window).resize(function ( ) {
+
+            var height = $(window).outerHeight();
+
+            $('.plugin.Core.Images.Slider.Index09 .image').css('height', height + 'px');
+        });
+
+        $(window).trigger('resize');
+    });
+</script>
+
+<div class="plugin Core Images Slider Index09 {% if variables.positionFixed %}fixed{% endif %}">
+
+    <div id="slider{{ plugin.getId }}" class="carousel files-count-{{ images.getCount() }} carousel-fade slide" data-ride="carousel">
+        <div class="carousel-inner">
+
+            {% for file in images %}
+                <div class="carousel-item {% if loop.index == 1 %}active{% endif %}">
+                    <div class="image" data-copyright="{{ file.getCopyright() }}" style="background-image: url({{ file.getUri() }}); background-position: center; background-size: cover; width: 100%;"></div>
+                </div>
+            {% endfor %}
+
+        </div>
+    </div>
+
+    {% if variables.withHeadline %}
+        <div class="headline-wrapper">
+            <div class="container h-100">
+                <div class="row h-100 align-items-center">
+                    <div class="col-12">
+                        <h1 class="first main-title" data-uid="{{ plugin.getUid('title') }}" data-editable>Überschrift</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if variables.withCtaButton %}
+        <div class="cta">
+            <a href="#" data-uid="{{ plugin.getUid('link') }}" data-editable-link class="btn btn-primary">Link</a>
+        </div>
+    {% endif %}
+
+
+</div>

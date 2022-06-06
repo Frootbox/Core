@@ -1,0 +1,56 @@
+{# config
+
+title: nur Text
+variables:
+    columns:
+        type: int
+        label: Spalten
+        default: 2
+    noTitles:
+        type: bool
+        default: false
+        label: mit Teaser-Titeln
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+{% set teasers = i.getTeasers() %}
+
+{% if variables.columns == 1 %}
+    {% set colClass = "col-12" %}
+{% elseif variables.columns == 2 %}
+    {% set colClass = "col-6" %}
+{% elseif variables.columns == 3 %}
+    {% set colClass = "col-12 col-sm-6 col-md-4" %}
+{% elseif variables.columns >= 4 %}
+    {% set colClass = "col-md-3" %}
+{% endif %}
+
+<div class="row">
+    <div class="col-12 plugin Core Navigation Teaser Index07">
+
+        <div class="row text-center">
+
+            {% for teaser in teasers %}
+
+                <div class="{{ colClass }}">
+                    <div class="teaser">
+                        {% if not variables.noTitles %}
+                            <h2 data-editable data-uid="{{ teaser.getUid('title')}}">{{ teaser.getTitle }}</h2>
+                        {% endif %}
+
+                        <div data-editable data-uid="{{ teaser.getUid('teaser-text') }}"></div>
+
+                        {% if not teaser.isLinkDeactivated() %}
+                            <p><a href="{{ teaser.getUrl() }}">weiterlesen ...</a></p>
+                        {% endif %}
+                    </div>
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+</div>

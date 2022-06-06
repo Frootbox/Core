@@ -1,0 +1,24 @@
+{% set sp = view.getViewhelper('SimplePartials') %}
+
+
+{% for child in data.category.getChildren() %}
+
+    <h{{ data.heading }} data-editable data-uid="{{ child.getUid('title') }}">{{ child.getTitle() }}</h{{ data.heading }}>
+
+    {{ sp.renderPartial('Category', { fromfile: __FILE__, colClass: data.colClass, category: child, heading: (data.heading + 1) }) | raw }}
+
+    {% set contacts = child.getContacts() %}
+
+    {% if contacts.getCount() > 0 %}
+
+        <div class="row">
+            {% for contact in contacts %}
+                {{ sp.renderPartial('Contact', { fromfile: __FILE__, colClass: data.colClass, contact: contact }) | raw }}
+            {% endfor %}
+        </div>
+
+    {% endif %}
+
+{% endfor %}
+
+

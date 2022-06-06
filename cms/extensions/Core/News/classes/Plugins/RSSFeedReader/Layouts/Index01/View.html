@@ -1,0 +1,20 @@
+{# config
+
+title: Standard
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+{{ i.injectScss({ path: 'Index01/public/standards.less'}) | raw }}
+
+<div class="row">
+    <div class="col-12 plugin Core News RSSFeedReader Index01">
+    
+    	<h2 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+        
+        <div data-editable data-uid="{{ plugin.getUid('teaser') }}"></div>
+
+    </div>
+</div>
+

@@ -1,0 +1,11 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{% for page in data.page.getChildren %}
+    <li data-id="{{ page.getId }}" data-name="{{ page.getTitle }}">
+        {{ page.getTitle }}{% if user.getType() == 'SuperAdmin' %} {{ page.getLft() }}-{{ page.getRgt() }}{% endif %}
+
+        <ol>
+            {{ v.injectPartial('\\Frootbox\\Admin\\Controller\\Page\\Partials\\ListSortableChildren', { page: page } ) | raw }}
+        </ol>
+    </li>
+{% endfor %}

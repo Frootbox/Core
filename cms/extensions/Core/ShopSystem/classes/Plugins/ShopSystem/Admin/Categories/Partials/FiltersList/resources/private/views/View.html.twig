@@ -1,0 +1,28 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{% set filters = data.category.getFilters() %}
+
+{% if filters | length == 0 %}
+    <div class="message warning">Es wurden noch keine Filterkriterien erstellt.</div>
+{% else %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+
+            {% for index, filter in filters %}
+                <tr class="ajax {% if filter.field.getId() == data.highlight %}highlighted{% endif %}" data-href="{{ data.plugin.getAdminUri('Products', 'details', { productId: product.getId(), categoryId: data.category.getId() }) }}">
+                    <td>{{ filter.field.getTitle() }}</td>
+                    <td class="text-right">
+                        <a data-confirm="Soll dieses Filterkriterium wirklich gelöscht werden?" class="ajax" href="{{ data.plugin.getAdminUri('Categories', 'ajaxFilterCriteriaDelete', { fieldId: filter.field.getId(), categoryId: data.category.getId() }) }}"><i class="fa fa-times"></i></a>
+                    </td>
+                </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+{% endif %}

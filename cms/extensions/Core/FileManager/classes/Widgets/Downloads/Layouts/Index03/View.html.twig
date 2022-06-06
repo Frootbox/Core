@@ -1,0 +1,21 @@
+{% set i = view.getViewhelper('Delegator', { object: widget }) %}
+
+{% if widget.getConfig('withHeadline') %}
+    <h4 data-editable data-uid="{{ widget.getUid('title') }}">Überschrift</h4>
+{% endif %}
+
+<table class="table">
+    <tbody>
+
+        {% for file in i.getFiles() %}
+            <tr>
+                <td>
+                    <a href="{{ file.getUriDownload() }}">
+                        <i class="fa {{ file.getIcon() }} fa-fw icon"></i>{{ file.getTitle }}<br />
+                    </a>
+                </td>
+            </tr>
+        {% endfor %}
+
+    </tbody>
+</table>

@@ -1,0 +1,31 @@
+{% set b = view.getViewhelper('Breadcrumb', { singleton: true }) %}
+
+{% set sections = b.getSections(xpage) %}
+
+
+{% if sections | length > 1 %}
+    <nav aria-label="breadcrumb" class="breadcrumb-container">
+        <ol class="breadcrumb d-none d-md-flex">
+            {% for section in sections %}
+
+                {% if not (skipSecond and loop.index == 2) %}
+                    <li class="breadcrumb-item {% if loop.last %}active{% endif %}" {% if loop.last %}aria-current="page"{% endif %}>
+
+                        {% if section.href %}
+                            <a href="{{ section.href }}">{{ section.title }}</a>
+                        {% else %}
+                            <a href="#">{{ section.title}}</a>
+                        {% endif %}
+
+                    </li>
+                {% endif %}
+
+            {% endfor %}
+        </ol>
+
+        <p class="d-md-none"><a class="back-link" href="{{ sections[(sections | length) - 2].href }}">zurück</a></p>
+
+    </nav>
+{% endif %}
+
+

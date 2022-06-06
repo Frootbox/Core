@@ -1,0 +1,72 @@
+{# config
+
+title: Standard
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set p = view.getViewhelper('Partials') %}
+
+<div class="row">
+    <div class="col-12 plugin Core HelpAndSupport ContactPersons Index03">
+
+        {% if plugin.isFirst %}
+            <h1 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h1>
+        {% else %}
+            <h2 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+        {% endif %}
+
+        <div data-editable data-uid="{{ plugin.getUid('text') }}"></div>
+
+        {% for category in i.getTopCategories() %}
+            <div class="row contact-group">
+                <div class="col-6">
+
+                    <h3 data-editable data-uid="{{ category.getUid('title') }}">{{ category.getTitle() }}</h3>
+
+                    <div data-editable data-uid="{{ category.getUid('text-teaser') }}"></div>
+
+                    <p><a href="{{ category.getUri }}"><i class="fa fa-chevron-circle-right"></i> mehr Informationen</a></p>
+
+
+                </div>
+                <div class="col-6">
+                    <div class="row">
+
+                        {% for contact in category.getContacts %}
+                            <div class="col-6 contact-person">
+                                <div class="row">
+                                    <div class="col-3">
+
+                                        <picture class="fluid" data-editable data-uid="{{ contact.getUid('image')}}">
+                                            <img class="round" width="80" height="80" src="{{ i.getDummyImage({ width: 80, height: 80 }) }}" alt="" />
+                                        </picture>
+
+                                    </div>
+                                    <div class="col-9">
+                                        <b>{{ contact.getName }}</b>
+
+                                        {% if contact.getPhone() %}
+                                            <br /><a href="tel:{{ contact.getPhone() }}"><i class="fa fa-phone"></i> {{ contact.getPhone() }}</a>
+                                        {% endif %}
+
+                                        {% if contact.getEmail() %}
+                                            <br /><a href="mailto:{{ contact.getEmail() }}"><i class="fa fa-envelope"></i> E-Mail</a>
+                                        {% endif %}
+
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+
+                    </div>
+                </div>
+            </div>
+
+            <hr /><br />
+
+        {% endfor %}
+
+    </div>
+</div>
+

@@ -1,0 +1,13 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<li data-id="{{ data.item.getId() }}" data-name="{{ data.item.getTitle() }}">
+	{{ data.item.getTitle() }}
+
+	<ol>
+		{% for item in data.item.getItemsDefault() %}
+			{{ v.injectPartial('\\Frootbox\\Admin\\Controller\\NavigationBars\\Partials\\ListNavigationSortables\\Partial', {
+				item: item
+			}) | raw }}
+		{% endfor %}
+	</ol>
+</li>

@@ -1,0 +1,34 @@
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set b = view.getViewhelper('Breadcrumb', { singleton: true }) %}
+
+{{ b.addSection(contact.getName()) }}
+
+<div class="row">
+    <div class="col-12 plugin Core HelpAndSupport ContactPersons ShowContact01">
+        <div class="inner-wrapper">
+
+            {% if plugin.isFirst %}
+                <h1>{{ contact.getName() }}</h1>
+            {% else %}
+                <h2>{{ contact.getName() }}</h2>
+            {% endif %}
+
+            <p class="backlink"><a href="{{ page.getUri() }}">zurück</a></p>
+
+            <div class="row">
+                <div class="col-md-4">
+                    <picture  data-editable data-uid="{{ contact.getUid('image')}}">
+                        <img class="round" width="400" height="400" src="{{ i.getDummyImage({ width: 400, height: 400 }) }}" alt="" />
+                    </picture>
+                </div>
+                <div class="col-md-8">
+
+
+
+                </div>
+            </div>
+            {{ contact }}
+
+        </div>
+    </div>
+</div>

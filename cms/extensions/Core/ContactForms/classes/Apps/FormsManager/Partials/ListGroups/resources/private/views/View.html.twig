@@ -1,0 +1,71 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{% set groups = data.form.getGroups() %}
+
+{% if groups.getCount == 0 %}
+	<div class="message warning">Es wurden noch keine Formulargruppen erstellt.</div>
+{% else %}
+
+	{% for group in groups %}
+		<div class="form-group-container" id="{{ group.getId() }}">
+			<h4>
+				<span data-group="{{ group.getId() }}">{{ group.getTitle | default('kein Titel') }}</span>
+
+				<span class="headoptions">
+
+					<!--
+						<a data-toggle="tooltip" data-modal data-title="neues Formularfeld hinzufügen" href="{{ plugin.getAdminUri('Field', 'ajaxModalCompose', { groupId: group.getId() }) }}"><i class="fa fa-plus-circle"></i></a>
+					-->
+
+					<span class="dropdown">
+						<i class="far fa-bars dropdown-toggle" data-toggle="dropdown"></i>
+
+						<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+							<a class="dropdown-item" data-modal href="{{ app.getUri('ajaxModalGroupEdit', { groupId: group.getId() }) }}">Gruppe bearbeiten</a>
+							<a data-confirm="Soll diese Gruppe wirklich gelöscht werden?" class="dropdown-item ajax" href="{{ app.getUri('ajaxGroupDelete', { groupId: group.getId() }) }}">Gruppe löschen</a>
+						</div>
+					</span>
+
+					<a href="#" class="drag-handle" style="cursor: grab; position: absolute; right: 0;"><i class="fa fa-grip-lines"></i></a>
+
+				</span>
+			</h4>
+
+			<div class="row">
+				{% for column in group.getColumns() %}
+					<div class="col-md-{{ column.columns }}">
+
+						<h4>
+							<span>Felder</span>
+							<span class="headoptions">
+								<a data-toggle="tooltip" data-modal data-title="neues Formularfeld hinzufügen" href="{{ app.getUri('ajaxModalFieldCompose', { groupId: group.getId(), column: loop.index }) }}"><i class="fa fa-plus-circle"></i></a>
+							</span>
+						</h4>
+
+						{% if column.fields | length %}
+							<table class="table" data-sort="{{ app.getUri('ajaxFieldSort', { groupId: group.getId() }) }}">
+								<tbody>
+									{% for field in column.fields %}
+										<tr id="row-{{ field.getId() }}" data-size="lg" data-title="Feld bearbeiten" data-modal="{{ app.getUri('ajaxModalFieldEdit', { fieldId: field.getId() }) }}">
+											<td>{{ field.getTitle() }}{% if field.getMandatory() %}*{% endif %}</td>
+											<td>{{ field.getTypeTitle() }}</td>
+											<td class="handle">
+												<i class="fa fa-grip-lines"></i>
+											</td>
+											<td class="text-right">
+												<a class="ajax" data-confirm="Soll dieses Feld wirklich gelöscht werden?" href="{{ app.getUri('ajaxFieldDelete', { fieldId: field.getId() }) }}"><i class="fa fa-times icon"></i></a>
+											</td>
+										</tr>
+									{% endfor %}
+								</tbody>
+							</table>
+						{% endif %}
+
+					</div>
+				{% endfor %}
+			</div>
+
+		</div>
+	{% endfor %}
+
+{% endif %}

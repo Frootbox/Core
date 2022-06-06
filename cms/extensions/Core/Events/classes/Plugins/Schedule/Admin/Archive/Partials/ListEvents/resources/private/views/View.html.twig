@@ -1,0 +1,57 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{% if events.getCount == 0 %}
+	<div class="message warning">Es wurden noch keine Veranstaltungen erstellt.</div>
+{% else %}
+
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Veranstaltung</th>
+				<th>Start</th>
+				<th>Ende</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+
+			{% for event in events %}
+				<tr class="ajax {% if data.highlight == event.getId %}highlighted{% endif %}" data-href="{{ data.plugin.getAdminUri('Event', 'details', { eventId: event.getId() }) }}">
+					<td>
+						{{ event.getTitle }}
+
+						{% if event.getConfig('bookable.seats') > 0 %}
+							<br />
+							<i class="fa fa-user"></i> {{ event.getConfig('bookable.bookedSeats') | default(0) }}/{{ event.getConfig('bookable.seats') }}
+						{% endif %}
+
+						{% for tag in event.getTags() %}
+							<span class="badge badge-secondary">{{ tag.getTag() }}</span>
+						{% endfor %}
+
+					</td>
+					<td nowrap>
+						{{ event.getDateStart.format('%d.%m.%Y') }}
+
+						{% if event.getDateStart.format('%H:%M') != "00:00" %}
+							{{ event.getDateStart.format('%H:%M') }} Uhr
+						{% endif %}
+					</td>
+					<td nowrap>
+						{{ event.getDateEnd.format('%d.%m.%Y') }}
+
+						{% if event.getDateEnd.format('%H:%M') != "00:00" %}
+							{{ event.getDateEnd.format('%H:%M') }} Uhr
+						{% endif %}
+					</td>
+					<td class="text-right" nowrap>
+						<a class="ajax" href="{{ data.plugin.getAdminUri('Event', 'ajaxSwitchVisibility', { eventId: event.getId() }) }}"><i data-event="{{ event.getId() }}" class="fa fa-lightbulb visibility {{ event.getVisibilityString() }} icon"></i></a>
+						<a class="ajax" data-confirm="Soll diese Veranstaltung wirklich gelöscht werden?" href="{{ data.plugin.getAdminUri('Event', 'ajaxDelete', { eventId: event.getId() }) }}"><i class="fa fa-times icon"></i></a>
+					</td>
+				</tr>
+			{% endfor %}
+
+		</tbody>
+	</table>
+
+{% endif %}

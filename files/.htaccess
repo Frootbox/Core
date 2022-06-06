@@ -1,0 +1,12 @@
+RewriteEngine on
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule (.*) index.php
+
+#ErrorDocument 404 /files/index.php
+
+
+<IfModule mod_headers.c>
+<FilesMatch "\.(webp|gif|ico|jpeg|jpg|png|css|js|svg|ttf|woff|woff2)$">
+Header set Cache-Control "max-age=31536000, public"
+</FilesMatch>
+</IfModule>

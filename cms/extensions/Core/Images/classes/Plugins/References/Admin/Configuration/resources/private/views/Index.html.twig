@@ -1,0 +1,68 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+{% set i = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\Delegator', { object: controller }) %}
+
+<h2>
+    Konfiguration
+    {#
+    <span class="headoptions">
+		<a data-toggle="tooltip" data-modal data-title="neue Ansprechperson hinzufügen" href="{{ plugin.getAdminUri('Contact', 'ajaxModalCompose') }}"><i class="fa fa-plus-circle"></i></a>
+	</span>
+    #}
+</h2>
+
+<p><a class="ajax" href="{{ plugin.getAdminUri('Index', 'index') }}"><i class="fa fa-chevron-circle-left"></i> zurück</a></p>
+
+
+<div class="row">
+    <div class="col">
+
+        <div class="card">
+            <div class="card-body">
+
+                <form method="post" class="ajax" action="{{ plugin.getAdminUri('Configuration', 'ajaxUpdate') }}">
+
+                    <div class="form-group">
+                        <label for="order">Sortierung</label>
+                        <select class="form-control" name="order" id="order">
+                            <option {% if plugin.getConfig('order') == "Manual" %}selected{% endif %} value="Manual">manuelle Sortierug</option>
+                            <option {% if plugin.getConfig('order') == "DateDesc" %}selected{% endif %} value="DateDesc">Neueste zuerst</option>
+                            <option {% if plugin.getConfig('order') == "DateAsc" %}selected{% endif %} value="DateAsc">Älteste zuerst</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group form-check">
+                        <input {% if plugin.getConfig('noReferencesDetailPage') %}checked{% endif %} type="checkbox" class="form-check-input" id="noReferencesDetailPage" name="noReferencesDetailPage">
+                        <label class="form-check-label" for="noReferencesDetailPage">keine Detailseite für Referenzen</label>
+                    </div>
+
+                    {% if v.isExtensionInstalled('Core', 'ContactForms') %}
+                        <div class="form-group">
+                            <label for="formId">Anfrageformular</label>
+                            <select class="form-control" id="formId" name="formId">
+                                <option value="">kein Anfrageformular</option>
+                                {% for form in i.getForms() %}
+                                    <option {% if plugin.getConfig('formId') == form.getId %}selected{% endif %} value="{{ form.getId }}">{{ form.getTitle() }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    {% else %}
+                        <div class="message warning">Zur Verbindung eines Anfrageformulares müssen Sie die Erweiterung <b>Core/ContactForms</b> installieren.</div>
+                    {% endif %}
+
+                    <button type="submit" class="btn btn-primary">Speichern</button>
+
+                </form>
+
+                {% if user.getType %}
+
+                    <hr />
+
+                    <p><a class="ajax btn btn-primary" href="{{ plugin.getAdminUri('Configuration', 'ajaxTriggerSave') }}">Alle Referenzen spichern</a></p>
+
+                {% endif %}
+
+            </div>
+        </div>
+
+    </div>
+</div>

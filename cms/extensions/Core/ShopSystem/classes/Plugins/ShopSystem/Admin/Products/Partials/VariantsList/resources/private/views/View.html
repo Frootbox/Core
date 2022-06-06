@@ -1,0 +1,28 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{% if variants.getCount() == 0 %}
+    <div class="message warning">Es wurden noch keine Varianten erstellt.</div>
+{% else %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th class="text-right">Preis</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+
+            {% for variant in variants %}
+                <tr class="{% if variant.getId == data.highlight %}highlighted{% endif %}" data-title="Variante bearbeiten" data-modal="{{ data.plugin.getAdminUri('Products', 'ajaxModalVariantEdit', { variantId: variant.getId() }) }}">
+                    <td>{{ variant.getTitle() }}</td>
+                    <td class="text-right">{{ variant.getPrice() | number_format(2, ',', '.') }} EUR</td>
+                    <td class="text-right">
+                        <a class="ajax" data-confirm="Soll diese Variante wirklich gelöscht werden?" href="{{ data.plugin.getAdminUri('Products', 'ajaxVariantDelete', { productId: variant.getParentId(), variantId: variant.getId() }) }}"><i class="fa fa-times"></i></a>
+                    </td>
+                </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+{% endif %}

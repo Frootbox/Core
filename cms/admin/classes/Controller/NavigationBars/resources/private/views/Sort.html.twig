@@ -1,0 +1,104 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    'title' : 'Sitemap',
+}) }}
+
+{{ front.addTab('Navigationen', front.getUri('NavigationBars')) }}
+{{ front.addTab(navigation.getTitle(), front.getUri('NavigationBars', 'details', { navigationId: navigation.getId() })) }}
+
+<h2>
+    Navigation „{{ navigation.getTitle() }}“
+    <span class="headoptions">
+        <a data-modal href="{{ v.getUri('NavigationBars', 'ajaxModalEdit', { navigationId: navigation.getId(), language: get.get('language') }) }}" data-title="Navigation bearbeiten"><i class="fa fa-pencil"></i></a>
+        <a href="{{ v.getUri('NavigationBars', 'sort', { navigationId: navigation.getId() } ) }}"><i class="fa fa-sort-alt"></i></a>
+        <a data-modal href="{{ v.getUri('NavigationBars', 'ajaxModalComposeItem', { navigationId: navigation.getId(), language: get.get('language') }) }}" data-title="Navigations-Punkt erstellen"><i class="fa fa-plus-circle"></i></a>
+    </span>
+</h2>
+
+<script src='https://johnny.github.io/jquery-sortable/js/jquery-sortable.js'></script>
+
+
+<ol class="example">
+    {% for item in navigation.getItems({ language: get.get('language') }) %}
+        {{ v.injectPartial('\\Frootbox\\Admin\\Controller\\NavigationBars\\Partials\\ListNavigationSortables\\Partial', {
+            item: item
+        }) | raw }}
+    {% endfor %}
+</ol>
+
+<script>
+    $(function  () {
+        $("ol.example").sortable({
+            onDrop: function ($item, container, _super, event) {
+
+                var data = $("ol.example").sortable("serialize").get();
+                var jsonString = JSON.stringify(data, null, ' ');
+
+                // console.log(jsonString);
+
+                $item.removeClass(container.group.options.draggedClass).removeAttr("style")
+                $("body").removeClass(container.group.options.bodyClass);
+
+                $('#pageData').val(jsonString);
+
+                $.ajax({
+                    url: "{{ v.getUri('NavigationBars', 'ajaxSort', { navigationId: navigation.getId() }) }}",
+                    type: 'POST',
+                    data: {
+                        pageData: jsonString
+                    },
+                    success: function ( ) {
+                        toastr.success('Die Daten wurden erfolgreich gespeichert.');
+                    }
+                });
+            }
+        });
+    });
+</script>
+
+<textarea name="pageData" id="pageData"></textarea>
+
+<style>
+    body.dragging, body.dragging * {
+        cursor: move !important;
+    }
+
+    .dragged {
+        position: absolute;
+        opacity: 0.5;
+        z-index: 2000;
+    }
+
+    ol.example {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+    ol.example li {
+        padding: 5px;
+        border: 1px solid #cccccc;
+    }
+
+    ol.example li.placeholder {
+        position: relative;
+        /** More li styles **/
+    }
+    ol.example li.placeholder:before {
+        position: absolute;
+        display: block;
+        content: " ";
+        height: 5px;
+        width: 5px;
+        background: red;
+    }
+
+    ol.example ol {
+        padding: 0 0 10px 20px;
+    }
+
+    #pageData {
+        position: absolute;
+        left: -10000px;
+    }
+</style>

@@ -1,0 +1,25 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    'frame' : false,
+}) }}
+
+<form method="post" class="ajax" action="{{ plugin.getAdminUri('Group', 'ajaxUpdate', { groupId: group.getId() }) }}">
+
+    <div class="modal-body">
+
+        <div class="form-group">
+            <label for="title">Titel</label>
+            <input type="text" class="form-control" name="group[title]" required id="title" placeholder="Titel" value="{{ group.getTitle() }}">
+        </div>
+        <div class="form-group">
+            <label for="columns">Spalten</label>
+            <input type="number" min="1" max="12" step="1" class="form-control" name="group[config][columns]" id="columns" placeholder="Spalten" value="{{ group.getColumns }}">
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Speichern</button>
+    </div>
+
+</form>

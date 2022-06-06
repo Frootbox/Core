@@ -1,0 +1,36 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    'frame' : false,
+}) }}
+
+<form method="post" class="ajax" action="{{ v.getUri('Extensions', 'ajaxInstall') }}">
+
+    <div class="modal-body">
+
+        <div class="form-group">
+            <label for="extension">Erweiterung</label>
+            <select class="form-control" id="extension" name="extension">
+                <option value="">bitte wählen ...</option>
+
+                <optgroup label="native Erweiterungen">
+                    {% for extData in extensions.native %}
+                        <option value="{{ extData.path }}">{{ extData.vendorId }}/{{ extData.extensionId }}</option>
+                    {% endfor %}
+                </optgroup>
+
+                <optgroup label="benutzerdefinierte Erweiterungen">
+                    {% for extData in extensions.custom %}
+                        <option value="{{ extData.path }}">{{ extData.vendorId }}/{{ extData.extensionId }}</option>
+                    {% endfor %}
+                </optgroup>
+
+            </select>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Erweiterung installieren</button>
+    </div>
+
+</form>

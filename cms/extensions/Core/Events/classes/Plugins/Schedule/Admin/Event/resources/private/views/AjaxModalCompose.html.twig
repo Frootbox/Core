@@ -1,0 +1,34 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    'frame' : false,
+}) }}
+
+<form method="post" class="ajax" action="{{ plugin.getAdminUri('Event', 'ajaxCreate', { cloneFrom: clone.getId() }) }}">
+
+    <div class="modal-body">
+
+        <div class="form-group">
+            <label for="title">Titel</label>
+            <input type="text" class="form-control" name="title" required id="title" placeholder="Titel" value="{{ clone.getTitle() }}">
+        </div>
+
+        {{ v.injectPartial('\\Frootbox\\Admin\\View\\Partials\\Input\\Daterange', {
+            startDate: clone.getDateStart().format('%d.%m.%Y %H:%M'),
+            endDate: clone.getDateEnd().format('%d.%m.%Y %H:%M')
+        }) | raw }}
+
+        {% if v.isExtensionInstalled('Core', 'Addresses') %}
+            {{ v.injectPartial('\\Frootbox\\Ext\\Core\\Addresses\\Admin\\Partials\\Input\\Select', {
+                className: 'Frootbox\\Ext\\Core\\Events\\Persistence\\Venue',
+                pluginId: get.get('pluginId')
+            }) | raw }}
+        {% endif %}
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Veranstaltung erstellen</button>
+    </div>
+
+</form>
+

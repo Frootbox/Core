@@ -1,0 +1,57 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    'title' : 'Sitemap',
+}) }}
+
+{{ front.addTab('Sitemap', front.getUri('Sitemap')) }}
+
+<div class="row">
+    <div class="col-4 noprint">
+
+        <h2>
+            Sitemap
+
+            <span class="headoptions">
+                <!--<a data-modal href="{{ v.getUri('Page', 'ajaxModalContentCompose', { 'pageId' : page.getId(), 'socket' : socket.socket } ) }}" data-title="Inhalt hinzufügen"><i class="fa fa-plus-circle"></i></a>-->
+
+                <span class="dropdown">
+                    <i class="far fa-bars dropdown-toggle" data-toggle="dropdown"></i>
+
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item" href="{{ v.getUri('Page', 'sort') }}">Seiten sortieren</a>
+                        <a class="dropdown-item" href="{{ v.getUri('Sitemap', 'print') }}">druckbare Checkliste</a>
+                        <a class="dropdown-item" href="{{ v.getUri('Sitemap', 'multiDelete') }}">Massenlöschung</a>
+                    </div>
+                </span>
+            </span>
+        </h2>
+
+
+        <div>
+            <div id="sitemapReceiver">
+                {{ v.injectPartial('\\Frootbox\\Admin\\Controller\\Sitemap\\Partials\\Sitemap\\Partial') | raw }}
+            </div>
+        </div>
+
+
+    </div>
+    <div class="col-8">
+
+        <div id="panelReceiver" class="{% if not configuration.get('Admin.Controller.Sitemap.skipStickyTop') %}sticky-top{% endif %}">
+
+        </div>
+
+    </div>
+</div>
+
+{% if get.get('jumpTo') %}
+    <a class="ajax" id="jlkjll" href="{{ get.get('jumpTo') }}">xxxx</a>
+
+    <script>
+        $(function ( ) {
+            $('#jlkjll').trigger('click');
+            $('#jlkjll').remove();
+        });
+    </script>
+{% endif %}

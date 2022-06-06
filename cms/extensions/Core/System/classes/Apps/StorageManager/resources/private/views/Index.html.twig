@@ -1,0 +1,33 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ front.addTab('Speicher-Verwaltung', app.getUri('index')) }}
+
+
+<h2>
+	Speicher-Verwaltung
+</h2>
+
+<table class="table">
+	<thead>
+		<tr>
+			<th>Pfad</th>
+			<th>Größe</th>
+		</tr>
+	</thead>
+	<tbody>
+
+		{% for folder in folders %}
+			<tr data-href="{{ app.getUri('index', { path: folder.path }) }}">
+				<td>{{ folder.path }}</td>
+				<td>{{ folder.size | number_format(2, '.', ',') }}</td>
+			</tr>
+		{% endfor %}
+
+	</tbody>
+	<tfoot>
+		<tr>
+			<td></td>
+			<td>{{ total }}</td>
+		</tr>
+	</tfoot>
+</table>

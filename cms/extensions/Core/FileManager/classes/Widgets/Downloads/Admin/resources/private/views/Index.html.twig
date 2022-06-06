@@ -1,0 +1,147 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<script>
+
+    var storedHtml;
+
+    $(function ( ) {
+
+        /**
+         *
+         */
+        $('#downloadUpdateForm').submit(function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            $.ajax({
+                url: $(this).attr('action'),
+                data: $(this).serialize(),
+                type: 'POST',
+                headers: {
+                    Accept: "application/json; charset=utf-8",
+                },
+                success: function ( response ) {
+
+                    $('figure[data-id="' + response.widget.id + '"]').replaceWith(response.widget.html);
+
+                    $('#fbxEditorGenericModal').modal('hide');
+                },
+            });
+        });
+
+        /**
+         *
+         */
+        $(document).on('click', 'a.edit-file', function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            storedHtml = $('#fbxEditorGenericModal .modal-content').html();
+
+            $('#fbxEditorGenericModal .modal-content .modal-body:not(:first)').remove();
+            $('#fbxEditorGenericModal .modal-content .modal-body').html('Daten werden geladen ...');
+
+            $.ajax({
+                url: $(this).attr('href'),
+                headers: {
+                    Accept: "application/json; charset=utf-8",
+                },
+                success: function ( html ) {
+                    $('#fbxEditorGenericModal .modal-content .modal-body').remove();
+                    $('#fbxEditorGenericModal .modal-content').append(html);
+                },
+            });
+        });
+
+        /**
+         *
+         */
+        $(document).on('submit', '#fbxModalEditFileForm', function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            $.ajax({
+                url: $(this).attr('action'),
+                type: 'POST',
+                data: $(this).serialize(),
+                headers: {
+                    Accept: "application/json; charset=utf-8",
+                },
+                success: function ( response ) {
+
+                    $('#fbxEditorGenericModal .modal-content').html(storedHtml);
+
+                    fbxEditorWidgetRefresh({
+                        widgetId: {{ widget.getId() }}
+                    });
+                }
+            });
+        });
+    });
+</script>
+
+<div class="modal-header">
+    <h5 class="modal-title">Downloads konfigurieren</h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+</div>
+
+<form id="downloadUpdateForm" action="{{ widgetController.getAdminUrl('ajaxUpdate') }}" method="post">
+
+
+    <div class="modal-body">
+
+        <div class="form-group">
+            <label for="title">Titel (optional)</label>
+            <input type="text" class="form-control" name="title" id="title" value="{{ widget.getConfig('title') }}" />
+        </div>
+
+        <div class="form-group form-check">
+            <input type="checkbox" class="form-check-input" id="withHeadline" name="withHeadline" {% if widget.getConfig('withHeadline') %}checked{% endif %}>
+            <label class="form-check-label" for="withHeadline">mit Überschrift</label>
+        </div>
+
+     </div>
+
+    {{ v.injectPartial('Frootbox/Ext/Core/FileManager/Editor/Partials/FileManager', {
+        uid: widget.getUid('files')
+    }) | raw }}
+
+    <div class="modal-body">
+
+            {{ v.injectPartial('Frootbox/Ext/Core/FileManager/Editor/Partials/FileUpload', {
+                multiple: true,
+                uid: widget.getUid('files')
+            }) | raw }}
+
+    </div>
+
+    {% set template = widget.getViewTemplate() %}
+
+    <div class="modal-body">
+        {% for variable in template.getVariables() %}
+
+
+            {% if variable.type == 'bool' %}
+                <div class="form-group form-check">
+                    <input type="checkbox" class="form-check-input" name="variables[{{ variable.name }}]" id="{{ variable.name }}" {% if variable.value %}checked{% endif %}>
+                    <label class="form-check-label" for="{{ variable.name }}">{{ variable.label }}</label>
+                </div>
+            {% else %}
+                <div class="form-group">
+                    <label for="{{ variable.name }}">{{ variable.label }}</label>
+                    <input type="text" class="form-control" id="{{ variable.name }}" name="variables[{{ variable.name }}]" placeholder="{{ variable.label }}" value="{{ variable.value }}">
+                </div>
+            {% endif %}
+
+        {% endfor %}
+
+
+        <button tpye="submit" class="btn btn-primary">Speichern</button>
+
+    </div>
+
+</form>

@@ -1,0 +1,23 @@
+{# config
+
+title: Blöcke
+variables:
+    withHeadline:
+        type: bool
+        label: mit Überschrift
+
+/config #}
+
+<div class="plugin Core Editing Text Index02">
+
+    {% if variables.withHeadline %}
+        {% if plugin.isFirst %}
+            <h1 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h1>
+        {% else %}
+            <h2 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+        {% endif %}
+    {% endif %}
+
+    <div data-blocks data-uid="{{ plugin.getUid('block-content') }}"></div>
+
+</div>

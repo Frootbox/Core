@@ -1,0 +1,22 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<nav class="big-options">
+
+    <div class="row">
+
+        {% for link in data.links %}
+
+            {% if not link.disabled %}
+                <div class="col-3">
+                    <a class="{{ link.type | default('ajax') }}" href="{{ link.url }}">
+                        <i class="fa {{ link.icon }}"></i><br />
+                        {{ link.title }}
+                    </a>
+                </div>
+            {% endif %}
+
+        {% endfor %}
+
+    </div>
+
+</nav>

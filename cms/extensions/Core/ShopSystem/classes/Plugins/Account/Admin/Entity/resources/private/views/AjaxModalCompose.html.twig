@@ -1,0 +1,22 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    'frame': false,
+}) }}
+
+<form method="post" class="ajax" action="{{ plugin.getAdminUri('Entity', 'ajaxCreate') }}">
+
+    <div class="modal-body">
+
+        <div class="form-group">
+            <label for="title">Titel</label>
+            <input type="text" class="form-control" name="title" required id="title" placeholder="Titel">
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">neue Einheit erstellen</button>
+    </div>
+
+</form>
+

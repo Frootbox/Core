@@ -1,0 +1,53 @@
+$colorSpot2: $colorSpot1 !default;
+
+.plugin.Core.HelpAndSupport.Jobs.Index02 {
+
+  .accordion {
+    margin-top: 50px;
+  }
+
+  .card {
+
+    .card-header {
+
+      h3 {
+
+        cursor: pointer;
+
+        span {
+
+          span.icons {
+            float: right;
+
+            svg {
+              color: $colorSpot2;
+            }
+
+            .down {
+              display: none;
+            }
+
+            .up {
+              display: inline-block;
+            }
+          }
+
+          &.collapsed {
+
+            span.icons {
+
+              .down {
+                display: inline-block;
+              }
+
+              .up {
+                display: none;
+              }
+            }
+          }
+
+        }
+      }
+    }
+  }
+}

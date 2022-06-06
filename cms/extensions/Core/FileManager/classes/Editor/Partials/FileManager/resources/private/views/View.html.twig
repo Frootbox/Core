@@ -1,0 +1,98 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<script>
+    $(function ( ) {
+
+
+        /**
+         * Sort files
+         */
+        $('#fileManager table').tableDnD({
+            dragHandle: '.handle',
+            serializeParamName: 'files',
+            onDragClass: 'dragging',
+            onDrop: function (table, row) {
+
+                $.ajax({
+                    url: '{{ serverpath }}static/Ext/Core/FileManager/Editor/sort?uid={{ data.uid }}',
+                    data: $.tableDnD.serialize()
+                });
+            }
+        });
+
+
+        /**
+         *
+         */
+        $('input.inplace[data-file]').blur(function ( event ) {
+
+            $.ajax({
+                url: "{{ serverpath }}static/Ext/Core/FileManager/Editor/ajaxUpdate?fileId=" + $(this).attr('data-file'),
+                type: 'POST',
+                data: {
+                    title: $(this).val()
+                }
+            });
+        });
+
+
+        /**
+         *
+         */
+        $('a.file-delete').click(function ( event ) {
+
+            event.preventDefault();
+
+            if (!confirm('Soll diese Datei wirklich gelöscht werden?')) {
+                return;
+            }
+
+            let fileId = $(this).attr('data-file');
+
+            $.ajax({
+                url: $(this).attr('href'),
+                success : function ( html ) {
+
+                    $('tr[data-file="' + fileId + '"]').remove();
+                },
+                error : function ( ) {
+
+                }
+            });
+        });
+    });
+</script>
+
+<style>
+    input.inplace {
+        width: 100%;
+        border-width: 0 0 1px 0;
+    }
+
+    input.inplace:focus {
+        outline: none;
+    }
+</style>
+
+<div id="fileManager">
+
+    <table class="table" id="table-{{ random(1000, 9999) }}">
+        <tbody>
+
+            {% for file in files %}
+                <tr id="files-{{ file.getId }}" data-file="{{ file.getId() }}">
+                    <td width="70"><img width="50" height="50" src="{{ file.getUri({ width: 50, height: 50 }) }}" alt="" /></td>
+                    <td>
+                        <input data-file="{{ file.getId }}" class="inplace" type="text" value="{{ file.getTitleReal() | default(file.getName()) }}" placeholder="Titel der Datei" /><br />
+                        <a data-file="{{ file.getId() }}" class="file-delete" href="{{ serverpath }}static/Ext/Core/FileManager/Editor/ajaxFileDelete?fileId={{ file.getId() }}"><i class="fa fa-times"></i></a>&nbsp;&nbsp;
+                        <a href="{{ file.getUriDownload() }}"><i class="fa fa-download"></i></a>&nbsp;&nbsp;
+                        <a target="cms_file_editing" href="{{ serverpath }}static/Ext/Core/FileManager/Editor/jumpToFile?fileId={{ file.getId() }}"><i class="fa fa-pencil"></i></a>
+                    </td>
+                    <td class="handle" style="cursor: pointer; vertical-align: middle;" width="40"><i class="fa fa-grip-lines"></i></td>
+                </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+
+</div>

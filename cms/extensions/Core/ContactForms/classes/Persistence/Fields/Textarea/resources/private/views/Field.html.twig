@@ -1,0 +1,10 @@
+
+<div class="form-group">
+    <label for="field-{{ field.getId() }}">
+        <span {% if renderer.options.editable %}data-editable-element data-uid="{{ field.getUid('title') }}"{% endif %}>{{ field.getTitle() }}</span><!--
+        -->{% if field.getMandatory() %}<span class="mandatory">*</span>{% endif %}</label>
+    <textarea rows="{{ field.getConfig('rows') | default(5) }}" class="form-control" id="field-{{ field.getId() }}" placeholder="{% if renderer.options.placeholderLabel %}{{ field.getTitle() }}{% if field.isRequired() %}*{% endif %}{% endif %}" name="fields[{{ field.getId() }}]" aria-describedby="helpField{{ field.getId() }}"></textarea>
+    <!--<small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>-->
+</div>
+
+

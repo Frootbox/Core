@@ -1,0 +1,34 @@
+
+{% set partialId = "DataRangeInput" ~ random(10000, 99999) %}
+
+<script>
+    $(function ( ) {
+
+        $('#{{ partialId }}').daterangepicker({
+            {% if data.startDate %}startDate: '{{ data.startDate }}',{% endif %}
+            {% if data.endDate %}endDate: '{{ data.endDate }}',{% endif %}
+            timePicker: true,
+            timePickerIncrement: 5,
+            timePicker24Hour: true,
+            locale: {
+                format: 'DD.MM.YY HH:mm',
+                daysOfWeek: [
+                    "So",
+                    "Mo",
+                    "Di",
+                    "Mi",
+                    "Do",
+                    "Fr",
+                    "Sa"
+                ],
+                "firstDay": 1
+            }
+        });
+
+    });
+</script>
+
+<div class="form-group">
+    <label for="{{ partialId }}">Datum</label>
+    <input type="text" class="daterange form-control" id="{{ partialId }}" name="dates" placeholder="Datum">
+</div>

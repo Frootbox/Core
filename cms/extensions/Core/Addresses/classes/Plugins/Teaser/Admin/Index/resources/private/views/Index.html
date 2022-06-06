@@ -1,0 +1,24 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<h2>
+    Adressen-Teaser
+</h2>
+
+<p><a class="ajax" href="{{ v.getUri('Page', 'ajaxPanelContent', { 'pageId' : plugin.getPageId() }) }}"><i class="fa fa-chevron-circle-left"></i> zurück</a></p>
+
+<div class="card">
+    <div class="card-body">
+
+        <form method="post" class="ajax" action="{{ plugin.getAdminUri('Index', 'ajaxUpdate') }}">
+
+            <div class="form-group">
+                <label for="limit">Anzahl Adressen</label>
+                <input type="number" class="form-control" id="limit" name="limit" step="1" placeholder="Anzahl" value="{{ plugin.getConfig('limit') }}">
+            </div>
+
+            <button type="submit" class="btn btn-primary">Speichern</button>
+
+        </form>
+
+    </div>
+</div>

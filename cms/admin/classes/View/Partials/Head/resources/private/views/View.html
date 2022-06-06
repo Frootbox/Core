@@ -1,0 +1,36 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<meta charset="utf-8" />
+
+<title>{{ title }}</title>
+
+<script src="{{ serverpath }}cms/admin/resources/public/libs/popper.min.js"></script>
+
+{{ v.injectLibrary('jquery/jquery.3-3-1.min.js') | raw }}
+
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/TableDnD/0.9.1/jquery.tablednd.js" integrity="sha256-d3rtug+Hg1GZPB7Y/yTcRixO/wlI78+2m08tosoRn7A=" crossorigin="anonymous"></script>
+
+{{ v.injectLibrary('bootstrap-4.3.1-dist/css/bootstrap.min.css') | raw }}
+{{ v.injectLibrary('bootstrap-4.3.1-dist/js/bootstrap.min.js') | raw }}
+
+{{ v.injectLibrary('fontawesome-pro-5.10.2-web/js/all.min.js') | raw }}
+
+{{ v.inject('init.js') | raw }}
+{{ v.inject('forms.js') | raw }}
+{{ v.inject('links.js') | raw }}
+{{ v.inject('modals.js') | raw }}
+
+{{ v.inject('standards-xs.less') | raw }}
+{{ v.inject('styles-table.less') | raw }}
+{{ v.inject('styles-form.less') | raw }}
+
+{{ v.inject('styles-print.less') | raw }}
+
+{{ controller.injectActionCss() | raw }}
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+<link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
+

@@ -1,0 +1,108 @@
+{# config
+
+title: Standard
+variables:
+    columns:
+        type: int
+        label: Spalten
+        default: 4
+    image_width:
+        type: int
+        label: Bildbreite
+        default: 600
+    image_height:
+        type: int
+        label: Bildhöhe
+        default: 400
+    noCategoryAutoImage:
+        type: bool
+        label: Kategoriebild nicht automatisches wählen
+    withLayoutContainer:
+        type: bool
+        label: mit Layout-Container
+    withTextBelowImage:
+        type: bool
+        label: mit Text unter dem Bild
+
+/config #}
+
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set a = view.getViewhelper('Assets', {   }) %}
+
+{% if variables.columns == 1 %}
+    {% set colClass = "col-12" %}
+{% elseif variables.columns == 2 %}
+    {% set colClass = "col-6" %}
+{% elseif variables.columns == 3 %}
+    {% set colClass = "col-4" %}
+{% elseif variables.columns == 4 %}
+    {% set colClass = "col-3" %}
+{% elseif variables.columns > 4 %}
+    {% set colClass = "col-2" %}
+{% endif %}
+
+{{ a.import('https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css') | raw }}
+{{ a.import('https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js') | raw }}
+
+<div class="plugin Core Images Gallery Index01">
+
+    {% if variables.withLayoutContainer %}<div class="container">{% endif %}
+
+    <div class="row">
+        <div class="col-12">
+
+            <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+
+            <div data-editable data-uid="{{ plugin.getUid('teaser') }}"></div>
+
+            <div class="row justify-content-center">
+
+                {% for category in i.getTopCategories %}
+
+                    {% set c = view.getViewhelper('Delegator', { object: category }) %}
+
+                    <div class="{{ colClass }} category">
+                        <a href="{{ category.getUri }}">
+
+                            {% if not variables.noCategoryAutoImage %}
+                                <picture class="fluid">
+                                    <img width="{{ variables.image_width }}" height="{{ variables.image_height }}" src="{{ c.getDefaultImage({ width: variables.image_width, height: variables.image_height }) }}" alt="" />
+                                </picture>
+                            {% else %}
+                                <picture class="fluid" data-editable data-uid="{{ category.getUid('image')}}">
+                                    <img width="{{ variables.image_width }}" height="{{ variables.image_height }}" src="{{ i.getDummyImage({ width: variables.image_width, height: variables.image_height | default(300) }) }}" alt="" />
+                                </picture>
+                            {% endif %}
+
+                            {{ category.getTitle }}
+                        </a>
+                    </div>
+                {% endfor %}
+
+            </div>
+            <div class="row">
+
+                {% set categoryAdapter = view.getViewhelper('Delegator', { object: i.getRootCategory() }) %}
+
+                {% for file in categoryAdapter.getImages() %}
+                    <div class="{{ colClass }}">
+                        <div class="image">
+                            <a href="{{ file.getUriThumbnail() }}" data-fancybox="gallery">
+                                <picture class="fluid" data-fileid="{{ file.getId() }}">
+                                    <img src="{{ file.getUriThumbnail({ width: variables.image_width, height: variables.image_height }) }}" alt="{{ file.getAlt() }}" />
+                                </picture>
+                            </a>
+                            <div data-editable data-uid="{{ file.getUid('teaser-text') }}"></div>
+                        </div>
+                    </div>
+                {% endfor %}
+
+            </div>
+
+        </div>
+    </div>
+
+    {% if variables.withLayoutContainer %}</div>{% endif %}
+
+</div>

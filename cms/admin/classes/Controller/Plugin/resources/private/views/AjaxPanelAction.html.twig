@@ -1,0 +1,13 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+	'frame' : false,
+}) }}
+
+{% for message in front.getFlashMessages() %}
+	<div class="message {{ message.type }}">
+		{{ message.message }}
+	</div>
+{% endfor %}
+
+{{ pluginHtml | raw }}

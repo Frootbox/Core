@@ -1,0 +1,102 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+
+
+<script src="{{ serverpath }}cms/admin/resources/public/libs/jquery/upload/js/vendor/jquery.ui.widget.js"></script>
+<script src="{{ serverpath }}cms/admin/resources/public/libs/jquery/upload/js/jquery.iframe-transport.js"></script>
+<script src="{{ serverpath }}cms/admin/resources/public/libs/jquery/upload/js/jquery.fileupload.js"></script>
+
+<script>
+    $(function () {
+
+        $('#fileupload').fileupload({
+            dataType: 'json',
+
+            done: function (e, data) {
+
+                $('#fileupload').after('<div id="fileUploadResponse" style="margin: 20px 0; padding: 10px 0; color: green; border: 1px solid green; text-align: center;">Die Datei wurde erfolgreich hochgeladen.</div>');
+
+                $.each(data.result.files, function (index, file) {
+
+                    window.setTimeout(function ( ) {
+                        $('picture[data-uid="' + file.uid + '"] img').attr('src', file.src);
+                    }, 2000);
+                });
+            }
+        });
+
+
+        /**
+         *
+         */
+        $('#pictureUpdateForm').submit(function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            $.ajax({
+                url: $(this).attr('action'),
+                data: $(this).serialize(),
+                type: 'POST',
+                success: function ( response ) {
+
+                    $('picture[data-uid="' + response.uid + '"] img').attr('src', response.src);
+
+                    $('#fbxEditorGenericModal').modal('hide');
+                }
+            });
+
+        });
+    });
+</script>
+
+<form enctype="multipart/form-data" target="xxxxxxxx" id="pictureUpdateForm" action="{{ v.getUri('Editor/Picture', 'ajaxUpdate', { fileId: file.getId(), uid: get.get('uid'), width: get.get('width'), height: get.get('height') }) }}" method="post" data-uid="{{ get.get('uid') }}">
+
+    <div class="modal-header">
+        <h5 class="modal-title">Bild bearbeiten</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+
+
+        <div class="form-group">
+            <label for="fileupload">Datei</label>
+            <input class="form-control" id="fileupload" type="file" name="file" data-url="{{ v.getUri('Editor/Picture', 'ajaxUpload', { uid: get.get('uid'), 'width' : get.get('width'), 'height' : get.get('height') }) }}" multiple />
+
+            <small id="emailHelp" class="form-text text-muted">
+                {% if get.get('width') and get.get('height') %}
+                    optimale Maße: {{ get.get('width') }}x{{ get.get('height') }} Pixel
+                {% elseif get.get('width') %}
+                    optimale Breite: {{ get.get('width') }} Pixel
+                {% elseif get.get('height') %}
+                    optimale Höhe: {{ get.get('height') }} Pixel
+                {% endif %}
+            </small>
+        </div>
+        <div class="form-group">
+            <label for="url">von URL importieren</label>
+            <input type="text" class="form-control" id="url" name="url" placeholder="URL" value="">
+        </div>
+
+        {% if file %}
+            <div class="form-group">
+                <label for="width">Breite</label>
+                <input type="number" class="form-control" id="width" name="width" placeholder="Breite" value="{{ file.getConfig('width') }}">
+            </div>
+
+            <div class="form-group">
+                <label for="caption">Bildunterschrift</label>
+                <textarea rows="5" class="form-control" id="caption" name="caption" placeholder="Bildunterschrift">{{ file.getConfig('caption') }}</textarea>
+            </div>
+            <div class="form-group">
+                <label for="copyright">Copyright</label>
+                <input rows="5" class="form-control" id="copyright" name="copyright" placeholder="Copyright" value="{{ file.getCopyright() }}" />
+            </div>
+        {% endif %}
+
+        <button type="submit" class="btn btn-primary">Speichern</button>
+
+    </div>
+</form>

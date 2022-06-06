@@ -1,0 +1,43 @@
+{% set i = view.getViewhelper('Delegator', { object: widget }) %}
+
+{% set contact = i.getContact() %}
+
+
+<div class="row">
+
+    <div class="col-12 teaser">
+        <div class="row">
+            <div class="col-4">
+                <picture class="round"  data-editable data-uid="{{ contact.getUid('image')}}">
+                    <img width="{{ variables.image_width }}" height="{{ variables.image_height }}" src="{{ i.getDummyImage({ width: variables.image_width, height: variables.image_height }) }}" alt="" />
+                </picture>
+            </div>
+            <div class="col-8">
+
+                <h5 class="condensed">{{ contact.getName() }}</h5>
+
+                <p>
+                    {% if contact.getCompany() %}
+                    {{ contact.getCompany() }}<br />
+                    {% endif %}
+
+                    {% if contact.getPosition() %}
+                        {{ contact.getPosition() }}
+                    {% endif %}
+                </p>
+
+                <p>
+                    {% if contact.getPhone() %}
+                    <a href="tel:{{ contact.getPhone() }}"><i class="fa fa-phone"></i> {{ contact.getPhone() }}</a><br />
+                    {% endif %}
+
+                    {% if contact.getEmail() %}
+                    <a href="mailto:{{ contact.getEmail() }}"><i class="fa fa-envelope"></i> E-Mail</a><br />
+                    {% endif %}
+                </p>
+
+            </div>
+        </div>
+    </div>
+
+</div>

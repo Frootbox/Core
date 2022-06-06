@@ -1,0 +1,58 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<form id="updateForm" action="{{ v.getUri('Editor', 'ajaxUpdateHeadline', { 'uid' : get.get('uid') }) }}" method="post" data-uid="{{ get.get('uid') }}">
+
+    <div class="modal-header">
+        <h5 class="modal-title">Überschrift bearbeiten</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+
+        <div class="form-group">
+            <label for="title">Überschrift</label>
+            <input type="text" class="form-control" id="title" name="title" placeholder="Überschrift" value="{{ data.headline }}">
+        </div>
+        <div class="form-group">
+            <label for="subtitle">Untertitel</label>
+            <input type="text" class="form-control" id="subtitle" name="subtitle" placeholder="Untertitel" value="{{ data.subtitle }}">
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Speichern</button>
+    </div>
+
+</form>
+
+
+<script>
+    $(function ( ) {
+
+        window.setTimeout(function ( ) {
+            $('#title').delay(500).focus();
+        }, 500);
+
+        $('#updateForm').on('submit', function ( event ) {
+
+            event.preventDefault();
+
+            var form = $(this);
+
+            $.ajax({
+                url : $(this).attr('action'),
+                type: 'POST',
+                data : $(this).serialize(),
+                success : function ( html ) {
+
+                    $('#fbxEditorGenericModal').modal('hide');
+
+                    $('[data-uid="' + form.attr('data-uid') + '"]').html(form.find('#title').val() + '<span class="subtitle">' + form.find('#subtitle').val() + '</span>');
+                }
+            });
+        });
+
+
+    });
+</script>

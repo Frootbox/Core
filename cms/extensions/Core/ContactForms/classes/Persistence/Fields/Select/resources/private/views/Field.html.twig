@@ -1,0 +1,17 @@
+{% set i = view.getViewhelper('Delegator', { object: field }) %}
+{% set t = view.getViewhelper('Translator') %}
+
+
+<div class="form-group">
+    <label for="field-{{ field.getId() }}">
+        <span {% if renderer.options.editable %}data-editable-element data-uid="{{ field.getUid('title') }}"{% endif %}>{{ field.getTitle() }}</span><!--
+        -->{% if field.getMandatory() %}<span class="mandatory">*</span>{% endif %}
+    </label>
+    <select {% if field.isRequired() %}required{% endif %} class="form-control" id="field-{{ field.getId() }}" name="fields[{{ field.getId() }}]">
+        <option value="">{{ t.translate('PleaseSelect') }}</option>
+        {% for option in field.getOptions() %}
+            <option value="{{ option }}">{{ option }}</option>
+        {% endfor %}
+    </select>
+
+</div>

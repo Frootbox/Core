@@ -1,0 +1,34 @@
+{# config
+
+title: Internbereich
+variables:
+    withLayoutContainer:
+        type: bool
+        label: mit Layout-Container
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+<div class="plugin Core System Login Intern01">
+
+    {% if variables.withLayoutContainer %}<div class="container">{% endif %}
+
+    <div class="row">
+        <div class="col-12">
+            <div class="inner-wrapper">
+
+                {% if plugin.isFirst %}
+                    <h1 data-editable data-uid="{{ plugin.getUid('intern-title') }}">Interner Bereich</h1>
+                {% else %}
+                    <h2 data-editable data-uid="{{ plugin.getUid('intern-title') }}">Interner Bereich</h2>
+                {% endif %}
+
+                <div data-editable data-uid="{{ plugin.getUid('intern-text') }}"></div>
+
+            </div>
+        </div>
+    </div>
+
+    {% if variables.withLayoutContainer %}</div>{% endif %}
+
+</div>

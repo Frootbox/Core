@@ -1,0 +1,54 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<script>
+    $(function ( ) {
+
+        $('#updateForm').submit(function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            $.ajax({
+                url: $(this).attr('action'),
+                data: $(this).serialize(),
+                type: 'POST',
+                headers: {
+                    Accept: "application/json; charset=utf-8",
+                },
+                success: function ( response ) {
+
+                    $('figure[data-id="' + response.widget.id + '"]').replaceWith(response.widget.html);
+
+                    $('#fbxEditorGenericModal').modal('hide');
+                },
+                error: function ( xhr ) {
+                    alert(xhr.responseText);
+                }
+            });
+
+        });
+    });
+</script>
+
+
+<form id="updateForm" action="{{ widgetController.getAdminUrl('ajaxUpdate') }}" method="post">
+
+    <div class="modal-header">
+        <h5 class="modal-title">HTML Eingabe</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+
+        <div class="form-group">
+            <label for="source">HTML Eingabe</label>
+            <textarea rows="20" class="form-control" id="source" name="source" placeholder="HTML">{{ widget.getConfig('source') }}</textarea>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Speichern</button>
+    </div>
+
+</form>

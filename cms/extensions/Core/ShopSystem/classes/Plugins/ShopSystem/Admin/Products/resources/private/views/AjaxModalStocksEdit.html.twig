@@ -1,0 +1,27 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    'frame' : false,
+}) }}
+
+<form method="post" class="ajax" action="{{ plugin.getAdminUri('Products', 'ajaxStocksUpdate', { stockId: stock.getId() }) }}">
+
+    <div class="modal-body">
+
+        <p><b>{{ stock.getOptionsAsString() }}</b></p>
+
+        <div class="form-group">
+            <label for="amount">Anzahl</label>
+            <input type="number" class="form-control" name="amount" id="amount" placeholder="Anzahl" value="{{ stock.getAmount() }}">
+        </div>
+        <div class="form-group">
+            <label for="price">Preis (brutto)</label>
+            <input type="number" step="0.01" class="form-control" name="price" id="price" placeholder="Preis" value="{{ stock.getPrice() }}">
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Warenbestand hinzufügen</button>
+    </div>
+
+</form>

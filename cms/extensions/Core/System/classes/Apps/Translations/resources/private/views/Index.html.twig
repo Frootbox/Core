@@ -1,0 +1,16 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ front.addTab('Übersetzungen', app.getUri('index')) }}
+
+<h2>Übersetzungs-Zentrale</h2>
+
+{% set links = [
+	{
+		url : app.getUri('export'),
+		icon : 'fa fa-file-export',
+		title : 'Export',
+		type : 'xx'
+	}
+] %}
+
+{{ v.injectPartial('\\Frootbox\\Admin\\View\\Partials\\Navigation\\Buttons', { links:  links }) | raw }}

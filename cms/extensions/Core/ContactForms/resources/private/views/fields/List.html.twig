@@ -1,0 +1,15 @@
+<div class="form-group">
+    {% if not parameters.hideLabel %}
+        <label for="field_{{ field.getId() }}">{{ field.getLabel }}{% if field.isRequired %}*{% endif %}</label>
+    {% endif %}
+    <select class="form-control" id="field_{{ field.getId() }}" name="fields[{{ field.getId() }}]" {% if field.isRequired %}required{% endif %}>
+
+        <option value="">{% if parameters.placeholder %}{{ parameters.placeholder }}{% else %}bitte wählen ...{% endif %}</option>
+
+        {% for option in field.getOptions() %}
+            <option value="{{ option.key }}">{{ option.label }}</option>
+        {% endfor %}
+
+    </select>
+</div>
+

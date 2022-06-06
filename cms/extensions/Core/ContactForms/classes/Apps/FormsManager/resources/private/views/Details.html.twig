@@ -1,0 +1,87 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ front.addTab('Formular-Verwaltung', app.getUri('index')) }}
+{{ front.addTab(form.title) }}
+
+<h2>
+    {{ form.title }}
+
+    <span class="headoptions">
+        <span class="dropdown">
+            <i class="far fa-bars dropdown-toggle" data-toggle="dropdown"></i>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <a class="dropdown-item ajax" href="{{ app.getUri('ajaxDuplicate', { formId: form.getId() }) }}">Formular duplizieren</a>
+            </div>
+        </span>
+    </span>
+</h2>
+
+<br />
+
+<ul class="nav nav-tabs">
+    <li class="nav-item">
+        <a class="nav-link active" href="{{ app.getUri('details', { formId: form.getId() }) }}">Formularfelder</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{{ app.getUri('config', { formId: form.getId() }) }}">Konfiguration</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{{ app.getUri('archive', { formId: form.getId() }) }}">Anfragen</a>
+    </li>
+</ul>
+
+<style>
+    .dragging-placeholder {
+        min-height: 50px;
+        border: 2px dashed #CCC;
+    }
+</style>
+<script>
+    $( function() {
+        $("#groupsReceiver").sortable({
+            items: '.form-group-container',
+            axis: 'y',
+            handle: '.drag-handle',
+            placeholder: 'dragging-placeholder',
+            start: function(event, ui) {
+                ui.placeholder.height(ui.item.height());
+            },
+            stop: function(event, ui) {
+
+                $.ajax({
+                    url: "{{ app.getUri('ajaxGroupSort') | raw }}",
+                    data: {
+                        groups: $('#groupsReceiver').sortable('toArray')
+                    },
+                    success : function ( response ) {
+                        toastr.success(response.success);
+                    }
+                });
+            }
+        });
+        $("#groupsReceiver").disableSelection();
+    } );
+</script>
+
+<div class="tab-content" id="myTabContent">
+    <div class="tab-pane fade show active" id="info" role="tabpanel" aria-labelledby="info-tab">
+
+        <div class="card">
+            <div class="card-body">
+
+                <h2>
+                    Formularfelder
+                    <span class="headoptions">
+                        <a data-toggle="tooltip" data-modal data-title="neue Formulargruppe hinzufügen" href="{{ app.getUri('ajaxModalGroupCompose', { formId: form.getId() }) }}"><i class="fa fa-plus-circle"></i></a>
+                    </span>
+                </h2>
+
+                <div id="groupsReceiver">
+                    {{ v.injectPartial('\\Frootbox\\Ext\\Core\\ContactForms\\Apps\\FormsManager\\Partials\\ListGroups', { form: form }) | raw }}
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>

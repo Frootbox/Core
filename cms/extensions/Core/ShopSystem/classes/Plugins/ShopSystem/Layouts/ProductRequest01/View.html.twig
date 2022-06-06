@@ -1,0 +1,90 @@
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set t = i.getTranslator() %}
+{% set b = view.getViewhelper('Breadcrumb', { singleton: true }) %}
+
+{{ b.addSection(product.getTitle(), product.getUri()) }}
+{{ b.addSection('Produkt-Anfrage') }}
+
+{{ view.set({ pagedata: { robots: "noindex" } }) }}
+
+<div class="wave white plugin Core ShopSystem ShopSystem ProductRequest01">
+
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+
+                {% if plugin.isFirst %}
+                    <h1 data-editable data-uid="{{ plugin.getUid('request-title') }}">Produkt-Anfrage</h1>
+                {% else %}
+                    <h2 data-editable data-uid="{{ plugin.getUid('request-title') }}">Produkt-Anfrage</h2>
+                {% endif %}
+
+                <br />
+
+                <div class="row">
+                    <div class="col-md-6">
+
+                        <h3 data-editable data-uid="{{ plugin.getUid('request-title-product') }}">Artikel</h3>
+
+                        <h4>{{ product.getTitle() }}</h4>
+                        <br />
+
+                        <picture class="fluid" data-editable data-uid="{{ product.getUid('image')}}">
+                            <img width="700" height="500" src="{{ i.getDummyImage({ width: 700, height: 500 }) }}" alt="" />
+                        </picture>
+
+                        <br />
+
+                        <div data-editable data-nowidgets data-uid="{{ product.getUid('teaser') }}"></div>
+
+                    </div>
+                    <div class="col-md-6">
+
+                        <h3>Ihre Anfrage</h3>
+
+                        <br />
+
+                        <form method="post" action="{{ plugin.getUriAjax('submitRequest', { productId: product.getId() }) }}" id="requestForm">
+
+                            <div class="form-group">
+                                <label for="name">Name, Vorname*</label>
+                                <input type="text" required class="form-control" id="name" name="name" value="">
+                            </div>
+                            <div class="form-group">
+                                <label for="company">Firma</label>
+                                <input type="text" class="form-control" id="company" name="company">
+                            </div>
+                            <div class="form-group">
+                                <label for="email">E-Mail*</label>
+                                <input type="email" required class="form-control" id="email" name="email">
+                            </div>
+                            <div class="form-group">
+                                <label for="phone">Telefon</label>
+                                <input type="text" class="form-control" id="phone" name="phone">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="amount">gewünschte Stückzahl</label>
+                                <input type="text" class="form-control" id="amount" name="amount">
+                            </div>
+                            <div class="form-group">
+                                <label for="message">Nachricht*</label>
+                                <textarea class="form-control" required id="message" name="message" rows="3"></textarea>
+                            </div>
+                            <div class="form-group form-check">
+                                <input type="checkbox" required class="form-check-input" id="privacyPolicy" name="privacyPolicy">
+                                <label class="form-check-label" for="privacyPolicy">{{ t.translate('AcceptPrivacyPolicy', [ i.getPrivacyPolicyLink() ]) | raw }}</label>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">unverbindliche Anfrage senden</button>
+
+                        </form>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>

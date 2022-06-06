@@ -1,0 +1,103 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<!--
+    FormData: https://developer.mozilla.org/en-US/docs/Web/API/FormData/Using_FormData_Objects
+    Upload: https://www.html5rocks.com/de/tutorials/file/dndfiles/
+-->
+
+
+<script>
+    $(function ( ) {
+
+        $('#updateForm').submit(function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            $.ajax({
+                url: $(this).attr('action'),
+                data: $(this).serialize(),
+                type: 'POST',
+                headers: {
+                    Accept: "application/json; charset=utf-8",
+                },
+                success: function ( response ) {
+
+                    $('figure[data-id="' + response.widget.id + '"]').replaceWith(response.widget.html);
+
+                    $('#fbxEditorGenericModal').modal('hide');
+                },
+                error: function ( xhr ) {
+                    alert(xhr.responseText);
+                }
+            });
+
+        });
+    });
+</script>
+
+
+<div class="modal-header">
+    <h5 class="modal-title">Galerie konfigurieren</h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<form id="updateForm" action="{{ widgetController.getAdminUrl('ajaxUpdate') }}" method="post">
+
+    {{ v.injectPartial('Frootbox/Ext/Core/FileManager/Editor/Partials/FileManager', {
+        uid: widget.getUid('images')
+    }) | raw }}
+
+    <div class="modal-body">
+
+        {{ v.injectPartial('Frootbox/Ext/Core/FileManager/Editor/Partials/FileUpload', {
+            multiple: true,
+            uid: widget.getUid('images')
+        }) | raw }}
+
+        <div class="form-group">
+            <label for="columns">Spalten</label>
+            <select class="form-control" id="columns" name="columns">
+                <option {% if widget.getColumns == 1 %}selected{% endif %} value="1">1</option>
+                <option {% if widget.getColumns == 2 %}selected{% endif %} value="2">2</option>
+                <option {% if widget.getColumns == 3 %}selected{% endif %} value="3">3</option>
+                <option {% if widget.getColumns == 4 %}selected{% endif %} value="4">4</option>
+                <option {% if widget.getColumns == 5 %}selected{% endif %} value="5">5</option>
+                <option {% if widget.getColumns == 6 %}selected{% endif %} value="6">6</option>
+                <option {% if widget.getColumns == 7 %}selected{% endif %} value="7">7</option>
+            </select>
+        </div>
+
+        <div class="form-group form-check">
+            <input {% if widget.getConfig('noMagnifier') %}checked{% endif %} type="checkbox" class="form-check-input" id="noMagnifier" name="noMagnifier">
+            <label class="form-check-label" for="noMagnifier">keine Lupenfunktion</label>
+        </div>
+
+
+
+        <div class="form-row">
+            <div class="col-6">
+
+                <div class="form-group">
+                    <label for="width">Bilder-Breite</label>
+                    <input type="number" class="form-control" id="width" name="width" placeholder="Breite in Pixeln" value="{{ widget.getImageWidth() }}">
+                </div>
+
+            </div>
+            <div class="col-6">
+
+                <div class="form-group">
+                    <label for="height">Bilder-Höhe</label>
+                    <input type="number" class="form-control" id="height" name="height" placeholder="Höhe in Pixeln" value="{{ widget.getImageHeight() }}">
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Speichern</button>
+    </div>
+
+</form>

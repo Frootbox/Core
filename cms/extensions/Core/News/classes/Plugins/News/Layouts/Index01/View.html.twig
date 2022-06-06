@@ -1,0 +1,48 @@
+{# config
+
+title: Standard
+variables:
+    withContainer:
+        label: mit Layout-Container
+        type: bool
+        default: false
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+{{ i.injectScss({ path: 'Index01/public/standards.less'}) | raw }}
+
+<div class="plugin Core News News Index01">
+
+    {% if variables.withContainer %}<div class="container">{% endif %}
+
+    <div class="row">
+        <div class="col-12 ">
+
+            <div class="inner-wrapper">
+
+                <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+
+                <div data-editable data-uid="{{ plugin.getUid('teaser-text') }}"></div>
+
+                {% set articles = i.getArticles() %}
+
+                {% for article in articles %}
+
+                    <h3 data-editable data-uid="{{ article.getUid('title') }}">{{ article.getTitle }}</h3>
+
+                    <div data-nowidgets data-editable data-uid="{{ article.getUid('teaser') }}"></div>
+
+                    {% if article.showReadMore() %}
+                        <p><a class="read-more" href="{{ article.getUri() }}">weiterlesen</a></p>
+                    {% endif %}
+
+                {% endfor %}
+            </div>
+
+        </div>
+    </div>
+
+    {% if variables.withContainer %}</div>{% endif %}
+</div>

@@ -1,0 +1,50 @@
+{# config
+
+title: Liste
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+<div class="plugin Core HelpAndSupport Jobs Index03">
+
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+
+                <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+
+                <div data-editable data-uid="{{ plugin.getUid('teaser') }}"></div>
+
+                <div class="jobs">
+                    {% for job in jobs %}
+
+                        <div class="job-wrapper" data-href>
+
+                            <div class="row align-items-end">
+                                <div class="col-md-8">
+
+                                    <h4 class="first" data-editable data-uid="{{ job.getUid('title') }}">{{ job.getTitle }}</h4>
+                                    <div data-editable data-nowidgets data-uid="{{ job.getUid('teaser') }}"></div>
+
+                                </div>
+                                <div class="col-md-4">
+
+                                    {% if plugin.getConfig('customButtonEmail') %}
+                                        <a class="btn btn-block btn-primary" href="mailto:{{ plugin.getConfig('customButtonEmail') }}?subject={{ plugin.getMailSubject(job) }}">Jetzt bewerben!</a>
+                                    {% elseif job.getUri() %}
+                                        <a class="btn btn-block btn-primary" href="{{ job.getUri() }}"><span data-uid="{{ plugin.getUid('button-details') }}" data-editable-element>Mehr erfahren</span></a>
+                                    {% endif %}
+
+                                </div>
+                            </div>
+
+                        </div>
+
+                    {% endfor %}
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

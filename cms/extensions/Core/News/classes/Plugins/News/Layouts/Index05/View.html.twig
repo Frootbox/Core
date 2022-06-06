@@ -1,0 +1,47 @@
+{# config
+
+title: Historie
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+<div class="row">
+    <div class="col-12 plugin Core News News Index05">
+
+        {% if plugin.isFirst %}
+            <h1 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h1>
+        {% else %}
+            <h2 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+        {% endif %}
+
+        <div data-editable data-uid="{{ plugin.getUid('teaser-text') }}"></div>
+
+        {% set articles = i.getArticles() %}
+
+
+        {% for article in articles %}
+            <div class="row justify-content-center article">
+                <div class="col-md-4">
+                    <span class="date">{{ article.getDateStart() | date('Y') }}</span>
+
+                    <picture class="fluid" data-editable data-skipempty="1" data-uid="{{ article.getUid('image')}}">
+                        <img width="700" src="{{ i.getDummyImage({ width: 700, height: 300 }) }}" alt="" />
+                    </picture>
+                </div>
+                <div class="col-md-4 history-event">
+
+                    <h4 data-editable data-uid="{{ article.getUid('title') }}">{{ article.getTitle() }}</h4>
+
+                    <div data-nowidgets data-editable data-uid="{{ article.getUid('teaser') }}"></div>
+
+                </div>
+
+
+
+            </div>
+        {% endfor %}
+
+    </div>
+</div>
+

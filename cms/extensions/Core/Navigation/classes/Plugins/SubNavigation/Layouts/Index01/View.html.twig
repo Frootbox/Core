@@ -1,0 +1,58 @@
+{# config
+
+title: Teaser-Blöcke
+variables:
+    columns:
+        label: Spalten
+        type: list
+        options:
+            2: 2 Spalten
+            3: 3 Spalten
+            4: 4 Spalten
+        default: 4
+    img_width:
+        label: Bild-Breite
+        type: int
+        default: 600
+    img_height:
+        label: Bild-Höhe
+        type: int
+        default: 300
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+{{ i.injectScss({ path: 'Index01/public/standards.less'}) | raw }}
+
+
+{% set children = i.getPages() %}
+
+{% if variables.columns == 2 %}
+    {% set colClass = 'col-lg-6' %}
+{% elseif variables.columns == 3 %}
+    {% set colClass = 'col-lg-4' %}
+{% else%}
+    {% set colClass = 'col-lg-3' %}
+{% endif %}
+
+<div class="row">
+    <div class="col-12 plugin Core Navigation SubNavigation Index01">
+
+        <div class="row justify-content-md-center">
+
+            {% for child in children %}
+                <div class="{{ colClass }} teaser">
+                    <a href="{{ child.getUri() }}">
+                        <picture class="fluid" data-editable data-uid="{{ child.getUid('image')}}">
+                            <img class="teaser-image" width="{{ variables.img_width }}" height="{{ variables.img_height }}" src="{{ i.getDummyImage({ width: variables.img_width, height: variables.img_height }) }}" alt="" />
+                        </picture>
+                        {{ child.getTitle(globalLanguage) }}
+                    </a>
+                </div>
+            {% endfor %}
+
+        </div>
+
+    </div>
+</div>

@@ -1,0 +1,163 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<h2 id="categoriesHead">
+    Buchungs Details
+</h2>
+
+<p><a class="ajax" href="{{ plugin.getAdminUri('Bookings', 'index', { highlight: booking.getId() }) }}"><i class="fa fa-chevron-circle-left"></i> zurück</a></p>
+
+<div class="row">
+    <div class="col-md-6">
+
+        <table class="table">
+            <tbody>
+                <tr>
+                    <td width="25%">Buchung</td>
+                    <td>#{{ booking.getId() }}</td>
+                </tr>
+                <tr>
+                    <td>Datum</td>
+                    <td>{{ booking.getDate() | date('d.m.Y H:i:s') }} Uhr</td>
+                </tr>
+
+            </tbody>
+        </table>
+
+    </div>
+    <div class="col-md-6">
+
+        <table class="table">
+            <tbody>
+            <tr>
+                <td width="25%">Bemerkung</td>
+                <td>{{ booking.getConfig('note') | nl2br | default('keine Bemerkung') }}</td>
+            </tr>
+
+            </tbody>
+        </table>
+
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6">
+
+        <h3>persönliche Daten</h3>
+
+        <table class="table">
+            <tbody>
+                <tr>
+                    <td width="25%">Name</td>
+                    <td>{{ booking.getConfig('personal.firstname') }} {{ booking.getConfig('personal.lastname') }}</td>
+                </tr>
+                <tr>
+                    <td>E-Mail</td>
+                    <td><a href="mailto:{{ booking.getConfig('personal.email') }}">{{ booking.getConfig('personal.email') }}</a></td>
+                </tr>
+                <tr>
+                    <td>Telefon</td>
+                    <td><a href="tel:{{ booking.getConfig('personal.phone') }}">{{ booking.getConfig('personal.phone') }}</a></td>
+                </tr>
+                <tr>
+                    <td>Adresse</td>
+                    <td>
+                        {{ booking.getConfig('personal.street') }} {{ booking.getConfig('personal.streetNumber') }}<br />
+                        {{ booking.getConfig('personal.postalCode') }} {{ booking.getConfig('personal.city') }}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Lieferadresse</h3>
+
+        {% if booking.getConfig('shipping.type') == "selfPickup" %}
+            <p>Selbstabholung.</p>
+        {% elseif booking.getConfig('shipping.type') == 'shipToBillingAddress' %}
+            <p>Gleich wie Rechnungsadresse.</p>
+        {% else %}
+
+            <table class="table">
+                <tbody>
+                    <tr>
+                        <td width="25%">Name</td>
+                        <td>{{ booking.getConfig('shipping.firstname') }} {{ booking.getConfig('shipping.lastname') }}</td>
+                    </tr>
+                    <tr>
+                        <td>Adresse</td>
+                        <td>
+                            {{ booking.getConfig('shipping.street') }} {{ booking.getConfig('shipping.streetNumber') }}<br />
+                            {{ booking.getConfig('shipping.postalCode') }} {{ booking.getConfig('shipping.city') }}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+        {% endif %}
+
+        <h3>Bezahlung</h3>
+
+        <table class="table">
+            <tbody>
+                <tr>
+                    <td width="25%">Zahlungsart</td>
+                    <td>{{ paymentMethod.getTitle() }}</td>
+                </tr>
+                <tr>
+                    <td>Informationen</td>
+                    <td>{{ summary | raw }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+    <div class="col-md-6">
+
+        <h3>Artikel</h3>
+
+        <table class="table">
+            <tbody>
+                {% for item in booking.getItems() %}
+                    <tr>
+                        <td>
+                            {{ item.getAmount() }} x {{ item.getTitle() }}<br />
+
+                            {% if item.getFieldOptions() %}
+                                {% for option in item.getFieldOptions() %}
+                                    {{ option.group }}: {{ option.option }}<br />
+                                {% endfor %}
+                            {% endif %}
+
+
+                            <span style="color: #999;">
+                                {% if item.getItemNumber() %}
+                                    Art.-Nr. {{ item.getItemNumber() }}<br />
+                                {% endif %}
+                                Preis: {{ item.priceGross }} EUR
+                            </span>
+
+                            {% if item.getAdditionalText() %}
+                                <br />{{ item.getAdditionalText() | nl2br }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+
+            </tbody>
+        </table>
+
+        {% if booking.getCoupons() | length > 0 %}
+            <h3>eingelöste Gutscheine</h3>
+
+            <table class="table">
+                <tbody>
+                    {% for couponData in booking.getCoupons() %}
+                        <tr>
+                            <td width="25%">{{ couponData.code }}</td>
+                            <td>{{ couponData.redeemedValue }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+
+    </div>
+</div>

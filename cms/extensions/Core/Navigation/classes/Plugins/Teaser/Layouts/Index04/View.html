@@ -1,0 +1,71 @@
+{# config
+
+title: Bubbles
+variables:
+    img_width:
+        type: int
+        label: Bildbreite
+        default: 350
+    img_height:
+        type: int
+        label: Bildhöhe
+        default: 160
+    teaser_height:
+        type: int
+        label: Teaser-Höhe
+        default: 500
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+{% set teasers = i.getTeasers() %}
+
+<div class="row">
+    <div class="col-12 plugin Core Navigation Teaser Index04">
+
+        <div id="carouselExampleFade" class="carousel slide carousel-fade" data-ride="carousel">
+            <div class="carousel-inner">
+
+                {% for teaser in teasers %}
+                    <div class="carousel-item {% if loop.index == 1 %}active{% endif %}">
+                        <div data-type="Images/Background" data-uid="{{ teaser.getUid('background') }}">
+                            <div class="row">
+                                <div class="col-6">
+
+                                </div>
+                                <div class="col-6">
+                                    <div style="background: rgba(255, 255, 255, .9); min-height: {{ variables.teaser_height }}px; padding: 30px;">
+                                        <div class="row" style="min-height: {{ variables.teaser_height }}px">
+                                            <div class="col align-self-center">
+                                                <div data-editable data-uid="{{ teaser.getUid('teaser-text') }}"></div>
+                                                <p><a href="{{ teaser.getUrl }}">mehr lesen</a></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+
+            </div>
+
+            {% if teasers.getCount > 1 %}
+                <a class="carousel-control-prev" href="#carouselExampleFade" role="button" data-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Previous</span>
+                </a>
+                <a class="carousel-control-next" href="#carouselExampleFade" role="button" data-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Next</span>
+                </a>
+            {% endif %}
+
+
+        </div>
+
+        <br />
+
+    </div>
+</div>

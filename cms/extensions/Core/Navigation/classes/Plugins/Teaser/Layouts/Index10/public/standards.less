@@ -1,0 +1,70 @@
+.plugin.Core.Navigation.Teaser.Index10 {
+
+  margin-bottom: 40px;
+
+  .teaser {
+    position: relative;
+
+    height: 200px;
+    margin-bottom: 30px;
+    background: #CCC;
+
+    .pill {
+      position: absolute;
+      bottom: 20px;
+      left: 35px;
+
+      display: inline-block;
+      padding: 10px 30px;
+
+      background: rgba(255, 255, 255, .9);
+      border-radius: 30px;
+
+      &:hover {
+        background: #666;
+        color: #FFF;
+      }
+    }
+  }
+
+  @media (min-width: 768px) {
+
+    .teaser {
+      height: 150px;
+    }
+
+    .teaser.main {
+      height: 100%;
+      min-height: 300px;
+    }
+
+    .teaser.side {
+
+      &:last-of-type {
+        margin: 0;
+      }
+    }
+
+    .carousel-indicators {
+      bottom: -50px;
+
+      li {
+        background-color: $colorSpot1;
+      }
+    }
+  }
+
+  @media (min-width: 992px) {
+
+    .teaser {
+      height: 200px;
+    }
+  }
+
+  @media (min-width: 1200px) {
+
+    .teaser {
+      height: 250px;
+    }
+  }
+}

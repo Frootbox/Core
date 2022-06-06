@@ -1,0 +1,20 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<h2>
+    Ansprechpersonen
+
+    <span class="headoptions">
+		<a data-toggle="tooltip" data-modal data-title="neue Ansprechperson hinzufügen" href="{{ plugin.getAdminUri('Contact', 'ajaxModalCompose') }}"><i class="fa fa-plus-circle"></i></a>
+	</span>
+
+</h2>
+
+<p><a class="ajax" href="{{ plugin.getAdminUri('Index', 'index') }}"><i class="fa fa-chevron-circle-left"></i> zurück</a></p>
+
+<div id="contactsListReceiver">
+
+    {{ v.injectPartial('\\Frootbox\\Ext\\Core\\HelpAndSupport\\Plugins\\ContactPersons\\Admin\\Contact\\Partials\\ContactsList', {
+        'plugin' : plugin
+    }) | raw }}
+
+</div>

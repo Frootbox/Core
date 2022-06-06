@@ -1,0 +1,35 @@
+{# config
+
+title: Standard
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+<div class="row">
+    <div class="col-12 plugin Core HelpAndSupport FAQ Index03">
+
+        {% if plugin.isFirst %}
+            <h1 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h1>
+        {% else %}
+            <h2 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+        {% endif %}
+
+        <div data-editable data-uid="{{ plugin.getUid('teaser') }}"></div>
+
+
+        {% set questions = i.getQuestions() %}
+
+        {% if questions.getCount > 0 %}
+
+            <ul>
+                {% for question in questions %}
+                    <li><a href="{{ question.getUri() }}">{{ question.getTitle }}</a></li>
+                {% endfor %}
+            </ul>
+
+        {% endif %}
+
+    </div>
+</div>
+

@@ -1,0 +1,53 @@
+{# config
+
+title: Standard
+variables:
+    withContainer:
+        type: bool
+        label: mit Layout-Container
+    withPositions:
+        type: bool
+        label: mit Positionen
+    withHeader:
+        type: bool
+        label: mit Tabellen-Köpfen
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set p = view.getViewhelper('Partials') %}
+
+<div class="plugin Core HelpAndSupport ContactPersons Index01">
+    {% if variables.withContainer %}<div class="container">{% endif %}
+
+    <div class="row">
+        <div class="col-12 ">
+            <div class="inner-wrapper">
+
+                <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+
+                <div class="top-teaser" data-editable data-uid="{{ plugin.getUid('teaser-text') }}"></div>
+
+                {{ p.renderPartial('category', { category: i.getCategory() }) | raw }}
+
+                {% for category in i.getTopCategories() %}
+
+                    <h3 data-editable data-uid="{{ category.getUid('title') }}">{{ category.getTitle() }}</h3>
+
+                    {{ p.renderPartial('category', { category: category }) | raw }}
+
+                    {% for child in category.getChildren() %}
+                        <h4>{{ child.getTitle() }}</h4>
+
+                        {{ p.renderPartial('category', { category: child }) | raw }}
+
+                    {% endfor %}
+
+                {% endfor %}
+
+            </div>
+        </div>
+    </div>
+
+    {% if variables.withContainer %}</div>{% endif %}
+</div>

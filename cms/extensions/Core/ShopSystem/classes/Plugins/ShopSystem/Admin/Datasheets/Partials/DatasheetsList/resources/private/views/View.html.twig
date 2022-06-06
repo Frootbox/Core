@@ -1,0 +1,26 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{% if datasheets.getCount == 0 %}
+    <div class="message warning">Es wurden noch keine Datenblätter erstellt.</div>
+{% else %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+
+            {% for datasheet in datasheets %}
+                <tr class="ajax {% if datasheet.getId == data.highlight %}highlighted{% endif %}" data-href="{{ data.plugin.getAdminUri('Datasheets', 'details', { datasheetId: datasheet.getId() }) }}">
+                    <td>{{ datasheet.getTitle() }}</td>
+                    <td class="text-right">
+                        <a class="ajax" data-confirm="Soll dieses Datenblatt wirklich gelöscht werden?" href="{{ data.plugin.getAdminUri('Datasheets', 'ajaxDelete', { datasheetId: datasheet.getId() }) }}"><i class="fa fa-times"></i></a>
+                    </td>
+                </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+{% endif %}

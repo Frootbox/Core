@@ -1,0 +1,38 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{% if coupons.getCount == 0 %}
+    <div class="message warning">Es wurden noch keine Gutscheine erstellt.</div>
+{% else %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Code</th>
+                <th>Wert</th>
+                <th>Status</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+
+            {% for coupon in coupons %}
+                <tr class="ajax {% if coupon.getId() == data.highlight %}highlighted{% endif %}" data-title="Gutschein bearbeiten" data-modal="{{ data.plugin.getAdminUri('Coupons', 'ajaxModalDetails', { couponId: coupon.getId() }) }}">
+                    <td>{{ coupon.getTitle() }}</td>
+                    <td>{{ coupon.getUidRaw() }}</td>
+                    <td class="text-right">
+                        {% if coupon.getValue() %}
+                            {{ coupon.getValue() | number_format(2, ',', '.') }} EUR
+                        {% elseif coupon.getValuePercent() %}
+                            {{ coupon.getValuePercent() }} %
+                        {% endif %}
+                    </td>
+                    <td>{{ coupon.getState() }}</td>
+                    <td class="text-right">
+                        <a class="ajax" data-confirm="Soll dieser Gutschein wirklich gelöscht werden?" href="{{ data.plugin.getAdminUri('Coupons', 'ajaxDelete', { couponId: coupon.getId() }) }}"><i class="fa fa-times"></i></a>
+                    </td>
+                </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+{% endif %}

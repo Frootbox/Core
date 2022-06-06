@@ -1,0 +1,24 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{% if forms | length == 0 %}
+	<div class="message warning">Es wurden noch keine Formulare erstellt.</div>
+{% else %}
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Formular</th>
+			</tr>
+		</thead>
+		<tbody>
+
+			{% for form in forms %}
+				<tr class="{% if data.highlight == form.getId() %}highlighted{% endif %}">
+					<td data-href="{{ app.getUri('details', { formId: form.getId() }) }}">
+						{{ form.title }}
+					</td>
+				</tr>
+			{% endfor %}
+
+		</tbody>
+	</table>
+{% endif %}

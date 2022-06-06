@@ -1,0 +1,100 @@
+{# config
+
+title: Accordeon
+variables:
+    withContainer:
+        type: bool
+        label: mit Layout-Container
+    columns:
+        type: list
+        label: Anzahl Spalten
+        options:
+            1: 1
+            2: 2
+            3: 3
+            4: 4
+        default: 2
+    skipSubColumns:
+        type: bool
+        label: ohne Unterüberschriften
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set icons = view.getViewhelper('Ext/HerrUndFrauPixelExt/Icons/Icons', { createDummyOnFail: true  }) %}
+
+<div class="plugin Core HelpAndSupport Jobs Index02">
+
+    {% if variables.withContainer %}<div class="container">{% endif %}
+
+    <div class="row">
+        <div class="col-12">
+
+            <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+
+            <div data-editable data-uid="{{ plugin.getUid('teaser') }}"></div>
+
+            <div class="accordion" id="jobsAccordion{{ plugin.getId() }}">
+
+                {% for job in jobs %}
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="first mb-0">
+                                    <span data-toggle="collapse" data-target="#collapse{{ job.getId() }}" aria-expanded="true" aria-controls="collapseOne" class="collapsed">
+                                        <span data-editable-element data-uid="{{ job.getUid('title') }}">{{ job.getTitle }}</span>
+
+                                        <span class="icons">
+                                            {{ icons.render('plus', [ 'down' ]) | raw }}
+                                            {{ icons.render('minus', [ 'up' ]) | raw }}
+                                        </span>
+                                    </span>
+                            </h3>
+                        </div>
+                        <div id="collapse{{ job.getId() }}" class="collapse" aria-labelledby="headingOne" data-parent="#jobsAccordion{{ plugin.getId() }}">
+                            <div class="card-body">
+
+                                <div data-editable data-uid="{{ job.getUid('text') }}"></div>
+
+                                {% if not variables.skipSubColumns %}
+                                    <div class="row">
+
+                                        {% if variables.columns == 1 %}
+                                            <div class="col-md-12">
+
+                                                <h4 class="first" data-editable data-uid="{{ plugin.getUid('title1') }}">Überschrift</h4>
+                                                <div data-editable data-uid="{{ job.getUid('teaser1') }}"></div>
+
+                                            </div>
+                                        {% else %}
+                                            <div class="col-md-6">
+                                                <h4 data-editable data-uid="{{ plugin.getUid('title1') }}">Ihre Aufgaben:</h4>
+                                                <div data-editable data-uid="{{ job.getUid('teaser1') }}"></div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <h4 data-editable data-uid="{{ plugin.getUid('title2') }}">Ihr Profil:</h4>
+                                                <div data-editable data-uid="{{ job.getUid('teaser2') }}"></div>
+                                            </div>
+                                        {% endif %}
+
+                                    </div>
+                                {% endif %}
+
+                                {% if plugin.getConfig('customButtonEmail') %}
+                                    <a class="btn btn-primary" href="mailto:{{ plugin.getConfig('customButtonEmail') }}?subject={{ plugin.getMailSubject(job) }}">Jetzt bewerben!</a>
+                                {% elseif job.getUri() %}
+                                    <a class="btn btn-primary" href="{{ job.getUri() }}"><span data-uid="{{ plugin.getUid('button-details') }}" data-editable-element>Mehr erfahren</span></a>
+                                {% endif %}
+
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+
+            </div>
+
+        </div>
+    </div>
+
+    {% if variables.withContainer %}</div>{% endif %}
+
+</div>

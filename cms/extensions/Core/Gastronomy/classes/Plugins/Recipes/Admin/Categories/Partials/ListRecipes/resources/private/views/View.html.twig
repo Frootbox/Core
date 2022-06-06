@@ -1,0 +1,35 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+{% set i = view.getViewhelper('\\Frootbox\\Admin\\Viewhelper\\Delegator', { object: data.plugin }) %}
+{% set t = i.getTranslator() %}
+
+{% if data.category.getItems() | length > 0 %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Titel</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+
+            {% for recipe in data.category.getItems() %}
+                <tr class="ajax {% if data.highlight == recipe.getId() %}highlighted{% endif %}" data-recipe="{{ recipe.getId() }}" data-href="{{ data.plugin.getAdminUri('Recipe', 'ajaxPanelEdit', { recipeId: recipe.getId(), categoryId: data.category.getId(), connId: listEntry.getConnId() }) }}">
+                    <td>{{ recipe.getTitle() }}</td>
+                    <td class="text-right">
+                        <a href="{{ data.plugin.getAdminUri('Recipe', 'ajaxUnlink', { categoryId: data.category.getId(), recipeId: recipe.getId() }) }}" class="ajax"><i class="fa fa-unlink"></i></a>
+                    </td>
+                </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+
+{% else %}
+
+    <div class="card">
+        <div class="card-body">
+            Es wurden noch keine Rezepte für diese Kategorie erstellt.
+        </div>
+    </div>
+
+{% endif %}

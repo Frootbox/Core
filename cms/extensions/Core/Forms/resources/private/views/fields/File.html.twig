@@ -1,0 +1,78 @@
+{% set v = view.getViewhelper('View') %}
+{% set f = view.getViewhelper('Files') %}
+{% set a = view.getViewhelper('Assets', {   }) %}
+
+{{ v.asset('EXT:Core/Forms/css/File.less') | raw }}
+{{ a.import('https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.2/min/dropzone.min.js') | raw }}
+
+
+<script>
+    $(function ( ) {
+
+        $("#fileupload_{{ field.getId() }}").dropzone({
+            url: "{{ plugin.getUriAjax('upload', { fieldId: field.getId() }) | raw }}",
+            clickable: '.droppable.clickable',
+            queuecomplete: function ( ) {
+                previewFiles();
+            }
+        });
+
+        function previewFiles( ) {
+
+            $.ajax({
+                url: "{{ plugin.getUriAjax('getFilesBucket', { fieldId: field.getId() }) | raw }}",
+                success: function ( html ) {
+
+                    $('div.filesReceiver[data-field="{{ field.getId() }}"]').html(html);
+                }
+            });
+        }
+
+        previewFiles();
+
+        /**
+         *
+         */
+        $(document).on('click', 'a.drop-uploaded-file', function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            if (!confirm('Soll diese Datei wirklich entfernt werden?')) {
+                return;
+            }
+
+            var fileId = $(this).attr('data-file');
+
+            $.ajax({
+                url: $(this).attr('href'),
+                success: function ( response ) {
+
+                    $('[data-file="' + fileId + '"').fadeOut();
+
+                }
+            });
+        });
+    });
+
+
+</script>
+
+<div class="Core Forms Field File">
+
+    <label for="field_{{ field.getId() }}">{{ field.getLabel }}{% if field.isRequired %}*{% endif %}</label>
+
+    <div id="fileupload_{{ field.getId() }}">
+        <div class="droppable clickable">
+            <p><i class="fa fa-upload"></i> Datei zum Hochladen hier ablegen.</p>
+        </div>
+    </div>
+
+    <p class="annotation">maximal {{ f.getUploadMaxSize() }} MB</p>
+
+    <div class="filesReceiver" data-field="{{ field.getId() }}">
+
+    </div>
+
+</div>
+

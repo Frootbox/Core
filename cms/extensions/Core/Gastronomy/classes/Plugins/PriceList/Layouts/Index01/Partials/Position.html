@@ -1,0 +1,63 @@
+{% set positionInterface = view.getViewhelper('Delegator', { object: data.position }) %}
+
+{% if positionInterface.getPrices() | length == 1 %}
+
+    <table class="table prices single-item">
+        <tbody>
+
+            {% for price in positionInterface.getPrices() %}
+                <tr>
+                    <td>
+                        <h5>{{ data.position.getTitle()}}</h5>
+
+                        <div data-editable data-nowidgets data-uid="{{ data.position.getUid('text') }}"></div>
+
+                        {% if price.getTitle() and price.getConfig('addition') %}
+                        <b>{{ price.getTitle() }}</b><br />
+                        {{ price.getConfig('addition') }}
+                        {% else %}
+                        {{ price.getTitle() }}
+                        {% endif %}
+                    </td>
+                    <td class="price">
+                        {% if price.getConfig('priceFrom') %}ab {% endif %}
+                        {{ price.getConfig('price') | number_format(2, ',', '.') }} EUR
+                        {% if price.getConfig('unit') == 'Person' %} pro Person{% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+
+{% else %}
+
+    <h5>{{ data.position.getTitle()}}</h5>
+
+    <div data-editable data-nowidgets data-uid="{{ data.position.getUid('text') }}"></div>
+
+    <table class="table prices">
+        <tbody>
+
+            {% for price in positionInterface.getPrices() %}
+                <tr>
+                    <td>
+                        {% if price.getTitle() and price.getConfig('addition') %}
+                        <b>{{ price.getTitle() }}</b><br />
+                        {{ price.getConfig('addition') }}
+                        {% else %}
+                        {{ price.getTitle() }}
+                        {% endif %}
+                    </td>
+                    <td class="price">
+                        {% if price.getConfig('priceFrom') %}ab {% endif %}
+                        {{ price.getConfig('price') | number_format(2, ',', '.') }} EUR
+                        {% if price.getConfig('unit') == 'Person' %} pro Person{% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+
+{% endif %}

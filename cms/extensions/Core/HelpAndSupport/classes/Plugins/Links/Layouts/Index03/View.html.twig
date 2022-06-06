@@ -1,0 +1,44 @@
+{# config
+
+title: Kacheln
+variables:
+    image_height:
+        type: int
+        label: Bildhöhe
+        default: 120
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+<style>
+    .plugin.Core.HelpAndSupport.Links.Index03.plugin-{{ plugin.getId() }} img {
+        height: {{ variables.image_height }}px;
+        width: auto;
+    }
+</style>
+
+<div class="row">
+    <div class="col-12 plugin Core HelpAndSupport Links Index03 plugin-{{ plugin.getId() }}">
+
+        {% if plugin.isFirst %}
+            <h1 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h1>
+        {% else %}
+            <h2 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+        {% endif %}
+
+        <div data-editable data-uid="{{ plugin.getUid('teaser-text') }}"></div>
+
+        <div class="links">
+            {% for link in i.getLinks() %}
+                <a target="_blank" href="{{ link.getConfig('url') }}">
+                    <picture data-editable data-uid="{{ link.getUid('image')}}">
+                        <img height="{{ variables.image_height }}" src="{{ i.getDummyImage({ width: 300, height: variables.image_height }) }}" alt="" />
+                    </picture>
+                </a>
+            {% endfor %}
+        </div>
+
+        <div data-editable data-uid="{{ plugin.getUid('text-below') }}"></div>
+
+    </div>
+</div>

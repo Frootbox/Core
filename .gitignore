@@ -1,0 +1,5 @@
+.buildpath
+.idea
+.project
+localconfig.php
+/lib

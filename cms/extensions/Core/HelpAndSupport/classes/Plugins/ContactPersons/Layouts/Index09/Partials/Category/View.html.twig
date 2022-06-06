@@ -1,0 +1,63 @@
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+
+{% if not data.skipContainer %}<div class="container">{% endif %}
+
+<div class="contacts">
+
+    {% for contact in data.category.getContacts() %}
+        <div class="row no-gutters align-items-center">
+                <div class="col-md-6 order-md-{{ (loop.index0 % 2) + 1 }}">
+
+                    <picture data-editable data-uid="{{ contact.getUid('image')}}">
+                        <img width="600" height="400" src="{{ i.getDummyImage({ width: 600, height: 400 }) }}" alt="" />
+                    </picture>
+
+                </div>
+                <div class="col-md-6 order-md-{{ (loop.index % 2) + 1 }}">
+
+                    <div class="contact-data">
+                        <h4 class="first">{{ contact.getName() }}</h4>
+
+                        {% if contact.connConfig.position %}
+                            <p class="position role">{{ contact.connConfig.position }}</p>
+                        {% elseif contact.getCompany() or contact.getPosition() %}
+                            <p>
+                                {% if contact.getCompany() %}
+                                    {{ contact.getCompany() }}<br />
+                                {% endif %}
+
+                                {% if contact.getPosition() %}
+                                    <span class="position role">{{ contact.getPosition() | nl2br }}</span>
+                                {% endif %}
+                            </p>
+                        {% endif %}
+
+                        <p>
+                            {% if contact.getPhone() %}
+                                <a href="tel:{{ contact.getPhone() }}"><i class="fa fa-fw fa-phone"></i>{{ contact.getPhone() }}</a><br />
+                            {% endif %}
+
+                            {% if contact.getEmail() %}
+                                <a class="email" href="mailto:{{ contact.getEmail() }}">
+                                    <i class="fa fa-fw fa-envelope"></i>{% if variables.showFullEmail %}{{ contact.getEmail() }}{% else %}E-Mail{% endif %}
+                                </a><br />
+                            {% endif %}
+
+                            {% if contact.getFax() %}
+                                <i class="fa fa-fw fa-fax"></i>{{ contact.getFax() }}
+                                <br />
+                            {% endif %}
+
+                        </p>
+                    </div>
+
+
+                </div>
+        </div>
+    {% endfor %}
+
+</div>
+
+{% if not data.skipContainer %}</div>{% endif %}

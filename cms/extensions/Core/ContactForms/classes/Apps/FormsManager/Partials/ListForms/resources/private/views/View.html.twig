@@ -1,0 +1,28 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{% if forms | length == 0 %}
+	<div class="message warning">Es wurden noch keine Formulare erstellt.</div>
+{% else %}
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Formular</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+
+			{% for form in forms %}
+				<tr class="{% if data.highlight == form.getId() %}highlighted{% endif %}" data-href="{{ app.getUri('details', { formId: form.getId() }) }}">
+					<td>
+						{{ form.title }}
+					</td>
+					<td class="text-right">
+						<a class="ajax" data-confirm="Soll dieses Formular wirklich gelöscht werden?" href="{{ app.getUri('ajaxFormDelete', { formId: form.getId() }) }}"><i class="fa fa-times icon"></i></a>
+					</td>
+				</tr>
+			{% endfor %}
+
+		</tbody>
+	</table>
+{% endif %}

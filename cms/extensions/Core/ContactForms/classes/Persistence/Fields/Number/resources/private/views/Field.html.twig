@@ -1,0 +1,8 @@
+
+<div class="form-group">
+    <label for="field-{{ field.getId() }}">{{ field.getTitle() }}{% if field.getMandatory() %}<span class="mandatory">*</span>{% endif %}</label>
+    <input {% if field.getConfig('maximum') %}max="{{ field.getConfig('maximum') }}"{% endif %} {% if field.getConfig('minimum') %}min="{{ field.getConfig('minimum') }}"{% endif %} {% if field.isRequired() %}required{% endif %} type="number" class="form-control" id="field-{{ field.getId() }}" placeholder="{% if renderer.options.placeholderLabel %}{{ field.getTitle() }}{% if field.isRequired() %}*{% endif %}{% endif %}" name="fields[{{ field.getId() }}]" {% if field.getConfig('helpText') %}aria-describedby="helpText{{ field.getId() }}"{% endif %}>
+
+    {% if field.getConfig('helpText') %}<small id="helpText{{ field.getId() }}" class="form-text text-muted">{{ field.getConfig('helpText') }}</small>{% endif %}
+</div>
+

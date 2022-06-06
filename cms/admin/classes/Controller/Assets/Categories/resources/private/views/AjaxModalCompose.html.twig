@@ -1,0 +1,24 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    'frame' : false,
+}) }}
+
+<form method="post" class="ajax" action="{{ v.getUri('Assets/Categories', 'ajaxCreate', { 'parentId' : category.getId(), pluginId: get.get('pluginId') }) }}">
+
+    <div class="modal-body">
+
+        <p>Neue Unrerkategorie unterhalb von „{{ category.getTitle() }}“ erstellen.</p>
+
+        <div class="form-group">
+            <label for="title">Titel</label>
+            <input type="text" class="form-control" name="title" required id="title" placeholder="Titel">
+        </div>
+
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Kategorie erstellen</button>
+    </div>
+
+</form>

@@ -1,0 +1,56 @@
+$colorSpot2: $colorSpot1 !default;
+
+.plugin.Core.HelpAndSupport.ContactPersons.Index06 {
+
+  .card {
+
+    border: none;
+
+    .card-header {
+
+      padding: 20px 0;
+
+      border: none;
+      background: none;
+
+      h2 {
+        margin: 0;
+
+        span {
+          float: right;
+
+          i {
+            color: $colorSpot2;
+          }
+
+          i.down {
+            display: none;
+          }
+
+          i.up {
+            display: inline-block;
+          }
+        }
+
+        &.collapsed {
+
+          i.down {
+            display: inline-block;
+          }
+
+          i.up {
+            display: none;
+          }
+        }
+      }
+    }
+
+    .card-body {
+      padding: 30px 0;
+
+      .vcard {
+        margin-bottom: 30px;
+      }
+    }
+  }
+}

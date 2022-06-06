@@ -1,0 +1,42 @@
+{# config
+
+title: Standard
+variables:
+    columns:
+        label: Spaltenzahl
+        type: int
+        default: 4
+    image_width:
+        label: Bildbreite
+        type: int
+        default: 400
+    image_height:
+        label: Bildhöhe
+        type: int
+        default: 400
+    showFullEmail:
+        label: E-Mail Adresse zeigen
+        type: bool
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set sp = view.getViewhelper('SimplePartials') %}
+
+{% set colClass = 'col-6' %}
+
+<div class="row">
+    <div class="col-12 plugin Core HelpAndSupport ContactPersons Index07">
+
+        {% if plugin.isFirst %}
+            <h1 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h1>
+        {% else %}
+            <h2 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+        {% endif %}
+
+        <div class="teaser" data-editable data-uid="{{ plugin.getUid('teaser') }}"></div>
+
+        {{ sp.renderPartial('Partials/Category', { fromfile: __FILE__, colClass: colClass, category: i.getCategory(), heading: 2 }) | raw }}
+
+
+    </div>
+</div>

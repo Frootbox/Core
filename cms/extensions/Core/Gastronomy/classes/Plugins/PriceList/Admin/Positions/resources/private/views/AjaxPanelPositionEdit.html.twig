@@ -1,0 +1,43 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<h2>
+    Position bearbeiten
+
+    <span class="headoptions">
+		<a data-toggle="tooltip" data-title="Preis hinzufügen" class="ajax" href="{{ plugin.getAdminUri('Positions', 'ajaxPriceCreate', { listEntryId: listEntry.getId() }) }}"><i class="fa fa-plus-circle"></i></a>
+	</span>
+</h2>
+
+<p><a class="ajax" href="{{ plugin.getAdminUri('Index', 'index', { categoryId: get.get('categoryId') }) }}"><i class="fa fa-chevron-circle-left"></i> zurück</a></p>
+
+<div id="pricesReceiver">
+    {{ v.injectPartial('\\Frootbox\\Ext\\Core\\Gastronomy\\Plugins\\PriceList\\Admin\\Positions\\Partials\\Prices', {
+        listEntry: listEntry,
+        plugin: plugin
+    }) | raw }}
+</div>
+
+<h3>Position Details</h3>
+
+<div class="card">
+    <div class="card-body">
+
+
+        <form method="post" class="ajax" action="{{ plugin.getAdminUri('Positions', 'ajaxUpdate', { listEntryId: listEntry.getId() }) }}">
+
+            <div class="form-group">
+                <label for="title">Titel</label>
+                <input type="text" class="form-control" name="title" id="title" placeholder="Titel" value="{{ listEntry.getTitle() }}">
+            </div>
+            <div class="form-group">
+                <label for="number">Nummer</label>
+                <input type="text" class="form-control" name="number" id="number" placeholder="Nummer" value="{{ listEntry.getNumber() }}">
+            </div>
+
+            <button type="submit" class="btn btn-primary">Speichern</button>
+
+        </form>
+
+
+    </div>
+</div>

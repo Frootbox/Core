@@ -1,0 +1,26 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{% if recommendations | length == 0 %}
+    <div class="message warning">Es wurden noch keine Empfehlung hinzugefügt.</div>
+{% else %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+
+            {% for recommendation in recommendations %}
+                <tr class="{% if recommendation.product.getId() == data.highlight %}highlighted{% endif %}">
+                    <td>{{ recommendation.product.getTitle() }}</td>
+                    <td class="text-right">
+                        <a class="ajax" data-confirm="Soll dieses Zubehör wirklich gelöscht werden?" href="{{ data.plugin.getAdminUri('Products', 'ajaxRecommendationDelete', { recommendationId: recommendation.product.getId(), productId: product.getId() }) }}"><i class="fa fa-times"></i></a>
+                    </td>
+                </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+{% endif %}

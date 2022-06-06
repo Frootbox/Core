@@ -1,0 +1,52 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ front.addTab('Alias-Verwaltung', app.getUri('index')) }}
+{{ front.addTab('manuelle Aliase') }}
+
+<h2>
+    aus Texten importieren
+</h2>
+
+{% if list | length == 0 %}
+    <div class="message info">Es wurde keine URL gefunden.</div>
+{% else %}
+
+    <form method="post" action="{{ app.getUri('ajaxCreateFromUrls') }}" class="ajax">
+
+        <button type="submit" class="btn btn-primary">Speichern</button>
+
+        <table class="table" style="margin: 20px 0;">
+            <thead>
+            <tr>
+                <th width="50%">Alias</th>
+                <th>Ziel</th>
+            </tr>
+            </thead>
+            <tbody>
+
+            {% for url in list %}
+                <tr data-title="Alias bearbeiten" data-modal="{{ app.getUri('ajaxModalEdit', { aliasId: alias.getId() }) }}">
+                    <td><input type="text" class="form-control" name="urls[]" value="{{ url }}"></td>
+                    <td>
+
+                        <select class="form-control" name="targets[]">
+                            <option value="">bitte wählen ...</option>
+                            {% for child in tree %}
+                                <option value="{{ child.getId() }}">{% for i in 1..child.getLevel() %}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{% endfor %}- {{ child.getTitle() }}</option>
+                            {% endfor %}
+                        </select>
+
+                    </td>
+                </tr>
+            {% endfor %}
+
+            </tbody>
+        </table>
+
+        <button type="submit" class="btn btn-primary">Speichern</button>
+
+        <br /><br /><br />
+    </form>
+
+{% endif %}
+

@@ -1,0 +1,67 @@
+{# config
+
+title: Cards
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set t = i.getTranslator() %}
+
+<div class="plugin Core HelpAndSupport Jobs Index04">
+
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+
+                <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+
+                <div data-editable data-uid="{{ plugin.getUid('teaser') }}"></div>
+
+            </div>
+        </div>
+
+        <div class="xcards">
+            <div class="row">
+
+                {% for job in jobs %}
+                    <div class="col-md-6">
+                        <div class="xcard" data-equalheight="{{ plugin.getUid('xcards-height') }}" data-href>
+
+                            <h4>{{ job.getTitle() }}</h4>
+
+                            <p>
+                                {% if job.getConfig('typeId') %}
+                                    {{ t.translate('Type' ~ job.getConfig('typeId')) }} /
+                                {% elseif job.getConfig('type') %}
+                                    {{ job.getConfig('type') }} /
+                                {% endif %}
+
+                                {% if job.getLocation() %}
+                                    {{ job.getLocation().getCity() }} /
+                                    {% if variables.showCountry and job.getLocation().getCountry() %}
+                                        / {{ job.getLocation().getCountry() }} /
+                                    {% endif %}
+                                {% endif %}
+
+                                {% if job.getConfig('asSoonAsPossible') %}
+                                    {{ t.translate('asSoonAsPossible') }}
+                                {% elseif job.getConfig('start') %}
+                                    {{ job.getConfig('start') }}
+                                {% elseif job.getDateStart() %}
+                                    ab {{ job.getDateStart() | date('d.m.Y') }}
+                                {% endif %}
+                            </p>
+
+                            {% if job.getUri() %}
+                                <p><a href="{{ job.getUri() }}">mehr Infos</a></p>
+                            {% endif %}
+                        </div>
+
+                    </div>
+                {% endfor %}
+
+            </div>
+        </div>
+    </div>
+
+</div>

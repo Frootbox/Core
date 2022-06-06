@@ -1,0 +1,31 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{% if addresses.getCount == 0 %}
+	<div class="message warning">Es wurden noch keine Adressen erstellt.</div>
+{% else %}
+
+	<table class="table" data-sort="{{ plugin.getAdminUri('Job', 'ajaxSort') }}">
+		<thead>
+			<tr>
+				<th>Titel</th>
+				<th></th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+
+			{% for address in addresses %}
+				<tr data-address="{{ address.getId() }}" id="row-{{ address.getId }}" class="{% if data.highlight == address.getId() %}highlighted{% endif %} ajax" data-title="sdfsdf" data-modal="{{ v.getStaticUri('Core/Addresses/AssetManager', 'ajaxModalEdit', { addressId: address.getId() }) }}">
+					<td class="title">{{ address.getTitle() }}</td>
+					<td class="handle"><i class="fa fa-grip-lines"></i></td>
+					<td class="text-right">
+						<a class="ajax" href="{{ v.getStaticUri('Core/Addresses/AssetManager', 'ajaxSwitchVisibility', { addressId: address.getId() }) }}"><i data-asset="{{ address.getId() }}" class="fa fa-lightbulb visibility {{ address.getVisibilityString() }} icon"></i></a>
+						<a class="ajax" data-confirm="Soll diese Adresse wirklich gelöscht werden?" href="{{ v.getStaticUri('Core/Addresses/AssetManager', 'ajaxDelete', { addressId: address.getId() }) }}"><i class="fa fa-times icon"></i></a>
+					</td>
+				</tr>
+			{% endfor %}
+
+		</tbody>
+	</table>
+
+{% endif %}

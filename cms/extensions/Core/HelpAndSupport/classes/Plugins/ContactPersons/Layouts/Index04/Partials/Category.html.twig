@@ -1,0 +1,47 @@
+{% set icons = view.getViewhelper('Ext/HerrUndFrauPixelExt/Icons/Icons', { createDummyOnFail: true  }) %}
+
+{% set contacts = data.category.getContacts() %}
+
+{% if contacts.getCount() > 0 %}
+
+    {% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+
+    {% if data.category.getParentId() > 0 %}
+        <h3>{{ data.category.getTitle() }}</h3>
+    {% endif %}
+
+    <div class="row justify-content-center">
+        {% for contact in contacts %}
+            <div class="{{ data.colClass }} vcard" {% if variables.withDetailsPage %}data-href="{{ contact.getUri() }}"{% endif %}>
+
+                <picture  data-editable data-uid="{{ contact.getUid('image')}}">
+                    <img class="round" width="400" height="400" src="{{ i.getDummyImage({ width: 400, height: 400 }) }}" alt="" />
+                </picture>
+
+                <div class="fn">{{ contact.getName() }}</div>
+
+                {% if contact.getConnConfig.position %}
+                    <div class="title">{{ contact.getConnConfig.position }}</div>
+                {% endif %}
+
+                {% if contact.getPosition() %}
+                    <div class="title">{{ contact.getPosition() }}</div>
+                {% endif %}
+
+                {% if not data.skipContactData %}
+                    <p>
+                        {% if contact.getPhone() %}
+                            <a class=email" href="tel:{{ contact.getPhone() }}">{{ icons.render('phone') | raw }}{{ contact.getPhone() }}</a><br />
+                        {% endif %}
+
+                        {% if contact.getEmail() %}
+                            <a class="phone" href="mailto:{{ contact.getEmail() }}">{{ icons.render('envelope') | raw }}E-Mail</a><br />
+                        {% endif %}
+                    </p>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+
+{% endif %}

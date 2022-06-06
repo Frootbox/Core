@@ -1,0 +1,106 @@
+<script>
+    $(function ( ) {
+
+        /**
+         * Show "background edit" buttons
+         */
+        $(document).on('mouseenter', '[data-type="Images/Background"][data-uid]', function (event) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            if (!$('.frootbox-raise-tooltips').hasClass('active')) {
+                $('.popover').popover('hide');
+            }
+
+            var uid = $(this).attr('data-uid');
+            var element = $(this);
+
+            // Generate label
+            var label = 'Hintergrund';
+
+            if (typeof $(this).data('label') != 'undefined') {
+                label = $(this).data('label');
+            }
+
+            $(this).attr('data-content', '<span class="options edit-mode">' + label +
+                '&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;' +
+                '<a class="images-background-edit" href="#' + uid + '"><i class="far fa-pencil"><\/i><\/a>&nbsp;&nbsp;&nbsp;' +
+                '|&nbsp;&nbsp;&nbsp;' +
+                '<a class="images-background-delete" href="#' + uid + '"><i class="far fa-trash"><\/i><\/a>&nbsp;&nbsp;&nbsp;' +
+                '|&nbsp;&nbsp;&nbsp;' +
+                '<a class="popover-dismiss" href="#"><i class="far fa-times"><\/i><\/a>' +
+                ($(this).attr('data-href') ? '&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;<a class="follow-parent-href" href="' + $(this).attr('data-href') + '"><i class="far fa-link"><\/i><\/a>' : '') +
+                (($(this).parents('[data-href]').length > 0) ? '&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;<a class="follow-parent-href" href="' + $(this).parents('[data-href]').attr('data-href') + '"><i class="far fa-link"><\/i><\/a>' : '') +
+            '</span>');
+
+
+            $(this).popover({
+                placement: 'top',
+                html: true
+            });
+
+            $(this).popover('show');
+        });
+
+
+        /**
+         *
+         */
+        $(document).on('click', 'a.images-background-edit', function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            // Extract uid from href="#uid"
+            var uid = $(this).attr('href').substr(1);
+
+            fbxEditorOpenGenericModal();
+
+            var element = $('[data-type="Images/Background"][data-uid="' + uid + '"]');
+
+            $.ajax({
+                url: "{{ settings.serverpath }}cms/admin/Editor/callEditable",
+                data: {
+                    method: 'ajaxModalEdit',
+                    editable: 'Frootbox/Ext/Core/Images/Editables/Background',
+                    uid: uid,
+                    width: element.attr('data-width'),
+                    height: element.attr('data-height')
+                },
+                success: function ( html ) {
+
+                    $('#fbxEditorGenericModal .modal-content').html(html);
+
+                }
+            });
+
+        });
+
+
+        /**
+         *
+         */
+        $(document).on('click', 'a.images-background-delete', function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            // Extract uid from href="#uid"
+            var uid = $(this).attr('href').substr(1);
+
+            $.ajax({
+                url: "{{ settings.serverpath }}cms/admin/Editor/callEditable",
+                data: {
+                    method: 'ajaxDelete',
+                    editable: 'Frootbox/Ext/Core/Images/Editables/Background',
+                    uid: uid
+                },
+                success: function ( html ) {
+                    $('[data-type="Images/Background"][data-uid="' + uid + '"]').css('background-image', 'none');
+                }
+            });
+
+        });
+    });
+</script>

@@ -1,0 +1,34 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    frame: false,
+}) }}
+
+<form method="post" id="composeNewPage" class="ajax" action="{{ v.getUri('Dashboard', 'ajaxPanelCreate') }}">
+
+    <div class="modal-body">
+
+        <div class="form-group single">
+            <label for="panel">Panel</label>
+            <select class="form-control" id="panel" name="panel">
+                <option value="">bitte wählen ...</option>
+
+                {% for vendor, panelList in panels %}
+                    <optgroup label="{{ vendor }}">
+
+                        {% for panel in panelList %}
+                            <option value="{{ panel.class }}">{{ panel.title }}</option>
+                        {% endfor %}
+                    </optgroup>
+
+                {% endfor %}
+            </select>
+        </div>
+
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Seite erstellen</button>
+    </div>
+
+</form>

@@ -1,0 +1,42 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<form method="post" action="{{ v.getUri('Editor/OnPage', 'ajaxUpdateSeo') }}" class="ajax">
+
+    <div class="modal-body">
+
+        {% if alias %}
+            <div class="row">
+                <div class="col-md-6">
+
+                    <div class="form-group">
+                        <label for="seoTitle">Seiten-Titel</label>
+                        <input type="text" class="form-control" id="seoTitle" name="seoTitle" value="{{ alias.getConfig('seo.title') }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="metaKeywords">Meta Keywords</label>
+                        <textarea rows="5" class="form-control" id="metaKeywords" name="metaKeywords" aria-describedby="keywordsHelp">{{ alias.getConfig('seo.keywords') }}</textarea>
+                        <small id="keywordsHelp" class="form-text text-muted">Keywords mit Komma getrennt angeben.</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="metaDescription">Meta Beschreibung</label>
+                        <textarea rows="5" class="form-control" id="metaDescription" name="metaDescription">{{ alias.getConfig('seo.description') }}</textarea>
+                    </div>
+
+                </div>
+                <div class="col-md-6">
+
+                </div>
+            </div>
+        {% else %}
+            Die SEO Einstellungen sind für die Startseite derzeit nicht verfügbar.
+        {% endif %}
+
+    </div>
+
+    {% if alias %}
+        <div class="modal-footer">
+            <button type="submit" name="xx" class="btn btn-primary">Speichern</button>
+        </div>
+    {% endif %}
+
+</form>

@@ -1,0 +1,45 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<h4>
+    verknüpfte Referenzen
+    <span class="headoptions">
+		<a data-toggle="tooltip" data-modal data-title="neue Ansprechperson hinzufügen" href="{{ plugin.getAdminUri('Contact', 'ajaxModalCompose', { categoryId: category.getId() }) }}"><i class="fa fa-plus-circle"></i></a>
+	</span>
+</h4>
+
+<div id="referencesCategoryListReceiver">
+
+    {{ v.injectPartial('\\Frootbox\\Ext\\Core\\Images\\Plugins\\References\\Admin\\Categories\\Partials\\ReferencesList', {
+        'category' : category,
+        'plugin' : plugin
+    }) | raw }}
+
+</div>
+
+<h4>Referenz hinzufügen</h4>
+
+<div class="card">
+    <div class="card-body">
+
+            {% if references | length == 0 %}
+                <div class="message warning">Es sind derzeit keine Referenzen verfügbar.</div>
+            {% else %}
+                <form class="ajax" method="post" action="{{ plugin.getAdminUri('Categories', 'ajaxReferenceAdd', { categoryId : category.getId() }) }}">
+
+                        <div class="form-group">
+                            <label for="contactId">neue Referenz</label>
+                            <select class="form-control" id="contactId" name="contactId">
+                                <option value="">bitte wählen ...</option>
+
+                                {% for reference in references %}
+                                    <option value="{{ reference.getId() }}">{{ reference.getTitle() }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Referenz verknüpfen</button>
+                </form>
+            {% endif %}
+
+    </div>
+</div>

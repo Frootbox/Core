@@ -1,0 +1,43 @@
+{# config
+
+title: Standard
+variables:
+    withContainer:
+        type: bool
+        label: mit Layout-Container
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+
+{% if variables.withContainer %}<div class="container">{% endif %}
+
+<div class="row">
+    <div class="col-12 plugin Core HelpAndSupport Testimonials Index01">
+        <div class="inner-wrapper">
+
+            <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+
+            <div data-editable data-uid="{{ plugin.getUid('teaser') }}"></div>
+
+            <div class="row">
+                {% for column in i.getTestimonials().getColumns(2) %}
+                    <div class="col-md-6">
+                        {% for testimonial in column %}
+                            <figure class="testimonial">
+                                <blockquote class="me" cite="https://de.wikipedia.org/wiki/Friedrich_Dürrenmatt">
+                                    <div data-nowidgets data-editable data-uid="{{ testimonial.getUid('text') }}"></div>
+                                </blockquote>
+                                <figcaption>{{ testimonial.getTitle() }}</figcaption>
+                            </figure>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% if variables.withContainer %}</div>{% endif %}

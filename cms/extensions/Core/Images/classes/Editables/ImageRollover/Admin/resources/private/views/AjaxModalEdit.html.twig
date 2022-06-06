@@ -1,0 +1,91 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+
+<script>
+    var uid = "{{ get.get('uid') }}";
+
+    $(function () {
+
+        /**
+         *
+         */
+        $('#pictureUpdateForm').submit(function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            $.ajax({
+                url: $(this).attr('action'),
+                data: $(this).serialize(),
+                type: 'POST',
+                success: function ( response ) {
+
+
+                    $('#fbxEditorGenericModal').modal('hide');
+
+                    refreshEditable();
+
+
+                },
+                error: function ( xhr ) {
+                    alert("PL");
+                }
+            });
+
+        });
+    });
+
+    function refreshEditable ( ) {
+
+        var element = $('[data-type="Images/Background"][data-uid="' + uid + '"]');
+
+        var snippet = $('<div />').append(element.clone()).html();
+
+        $.ajax({
+            url: "{{ settings.serverpath }}cms/admin/Editor/callEditable",
+            type: 'POST',
+            data: {
+                method: 'ajaxRefresh',
+                editable: 'Frootbox/Ext/Core/Images/Editables/Background',
+                snippet: snippet
+            },
+            success: function ( html ) {
+
+                var response = $.parseJSON(html);
+
+                element.replaceWith(response.snippet.html);
+            }
+        });
+    }
+</script>
+
+<style>
+    .modal-dialog .nav.nav-tabs {
+        margin: 30px 0 0 0;
+    }
+</style>
+
+
+<form id="pictureUpdateForm" action="{{ controller.getActionUri('ajaxUpdate', { uid: get.get('uid') }) }}" method="post">
+
+    <div class="modal-header">
+        <h5 class="modal-title">Rollover-Bild bearbeiten</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+
+    {{ v.injectPartial('Frootbox/Ext/Core/FileManager/Editor/Partials/FileManager', {
+        uid: get.get('uid')
+    }) | raw }}
+
+    <div class="modal-body">
+
+        {{ v.injectPartial('Frootbox/Ext/Core/FileManager/Editor/Partials/FileUpload', {
+            multiple: true,
+            uid: get.get('uid')
+        }) | raw }}
+
+    </div>
+
+</form>

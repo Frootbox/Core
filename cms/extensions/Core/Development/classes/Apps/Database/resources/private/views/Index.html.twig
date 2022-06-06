@@ -1,0 +1,46 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ front.addTab('Datenbankverwaltung', app.getUri('index')) }}
+
+<h2>
+	Datenbankverwaltung
+</h2>
+
+{{ v.injectPartial('\\Frootbox\\Admin\\View\\Partials\\Navigation\\Buttons', { links:  [
+	{
+		url : v.getUri('App', 'index', { a: 'export', appId: app.getId() }),
+		icon : 'fa-download',
+		title : 'Dump (komplett)',
+		type : 'xx'
+	},
+	{
+		url : v.getUri('App', 'index', { a: 'export', appId: app.getId(), structureOnly: true }),
+		icon : 'fa-download',
+		title : 'Dump (nur Struktur)',
+		type : 'xx'
+	},
+	{
+		url : v.getUri('App', 'index', { a: 'import', appId: app.getId() }),
+		icon : 'fa-upload',
+		title : 'Import',
+		type : 'xx'
+	},
+	{
+		url : v.getUri('App', 'index', { a: 'showTableInfo', appId: app.getId() }),
+		icon : 'fa-table',
+		title : 'Datenstruktur Export',
+		type : 'xx'
+	},
+	{
+		url : v.getUri('App', 'index', { a: 'integrity', appId: app.getId() }),
+		icon : 'fa-wrench',
+		title : 'Datenbankintegrität',
+		type : 'xx'
+	},
+	{
+		url : v.getUri('App', 'index', { a: 'backups', appId: app.getId() }),
+		icon : 'fa-history',
+		title : 'Backups',
+		type : 'xx'
+	}
+]}) | raw }}

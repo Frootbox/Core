@@ -1,0 +1,144 @@
+{% verbatim %}{# config
+
+
+
+/config #}
+
+{% set v = view.getViewhelper('View') %}
+{% set p = view.getViewhelper('Pages') %}
+{% set a = view.getViewhelper('Assets') %}
+
+{% set nav = view.getViewhelper('Ext/Core/Navigation/Navigation') %}
+{% set gf = view.getViewhelper('Ext/HerrUndFrauPixelExt/GoogleFonts/GoogleFonts') %}
+{% set icons = view.getViewhelper('Ext/HerrUndFrauPixelExt/Icons/Icons', {   }) %}
+
+<!DOCTYPE html>
+<html lang="{{ globalLanguage }}" xml:lang="{{ globalLanguage }}" xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <script>
+            (function(){"use strict";var c=[],f={},a,e,d,b;if(!window.jQuery){a=function(g){c.push(g)};f.ready=function(g){a(g)};e=window.jQuery=window.$=function(g){if(typeof g=="function"){a(g)}return f};window.checkJQ=function(){if(!d()){b=setTimeout(checkJQ,100)}};b=setTimeout(checkJQ,100);d=function(){if(window.jQuery!==e){clearTimeout(b);var g=c.shift();while(g){jQuery(g);g=c.shift()}b=f=a=e=d=window.checkJQ=null;return true}return false}}})();
+        </script>
+
+        <title>
+            {% if alias.getConfig('seo.title') %}
+                {{ alias.getConfig('seo.title') }}
+            {% elseif pagedata.title %}
+                {{ pagedata.title }}
+            {% elseif page.getParentId() != "0" %}
+                {{ page.getTitle() }}
+            {% endif %}
+        </title>
+
+        {% if pagedata.ogImage %}
+            <meta property="og:image" content="{{ pagedata.ogImage.getUri({ width: 700, height: 700 }) }}" />
+            <meta property="og:image:width" content="700" />
+            <meta property="og:image:height" content="700" />
+        {% else %}
+            <meta property="og:image" content="EXT:{% endverbatim %}{{ vendorId }}/{{ extensionId }}{% verbatim %}/images/og-image.svg" />
+        {% endif %}
+
+        {% if alias.getConfig('seo.title') %}
+            <meta property="og:title" content="{{ alias.getConfig('seo.title') }}" />
+        {% elseif pagedata.ogTitle %}
+            <meta property="og:title" content="{{ pagedata.ogTitle }}" />
+        {% endif %}
+
+        {% if alias.getConfig('seo.description') %}
+            <meta property="og:description" content="{{ alias.getConfig('seo.description') }}" />
+        {% elseif pagedata.ogDescription %}
+            <meta property="og:description" content="{{ (pagedata.ogDescription | default()) | striptags | trim }}" />
+        {% endif %}
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="initial-scale=1">
+
+        <meta name="keywords" content="{{ alias.getConfig('seo.keywords') }}">
+        <meta name="description" content="{{ alias.getConfig('seo.description') }}" />
+
+        {{ a.import('https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css') | raw }}
+        {{ a.import('https://code.jquery.com/jquery-3.4.0.min.js') | raw }}
+        {{ a.import('https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js') | raw }}
+        {{ a.import('https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js') | raw }}
+
+        {{ gf.import('<link href="https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300,700|Open+Sans:400,400i,700&amp;display=swap" rel="stylesheet" />') | raw }}
+
+        {{ v.asset('EXT:{% endverbatim %}{{ vendorId }}/{{ extensionId }}{% verbatim %}/css/styles-variables.less') | raw }}
+        {{ v.asset('EXT:{% endverbatim %}{{ vendorId }}/{{ extensionId }}{% verbatim %}/css/styles-elements.less') | raw }}
+
+        {{ v.asset('EXT:{% endverbatim %}{{ vendorId }}/{{ extensionId }}{% verbatim %}/css/1standards-xs.less') | raw }}
+        {{ v.asset('EXT:{% endverbatim %}{{ vendorId }}/{{ extensionId }}{% verbatim %}/css/2standards-sm.less') | raw }}
+        {{ v.asset('EXT:{% endverbatim %}{{ vendorId }}/{{ extensionId }}{% verbatim %}/css/3standards-md.less') | raw }}
+        {{ v.asset('EXT:{% endverbatim %}{{ vendorId }}/{{ extensionId }}{% verbatim %}/css/4standards-lg.less') | raw }}
+        {{ v.asset('EXT:{% endverbatim %}{{ vendorId }}/{{ extensionId }}{% verbatim %}/css/5standards-xl.less') | raw }}
+
+        {{ v.asset('EXT:{% endverbatim %}{{ vendorId }}/{{ extensionId }}{% verbatim %}/js/init.js') | raw }}
+
+        {{ v.asset('EXT:Core/Editing/css/styles-default.less') | raw }}
+        {{ v.asset('EXT:Core/System/javascript/init-links.js') | raw }}
+
+        <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v={{ config.get('statics.cache.revision') }}">
+        <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png?v={{ config.get('statics.cache.revision') }}">
+        <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png?v={{ config.get('statics.cache.revision') }}">
+        <link rel="shortcut icon" href="favicon.ico?v={{ config.get('statics.cache.revision') }}" />
+        <link rel="manifest" href="site.webmanifest?v={{ config.get('statics.cache.revision') }}">
+        <meta name="msapplication-TileColor" content="#ffffff">
+        <meta name="theme-color" content="#ffffff">
+
+    </head>
+    <body class="--offcanvas-visible">
+
+        <div id="offcanvas">
+            <div class="outer-wrapper">
+                <div class="container">
+                    <div class="row align-items-center">
+                        <div class="col-4 col-md-3">
+                            <a class="logo" href="{{ v.link('') }}"><img src="EXT:{% endverbatim %}{{ vendorId }}/{{ extensionId }}{% verbatim %}/images/logo.svg" alt="Logo" /></a>
+                        </div>
+                        <div class="col-8 menu-col">
+                            <a class="toggle-offcanvas" href="#"><span class="icon-bars"></span></a>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+
+                            {{ nav.getNavigation('OffcanvasMain', {
+                                class: 'main'
+                            }).render() | raw }}
+
+                            {{ nav.getNavigation('OffcanvasMeta', {
+                                class: 'meta'
+                            }).render() | raw }}
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="topper"></div>
+
+        <div id="banner">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-4 col-md-3">
+                        <a class="logo" href="{{ v.link('') }}"><img src="EXT:{% endverbatim %}{{ vendorId }}/{{ extensionId }}{% verbatim %}/images/logo.svg" alt="Logo" /></a>
+                    </div>
+                    <div class="col-8 menu-col">
+                        <a class="toggle-offcanvas" href="#"><span class="icon-bars"></span></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% block content %} <!-- HERE GOES THE CONTENT :D --> {% endblock %}
+
+        <footer>
+
+            {{ nav.getNavigation('FooterMeta', {
+                class: 'meta'
+            }).render() | raw }}
+
+        </footer>
+
+    </body>
+</html>{% endverbatim %}

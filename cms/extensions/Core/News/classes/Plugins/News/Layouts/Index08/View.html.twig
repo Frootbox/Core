@@ -1,0 +1,59 @@
+{# config
+
+title: Pressespiegel
+autoLayout:
+    showArticle: ShowArticle08
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+{{ i.injectScss({ path: 'Index08/public/standards.less'}) | raw }}
+{{ i.injectScript({ path: 'Index08/public/init.js'}) | raw }}
+
+{% set years = i.getArticlesByYear({ limit: 2024 }) %}
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+<script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+
+<div class="row">
+    <div class="col-12 plugin Core News News Index08">
+
+        {% if plugin.isFirst %}
+            <h1 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h1>
+        {% else %}
+            <h2 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+        {% endif %}
+
+        <div data-editable data-uid="{{ plugin.getUid('teaser-text') }}"></div>
+
+        <div class="row">
+            <div class="col-6">
+
+                {% for year in years %}
+
+                    <h3>{{ year.year}}</h3>
+
+                    <table class="table">
+                        <tbody>
+                        {% for article in year.articles %}
+                        <tr>
+                            <td width="140">{{ article.getDateStart | date("d.m.Y") }}</td>
+                            <td><a class="show-article" href="{{ plugin.getUriAjax('showArticle', { articleId: article.getId() }) }}">{{ article.getTitle }}</a></td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% endfor %}
+
+            </div>
+            <div class="col-6">
+
+                <div class="sticky-top" id="articleReceiver"></div>
+
+            </div>
+        </div>
+
+
+    </div>
+</div>

@@ -1,0 +1,45 @@
+<script>
+    $(function ( ) {
+
+        /**
+         * Show "blocks edit" button
+         */
+        $(document).on('mouseenter', 'div[data-blocks]', function ( ) {
+
+            if (!$('.frootbox-raise-tooltips').hasClass('active')) {
+                $('.popover').popover('hide');
+            }
+
+            if (isEditingFreeText) {
+                return;
+            }
+
+            var uid = $(this).attr('data-uid');
+
+            var title = $(this).attr('data-xtitle') ? $(this).attr('data-xtitle') : 'Blöcke';
+
+
+            $(this).attr('data-content', '<span class="options edit-mode">' + title +
+                '&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;' +
+                '<a class="block-compose" href="#' + uid + '"><i class="far fa-plus"><\/i><\/a>&nbsp;&nbsp;&nbsp;' +
+                '<a class="block-list" href="#' + uid + '"><i class="far fa-list"><\/i><\/a>' +
+                '&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;' +
+                '<a class="popover-dismiss" href="#"><i class="far fa-times"><\/i><\/a>' +
+                '<\/span>');
+
+            $(this).popover({
+                placement: 'top',
+                html: true
+            });
+
+            $(this).popover('show');
+
+        });
+
+
+
+
+
+    });
+
+</script>

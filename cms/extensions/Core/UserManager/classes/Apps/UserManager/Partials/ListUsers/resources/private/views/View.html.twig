@@ -1,0 +1,38 @@
+{% if users.getCount() == 0 %}
+	<div class="message warning">Es sind derzeit keine Benutzer mit dieser Rolle vorhanden.</div>
+{% else %}
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Benutzername</th>
+				<th width="200">Name</th>
+				<th width="200">letzter Klick</th>
+				<th width="100"></th>
+			</tr>
+		</thead>
+		<tbody>
+
+			{% for user in users %}
+				<tr data-modal="{{ app.getUri('ajaxModalUserEdit', { userId: user.getId }) }}" data-title="Benutzer bearbeiten" class="{% if user.getId == data.highlight %}highlighted{% endif %}">
+					<td><i class="far fa-user fa-fw"></i> {{ user.getEmail }}</td>
+					<td>
+						<div style="width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+							{{ user.getFirstName() }} {{ user.getLastName() }}
+						</div>
+					</td>
+					<td>
+						{% if user.getLastClick() %}
+							{{ user.getLastClick() | date('d.m.Y H:i:s') }} Uhr
+						{% endif %}
+					</td>
+					<td class="text-right">
+						<a data-toggle="tooltip" title="Link zum Passwort setzen schicken" class="ajax" href="{{ app.getUri('ajaxUserActivate', { userId : user.getId } ) }}"><i class="fa fa-envelope icon"></i></a>
+						<a data-toggle="tooltip" title="Benutzer exportieren" href="{{ app.getUri('export', { userId : user.getId } ) }}"><i class="fa fa-download icon"></i></a>
+						<a data-toggle="tooltip" title="Benutzer löschen" data-confirm="Soll dieser Benutzer wirklich gelöscht werden?" href="{{ app.getUri('ajaxUserDelete', { userId : user.getId } ) }}" class="ajax"><i class="fa fa-times icon"></i></a>
+					</td>
+				</tr>
+			{% endfor %}
+
+		</tbody>
+	</table>
+{% endif %}

@@ -1,0 +1,7 @@
+<div class="form-group">
+	{% if not parameters.hideLabel %}
+		<label for="field_{{ field.getId() }}">{{ field.getLabel }}{% if field.isRequired %}*{% endif %}</label>
+	{% endif %}
+	<input {% if field.isRequired %}required{% endif %} type="email" class="form-control" id="field_{{ field.getId() }}" name="fields[{{ field.getId() }}]" placeholder="{% if parameters.placeholder %}{{ parameters.placeholder }}{% else %}{{ parameters.t.translate('Core.Forms.Plugins.Form.PleaseFill') }}{% endif %}">
+</div>
+

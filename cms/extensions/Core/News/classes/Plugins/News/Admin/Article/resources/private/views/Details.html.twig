@@ -1,0 +1,144 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<h2>
+    Artikel bearbeiten
+    <span class="headoptions">
+        <a data-toggle="tooltip" data-title="Artikel bearbeiten" target="edit-article-{{ article.getId() }}" href="{{ article.getUriEdit() }}"><i class="fa fa-pencil"></i></a>
+        <a href="{{ plugin.getAdminUri('Article', 'details', { articleId: article.getId(), target: 'next' }) }}" class="ajax"><i class="fa fa-chevron-double-right"></i></a>
+    </span>
+</h2>
+
+<p><a class="ajax" href="{{ plugin.getAdminUri('Index', 'index') }}"><i class="fa fa-chevron-circle-left"></i> zurück</a></p>
+
+
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+    <li class="nav-item">
+        <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Details</a>
+    </li>
+
+    {% if categories.getCount() > 0 %}
+        <li class="nav-item">
+            <a class="nav-link" id="categories-tab" data-toggle="tab" href="#categories" role="tab" aria-controls="layout" aria-selected="false">Kategorien</a>
+        </li>
+    {% endif %}
+</ul>
+
+<div class="tab-content" id="myTabContent">
+    <div class="tab-pane show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+
+        <div class="card">
+            <div class="card-body">
+
+                <h3>Artikel-Details</h3>
+
+                <form method="post" class="ajax" action="{{ plugin.getAdminUri('Article', 'ajaxUpdate', { articleId : article.getId() }) }}">
+
+                    {% if not configuration.get('i18n.multiAliasMode') %}
+                        <div class="form-group">
+                            <label for="title">Titel</label>
+                            <input type="text" class="form-control" id="title" name="title" placeholder="Titel" value="{{ article.getTitle() }}">
+                        </div>
+                    {% else %}
+                        {% for language in configuration.get('i18n.languages') %}
+
+                            <div class="form-group">
+                                <label for="title_{{ loop.index }}">Titel ({{ language }}){% if settings.default_language == language %}*{% endif %}</label>
+                                <input type="text" {% if settings.default_language == language %}required{% endif %} class="form-control" id="title_{{ loop.index }}" name="titles[{{ language }}]" placeholder="Titel ({{ language }})" value="{{ article.getTitleWithoutFallback(language) }}">
+                            </div>
+
+                        {% endfor %}
+                    {% endif %}
+
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label for="dateStart">Datum</label>
+                            <input type="date" class="form-control" id="dateStart" name="dateStart" placeholder="Datum" value="{{ article.getDateStart() | default(article.getDate()) | date("Y-m-d") }}">
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="timeStart">Uhrzeit</label>
+                            <input type="text" class="form-control" id="timeStart" name="timeStart" placeholder="Uhrzeit" value="{{ article.getDateStart() | default(article.getDate()) | date("H:i:s") }}">
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="dateDisplay">Darstellung</label>
+                            <select class="form-control" id="dateDisplay" name="dateDisplay">
+                                <option {% if article.getDateDisplay() == "Default" %}selected{% endif %} value="Default">Standard</option>
+                                <option {% if article.getDateDisplay() == "DateAndTime" %}selected{% endif %} value="DateAndTime">Datum & Uhrzeit</option>
+                                <option {% if article.getDateDisplay() == "DateOnly" %}selected{% endif %} value="DateOnly">nur Datum</option>
+                                <option {% if article.getDateDisplay() == "MonthAndYear" %}selected{% endif %} value="MonthAndYear">nur Monat & Jahr</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="source">Quelle</label>
+                        <input type="text" class="form-control" id="source" name="source" placeholder="Quelle" value="{{ article.getSource() }}">
+                    </div>
+
+                    {{ v.injectPartial('\\Frootbox\\Admin\\View\\Partials\\Input\\Tags', {
+                        object: article
+                    }) | raw }}
+
+                    <div class="form-group">
+                        <label for="link">Link</label>
+                        <input type="text" class="form-control" id="link" name="link" placeholder="Link" value="{{ article.getConfig('link') }}">
+                    </div>
+                    <div class="form-group form-check">
+                        <input {% if article.getConfig('noIndividualDetailPage') %}checked{% endif %} type="checkbox" class="form-check-input" id="noIndividualDetailPage" name="noIndividualDetailPage">
+                        <label class="form-check-label" for="noIndividualDetailPage">keine Verlinkung oder Detailseite an diesem Artikel</label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Speichern</button>
+
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+    <div class="tab-pane" id="categories" role="tabpanel" aria-labelledby="categories-tab">
+
+        <div class="card">
+            <div class="card-body">
+
+                <h3>Kategorien</h3>
+
+                <script>
+                    $(function ( ) {
+
+                        $('input.category-switcher').on('change', function ( ) {
+
+                            $.ajax({
+                                url: "{{ plugin.getAdminUri('Article', 'ajaxCategorySet', { articleId: article.getId() }) | raw }}",
+                                data : {
+                                    state: ($(this).is(':checked') ? 1 : 0),
+                                    categoryId: $(this).attr('data-category')
+                                },
+                                success: function ( event ) {
+
+                                    toastr.success('Die Änderungen wurden gespeichert.');
+                                }
+                            });
+                        });
+                    });
+                </script>
+
+                <table class="table">
+                    <tbody>
+
+                    {% for category in categories %}
+                        <tr>
+                            <td class="level-{{ category.getLevel() }}">
+                                <label>
+                                    <input class="category-switcher" type="checkbox" {% if category.hasItem(article) %}checked{% endif %} data-category="{{ category.getId() }}" />&nbsp;&nbsp;{{ category.getTitle() }}
+                                </label>
+                            </td>
+                        </tr>
+                    {% endfor %}
+
+                    </tbody>
+
+            </div>
+        </div>
+
+    </div>
+</div>

@@ -1,0 +1,61 @@
+{# config
+
+title: tabellarisch
+variables:
+    count:
+        default: 10
+        type: int
+        label: Anzahl Teaser
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set p = view.getViewhelper('Pages') %}
+
+{% set events = i.getEvents() %}
+
+<div class="row">
+    <div class="col-12 plugin Core Events Teaser Index01">
+
+        <h2 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+
+        <table class="table">
+            <tbody>
+
+                {% set xEvent = "" %}
+
+                {% for event in events %}
+                    <tr>
+                        <td nowrap>
+                            {% if not event.hasOneDay() %}
+                                {{ event.getDateStart.format('%d.%m.') }}–{{ event.getDateEnd.format('%d.%m.') }}
+                            {% else %}
+                                {{ event.getDateStart.format('%d.%m.') }}
+
+                                {% if event.getDateStart.format('%H:%M') != event.getDateEnd.format('%H:%M') %}
+                                    <span class="time">{{ event.getDateStart.format('%H:%M') }}–{{ event.getDateEnd.format('%H:%M') }} Uhr</span>
+                                {% elseif event.getDateStart.format('%H:%M') != "00:00" %}
+                                    <span class="time">{{ event.getDateStart.format('%H:%M') }} Uhr</span>
+                                {% endif %}
+
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ event.getTitle }}
+                            <span class="time">{{ event.getLocationTitle }}</span>
+                        </td>
+                    </tr>
+
+                    {% set xEvent = event %}
+
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% if events.getCount < events.getTotal %}
+            <p><a href="{{ p.getPage(xEvent.getPageId()).getUri() }}"><i class="fa fa-chevron-circle-right"></i> alle Termine im Überblick</a></p>
+        {% endif %}
+
+    </div>
+</div>
+

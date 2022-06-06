@@ -1,0 +1,30 @@
+<style>
+    .Gizmo.Core.Forms.FormChecker {
+        min-height: 140px;
+        text-align: center;
+    }
+
+    .Gizmo.Core.Forms.FormChecker table {
+        text-align: left;
+    }
+</style>
+
+<h4>Formular-Warnung</h4>
+
+<table class="table">
+    <tbody>
+
+        {% for entry in list %}
+            <tr>
+                <td>
+                    Formular #{{ entry.plugin.getId() }}: Kein Empfänger hinterlegt.
+                </td>
+                <td>
+                    <a href="{{ serverpath }}cms/admin/Sitemap/index/?jumpTo={{ entry.plugin.getAdminUri('Index', 'index') | url_encode }}#plugin:{{ entry.plugin.getPageId() }}:{{ entry.plugin.getId() }}:Config:index"><i class="fa fa-external-link"></i></a>
+                </td>
+            </tr>
+        {% endfor %}
+
+    </tbody>
+</table>
+

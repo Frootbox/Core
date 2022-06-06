@@ -1,0 +1,28 @@
+
+
+<script>
+    {% if get.get('highlight') %}
+        $('tr[data-text="{{ get.get('highlight') }}"]').trigger('click');
+    {% endif %}
+</script>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Text</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+
+        {% for text in texts %}
+            <tr class="ajax {% if get.get('highlight') == text.getId() %}highlighted{% endif %}" data-text="{{ text.getId() }}" data-href="{{ app.getUri('ajaxDetails', { textId: text.getId(), query: query }) }}">
+                <td>{{ text.getText() }}</td>
+                <td class="text-right">
+                    <a data-confirm="Soll dieser Text wirklich gelöscht werden?" class="ajax" href="{{ app.getUri('ajaxDelete', { textId: text.getId() }) }}"><i class="fa fa-times"></i></a>
+                </td>
+            </tr>
+        {% endfor %}
+
+    </tbody>
+</table>

@@ -1,0 +1,33 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ front.addTab('Entwickler-Tools', app.getUri('index')) }}
+{{ front.addTab('Seiten-Verwaltung') }}
+
+<h2>
+	Seiten-Verwaltung
+</h2>
+
+
+<table class="table">
+	<thead>
+		<tr>
+			<th>ID</th>
+			<th>Titel</th>
+			<th>Parent</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for item in stack %}
+			<tr>
+				<td>{{ item.page.getId() }}</td>
+				<td class="level-{{ item.depth }}">
+					<span style="color: #CCC;">{{ item.page.getLft() }}</span>
+					{{ item.page.getTitle() }}
+					<span style="color: #CCC;">{{ item.page.getRgt() }}</span><br />
+					{{ item.page.getUri() }}
+				</td>
+				<td>{{ item.page.getParentId() }}</td>
+			</tr>
+		{% endfor %}
+	</tbody>
+</table>

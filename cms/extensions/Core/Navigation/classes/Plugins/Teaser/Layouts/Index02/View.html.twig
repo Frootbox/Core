@@ -1,0 +1,62 @@
+{# config
+
+title: Kacheln mit Bild
+variables:
+    img_width:
+        type: int
+        label: Bildbreite
+        default: 350
+    img_height:
+        type: int
+        label: Bildhöhe
+        default: 160
+    columns:
+        type: int
+        label: Spalten
+        default: 2
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+{% set teasers = i.getTeasers() %}
+
+{% if variables.columns == 1 %}
+    {% set colClass = "col-12" %}
+{% elseif variables.columns == 2 %}
+    {% set colClass = "col-6" %}
+{% elseif variables.columns == 3 %}
+    {% set colClass = "col-6 col-sm-4" %}
+{% elseif variables.columns >= 4 %}
+    {% set colClass = "col-3" %}
+{% endif %}
+
+<div class="row">
+    <div class="col-12 plugin Core Navigation Teaser Index02">
+        <div class="inner-wrapper">
+            {% if plugin.isFirst %}
+                <h1 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h1>
+            {% else %}
+                <h2 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+            {% endif %}
+
+            <div data-editable data-uid="{{ plugin.getUid('teaser-text') }}" data-title="Inhalt"></div>
+
+            <div class="row justify-content-md-center">
+
+                {% for teaser in teasers %}
+
+                    <div class="{{ colClass }} teaser">
+                        <a href="{{ teaser.getUrl }}">
+                            <picture class="fluid" data-editable data-uid="{{ teaser.getUid('image')}}">
+                                <img width="{{ variables.img_width }}" height="{{ variables.img_height }}" src="{{ i.getDummyImage({ width: variables.img_width, height: variables.img_height }) }}" alt="" />
+                            </picture>
+
+                            <span>{{ teaser.getTitle }}</span>
+                        </a>
+                    </div>
+
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>

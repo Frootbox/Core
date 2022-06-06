@@ -1,0 +1,27 @@
+{% set b = view.getViewhelper('Breadcrumb', { singleton: true }) %}
+
+{{ b.addSection(reference.getTitle(), reference.getUri()) }}
+
+
+<param name="cloak" value="1" />
+<param name="layout" value="Default" />
+
+{{ view.set('overrideImageUid', reference.getUid('image')) }}
+{{ view.set({ pagedata: { title: reference.getTitle() } }) }}
+
+{{ view.addBreadcrumb(reference.getTitle(), reference.getUri()) }}
+
+<div class="row">
+    <div class="col-12 plugin Core Images References ShowReference01">
+
+        {% if plugin.isFirst %}
+            <h1 data-editable data-uid="{{ reference.getUid('title') }}">{{ reference.getTitle }}</h1>
+        {% else %}
+            <h2 data-editable data-uid="{{ reference.getUid('title') }}">{{ reference.getTitle }}</h2>
+        {% endif %}
+
+        <div class="teaser-text" data-editable data-uid="{{ reference.getUid('teaser') }}"></div>
+
+        <div data-editable data-uid="{{ reference.getUid('text') }}"></div>
+    </div>
+</div>

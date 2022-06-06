@@ -1,0 +1,482 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<h2>
+    Produktdetails „{{ product.getTitle() }}“
+
+    <span class="headoptions">
+        <span class="dropdown">
+            <i class="far fa-bars dropdown-toggle" data-toggle="dropdown"></i>
+
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <a class="dropdown-item" target="product-show" href="{{ product.getUri }}"><i class="fa fa-fw fa-eye icon"></i>ansehen</a>
+                <a class="dropdown-item" target="product-edit" href="{{ product.getUriEdit }}"><i class="fa fa-fw fa-pencil icon"></i>bearbeiten</a>
+            </div>
+        </span>
+    </span>
+
+</h2>
+
+{% if get.get('categoryId') %}
+    <p><a class="ajax" href="{{ plugin.getAdminUri('Categories', 'index', { categoryId: get.get('categoryId') }) }}"><i class="fa fa-chevron-circle-left"></i> zurück</a></p>
+{% else %}
+    <p><a class="ajax" href="{{ plugin.getAdminUri('Products', 'index') }}"><i class="fa fa-chevron-circle-left"></i> zurück</a></p>
+{% endif %}
+
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+    <li class="nav-item">
+        <a class="nav-link active" id="info-tab" data-toggle="tab" href="#info" role="tab" aria-controls="info" aria-selected="true">Info</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="datasheet-tab" data-toggle="tab" href="#datasheet" role="tab" aria-controls="datasheet" aria-selected="true">Datenblatt</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="options-tab" data-toggle="tab" href="#options" role="tab" aria-controls="options" aria-selected="true">Optionen</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="stocks-tab" data-toggle="tab" href="#stocks" role="tab" aria-controls="stocks" aria-selected="true">Bestand</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="variants-tab" data-toggle="tab" href="#variants" role="tab" aria-controls="variants" aria-selected="true">Varianten</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="equipment-tab" data-toggle="tab" href="#equipment" role="tab" aria-controls="equipment" aria-selected="true">Zubehör</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="recommendations-tab" data-toggle="tab" href="#recommendations" role="tab" aria-controls="recommendations" aria-selected="true">Empfehlungen</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="images-tab" data-toggle="tab" href="#images" role="tab" aria-controls="images" aria-selected="false">Bilder</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="downloads-tab" data-toggle="tab" href="#downloads" role="tab" aria-controls="downloads" aria-selected="false">Downloads</a>
+    </li>
+</ul>
+<div class="tab-content" id="myTabContent">
+    <div class="tab-pane fade show active" id="info" role="tabpanel" aria-labelledby="info-tab">
+
+        <div class="card">
+            <div class="card-body">
+
+                <form method="post" class="ajax" action="{{ plugin.getAdminUri('Products', 'ajaxUpdateInfo', { productId: product.getId() }) }}">
+
+
+
+                    {% if not configuration.get('i18n.multiAliasMode') %}
+                        <div class="form-group">
+                            <label for="title">Titel</label>
+                            <input type="text" class="form-control" id="title" name="title" placeholder="Titel" value="{{ product.getTitle() }}">
+                        </div>
+                    {% else %}
+                        {% for language in configuration.get('i18n.languages') %}
+
+                            <div class="form-group">
+                                <label for="title_{{ loop.index }}">Titel ({{ language }}){% if settings.default_language == language %}*{% endif %}</label>
+                                <input type="text" {% if settings.default_language == language %}required{% endif %} class="form-control" id="title_{{ loop.index }}" name="titles[{{ language }}]" placeholder="Titel ({{ language }})" value="{{ product.getTitleWithoutFallback(language) }}">
+                            </div>
+
+                        {% endfor %}
+                    {% endif %}
+
+
+
+
+
+                    <div class="form-row">
+                        <div class="col-6">
+
+                            <div class="form-group">
+                                <label for="itemNumber">Artikel-Nummer</label>
+                                <input type="text" class="form-control" id="itemNumber" name="itemNumber" placeholder="Artikel-Nummer" value="{{ product.getItemNumber() }}">
+                            </div>
+
+                        </div>
+                        <div class="col-6">
+
+                            <div class="form-group">
+                                <label for="itemNumber">Produkt-ID</label>
+                                <input type="text" class="form-control" readonly value="{{ product.getId() }}">
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                    {{ v.injectPartial('\\Frootbox\\Admin\\View\\Partials\\Input\\Tags', {
+                        object: product
+                    }) | raw }}
+
+                    {% if datasheets.getCount > 1 %}
+                        <div class="form-group">
+                            <label for="datasheetId">Datenblatt</label>
+                            <select aria-describedby="datasheetIdHelp" class="form-control" id="datasheetId" name="datasheetId">
+                                {% for xdatasheet in datasheets %}
+                                    <option value="{{ xdatasheet.getId() }}" {% if datasheet.getId() == xdatasheet.getId() %}selected{% endif %}>{{ xdatasheet.getTitle }}</option>
+                                {% endfor %}
+                            </select>
+                            <small id="datasheetIdHelp" class="form-text text-muted">Nach dem Ändern des Datenblattes muss diese Seite neu geladen werden.</small>
+
+                        </div>
+                    {% endif %}
+
+                    <script>
+                        $(function ( ) {
+
+                            /**
+                             *
+                             */
+                            $('#priceGross').keyup(function ( event ) {
+
+                                var priceGross = parseFloat($(this).val().replace(',', '.'));
+
+                                $('#price').val(priceGross / (1 + parseFloat($('#taxrate').val()) / 100));
+
+                            });
+
+                            /**
+                             *
+                             */
+                            $('a.update-from-gross').click(function ( event ) {
+
+                                event.preventDefault();
+
+                                var priceGross = parseFloat($('#priceGross').val().replace(',', '.'));
+
+                                $('#price').val(priceGross / (1 + parseFloat($('#taxrate').val()) / 100));
+                            });
+
+                        });
+                    </script>
+
+                    <div class="form-row">
+                        <div class="col">
+
+                            <div class="form-group">
+                                <label for="price">Preis (netto)</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text">€</div>
+                                    </div>
+                                    <input type="text" class="form-control" id="price" name="price" value="{{ product.getPrice() }}">
+                                    <div class="input-group-append">
+                                        <div class="input-group-text"><a class="update-from-gross" href="#"><i class="fa fa-sync"></i></a></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-3">
+
+                            <div class="form-group">
+                                <label for="taxrate">MwSt.</label>
+                                <div class="input-group mb-2">
+                                    <input type="text" class="form-control" id="taxrate" name="taxrate" placeholder="MwSt." value="{{ product.getTaxrate() | default('0') }}">
+                                    <div class="input-group-append">
+                                        <div class="input-group-text">%</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col">
+
+                            <div class="form-group">
+                                <label for="priceGross">Preis (brutto)</label>
+                                <input type="text" class="form-control" id="priceGross" name="priceGross" value="{{ product.getPriceGross() }}">
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="priceOld">alter Preis (brutto/durchgestrichen)</label>
+                        <input type="text" class="form-control" id="priceOld" name="priceOld" value="{{ product.getPriceOld() }}">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="col-md-6">
+
+                            <div class="form-group">
+                                <label for="packagingSize">Verpackungsgröße</label>
+                                <input type="number" step="0.001" class="form-control" id="packagingSize" name="packagingSize" placeholder="Verpackungsgröße" value="{{ product.getPackagingSize() }}">
+                            </div>
+
+                        </div>
+                        <div class="col-md-6">
+
+                            <div class="form-group">
+                                <label for="packagingUnit">Einheit</label>
+                                <select class="form-control" id="packagingUnit" name="packagingUnit">
+                                    <option value="">bitte wählen</option>
+                                    <optgroup label="Stückzahl">
+                                        <option value="Each" {% if product.getPackagingUnit() == "Each" %}selected{% endif %}>Stück</option>
+                                    </optgroup>
+                                    <optgroup label="Flüssigkeit">
+                                        <option value="Liter" {% if product.getPackagingUnit() == "Liter" %}selected{% endif %}>Liter</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="col-md-6">
+
+                            <div class="form-group">
+                                <label for="shippingcosts">Versandkosten</label>
+                                <select class="form-control" id="shippingcosts" name="shippingcosts">
+                                    <option value="">kein Versand</option>
+
+                                    {% for shippingcost in shippingcosts %}
+                                        <option value="{{ shippingcost.getId() }}" {% if product.getShippingId() == shippingcost.getId() %}selected{% endif %}>{{ shippingcost.getTitle() }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                        </div>
+                        <div class="col-md-6">
+
+                            <div class="form-group">
+                                <label for="shippingState">Versandstatus</label>
+                                <select class="form-control" id="shippingState" name="shippingState">
+                                    <option value="0" {% if product.getShippingState() == 0 %}selected{% endif %}>derzeit nicht lieferbar</option>
+                                    <option value="1" {% if product.getShippingState() == 1 %}selected{% endif %}>Standard-Lieferstatus</option>
+                                </select>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="manufacturers">Hersteller</label>
+                        <select class="form-control" id="manufacturers" name="manufacturerId">
+                            <option value="">keine Herstellerangabe</option>
+                            {% for manufacturer in manufacturers %}
+                                <option value="{{ manufacturer.getId() }}" {% if product.getManufacturerId() == manufacturer.getId() %}selected{% endif %}>{{ manufacturer.getTitle() }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="minimumAge">Mindestalter</label>
+                        <input type="text" class="form-control" id="minimumAge" name="minimumAge" value="{{ product.getMinimumAge() }}">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Speichern</button>
+
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+    <div class="tab-pane fade show" id="datasheet" role="tabpanel" aria-labelledby="datasheet-tab">
+
+        <div class="card">
+            <div class="card-body">
+
+                <form method="post" class="ajax" action="{{ plugin.getAdminUri('Products', 'ajaxUpdateDatasheetFields', { productId: product.getId() }) }}">
+
+                    {% set sections = product.getFieldsBySection({ forceEmpty: true }) %}
+
+                    {% for section, fields in sections %}
+
+                        {% if sections | length > 1 %}
+                            <h4>{{ section }}</h4>
+                        {% endif %}
+
+                        {% for field in fields %}
+                            <div class="row">
+                                <div class="col-md-6">
+
+                                    <div class="form-group">
+                                        <label for="field_{{ field.getId() }}">{{ field.getTitle() }}</label>
+                                        <div class="input-group mb-2">
+
+                                            {% if field.getType() == "OptionalList" %}
+                                                <textarea class="form-control" name="fields[{{ field.getId() }}]" id="field_{{ field.getId() }}" placeholder="{{ field.getTitle() }}">{{ field.getValueText() }}</textarea>
+                                            {% else %}
+                                                <input type="text" class="form-control" name="fields[{{ field.getId() }}]" id="field_{{ field.getId() }}" placeholder="{{ field.getTitle() }}" value="{{ field.getValueText() }}">
+                                            {% endif %}
+
+                                            {% if field.getSuffix() %}
+                                                <div class="input-group-append">
+                                                    <div class="input-group-text">{{ field.getSuffix() }}</div>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        {% if field.getHelpText() %}
+                                            <small id="emailHelp" class="form-text text-muted">{{ field.getHelpText() }}</small>
+                                        {% endif %}
+                                    </div>
+
+                                </div>
+                                <div class="col-md-6">
+
+                                    <div class="form-group">
+                                        <label for="">Darstellung</label>
+                                        <input class="form-control" disabled value="{{ field.getValueDisplay() }}" />
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        {% endfor %}
+                    {% endfor %}
+
+                    <button type="submit" class="btn btn-primary">Speichern</button>
+
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+    <div class="tab-pane fade show" id="options" role="tabpanel" aria-labelledby="options-tab">
+        <div class="card">
+            <div class="card-body">
+
+                {% set groups = product.getDatasheet().getGroups() %}
+
+                {% for group in groups %}
+                    <h4>
+                        {{ group.getTitle() }}
+                        <span class="headoptions">
+				            <a data-modal href="{{ plugin.getAdminUri('Options', 'ajaxModalCompose', { productId: product.getId(), groupId: group.getId() }) }}" data-title="Option hinzufügen"><i class="fa fa-plus-circle"></i></a>
+                        </span>
+                    </h4>
+
+                    <div id="optionsReceiver_{{ group.getId() }}">
+                        {{ v.injectPartial('\\Frootbox\\Ext\\Core\\ShopSystem\\Plugins\\ShopSystem\\Admin\\Options\\Partials\\OptionsList', {
+                            product: product,
+                            group: group,
+                            plugin: plugin
+                        }) | raw }}
+                    </div>
+                {% endfor %}
+
+
+            </div>
+        </div>
+    </div>
+    <div class="tab-pane fade show" id="stocks" role="tabpanel" aria-labelledby="stocks-tab">
+        <div class="card">
+            <div class="card-body">
+
+
+                <h4>
+                    Warenbestand
+                    <span class="headoptions">
+                        <a data-modal href="{{ plugin.getAdminUri('Products', 'ajaxModalStocksCompose', { productId: product.getId() }) }}" data-title="Warenbestand hinzufügen"><i class="fa fa-plus-circle"></i></a>
+                    </span>
+                </h4>
+
+                <div id="stocksReceiver">
+                    {{ v.injectPartial('\\Frootbox\\Ext\\Core\\ShopSystem\\Plugins\\ShopSystem\\Admin\\Products\\Partials\\StocksList', {
+                        product: product,
+                        plugin: plugin
+                    }) | raw }}
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="tab-pane fade show" id="variants" role="tabpanel" aria-labelledby="variants-tab">
+
+        <div class="card">
+            <div class="card-body">
+
+                <h4>
+                    Varianten des Produktes
+                    <span class="headoptions">
+				        <a data-modal href="{{ plugin.getAdminUri('Products', 'ajaxModalVariantCompose', { productId: product.getId() }) }}" data-title="Variante hinzufügen"><i class="fa fa-plus-circle"></i></a>
+                    </span>
+                </h4>
+
+                <div id="variantsReceiver">
+                    {{ v.injectPartial('\\Frootbox\\Ext\\Core\\ShopSystem\\Plugins\\ShopSystem\\Admin\\Products\\Partials\\VariantsList', {
+                        product: product,
+                        plugin: plugin
+                    }) | raw }}
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+    <div class="tab-pane fade show" id="equipment" role="tabpanel" aria-labelledby="equipment-tab">
+
+        <div class="card">
+            <div class="card-body">
+
+                <h4>
+                    Zubehör des Produktes
+                    <span class="headoptions">
+				        <a data-modal href="{{ plugin.getAdminUri('Products', 'ajaxModalEquipmentCompose', { productId: product.getId() }) }}" data-title="Zubehör hinzufügen"><i class="fa fa-plus-circle"></i></a>
+                    </span>
+                </h4>
+
+                <div id="equipmentReceiver">
+                    {{ v.injectPartial('\\Frootbox\\Ext\\Core\\ShopSystem\\Plugins\\ShopSystem\\Admin\\Products\\Partials\\EquipmentList', {
+                        product: product,
+                        plugin: plugin
+                    }) | raw }}
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+    <div class="tab-pane fade show" id="recommendations" role="tabpanel" aria-labelledby="recommendations-tab">
+
+        <div class="card">
+            <div class="card-body">
+
+                <h4>
+                    Empfehlungen für das Produkt
+                    <span class="headoptions">
+				        <a data-modal href="{{ plugin.getAdminUri('Products', 'ajaxModalRecommendationsCompose', { productId: product.getId() }) }}" data-title="Empfehlung hinzufügen"><i class="fa fa-plus-circle"></i></a>
+                    </span>
+                </h4>
+
+                <div id="recommendationsReceiver">
+                    {{ v.injectPartial('\\Frootbox\\Ext\\Core\\ShopSystem\\Plugins\\ShopSystem\\Admin\\Products\\Partials\\RecommendationsList', {
+                        product: product,
+                        plugin: plugin
+                    }) | raw }}
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+    <div class="tab-pane fade" id="images" role="tabpanel" aria-labelledby="images-tab">
+
+        <div class="card">
+            <div class="card-body">
+
+                {{ v.injectPartial('\\Frootbox\\Ext\\Core\\FileManager\\Admin\\Partials\\FileManager', {
+                    uid : product.getUid('images'),
+                    multiple : true
+                }) | raw }}
+
+            </div>
+        </div>
+
+    </div>
+    <div class="tab-pane fade" id="downloads" role="tabpanel" aria-labelledby="downloads-tab">
+
+        <div class="card">
+            <div class="card-body">
+
+                {{ v.injectPartial('\\Frootbox\\Ext\\Core\\FileManager\\Admin\\Partials\\FileManager', {
+                    uid : product.getUid('files'),
+                    multiple : true
+                }) | raw }}
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+

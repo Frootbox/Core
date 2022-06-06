@@ -1,0 +1,65 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    'frame' : false,
+}) }}
+
+<script>
+
+    var _FrootboxVideoGrabberCooldown = null;
+
+    $(function ( ) {
+
+        $('#url').keyup(function ( event ) {
+
+            var element = $(this);
+
+            window.clearTimeout(_FrootboxVideoGrabberCooldown);
+
+            _FrootboxVideoGrabberCooldown = window.setTimeout(function ( ) {
+
+                $.ajax({
+                    url: "{{ plugin.getAdminUri('Video', 'ajaxGrabData') | raw }}",
+                    data: {
+                        url: element.val()
+                    },
+                    success: function ( response ) {
+
+                        if ($('#title').val() == '') {
+                            $('#title').val(response.data.title);
+                        }
+
+                        if ($('#date').val() == '') {
+                            $('#date').val(response.data.date);
+                        }
+                    }
+                });
+
+            }, 400);
+        });
+    });
+</script>
+<form method="post" class="ajax" action="{{ plugin.getAdminUri('Video', 'ajaxCreate') }}">
+
+    <div class="modal-body">
+
+        <div class="form-group">
+            <label for="url">URL</label>
+            <input type="text" class="form-control" name="url" id="url" placeholder="URL">
+        </div>
+        <div class="form-group">
+            <label for="title">Titel</label>
+            <input type="text" class="form-control" required name="title" id="title" placeholder="Titel">
+        </div>
+        <div class="form-group">
+            <label for="date">Datum</label>
+            <input type="text" class="form-control" name="date" id="date" placeholder="Datum">
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Video erstellen</button>
+    </div>
+
+</form>
+

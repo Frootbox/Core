@@ -1,0 +1,26 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{% if venues.getCount == 0 %}
+	<div class="warning message">Es wurden noch keine Veranstaltungsorte erstellt.</div>
+{% else %}
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Ort</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+
+			{% for venue in venues %}
+				<tr class="ajax {% if data.highlight == venue.getId() %}highlighted{% endif %}" data-title="Veranstaltungsort bearbeiten" data-modal="{{ data.plugin.getAdminUri('Venues', 'ajaxModalDetails', { venueId: venue.getId() }) }}">
+					<td>{{ venue.getTitle }}</td>
+					<td class="text-right">
+						<a class="ajax" data-confirm="Soll dieser Veranstaltungsort wirklich gelöscht werden?" href="{{ data.plugin.getAdminUri('Venues', 'ajaxDelete', { venueId: venue.getId() }) }}"><i class="fa fa-times"></i></a>
+					</td>
+				</tr>
+			{% endfor %}
+
+		</tbody>
+	</table>
+{% endif %}

@@ -1,0 +1,607 @@
+{% set v = view.getViewhelper('View') %}
+{% set a = view.getViewhelper('Assets', {   }) %}
+
+{{ v.asset('EXT:Core/Editing/contenttools/content-tools.js', 'script', true) | raw }}
+{{ v.asset('EXT:Core/Editing/contenttools/content-tools.min.css', 'auto', true) | raw }}
+
+{{ v.asset('EXT:Core/Editing/fontawesome/css/all.min.css') | raw }}
+
+<link href="https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300,700|Open+Sans:400,400i,700&display=swap" rel="stylesheet">
+
+{#
+{{ a.import('https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css') | raw }}
+{{ a.import('https://code.jquery.com/jquery-3.4.0.min.js') | raw }}
+{{ a.import('https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js') | raw }}
+{{ a.import('https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js') | raw }}
+#}
+
+<style>
+    body .ct-widget .ct-tool--blockquote:before {
+        content: "\f10e";
+        font-family: "Font Awesome 5 Pro";
+    }
+
+    body .ct-widget .ct-tool--heading:before {
+        content: "\f314";
+        font-family: "Font Awesome 5 Pro";
+    }
+
+    body .ct-widget .ct-tool--subheading:before {
+        content: "\f315";
+        font-family: "Font Awesome 5 Pro";
+    }
+
+    body .ct-widget .ct-tool--subsubheading:before {
+        content: "\f316";
+        font-family: "Font Awesome 5 Pro";
+    }
+
+    .options.edit-mode {
+        color: #CCC;
+    }
+</style>
+
+
+
+<script>
+
+    $(function ( ) {
+
+        $('body').addClass('editing');
+
+        $.ajax({
+            url: 'https://cdnjs.cloudflare.com/ajax/libs/TableDnD/0.9.1/jquery.tablednd.js',
+            dataType: "script"
+        });
+    });
+
+    var isEditing = true;
+    var isEditingFreeText = false;
+
+    ContentTools.DEFAULT_TOOLS = [
+        [
+            'bold',
+            'italic',
+            'link',
+            'align-left',
+            'align-center',
+            'align-right'
+        ], [
+            'heading',
+            'subheading',
+            'subsubheading',
+            'paragraph',
+            'unordered-list',
+            'ordered-list',
+            'table',
+            'blockquote',
+            'indent',
+            'unindent',
+            'line-break'
+        ], [
+            'undo',
+            'redo',
+            'remove'
+        ]
+    ]
+
+    ContentTools.Tools.Heading.tagName = 'h2';
+    ContentTools.Tools.Subheading.tagName = 'h3';
+
+    var editorconfig = {
+        urls: {
+            widgets: {
+                align: '{{ settings.serverpath }}cms/admin/Editor/Widget/ajaxUpdateAlign?{{ SID }}',
+                config: '{{ settings.serverpath }}cms/admin/Editor/Widget/ajaxModalConfig?{{ SID }}',
+                create: '{{ settings.serverpath }}cms/admin/Editor/Widget/ajaxCreate?{{ SID }}',
+                delete: '{{ settings.serverpath }}cms/admin/Editor/Widget/ajaxDelete?{{ SID }}',
+                edit: '{{ settings.serverpath }}cms/admin/Editor/Widget/ajaxModalEdit?{{ SID }}',
+                refresh: '{{ settings.serverpath }}cms/admin/Editor/Widget/ajaxRefresh?{{ SID }}',
+            },
+            blocks: {
+                compose: '{{ settings.serverpath }}cms/admin/Editor/Block/ajaxModalCompose?{{ SID }}',
+                list: '{{ settings.serverpath }}cms/admin/Editor/Block/ajaxModalList?{{ SID }}'
+            },
+            texts : {
+                update : '{{ settings.serverpath }}cms/admin/Editor/Text/ajaxUpdate?{{ SID }}'
+            },
+            pictures : {
+                edit : '{{ settings.serverpath }}cms/admin/Editor/Picture/ajaxModalEdit?{{ SID }}',
+                delete : '{{ settings.serverpath }}cms/admin/Editor/Picture/ajaxDelete?{{ SID }}'
+            },
+            headlines : {
+                edit : '{{ settings.serverpath }}cms/admin/Editor/Headline/ajaxModalEdit?{{ SID }}',
+                switch : '{{ settings.serverpath }}cms/admin/Editor/Headline/ajaxSwitch?{{ SID }}'
+            },
+            backgrounds : {
+                edit : '{{ settings.serverpath }}cms/admin/Editor/Background/ajaxModalEdit?{{ SID }}'
+            }
+        }
+    };
+
+    $(function ( ) {
+
+        $('body').addClass('editing');
+
+        ContentTools.StylePalette.add([
+            new ContentTools.Style('Author', 'author', ['p'])
+        ]);
+
+        editor = ContentTools.EditorApp.get();
+        editor.init('div[data-editable]', 'data-uid');
+
+        editor.addEventListener('start', (ev) => {
+            isEditingFreeText = true;
+
+            $('#fbxConfigButton').hide();
+            $('.popover').popover('hide');
+        })
+
+        editor.addEventListener('stop', (ev) => {
+            isEditingFreeText = false;
+            $('#fbxConfigButton').show();
+        })
+
+        editor.addEventListener('saved', function (ev) {
+
+            $('#fbxConfigButton').show();
+            isEditingFreeText = false;
+
+            var name, payload, regions, xhr;
+
+            // Check that something changed
+            regions = ev.detail().regions;
+            if (Object.keys(regions).length == 0) {
+                return;
+            }
+
+            // Set the editor as busy while we save our changes
+            this.busy(true);
+
+
+            // Collect the contents of each region into a FormData instance
+            payload = new FormData();
+            for (name in regions) {
+                if (regions.hasOwnProperty(name)) {
+                    payload.append(name, regions[name]);
+                }
+            }
+
+
+            // Send the update content to the server to be saved
+            function onStateChange(ev) {
+                // Check if the request is finished
+                if (ev.target.readyState == 4) {
+                    editor.busy(false);
+                    if (ev.target.status == '200') {
+                        // Save was successful, notify the user with a flash
+                        new ContentTools.FlashUI('ok');
+                    } else {
+                        // Save failed, notify the user with a flash
+                        new ContentTools.FlashUI('no');
+                    }
+                }
+            };
+
+            xhr = new XMLHttpRequest();
+            xhr.addEventListener('readystatechange', onStateChange);
+            xhr.open('POST', editorconfig.urls.texts.update);
+            xhr.send(payload);
+        });
+
+
+        $(document).on('mouseenter', '[data-mouseovertrigger]', function ( event ) {
+
+            let uid = $(this).attr('data-mouseovertrigger');
+
+
+            $('[data-mouseovertriggertarget="' + uid + '"]').trigger('mouseenter');
+        });
+
+
+
+
+
+        /**
+         * Show "widget create" button
+         */
+        $(document).on('mouseenter', 'div[data-editable]:not([data-nowidgets])', function ( event ) {
+
+            if (isEditingFreeText) {
+                return;
+            }
+
+            event.stopImmediatePropagation();
+
+            // $('.popover').popover('hide');
+
+            var uid = $(this).attr('data-uid');
+
+            $(this).attr('data-content', '<span class="options edit-mode">Widget erstellen&nbsp;&nbsp;|&nbsp;&nbsp;' +
+                '<a class="widget-create" href="#' + uid + '"><i class="far fa-plus"><\/i><\/a>' +
+                '&nbsp;&nbsp;|&nbsp;&nbsp;' +
+                '<a class="popover-dismiss" href="#"><i class="far fa-times"><\/i><\/a>' +
+                '<\/span>');
+
+            $(this).popover({
+                placement: 'top',
+                html: true,
+                title: '',
+                delay: { "show": 0, "hide": 1300 },
+            });
+
+            $(this).popover('show');
+
+        });
+
+
+        /**
+         * Show "widget edit" buttons
+         */
+        $(document).on('mouseenter', 'figure[data-ce-moveable]:not([data-noedit])', function ( event ) {
+
+            if (isEditingFreeText) {
+                return;
+            }
+
+            event.stopImmediatePropagation();
+
+            // $('.popover').popover('hide');
+
+            var id = $(this).attr('data-id');
+
+            var html = '<span class="options edit-mode">Widget bearbeiten' +
+                '&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;' +
+                '<a href="' + id + '" class="widget-align left"><i class="far fa-align-left"><\/i><\/a>&nbsp;&nbsp;&nbsp;' +
+                '<a href="' + id + '" class="widget-align center"><i class="far fa-align-center"><\/i><\/a>&nbsp;&nbsp;&nbsp;' +
+                '<a href="' + id + '" class="widget-align justify"><i class="far fa-align-justify"><\/i><\/a>&nbsp;&nbsp;&nbsp;' +
+                '<a href="' + id + '" class="widget-align right"><i class="far fa-align-right"><\/i><\/a>&nbsp;&nbsp;&nbsp;' +
+                '|&nbsp;&nbsp;&nbsp;' +
+                '<a class="widget-edit" href="' + id + '"><i class="far fa-pencil"><\/i><\/a>&nbsp;&nbsp;&nbsp;' +
+                '|&nbsp;&nbsp;&nbsp;' +
+                '<a class="widget-config" href="' + id + '"><i class="far fa-cog"><\/i><\/a>&nbsp;&nbsp;&nbsp;' +
+                '<a class="widget-delete" href="' + id + '"><i class="far fa-trash"><\/i><\/a>&nbsp;&nbsp;&nbsp;' +
+                '|&nbsp;&nbsp;&nbsp;' +
+                '<a class="popover-dismiss" href="#"><i class="far fa-times"><\/i><\/a>' +
+                '<\/span>';
+
+            console.log(html);
+
+            $(this).attr('data-content', html);
+
+
+            $(this).popover({
+                placement: 'top',
+                html: true
+            });
+
+            $(this).popover('show');
+
+        });
+
+
+        /**
+         * Show "background edit" buttons
+         */
+        $(document).on('click', '[data-editable-background][data-uid]', function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            // $('.popover').popover('hide');
+
+            var uid = $(this).attr('data-uid');
+
+            $(this).attr('data-content', '<span class="options edit-mode">Hintergrund' +
+                '&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;' +
+                '<a class="background-edit" href="#' + uid + '"><i class="far fa-pencil"><\/i><\/a>&nbsp;&nbsp;&nbsp;' +
+                '|&nbsp;&nbsp;&nbsp;' +
+                '<a class="background-delete" href="#' + uid + '"><i class="far fa-trash"><\/i><\/a>&nbsp;&nbsp;&nbsp;' +
+                '|&nbsp;&nbsp;&nbsp;' +
+                '<a class="popover-dismiss" href="#"><i class="far fa-times"><\/i><\/a>' +
+                '</span>'
+            );
+
+            $(this).popover({
+                placement: 'top',
+                html: true
+            });
+
+            $(this).popover('show');
+        });
+
+
+        /**
+         *
+         */
+        $(document).on('click', 'a.popover-dismiss', function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            $(this).parents('.popover').popover('hide');
+        });
+
+
+        /**
+         *
+         */
+        $(document).on('click', 'a.widget-edit', function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            $('.popover').popover('hide');
+
+            // Extract uid from href="#uid"
+            var widgetId = $(this).attr('href');
+
+            // var element = $('[data-uid="' + uid + '"]');
+
+            fbxEditorOpenGenericModal();
+
+            $.ajax({
+                url: editorconfig.urls.widgets.edit,
+                data: {
+                    widgetId: widgetId
+                },
+                success: function ( response ) {
+
+                    if (typeof response.modal.size != "undefined") {
+                        $('#fbxEditorGenericModal .modal-dialog').removeClass('modal-sm modal-m modal-lg modal-xl');
+                        $('#fbxEditorGenericModal .modal-dialog').addClass('modal-' + response.modal.size);
+                    }
+
+                    $('#fbxEditorGenericModal .modal-content').html(response.modal.html);
+
+                }
+            });
+
+        });
+
+        /**
+         *
+         */
+        $(document).on('click', 'a.background-edit', function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            // Extract uid from href="#uid"
+            var uid = $(this).attr('href').substr(1);
+
+            var element = $('[data-uid="' + uid + '"]');
+
+            fbxEditorOpenGenericModal();
+
+            $.ajax({
+                url: editorconfig.urls.backgrounds.edit,
+                data: {
+                    uid: uid,
+                    width: element.attr('data-width'),
+                    height: element.attr('data-height')
+                },
+                success: function ( response ) {
+
+                    $('#fbxEditorGenericModal .modal-content').html(response.modal.html);
+
+                }
+            });
+
+        });
+
+        /**
+         *
+         */
+        $(document).on('click', 'a.widget-align', function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            var widgetId = $(this).attr('href');
+
+            if ($(this).hasClass('left')) {
+                var align = 'left';
+            }
+
+            if ($(this).hasClass('right')) {
+                var align = 'right';
+            }
+
+            if ($(this).hasClass('center')) {
+                var align = 'center';
+            }
+
+            if ($(this).hasClass('justify')) {
+                var align = 'justify';
+            }
+
+            $.ajax({
+                url: editorconfig.urls.widgets.align,
+                data: {
+                    widgetId: widgetId,
+                    align: align
+                },
+                success: function ( response ) {
+
+                    var figure = $('figure[data-id="' + widgetId + '"]');
+
+                    figure.removeClass('widget-left widget-right widget-center widget-justify');
+                    figure.removeClass('col-1 col-2 col-3 col-4 col-5 col-6 col-7 col-8 col-9 col-10 col-11 col-12');
+
+                    figure.addClass('widget-' + align);
+                    figure.addClass('col-' + width);
+
+                }
+            });
+        });
+
+
+        /**
+         *
+         */
+        $(document).on('click', 'a.widget-create', function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            var uid = $(this).attr('href').substr(1);
+            var parent = $(this).parents('.popover');
+            var placement = parent.hasClass('bs-popover-bottom') ? 'bottom' : 'top';
+
+            $.ajax({
+                url : editorconfig.urls.widgets.create,
+                data : {
+                    uid : uid,
+                    placement: placement
+                },
+                success : function ( response ) {
+
+                    if (placement == 'top') {
+                        $('div[data-editable][data-uid="' + uid + '"]').prepend(response.widget.html);
+                    }
+                    else {
+                        $('div[data-editable][data-uid="' + uid + '"]').append(response.widget.html + '<p></p>');
+                    }
+
+                    $('a.widget-config[href="' + response.widget.id + '"]').trigger('click');
+                },
+                error : function ( html ) {
+                    alert(html);
+                }
+            });
+
+        });
+
+
+        /**
+         *
+         */
+        $(document).on('click', 'a.widget-config', function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            $('.popover').popover('hide');
+
+            var id = $(this).attr('href');
+
+            fbxEditorOpenGenericModal();
+
+            $.ajax({
+                url : editorconfig.urls.widgets.config,
+                data : {
+                    widgetId : id
+                },
+                success : function ( response ) {
+
+                    $('#fbxEditorGenericModal .modal-content').html(response.modal.html);
+                },
+                error : function ( html ) {
+                    alert(html);
+                }
+            });
+
+        });
+
+
+        /**
+         *
+         */
+        $(document).on('click', 'a.widget-delete', function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            if (!confirm('Soll dieses Widget wirklich gelöscht werden?')) {
+                return;
+            }
+
+            var id = $(this).attr('href');
+
+            var widget = $('figure.widget[data-id="' + id + '"]');
+
+            var textUid = widget.parents('[data-uid]').first().attr('data-uid');
+
+
+            $.ajax({
+                url : editorconfig.urls.widgets.delete,
+                data : {
+                    widgetId : id,
+                    textUid : textUid
+                },
+                success : function ( response ) {
+
+                    $('figure[data-id="' + id + '"]').fadeOut();
+                    $('.popover').fadeOut();
+                },
+                error : function ( html ) {
+                    alert(html);
+                }
+            });
+        });
+
+    });
+
+
+    /**
+     *
+     *
+     *
+     *
+     */
+    function fbxEditorOpenGenericModal ( size = 'm' ) {
+
+        $('.popover').popover('hide');
+
+
+        $('#fbxEditorGenericModal .modal-dialog').removeClass('modal-sm modal-lg');
+        $('#fbxEditorGenericModal .modal-dialog').addClass('modal-' + size);
+
+        // Open generic modal
+        $('#fbxEditorGenericModal .modal-content').html('<div class="modal-header">\
+                    <h5 class="modal-title" id="fbxEditorGenericModalLabel">Element bearbeiten<\/h5>\
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">\
+                        <span aria-hidden="true">&times;<\/span>\
+                    <\/button>\
+                <\/div>\
+                <div class="modal-body">Daten werden geladen ...<\/div>\
+            ');
+
+        $('#fbxEditorGenericModal').modal('show');
+    }
+
+
+    /**
+     *
+     */
+    function fbxEditorWidgetRefresh ( parameters ) {
+
+        $.ajax({
+            url : editorconfig.urls.widgets.refresh,
+            data : {
+                widgetId : parameters.widgetId
+            },
+            success : function ( response ) {
+
+                $('figure[data-id="' + response.widget.id + '"]').replaceWith(response.widget.html);
+            },
+            error : function ( html ) {
+                alert(html);
+            }
+        });
+
+    }
+
+</script>
+
+<div class="modal fade" id="fbxEditorGenericModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+        </div>
+    </div>
+</div>
+
+
+{{ editablesHtml | raw }}

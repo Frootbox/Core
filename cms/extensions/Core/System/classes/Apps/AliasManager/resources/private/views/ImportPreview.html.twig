@@ -1,0 +1,69 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ front.addTab('Alias-Verwaltung', app.getUri('index')) }}
+{{ front.addTab('Importieren', app.getUri('import')) }}
+
+{% if alias.getType() == 'Generic' %}
+    {{ front.addTab('generische Aliase', app.getUri('generic')) }}
+{% endif %}
+
+
+<h2>
+    Aliasse importieren
+</h2>
+
+
+<div class="card">
+    <div class="card-body">
+
+        <form class="form-inline" method="post" action="{{ app.getUri('importPreview') }}">
+
+            <input type="hidden" name="source" value="{{ source }}" />
+
+            <select class="custom-select my-1 mr-sm-2" id="seperator" name="seperator">
+                <option value=",">Komma</option>
+                <option value=";">Semikolon</option>
+            </select>
+
+            <button type="submit" class="btn btn-primary">Vorschau neu erzeugen</button>
+
+        </form>
+
+    </div>
+</div>
+
+<br />
+
+<div class="card">
+    <div class="card-body">
+
+        <h3>Import-Vorschau</h3>
+
+        <form method="post" action="{{ app.getUri('ajaxImport') }}" class="ajax">
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Alias</th>
+                        <th>Ziel</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    {% for alias in aliases %}
+                        <tr>
+                            <td><input class="form-control" type="text" value="{{ alias.alias }}" name="aliases[]" /></td>
+                            <td><input class="form-control" type="text" value="{{ alias.target }}" name="targets[]" /></td>
+                        </tr>
+                    {% endfor %}
+
+                </tbody>
+            </table>
+
+
+            <button type="submit" class="btn btn-primary">Importieren</button>
+
+        </form>
+
+    </div>
+</div>

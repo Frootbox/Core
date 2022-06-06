@@ -1,0 +1,11 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{% for xcategory in data.category.getChildren() %}
+    <li data-id="{{ xcategory.getId }}" data-name="{{ xcategory.getTitle }}">
+        {{ xcategory.getTitle }} ({{ xcategory.getId() }})
+
+        <ol>
+            {{ v.injectPartial('\\Frootbox\\Admin\\Controller\\Assets\\Categories\\Partials\\ListSortableChildren', { category: xcategory } ) | raw }}
+        </ol>
+    </li>
+{% endfor %}

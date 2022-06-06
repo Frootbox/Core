@@ -1,0 +1,28 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{% if questions | length == 0 %}
+	<div class="message warning">Es wurden noch keine Fragen erstellt.</div>
+{% else %}
+
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Frage</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+
+			{% for target in questions %}
+				<tr id="row-{{ target.getId }}" class="{% if data.highlight == target.getId() %}highlighted{% endif %}">
+					<td>{{ target.getTitle() }}</td>
+					<td class="text-right">
+						<a class="ajax" data-confirm="Soll diese Verbindung wirklich gelöst werden?" href="{{ data.plugin.getAdminUri('Question', 'ajaxConnectionDelete', { targetId: target.getId(), questionId: question.getId() }) }}"><i class="fa fa-times"></i></a>
+					</td>
+				</tr>
+			{% endfor %}
+
+		</tbody>
+	</table>
+
+{% endif %}

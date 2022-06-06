@@ -1,0 +1,74 @@
+{# config
+
+title: Standard
+variables:
+    withContainer:
+        type: bool
+        label: mit Layout-Container
+    menuWidth:
+        type: int
+        label: Breite der Speisekarte
+        default: 12
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set p = view.getViewhelper('Partials') %}
+
+
+{% if variables.withContainer %}<div class="container">{% endif %}
+
+<div class="plugin Core Gastronomy PriceList Index01">
+
+    <div class="row">
+        <div class="col-md-12">
+
+            <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+
+            <div class="row justify-content-center">
+                <div class="col-md-{{ variables.menuWidth }}">
+
+
+                    <div data-editable data-uid="{{ plugin.getUid('teaser') }}"></div>
+
+                    <div class="categories">
+                        {% set category = i.getCategory() %}
+
+                        {% set positions = category.getPositions() %}
+
+                        {% if positions | length > 0 %}
+                            <div class="category">
+                                {% for position in category.getPositions() %}
+                                    {{ p.renderPartial('Position', { position: position }) | raw }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        {% for category in i.getTopCategories() %}
+                            <div class="category">
+
+                                <h3 data-editable data-uid="{{ category.getUid('title') }}">{{ category.getTitle() }}</h3>
+
+                                <div data-editable data-uid="{{ category.getUid('text') }}"></div>
+
+                                {% for position in category.getPositions() %}
+                                    {{ p.renderPartial('Position', { position: position }) | raw }}
+                                {% endfor %}
+
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                </div>
+            </div>
+
+
+
+            <div data-editable data-uid="{{ plugin.getUid('text-bottom') }}"></div>
+
+        </div>
+    </div>
+
+</div>
+
+{% if variables.withContainer %}</div>{% endif %}

@@ -1,0 +1,39 @@
+
+{% set partialId = "TagsInput" ~ random(10000, 99999) %}
+
+<script>
+    $(function ( ) {
+
+        $('#tagsSelector{{ partialId }}').change(function ( event ) {
+
+            $('#tags{{ partialId }}').tagsinput('add', $(this).val());
+            $('#tagsSelector{{ partialId }}').val('');
+        });
+    });
+</script>
+
+<div class="form-row">
+    <div class="col-8">
+
+        <div class="form-group">
+            <label for="tags{{ partialId }}">Tags</label>
+            <input data-role="tagsinput" type="text" class="form-control" id="tags{{ partialId }}" name="tags" placeholder="Tags" value="{{ tags | join(',') }}">
+        </div>
+
+    </div>
+    <div class="col-4">
+
+        <div class="form-group">
+            <label for="tagsSelector{{ partialId }}">vorhandene Tags</label>
+            <select class="form-control" id="tagsSelector{{ partialId }}">
+                <option value="">bitte wählen ...</option>
+
+                {% for tag in availableTags %}
+                    <option>{{ tag }}</option>
+                {% endfor %}
+
+            </select>
+        </div>
+
+    </div>
+</div>

@@ -1,0 +1,61 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<h2>
+    Anfrage-Archiv
+</h2>
+
+<p><a class="ajax" href="{{ plugin.getAdminUri('Archives', 'index') }}"><i class="fa fa-chevron-circle-left"></i> zurück</a></p>
+
+{% if log.getLogData() | length == 0 %}
+
+    <div class="warning message">Die Log-Datei scheint beschädigt zu sein.</div>
+
+    <div class="card">
+        <div class="card-body">
+
+            <h3>gespeicherte Daten</h3>
+
+            <p>{{ log.getLogDataRaw() }}</p>
+
+        </div>
+    </div>
+
+{% else %}
+
+    {% for group in log.getLogData().formData %}
+
+        <h3>{{ group.title }}</h3>
+
+        {{ log.getDate() }}
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th width="50%">Feld</th>
+                    <th>Eingabe</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                {% for field in group.fields %}
+                    <tr>
+                        <td>{{ field.title }}</td>
+                        <td>
+                            {% if field.type == 'File' %}
+
+                                {% for file in log.getFiles(field) %}
+                                    <a href="{{ file.getUriDownload() }}">{{ file.getName() }}</a><br />
+                                {% endfor %}
+
+                            {% else %}
+                                {{ field.value }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+
+            </tbody>
+        </table>
+    {% endfor %}
+
+{% endif %}

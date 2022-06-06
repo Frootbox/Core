@@ -1,0 +1,11 @@
+<div class="form-group">
+    <label for="maxSize">maximale Größe</label>
+    <div class="input-group mb-2">
+        <input type="number" class="form-control" id="maxSize" step="0.1" name="maxSize" value="{{ field.getConfig('maxSize') }}" />
+        <div class="input-group-append">
+            <div class="input-group-text">MB</div>
+        </div>
+    </div>
+</div>
+
+{{ field.getConfig('rows') }}

@@ -1,0 +1,39 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+{% set i = view.getViewhelper('\\Frootbox\\Admin\\Viewhelper\\Delegator', { object: data.plugin }) %}
+{% set t = i.getTranslator() %}
+
+{% if data.category.getListEntries() | length > 0 %}
+
+    <table class="table" data-sort="{{ data.plugin.getAdminUri('Positions', 'ajaxSort', { categoryId: data.category.getId() }) }}">
+        <thead>
+            <tr>
+                <th>Titel</th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+
+            {% for listEntry in data.category.getListEntries() %}
+                <tr id="row-{{ listEntry.getId() }}" class="ajax {% if data.highlight == listEntry.getId() %}highlighted{% endif %}" data-listentry="{{ listEntry.getId() }}" data-href="{{ data.plugin.getAdminUri('Positions', 'ajaxPanelPositionEdit', { listEntryId: listEntry.getId(), categoryId: data.category.getId(), connId: listEntry.getConnId() }) }}">
+                    <td>{{ listEntry.getTitle() }}</td>
+                    <td class="handle" width="40"><i class="fa fa-grip-lines"></i></td>
+                    <td class="text-right">
+                        <a class="ajax" href="{{ v.getUri('Assets', 'ajaxSwitchVisibility', { assetId: listEntry.getId() } ) }}"><i data-asset="{{ listEntry.getId() }}" class="fa fa-lightbulb visibility {{ listEntry.getVisibilityString() }} icon"></i></a>
+                        <a data-confirm="Soll dieser Preis wirklich gelöscht werden?" href="{{ data.plugin.getAdminUri('Index', 'ajaxListEntryDelete', { categoryId: category.getId(), listEntryId: listEntry.getId() }) }}" class="ajax"><i class="fa fa-times icon"></i></a>
+                    </td>
+                </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+
+{% else %}
+
+    <div class="card">
+        <div class="card-body">
+            Es wurden noch keine Preise für diese Kategorie erstellt.
+        </div>
+    </div>
+
+{% endif %}

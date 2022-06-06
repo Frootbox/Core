@@ -1,0 +1,7 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ front.addTab('Dateiverwaltung', app.getUri('index')) }}
+
+<div id="folderReceiver">
+	{{ v.injectPartial('\\Frootbox\\Ext\\Core\\FileManager\\Apps\\FileManager\\Partials\\Folder', { folderId: get.get('folderId') }) | raw }}
+</div>

@@ -1,0 +1,28 @@
+{% set i = view.getViewhelper('\\Frootbox\\Admin\\Viewhelper\\Delegator', { object: data.plugin }) %}
+
+{% if additives.getCount() == 0 %}
+    <div class="message">Es wurden noch keine Zusatzstoffe erstellt.</div>
+{% else %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nr.</th>
+                <th>Titel</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+
+            {% for additive in additives %}
+                <tr class="{% if additive.getId() == data.highlight %}highlighted{% endif %}" data-price="{{ price.getId() }}" data-modal="{{ plugin.getAdminUri('Additives', 'ajaxModalEdit', { additiveId: additive.getId() }) }}" data-title="Zusatzstoff bearbeiten">
+                    <td>{{ additive.getOrderId() }}</td>
+                    <td>{{ additive.getTitle() }}</td>
+                    <td class="text-right">
+                        <a data-confirm="Soll dieser Zusatzstoff wirklich gelöscht werden?" class="ajax" href="{{ plugin.getAdminUri('Additives', 'ajaxDelete', { additiveId: additive.getId() }) }}"><i class="fa fa-times icon"></i></a>
+                    </td>
+                </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+{% endif %}

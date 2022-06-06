@@ -1,0 +1,110 @@
+{# config
+
+title: Standard
+variables:
+    columns:
+        type: int
+        label: Spalten
+        default: 4
+    image_width:
+        type: int
+        label: Bildbreite
+        default: 600
+    image_height:
+        type: int
+        label: Bildhöhe
+        default:
+    showQickMoreNavigation:
+        type: bool
+        label: untere Zusatznavigation
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set p = view.getViewhelper('Pages') %}
+
+{% set articles = i.getArticles() %}
+
+{% if variables.columns == 1 %}
+    {% set colClass = "col-12" %}
+{% elseif variables.columns == 2 %}
+    {% set colClass = "col-6" %}
+{% elseif variables.columns == 3 %}
+    {% set colClass = "col-4" %}
+{% elseif variables.columns >= 4 %}
+    {% set colClass = "col-3" %}
+{% endif %}
+
+
+{% set xArticle = "" %}
+
+<div class="row">
+    <div class="col-12 plugin Core News Teaser Index01">
+
+        {% if plugin.isFirst %}
+            <h1 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h1>
+        {% else %}
+            <h2 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+        {% endif %}
+
+        <div data-editable data-uid="{{ plugin.getUid('teaser-text') }}"></div>
+        
+        <div class="teasers row justify-content-center">
+	        {% for article in articles %}
+                {% if loop.index <= 3 %}
+
+                    {% set xArticle = article %}
+
+                    <div class="{{ colClass }}">
+                        <div class="news-teaser">
+                            <picture class="fluid" data-editable data-skipempty="1" data-uid="{{ article.getUid('image')}}">
+                                <img width="{{ variables.image_width }}" height="{{ variables.image_height }}" src="{{ i.getDummyImage({ width: variables.image_width, height: variables.image_height | default(300) }) }}" alt="" />
+                            </picture>
+
+                            <h3 data-editable data-uid="{{ article.getUid('title') }}">{{ article.getTitle }}</h3>
+
+                            <div data-nowidgets data-editable data-uid="{{ article.getUid('teaser') }}"></div>
+
+                            {% if article.getTextByUid('text') or editing %}
+                                <p><a class="read-more" href="{{ article.getUri }}">weiterlesen</a></p>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %}
+	        {% endfor %}
+        </div>
+
+
+
+        {% if variables.showQickMoreNavigation and articles | length > 3 %}
+
+            <table class="table">
+                <tbody>
+
+                    {% for article in articles %}
+
+                        {% set xArticle = article %}
+
+                        {% if loop.index > 3 %}
+                            <tr>
+                                <td><a href="{{ article.getUri }}">{{ article.getTitle }}</a></td>
+                            </tr>
+                        {% endif %}
+
+                    {% endfor %}
+
+                </tbody>
+            </table>
+
+
+            {% set p = view.getViewhelper('Pages') %}
+
+            <p><a class="read-more" href="{{ p.getPage(xArticle.getPageId()).getUri() }}">mehr Beiträge in der Übersicht</a></p>
+
+        {% elseif (articles | length) > 3 %}
+            <p><a class="read-more" href="{{ p.getPage(xArticle.getPageId()).getUri() }}">mehr Beiträge in der Übersicht</a></p>
+        {% endif %}
+
+    </div>
+</div>
+

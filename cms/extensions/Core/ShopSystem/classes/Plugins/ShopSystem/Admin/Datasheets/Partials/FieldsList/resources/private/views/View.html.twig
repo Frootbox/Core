@@ -1,0 +1,49 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{% if datasheetFields | length == 0 %}
+    <div class="message warning">Dieses Datenblatt hat derzeit noch keine Datenfelder.</div>
+{% else %}
+
+    {% for section, fields in datasheetFields %}
+
+        {% if section %}
+            <h3>
+                {{ section }}
+
+                <span class="headoptions">
+                    <a data-toggle="tooltip" data-modal data-title="neues Datenfeld hinzufügen" href="{{ plugin.getAdminUri('Datasheets', 'ajaxModalFieldCompose', { datasheetId: data.datasheet.getId, section: section }) }}"><i class="fa fa-plus-circle"></i></a>
+                </span>
+            </h3>
+        {% endif %}
+
+        <table class="table" data-sort="{{ plugin.getAdminUri('Datasheets', 'ajaxFieldsSort', { datasheetId: data.datasheet.getId, section: section }) }}">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th width="200">Sektion</th>
+                    <th width="200">Typ</th>
+                    <th width="50"></th>
+                    <th width="50"></th>
+                </tr>
+            </thead>
+            <tbody>
+
+                {% for field in fields %}
+                    <tr id="row-{{ field.getId() }} "data-title="Datenblatt bearbeiten" class="ajax {% if field.getId == data.highlight %}highlighted{% endif %}" data-modal="{{ data.plugin.getAdminUri('Datasheets', 'ajaxModalFieldDetails', { fieldId: field.getId() }) }}">
+                        <td>{{ field.getTitle() }}</td>
+                        <td>{{ field.getSection() | default('<i style="color: #CCC;">Default</i>') | raw }}</td>
+                        <td>{{ field.getType() }}</td>
+                        <td class="handle">
+                            <i class="fa fa-grip-lines"></i>
+                        </td>
+                        <td class="text-right">
+                            <a class="ajax" data-confirm="Soll dieses Feld wirklich gelöscht werden?" href="{{ data.plugin.getAdminUri('Datasheets', 'ajaxFieldDelete', { fieldId: field.getId() }) }}"><i class="fa fa-times"></i></a>
+                        </td>
+                    </tr>
+                {% endfor %}
+
+            </tbody>
+        </table>
+    {% endfor %}
+
+{% endif %}

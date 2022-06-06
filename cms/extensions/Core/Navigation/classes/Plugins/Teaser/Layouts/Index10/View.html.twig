@@ -1,0 +1,90 @@
+{# config
+
+title: Dreiteilig
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+{% set teasers = i.getTeasers() %}
+{% set pages = (teasers.getCount() / 3) | round(0, 'ceil') %}
+
+<div class="row">
+    <div class="col-12 plugin Core Navigation Teaser Index10">
+
+        <div id="carouselExampleIndicators" class="carousel carousel-fade slide" data-ride="carousel">
+
+            {% if pages > 1 %}
+                <ol class="carousel-indicators">
+                    {% for i in 1..pages %}
+                        <li data-target="#carouselExampleIndicators" data-slide-to="{{ loop.index0 }}" class="{% if loop.index == 1 %}active{% endif %}"></li>
+                    {% endfor %}
+                </ol>
+            {% endif %}
+
+            <div class="carousel-inner">
+
+                {% for i in 1..pages %}
+
+                    <div class="carousel-item {% if loop.index == 1 %}active{% endif %}">
+
+                        <div class="row">
+                            <div class="col-md-7">
+
+                                {% set teaser = teasers.current() %}
+                                {{ teasers.next() }}
+
+                                <div class="teaser main" {% if not teaser.getConfig('linkageDeactivated') and teaser.getUri() != "#" %}data-href="{{ teaser.getUri() }}"{% endif %} data-type="Images/Background" data-width="635" data-height="530" data-uid="{{ teaser.getUid('background') }}">
+
+                                    {% if not teaser.isLinkDeactivated() %}
+                                        <a data-editable-element data-uid="{{ teaser.getUid('link-text') }}" class="pill" href="{{ teaser.getUri() }}">mehr erfahren</a>
+                                    {%  endif %}
+
+                                </div>
+
+                            </div>
+                            <div class="col-md-5">
+
+
+                                {% set teaser = teasers.current() %}
+                                {{ teasers.next() }}
+
+                                {% if teaser %}
+                                    <div class="teaser side" {% if not teaser.getConfig('linkageDeactivated') and teaser.getUri() != "#" %}data-href="{{ teaser.getUri() }}"{% endif %} data-type="Images/Background" data-width="880" data-height="500" data-uid="{{ teaser.getUid('background') }}">
+
+                                        {% if not teaser.isLinkDeactivated() %}
+                                            <a data-editable-element data-uid="{{ teaser.getUid('link-text') }}" class="pill" href="{{ teaser.getUri() }}">mehr erfahren</a>
+                                        {%  endif %}
+
+                                    </div>
+                                {% endif %}
+
+
+                                {% set teaser = teasers.current() %}
+                                {{ teasers.next() }}
+
+                                {% if teaser %}
+                                    <div class="teaser side" {% if not teaser.getConfig('linkageDeactivated') and teaser.getUri() != "#" %}data-href="{{ teaser.getUri() }}"{% endif %} data-type="Images/Background" data-width="880" data-height="500" data-uid="{{ teaser.getUid('background') }}">
+
+                                        {% if not teaser.isLinkDeactivated() %}
+                                            <a data-editable-element data-uid="{{ teaser.getUid('link-text') }}" class="pill" href="{{ teaser.getUri() }}">mehr erfahren</a>
+                                        {%  endif %}
+
+                                    </div>
+                                {% endif %}
+
+                            </div>
+                        </div>
+
+                    </div>
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+
+
+
+    </div>
+</div>

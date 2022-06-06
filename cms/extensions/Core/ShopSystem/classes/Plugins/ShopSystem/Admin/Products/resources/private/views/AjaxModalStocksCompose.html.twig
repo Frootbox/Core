@@ -1,0 +1,42 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    'frame' : false,
+}) }}
+
+<form method="post" class="ajax" action="{{ plugin.getAdminUri('Products', 'ajaxStocksCreate', { productId: product.getId() }) }}">
+
+    <div class="modal-body">
+
+        {% for group in product.getDatasheet().getGroups() %}
+
+            {% set options = group.getOptionsForProduct(product) %}
+
+            {% if options | length %}
+                <div class="form-group">
+                    <label for="group_{{ group.getId() }}">{{ group.getTitle() }}</label>
+                    <select class="form-control" id="group_{{ group.getId() }}" name="groups[{{ group.getId() }}]">
+                        <option value="">bitte wählen ...</option>
+
+                        {% for option in options %}
+                            <option value="{{ option.getId() }}">{{ option.getTitle() }}</option>
+                        {% endfor %}
+
+                    </select>
+                </div>
+            {% endif %}
+
+        {% endfor %}
+
+        <div class="form-group">
+            <label for="amount">Anzahl</label>
+            <input type="number" class="form-control" name="amount" id="amount" placeholder="Anzahl" value="{{ equipment.amount }}">
+        </div>
+
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Warenbestand hinzufügen</button>
+    </div>
+
+</form>

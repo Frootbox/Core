@@ -1,0 +1,118 @@
+<html>
+<head>
+
+    <style>
+        body {
+            font-family: Arial;
+            font-size: 14px;
+        }
+
+        td {
+            font-size: 14px;
+        }
+
+        td.text-right {
+            text-align: right;
+        }
+
+        table.items {
+            margin: 20px 0;
+        }
+
+        table.items thead th {
+            padding: 10px 0;
+        }
+
+        table.items td {
+            padding: 9px 0;
+            border-top: 1px solid #CCC;
+        }
+
+        a, a.email-link {
+            color: #000;
+        }
+
+        h4, th {
+            text-align: left;
+            font-size: 14px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+    </style>
+
+
+</head>
+<body>
+
+<table width="100%">
+    <tr>
+        <td align="center">
+
+            <table width="600">
+                <tr>
+                    <td>
+
+                        <img src="{{ settings.serverpath_absolute }}static/Ext/Core/Images/Email/serve/qs/EXT/{{ baseVendor }}:{{ baseExtension }}:images/f/logo-email.png" alt="" />
+
+                        <br /><br /><br />
+
+                        <p><b>Produkt-Anfrage</b></p>
+
+                        <p>
+                            <a href="{{ product.getUri({ absolute: true }) }}">{{ product.getTitle() }}</a>
+                        </p>
+
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>{{ post.get('name') }}</td>
+                                </tr>
+
+                                {% if post.get('company') %}
+                                    <tr>
+                                        <td>Firma</td>
+                                        <td>{{ post.get('company') }}</td>
+                                    </tr>
+                                {% endif %}
+
+                                <tr>
+                                    <td>E-Mail</td>
+                                    <td>{{ post.get('email') }}</td>
+                                </tr>
+
+                                {% if post.get('phone') %}
+                                    <tr>
+                                        <td>Telefon</td>
+                                        <td>{{ post.get('phone') }}</td>
+                                    </tr>
+                                {% endif %}
+
+                                {% if post.get('amount') %}
+                                    <tr>
+                                        <td>Stückzahl</td>
+                                        <td>{{ post.get('amount') }}</td>
+                                    </tr>
+                                {% endif %}
+
+                                <tr>
+                                    <td>Nachricht</td>
+                                    <td>{{ post.get('message') |  nl2br }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+
+
+
+                    </td>
+                </tr>
+            </table>
+
+        </td>
+    </tr>
+</table>
+
+</body>
+</html>

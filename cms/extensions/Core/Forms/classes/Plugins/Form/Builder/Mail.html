@@ -1,0 +1,49 @@
+<html>
+    <head>
+
+        <style>
+            body {
+                font-family: Arial;
+            }
+
+        </style>
+    </head>
+    <body>
+
+        <p>
+            <b>Anfrage über Ihre Website</b>
+        </p>
+        <p>
+            {{ plugin.getTitle }}
+        </p>
+
+        <table>
+            {% for group in formlog.getLogData.formData %}
+                <thead>
+                    <tr>
+                        <th style="text-align: left;" colspan="2">{{ group.title }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    {% for field in group.fields %}
+                        <tr>
+                            <td style="padding-right: 15px;">{{ field.title }}</td>
+                            <td>
+                                {% if field.type == 'File' %}
+                                    {% for file in formlog.getFiles(field) %}
+                                        <a href="{{ file.getUriDownload({ absolute: true }) }}">{{ file.getName() }}</a><br />
+                                    {% endfor %}
+                                {% else %}
+                                    {{ field.valueDisplay | nl2br }}
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+
+                </tbody>
+            {% endfor %}
+        <table>
+
+    </body>
+</html>

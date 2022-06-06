@@ -1,0 +1,158 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+
+<script>
+    var uid = "{{ get.get('uid') }}";
+
+    $(function () {
+
+        /**
+         *
+         */
+        $('#pictureUpdateForm').submit(function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            $.ajax({
+                url: $(this).attr('action'),
+                data: $(this).serialize(),
+                type: 'POST',
+                success: function ( response ) {
+
+                    $('#fbxEditorGenericModal').modal('hide');
+
+                    refreshEditable();
+                },
+                error: function ( xhr ) {
+                    alert("PL");
+                }
+            });
+
+        });
+    });
+
+    function refreshEditable ( ) {
+
+        var element = $('[data-type="Images/Background"][data-uid="' + uid + '"]');
+
+        var snippet = $('<div />').append(element.clone()).html();
+
+        $.ajax({
+            url: "{{ settings.serverpath }}cms/admin/Editor/callEditable",
+            type: 'POST',
+            data: {
+                method: 'ajaxRefresh',
+                editable: 'Frootbox/Ext/Core/Images/Editables/Background',
+                snippet: snippet
+            },
+            success: function ( html ) {
+
+                var response = $.parseJSON(html);
+
+                element.replaceWith(response.snippet.html);
+
+            }
+        });
+    }
+</script>
+
+<style>
+    .modal-dialog .nav.nav-tabs {
+        margin: 30px 0 0 0;
+    }
+</style>
+
+
+<form id="pictureUpdateForm" action="{{ controller.getActionUri('ajaxUpdate', { uid: get.get('uid') }) }}" method="post">
+
+    <div class="modal-header">
+        <h5 class="modal-title">Hintergrund bearbeiten</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Hintergrundbild</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Farbe</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="contact-tab" data-toggle="tab" href="#contact" role="tab" aria-controls="contact" aria-selected="false">Verlauf</a>
+        </li>
+    </ul>
+    <div class="tab-content" id="myTabContent">
+        <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+
+            <div class="modal-body">
+
+
+                {% set helpText %}
+                    <small id="helpText" class="form-text text-muted">
+                        {% if get.get('width') and get.get('height') %}
+                            optimale Maße: {{ get.get('width') }}x{{ get.get('height') }} Pixel
+                        {% elseif get.get('width') %}
+                            optimale Breite: {{ get.get('width') }} Pixel
+                        {% elseif get.get('height') %}
+                            optimale Höhe: {{ get.get('height') }} Pixel
+                        {% endif %}
+                    </small>
+                {% endset %}
+
+                {{ v.injectPartial('Frootbox/Ext/Core/FileManager/Editor/Partials/FileUpload', {
+                    multiple: false,
+                    uid: get.get('uid'),
+                    onComplete: 'refreshEditable',
+                    helpText: helpText
+                }) | raw }}
+
+
+                <div class="{% if not file %}d-none{% endif %}">
+                    <div class="form-group">
+                        <label for="width">Breite</label>
+                        <input type="number" class="form-control" id="width" name="width" placeholder="Breite" value="{{ file.getConfig('width') }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="caption">Bildunterschrift</label>
+                        <textarea rows="5" class="form-control" id="caption" name="caption" placeholder="Bildunterschrift">{{ file.getConfig('caption') }}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="copyright">Copright</label>
+                        <input type="text" class="form-control" id="copyright" name="copyright" placeholder="Copyright" value="{{ file.getCopyright }}">
+                    </div>
+
+
+                    <button type="submit" class="btn btn-primary">Speichern</button>
+
+
+                    {% if file %}
+
+                        <a href="{{ file.getUriDownload() }}" class="btn btn-primary"><i class="fa fa-download"></i></a>
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+        <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="color">Hex-Farbcode</label>
+                    <input type="text" class="form-control" id="color" name="color" placeholder="Hex-Farbcode" value="{{ file.getConfig('color') }}">
+                </div>
+
+                <button type="submit" class="btn btn-primary">Speichern</button>
+            </div>
+
+        </div>
+        <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">...</div>
+    </div>
+
+
+
+</form>

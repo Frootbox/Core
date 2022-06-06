@@ -1,0 +1,31 @@
+<style>
+    table.table.targets a {
+        color: #999;
+        transition: all 1s;
+    }
+
+    table.table.targets a:hover {
+        text-decoration: none;
+        color: #333;
+    }
+
+    table.table.targets a.selected svg {
+        color: green;
+    }
+</style>
+
+<table class="table targets">
+    <tbody>
+
+        {% for question in questions %}
+            <tr>
+                <td>
+                    <a data-question="{{ question.getId() }}" href="{{ plugin.getAdminUri('Question', 'ajaxConnectionCreate', { targetId: question.getId(), questionId: get.get('questionId') }) }}" class="ajax">
+                        <i class="fa fa-check-circle"></i> {{ question.getPage().getTitle() }} / {{ question.getTitle() }}
+                    </a>
+                </td>
+            </tr>
+        {% endfor %}
+
+    </tbody>
+</table>

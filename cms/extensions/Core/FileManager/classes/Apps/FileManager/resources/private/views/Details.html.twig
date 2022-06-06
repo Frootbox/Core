@@ -1,0 +1,110 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ front.addTab('Dateiverwaltung', app.getUri('index')) }}
+
+<h2>
+    {{ file.getName() }}
+    <span class="headoptions">
+        <a href="{{ app.getUri('edit', { fileId : file.getId } ) }}"><i class="far fa-pencil"></i></a>
+		<a href="{{ file.getUriDownload() }}"><i class="far fa-download"></i></a>
+        <a class="ajax" data-confirm="Soll diese Datei wirklich gelöscht werden?" href="{{ app.getUri('ajaxFileDelete', { fileId : file.getId } ) }}"><i class="far fa-trash"></i></a>
+    </span>
+</h2>
+
+<script>
+    $(function ( ) {
+
+        $(document).on('click', 'a.copy-url', function ( event ) {
+
+            event.preventDefault();
+
+            navigator.clipboard.writeText($(this).data('text')).then(function() {
+                toastr.success('URL in die Zwischenablage kopiert.');
+            }, function(err) {
+                toastr.error('URL konnte nicht kopiert werden.');
+            });
+
+        });
+    });
+</script>
+
+<div class="row">
+    <div class="col-md-6">
+
+        <table class="table">
+            <tbody>
+                <tr>
+                    <td width="25%">Titel</td>
+                    <td>{{ file.getTitle() }}</td>
+                </tr>
+                <tr>
+                    <td>Dateiname</td>
+                    <td>{{ file.getName() }}</td>
+                </tr>
+                <tr>
+                    <td>Copyright</td>
+                    <td>{{ file.getCopyright() }}</td>
+                </tr>
+                <tr>
+                    <td>UID</td>
+                    <td>{{ file.getUidRaw() }}</td>
+                </tr>
+                <tr>
+                    <td>Größe</td>
+                    <td>{{ file.getSize() }}</td>
+                </tr>
+                <tr>
+                    <td>Typ</td>
+                    <td>{{ file.getType() }}</td>
+                </tr>
+                <tr>
+                    <td>Pfad</td>
+                    <td>
+                        {% if file.isExistant() %}
+                            {{ file.getPath() }}
+                        {% else %}
+                            <span style="color: red;">{{ file.getPath() }}</span>
+
+                            {% if file.isTrashed() %}
+                                <br />
+                                <a class="ajax" href="{{ app.getUri('recoverFile', { fileId: file.getId() }) }}"><i class="fa fa-trash"></i> aus dem Papierkorb wiederherstellen</a>
+                            {% endif %}
+
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td><a data-text="{{ file.getUriDownload({ absolute: true }) }}" class="copy-url" href="#">Download-URL <i class="far fa-copy"></i></a></td>
+                    <td>
+                        <input type="text" class="form-control" value="{{ file.getUriDownload({ absolute: true }) }}" />
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+
+
+    </div>
+    <div class="col-md-6">
+
+        {% if file.isImage() and file.isExistant() %}
+            <div style="margin: 0 0 30px 0; padding: 20px; background: #FFF; border: 1px solid #CCC;">
+                <img class="img-fluid" src="{{ file.getUriThumbnail() }}" alt="" />
+            </div>
+        {% endif %}
+
+        <div class="card">
+            <div class="card-body">
+
+                <form action="{{ app.getUri('replaceFile', { fileId: file.getId() }) }}" method="post" enctype="multipart/form-data">
+                    <input type="file" name="file" id="file" />
+
+                    <button type="submit" class="btn btn-primary">Datei austauschen</button>
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+

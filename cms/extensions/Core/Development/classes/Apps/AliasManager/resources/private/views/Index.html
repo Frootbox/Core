@@ -1,0 +1,22 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ front.addTab('Entwickler-Tools', app.getUri('index')) }}
+
+<h2>
+	Alias-Verwaltung
+</h2>
+
+{% set links = [ ] %}
+
+{% for app in apps %}
+	{% set links = links | merge([
+		{
+			url : v.getUri('App', 'index', { appId: app.getId() }),
+			icon : app.getIcon(),
+			title : app.getTitle(),
+			type : 'xx'
+		}
+	]) %}
+{% endfor %}
+
+{{ v.injectPartial('\\Frootbox\\Admin\\View\\Partials\\Navigation\\Buttons', { links:  links }) | raw }}

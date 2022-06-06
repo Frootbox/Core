@@ -1,0 +1,80 @@
+{% set i = view.getViewhelper('\\Frootbox\\Admin\\Viewhelper\\Delegator', { object: data.plugin }) %}
+{% set entryInterface = view.getViewhelper('\\Frootbox\\Admin\\Viewhelper\\Delegator', { object: data.listEntry }) %}
+
+{% set t = i.getTranslator() %}
+
+<table class="table" data-sort="{{ plugin.getAdminUri('Positions', 'ajaxPriceSort', { listEntryId: listEntry.getId() }) }}">
+    <thead>
+        <tr>
+            <th>Info</th>
+            <th class="text-right">Preis</th>
+            <th>Einheit</th>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+
+        {% for price in entryInterface.getPrices() %}
+            <tr id="row-{{ price.getId() }}" class="{% if price.getId() == data.highlight %}highlighted{% endif %}" data-price="{{ price.getId() }}" data-modal="{{ plugin.getAdminUri('Positions', 'ajaxModalPriceEdit', { priceId: price.getId(), listEntryId: listEntry.getId() }) }}" data-title="Preis bearbeiten">
+                <td>{{ price.getTitle() }}</td>
+                <td class="text-right" nowrap>
+                    {% if price.getConfig('priceFrom') %}ab {% endif %}
+                    {{ price.getConfig('price') | number_format(2, ',', '.')}} EUR
+                </td>
+                <td>
+                    {% if price.getConfig('unit') %}
+                        / {{ t.translate("Units." ~ price.getConfig('unit') ~"Short") }}
+                    {% endif %}
+                </td>
+                <td class="handle">
+                    <a href="#"><i class="fa fa-grip-lines"></i></a>
+                </td>
+                <td class="text-right">
+                    <a data-confirm="Soll dieser Preis wirklich gelöscht werden?" class="ajax" href="{{ plugin.getAdminUri('Positions', 'ajaxPriceDelete', { priceId: price.getId(), listEntryId: listEntry.getId() }) }}"><i class="fa fa-times icon"></i></a>
+                </td>
+            </tr>
+        {% endfor %}
+
+    </tbody>
+</table>
+
+<!--
+    <div class="form-row">
+        <div class="col-5">
+
+            <div class="form-group">
+                <label for="title">Titel</label>
+                <input required type="text" class="form-control" name="title" id="title" placeholder="Titel" value="{{ listEntry.getTitle() }}">
+            </div>
+
+        </div>
+        <div class="col-3">
+
+            <div class="form-group">
+                <label for="price">Preis</label>
+                <input type="number" min="0" step="0.01" class="form-control" name="price" id="price" placeholder="Preis" value="{{ listEntry.getConfig('price') | number_format(2, '.', '') }}">
+            </div>
+
+        </div>
+        <div class="col-4">
+
+            <div class="form-group">
+                <label for="unit">pro Einheit</label>
+                <select class="form-control" id="unit" name="unit">
+                    <option value="">keine Angabe</option>
+                    <optgroup label="Stückzahl">
+                        <option {% if listEntry.getConfig('unit') == "Each" %}selected{% endif %} value="Each">Stück</option>
+                    </optgroup>
+                    <optgroup label="Gewicht">
+                        <option {% if listEntry.getConfig('unit') == "WeightTons" %}selected{% endif %} value="WeightTons">Tonnen</option>
+                    </optgroup>
+                    <optgroup label="Volumen">
+                        <option {% if listEntry.getConfig('unit') == "VolumeCubicMeters" %}selected{% endif %} value="VolumeCubicMeters">Kubikmeter</option>
+                    </optgroup>
+                </select>
+            </div>
+
+        </div>
+    </div>
+-->

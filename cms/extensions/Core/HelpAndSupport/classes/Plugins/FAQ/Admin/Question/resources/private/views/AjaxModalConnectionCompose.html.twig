@@ -1,0 +1,51 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    'frame' : false,
+}) }}
+
+<script>
+
+    var _FrootboxQuestionCooldown = null;
+
+    $(function ( ) {
+
+        /**
+         *
+         */
+        $(document).on('keyup', '#title', function ( event ) {
+
+            window.clearTimeout(_FrootboxQuestionCooldown);
+
+            var element = $(this);
+
+            _FrootboxQuestionCooldown = window.setTimeout(function ( ) {
+
+                $.ajax({
+                    url: "{{ plugin.getAdminUri('Question', 'ajaxSearch') | raw }}",
+                    data: {
+                        questionId: {{ get.get('questionId') }},
+                        query: element.val()
+                    },
+                    success: function ( html ) {
+
+                        $('#searchReceiver').html(html);
+                    }
+                });
+
+            }, 400);
+        });
+    });
+</script>
+
+
+<div class="modal-body">
+
+    <div class="form-group">
+        <label for="title">Frage finden</label>
+        <input type="text" class="form-control" name="title" autocomplete="off" required id="title" placeholder="Frage">
+    </div>
+
+</div>
+
+<div id="searchReceiver"></div>

@@ -1,0 +1,30 @@
+{# config
+
+title: Dropdown
+
+/config #}
+
+<div class="Plugin Navigation MainNavigation Index03">
+
+<nav>
+
+    {% for npage in pages %}
+        <span>
+            <a class="{% if npage.getIsActive() %}active{% endif %}" href="{{ npage.getUri() }}">{{ npage.getTitle }}</a>
+
+            {% set children = npage.getChildrenVisible %}
+
+            {% if children.getCount %}
+                <ul>
+                    {% for child in children %}
+                        <li><a href="{{ child.getUri }}">{{ child.getTitle }}</a></li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+        </span>
+    {% endfor %}
+
+</nav>
+
+</div>

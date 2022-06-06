@@ -1,0 +1,108 @@
+{# config
+
+title: Standard
+variables:
+    showDate:
+        type: bool
+        label: mit Anzeige des Datums
+    noImage:
+        type: bool
+        label: ohne Teaser-Bild
+    noImageDummy:
+        type: bool
+        label: ohne Dummy-Bild
+    columns:
+        type: int
+        label: Spalten
+        default: 3
+    image_width:
+        type: int
+        label: Bildbreite
+        default: 535
+    image_height:
+        type: int
+        label: Bildhöhe
+        default: 300
+    limit:
+        type: int
+        label: Artikel-Anzahl
+        default: 9
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set t = i.getTranslator() %}
+{% set texts = view.getViewhelper('Text') %}
+
+{% set articles = i.getArticles({ limit: variables.limit }) %}
+
+
+{% if variables.columns == 1 %}
+    {% set colClass = "col-12" %}
+{% elseif variables.columns == 2 %}
+    {% set colClass = "col-md-6" %}
+{% elseif variables.columns == 3 %}
+    {% set colClass = "col-md-4" %}
+{% elseif variables.columns >= 4 %}
+    {% set colClass = "col-md-3" %}
+{% endif %}
+
+<div class="row">
+    <div class="col-12 plugin Core News News Index02">
+        <div class="inner-wrapper">
+
+            {% if plugin.isFirst %}
+                <h1 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h1>
+            {% else %}
+                <h2 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+            {% endif %}
+
+            <div data-editable data-uid="{{ plugin.getUid('teaser-text') }}"></div>
+
+            <div class="row articles">
+
+                {% for article in articles %}
+                    <div class="{{ colClass }} article-col">
+                        <div class="article" data-href>
+                            {% if not variables.noImage %}
+                                <picture class="fluid" data-editable {% if variables.noImageDummy %}data-skipempty="1"{% endif %} data-uid="{{ article.getUid('image')}}">
+                                    <img width="{{ variables.image_width }}" height="{{ variables.image_height }}" src="{{ i.getDummyImage({ width: variables.image_width, height: variables.image_height | default(300) }) }}" alt="" />
+                                </picture>
+                            {% endif %}
+
+                            <div class="text-pillow">
+
+                                <div class="pre-title" data-editable data-nowidgets data-uid="{{ article.getUid('pre-title') }}"></div>
+
+                                <h3 data-editable data-uid="{{ article.getUid('title') }}">{{ article.getTitle(globalLanguage) }}</h3>
+
+                                {% if variables.showDate %}
+                                    <p class="_skipsearch">
+                                        {{ article.getDateStart.format('%d') }}.
+                                        {{ t.translate(article.getDateStart.format('Monthname%m')) }}
+                                        {{ article.getDateStart.format('%G') }}
+                                    </p>
+                                {% endif %}
+
+                                <div data-nowidgets data-editable data-uid="{{ article.getUid('teaser') }}"></div>
+
+                                {% if article.showReadMore() %}
+                                    <p><a class="read-more _skipsearch" href="{{ article.getUri() }}" data-editable-element data-uid="{{ plugin.getUid('link-read-more') }}">{{ t.translate('LinkReadMore') }}</a></p>
+                                {% endif %}
+                            </div>
+
+                        </div>
+                    </div>
+                {% endfor %}
+
+            </div>
+
+            {% if articles.getCount() < articles.getTotal() %}
+                <br />
+                <p><a class="read-more" href="{{ plugin.getActionUri('archive') }}">{{ t.translate('MoreArticlesInArchive') }}</p>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+

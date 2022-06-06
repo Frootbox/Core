@@ -1,0 +1,128 @@
+{# config
+
+title: Standard
+variables:
+    pluginWidth:
+        type: int
+        default: 12
+        label: Breite des Plugins (1-12)
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set f = view.getViewhelper('Ext/Core/Forms/Form') %}
+{% set t = i.getTranslator() %}
+
+<script>
+    $(function ( ) {
+
+        /**
+         * Submit form via ajax
+         */
+        $(document).on('submit', '.core-forms-form-contactform', function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            var form = $(this);
+
+            $.ajax({
+                url: $(this).attr('action'),
+                data: $(this).serialize(),
+                dataType: 'json',
+                type: 'POST',
+                headers: {
+                    Accept: "application/json; charset=utf-8",
+                },
+                success: function ( response ) {
+
+                    console.log(response);
+
+                    if (typeof response.redirect != "undefined") {
+                        window.location.href = response.redirect;
+                    }
+                    else {
+                        alert("Ihre Daten wurden gesendet. Vielen Dank.");
+
+                        form.find('input[type="text"], textarea').val('');
+
+                        $('.filesReceiver[data-field]').html('');
+                        $('.dz-preview').remove();
+                    }
+                },
+                error: function ( xhr ) {
+
+                    if (xhr.responseText.charAt(0) != '{') {
+                        alert(xhr.responseText);
+                        return;
+                    }
+                    var response = $.parseJSON(xhr.responseText);
+
+                    alert(response.error);
+                }
+            });
+        });
+    });
+</script>
+
+<div class="plugin Core Forms Form Index01">
+
+    <div class="container">
+        <div class="row justify-content-md-center">
+            <div class="col-12 col-md-{{ variables.pluginWidth }}">
+                <div class="inner-pillow">
+
+                    <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+
+                    <div data-editable data-uid="{{ plugin.getUid('text') }}"></div>
+
+                    <form class="core-forms-form-contactform" method="post" action="{{ plugin.getUriAjax('submit') }}">
+
+                        <div class="row">
+                            {% for group in i.getGroups() %}
+                                <div class="col-12 col-md-{{ group.getColumns }}">
+
+                                    {% if i.getGroups() | length > 1 %}
+                                        <h4>{{ group.getTitle }}</h4>
+
+                                        <div data-editable data-uid="{{ group.getUid('title') }}"></div>
+                                    {% endif %}
+
+                                    {% set g = view.getViewhelper('Delegator', { object: group }) %}
+
+                                    {% for field in g.getFields() %}
+                                        {{ f.render(field, { value: f.guessFieldValue(field, plugin), t: t }) | raw }}
+                                    {% endfor %}
+
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        {{ i.injectCaptcha() | raw }}
+
+                        <div class="form-group form-check small-text">
+                            <input type="checkbox" required class="form-check-input" id="privacyPolicy" name="privacyPolicy">
+                            <label class="form-check-label" for="privacyPolicy">
+
+                                {% if plugin.getAlternatePrivacy() %}
+                                    {{ plugin.getAlternatePrivacy(i.getPrivacyPolicyLink()) | raw }}
+                                {% else %}
+                                    {{ t.translate('AcceptPrivacyPolicy', [ i.getPrivacyPolicyLink() ]) | raw }}
+                                {% endif %}
+
+                            </label>
+                        </div>
+
+                        <div data-editable data-uid="{{ plugin.getUid('text-above-the-button') }}"></div>
+
+                        <button type="submit" class="btn btn-primary">{{ plugin.config('customButtonLabel') | default(t.translate('Send')) }}</button>
+
+                    </form>
+
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,17 @@
+
+<style>
+    figure.widget picture img {
+        max-width: 100%;
+        height: auto;
+    }
+</style>
+
+<div class="row justify-content-md-center">
+    <div class="col" style="max-width: {{ widget.getMaxWidthStyle }};">
+        {{ playerHtml | raw }}
+    </div>
+</div>
+
+{% if widget.getConfig('source') %}
+    <figcaption>{{ widget.getConfig('source') }}</figcaption>
+{% endif %}

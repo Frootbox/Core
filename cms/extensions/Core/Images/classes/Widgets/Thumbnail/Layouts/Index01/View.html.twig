@@ -1,0 +1,71 @@
+{% set i = view.getViewhelper('Delegator', { object: widget }) %}
+
+{% if file and widget.getConfig('magnify') %}
+    {% set a = view.getViewhelper('Assets', {   }) %}
+
+    {{ a.import('https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css') | raw }}
+    {{ a.import('https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js') | raw }}
+{% endif %}
+
+<style>
+    figure.widget picture[data-widget="{{ widget.getId }}"] img {
+        width: 100%;
+        height: auto;
+        {% if widget.getConfig('image.width') %}
+            max-width: {{ widget.getConfig('image.width') }}px !important;
+        {% endif %}
+    }
+
+    figure.widget picture .caption .copyright {
+        display: block;
+        padding: 4px 0 0 0;
+        color: #ccc;
+    }
+
+    figure.widget picture img.x-rounded {
+        border-radius: 100%;
+    }
+</style>
+
+
+{% if file %}
+    {% set src = file.getUri({ crop: widget.getConfig('crop'), width: widget.getConfig('image.width'), height: widget.getConfig('image.height') }) %}
+    {% set alt = file.getAlt() %}
+{% else %}
+    {% set src = i.getDummyImage({ width: 600, height: 300 }) %}
+{% endif %}
+
+{% if widget.getConfig('alt') %}
+    {% set alt = widget.getConfig('alt') %}
+{% endif %}
+
+<picture data-widget="{{ widget.getId }}">
+
+    {% if widget.getConfig('url') %}
+        <a href="{{ widget.getConfig('url') }}">
+    {% elseif file and widget.getConfig('magnify') %}
+        <a href="{{ file.getUriThumbnail() }}" data-fancybox="gallery">
+    {% endif %}
+
+        <img width="{{ widget.getConfig('image.width') }}" height="{{ widget.getConfig('image.height') }}" class="{% if widget.getConfig('image.rounded') %}x-rounded{% endif %}" src="{{ src }}" alt="{{ alt }}" />
+
+    {% if widget.getConfig('url') %}</a>{% endif %}
+
+    {% if file.getConfig('caption') %}
+        <p class="caption">
+            {{ file.getConfig('caption') | nl2br }}
+
+            {% if widget.getConfig('source') %}
+                <span class="copyright">{{ widget.getConfig('source') }}</span>
+            {% endif %}
+        </p>
+    {% endif %}
+
+    {% if file.getCopyright() %}
+        <!-- Copyright {{ file.getCopyright() }} -->
+    {% endif %}
+
+    {% if widget.getConfig('source') %}
+        <p class="source">Quelle: {{ widget.getConfig('source') }}</p>
+    {% endif %}
+</picture>

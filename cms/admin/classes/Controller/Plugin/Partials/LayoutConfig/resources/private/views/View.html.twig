@@ -1,0 +1,62 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{% set variables = template.getVariables() %}
+
+{% set systemVariables = data.plugin.getConfig('systemVariables') %}
+
+{% if variables | length > 0 %}
+    <br />
+
+    <h3>Layout konfigurieren</h3>
+
+    <br />
+
+    <form method="post" action="{{ v.getUri('Plugin', 'ajaxSetLayoutConfig', { 'pluginId' : data.plugin.getId(), 'action' : data.action } ) }}" class="ajax">
+
+        <div class="form-group form-check">
+            <input {% if systemVariables.firstContent %}checked{% endif %} name="systemVariables[firstContent]" value="1" type="checkbox" class="form-check-input" id="var__firstContent_">
+            <label class="form-check-label" for="var__firstContent_">erster Inhalt</label>
+        </div>
+        <div class="form-group">
+            <label for="cssClasses">CSS-Klassen</label>
+            <input type="text" class="form-control" value="{{ systemVariables.cssClasses }}" name="systemVariables[cssClasses]" id="cssClasses" placeholder="CSS-Klassen" />
+        </div>
+
+        {% for variable in variables %}
+
+            {% if variable.type == 'system' %}
+
+            {% elseif variable.type == 'bool' %}
+                <div class="form-group form-check">
+                    <input {% if variable.value %}checked{% endif %} name="variables[{{ variable.name }}]" type="checkbox" class="form-check-input" id="var__{{ variable.name }}">
+                    <label class="form-check-label" for="var__{{ variable.name }}">{{ variable.label }}</label>
+                </div>
+            {% elseif variable.type == 'list' %}
+                <div class="form-group">
+                    <label for="var__{{ variable.name }}">{{ variable.label }}</label>
+                    <select class="form-control" id="var__{{ variable.name }}" name="variables[{{ variable.name }}]">
+                        {% for value,label in variable.options %}
+                            <option {% if variable.value == value %}selected{% endif %} value="{{ value }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            {% elseif variable.type == 'int' %}
+                <div class="form-group">
+                    <label for="var__{{ variable.name }}">{{ variable.label }}</label>
+                    <input type="number" class="form-control" value="{{ variable.value }}" name="variables[{{ variable.name }}]" id="var__{{ variable.name }}" placeholder="{{ variable.label }}">
+                    {#<small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>#}
+                </div>
+            {% else %}
+                <div class="form-group">
+                    <label for="var__{{ variable.name }}">{{ variable.label }}</label>
+                    <input type="text" class="form-control" value="{{ variable.value }}" name="variables[{{ variable.name }}]" id="var__{{ variable.name }}" placeholder="{{ variable.label }}">
+                    {#<small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>#}
+                </div>
+            {% endif %}
+
+        {% endfor %}
+
+        <button type="submit" class="btn btn-primary">Speichern</button>
+
+    </form>
+{% endif %}

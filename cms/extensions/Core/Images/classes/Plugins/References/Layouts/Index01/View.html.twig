@@ -1,0 +1,106 @@
+{# config
+
+title: Standard
+variables:
+    columns:
+        type: int
+        label: Spalten
+        default: 3
+    image_width:
+        type: int
+        label: Bildbreite
+        default: 535
+    image_height:
+        type: int
+        label: Bildhöhe
+        default: 300
+    skipDetailsPage:
+        type: bool
+        label: keine Detailseite
+    withMagnifier:
+        type: bool
+        label: mit Lupenfunktion
+    withContainer:
+        type: bool
+        label: mit Layout-Container
+    skipTeaserText:
+        type: bool
+        label: ohne Teaser-Text
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set f = view.getViewhelper('Files') %}
+
+{% if variables.columns == 1 %}
+    {% set colClass = "col-12" %}
+{% elseif variables.columns == 2 %}
+    {% set colClass = "col-md-6" %}
+{% elseif variables.columns == 3 %}
+    {% set colClass = "col-md-4" %}
+{% elseif variables.columns >= 4 %}
+    {% set colClass = "col-md-3" %}
+{% endif %}
+
+{% if variables.withMagnifier %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+    <script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+{% endif %}
+
+<div class="plugin Core Images References Index01">
+
+
+    {% if variables.withContainer %}<div class="container">{% endif %}
+
+    <div class="row">
+        <div class="col-12">
+
+            <div class="inner-wrapper">
+
+                <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+
+                <div data-editable data-uid="{{ plugin.getUid('text') }}"></div>
+
+                <div class="references row">
+                    {% for reference in i.getReferences() %}
+                        <div class="{{ colClass }}">
+                            <div class="reference" {% if not variables.skipDetailsPage or reference.getUrlDomain() %}data-href{% endif %}>
+                                {% if not variables.noImage %}
+
+                                    {% if variables.withMagnifier %}<a href="{{ f.getFileByUid(reference.getUid('image')).getUriThumbnail() }}" data-fancybox="references-{{ plugin.getId() }}">{% endif %}
+                                        <picture class="fluid" data-editable {% if variables.noImageDummy %}data-skipempty="1"{% endif %} data-uid="{{ reference.getUid('image') }}">
+                                                <img width="{{ variables.image_width }}" height="{{ variables.image_height }}" src="{{ i.getDummyImage({ width: variables.image_width, height: variables.image_height | default(300) }) }}" alt="" />
+                                        </picture>
+                                    {% if variables.withMagnifier %}</a>{% endif %}
+
+                                {% endif %}
+
+                                <div class="text-pillow">
+
+                                    <h3 data-editable data-uid="{{ reference.getUid('title') }}">{{ reference.getTitle }}</h3>
+
+                                    {% if not variables.skipTeaserText %}
+                                        <div data-nowidgets data-editable data-uid="{{ reference.getUid('teaser') }}"></div>
+                                    {% endif %}
+
+                                    {% if not variables.skipDetailsPage %}
+                                        <p><a class="readmore" href="{{ reference.getUri() }}"><span>weiterlesen</span></a></p>
+                                    {% elseif reference.getUrlDomain() %}
+                                        <p><a class="readmore" href="{{ reference.getConfig('url') }}"><span>{{ reference.getUrlDomain() }}</span></a></p>
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    {% if variables.withContainer %}</div>{% endif %}
+
+</div>

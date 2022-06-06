@@ -1,0 +1,66 @@
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+
+<div class="form-group form-check">
+    <input {% if shopcart.getPaymentData('consent') %}checked{% endif %} type="checkbox" class="form-check-input" id="paymentmethod_debit_consent" name="paymentmethod_data[consent]">
+    <label class="form-check-label" for="paymentmethod_debit_consent">Ich ermächtige den Shop-Betreiber den Rechnungsbetrag dieser Bestellung von dem von mir angegebenen Konto per SEPA-Lastschrift abzubuchen.</label>
+</div>
+
+<p><b>Kontoverbindung</b></p>
+
+<script>
+    $(function () {
+
+        /**
+         *
+         */
+        $('#paymentmethod_debit_iban').blur(function ( ) {
+
+            var input = $(this);
+
+            $.ajax({
+                url: 'https://openiban.com/validate/' + $(this).val(),
+                data: {
+                    "validateBankCode": true,
+                    "getBIC": true
+                },
+                success: function(data) {
+                    var result = data;
+                    if(result.valid) {
+
+                        input.removeClass('is-invalid');
+                        input.addClass('is-valid');
+
+                        $('#paymentmethod_debit_bic').val(result.bankData.bic);
+                        $('#paymentmethod_debit_bank').val(result.bankData.name);
+
+                        console.log(result.bankData);
+                    }
+                    else {
+                        input.addClass('is-invalid');
+                    }
+                },
+                error: function(xhr) {
+                    input.addClass('is-invalid');
+                }
+            });
+        });
+    });
+</script>
+
+<div class="form-group">
+    <label for="paymentmethod_debit_owner">Kontoinhaber *</label>
+    <input type="text" required class="form-control" id="paymentmethod_debit_owner" name="paymentmethod_data[owner]" placeholder="Kontoinhaber" value="{{ shopcart.getPaymentData('owner') }}">
+</div>
+<div class="form-group ">
+    <label for="paymentmethod_debit_iban">IBAN *</label>
+    <input type="text" required class="form-control" id="paymentmethod_debit_iban" name="paymentmethod_data[iban]" placeholder="IBAN" value="{{ shopcart.getPaymentData('iban') }}">
+</div>
+<div class="form-group">
+    <label for="paymentmethod_debit_bic">BIC</label>
+    <input type="text" class="form-control" id="paymentmethod_debit_bic" name="paymentmethod_data[bic]" placeholder="BIC" value="{{ shopcart.getPaymentData('bic') }}">
+</div>
+<div class="form-group">
+    <label for="paymentmethod_debit_bank">Bank</label>
+    <input type="text" class="form-control" id="paymentmethod_debit_bank" name="paymentmethod_data[bank]" placeholder="Bank" value="{{ shopcart.getPaymentData('bank') }}">
+</div>

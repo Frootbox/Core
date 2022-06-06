@@ -1,0 +1,107 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    'title' : 'Sitemap',
+}) }}
+
+{{ front.addTab('Sitemap', front.getUri('Sitemap')) }}
+{{ front.addTab('Seiten sortieren') }}
+
+<h2>Seiten sortieren</h2>
+
+<div class="row">
+    <div class="col-md-6">
+
+        <ol class="example">
+            {{ v.injectPartial('\\Frootbox\\Admin\\Controller\\Page\\Partials\\ListSortableChildren', { page: page } ) | raw }}
+        </ol>
+
+    </div>
+    <div class="col-md-6">
+
+        {% if user.getType() == 'SuperAdmin' %}
+
+            <a href="{{ v.getUri('Page', 'ajaxNestedSetRebuild') }}" class="ajax btn btn-primary">Reset Left/Right-IDs</a>
+
+        {% endif %}
+
+    </div>
+</div>
+
+
+
+<script src='https://johnny.github.io/jquery-sortable/js/jquery-sortable.js'></script>
+
+<style>
+    body.dragging, body.dragging * {
+        cursor: move !important;
+    }
+
+    .dragged {
+        position: absolute;
+        opacity: 0.5;
+        z-index: 2000;
+    }
+
+    ol.example {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+    ol.example li {
+        padding: 5px;
+        border: 1px solid #cccccc;
+    }
+
+    ol.example li.placeholder {
+        position: relative;
+        /** More li styles **/
+    }
+    ol.example li.placeholder:before {
+        position: absolute;
+        display: block;
+        content: " ";
+        height: 5px;
+        width: 5px;
+        background: red;
+    }
+
+    ol.example ol {
+        padding: 0 0 10px 20px;
+    }
+</style>
+
+<script>
+    $(function  () {
+        $("ol.example").sortable({
+            onDrop: function ($item, container, _super, event) {
+
+                var data = $("ol.example").sortable("serialize").get();
+                var jsonString = JSON.stringify(data, null, ' ');
+
+                // console.log(jsonString);
+
+                $item.removeClass(container.group.options.draggedClass).removeAttr("style")
+                $("body").removeClass(container.group.options.bodyClass);
+
+                $('#pageData').val(jsonString);
+
+                $.ajax({
+                    url: "{{ v.getUri('Page', 'ajaxSort') }}",
+                    type: 'POST',
+                    data: {
+                        pageData: jsonString
+                    },
+                    success: function ( ) {
+                        toastr.success('Die Daten wurden erfolgreich gespeichert.');
+                    }
+                });
+            }
+        });
+    });
+</script>
+
+<form method="post" action="{{ v.getUri('Page', 'ajaxSort') }}">
+    <textarea name="pageData" id="pageData"></textarea>
+    <button type="submit">Sortieren!</button>
+</form>

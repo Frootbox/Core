@@ -1,0 +1,48 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    'frame' : false,
+}) }}
+
+<script>
+    var modalOverrideTitle = 'Sitzung abgelaufen';
+
+    $(function ( ) {
+
+        $('#login').val(user.email);
+        $('#password').focus();
+    });
+</script>
+
+<form method="post" class="ajax" action="{{ v.getUri('Session', 'ajaxLogin', { 'action' : 'modalDismiss' }) }}">
+
+    <div class="modal-body">
+
+        <p>Ihre Sitzung ist inzwischen abgelaufen. Bitte geben Sie Ihr Passwort ein, um fortzufahren.</p>
+
+        <div class="form-group">
+            <label for="login">Login</label>
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <div class="input-group-text"><i class="far fa-envelope"></i></div>
+                </div>
+                <input type="email" class="form-control" id="login" name="login" placeholder="E-Mail">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="password">Passwort</label>
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <div class="input-group-text"><i class="far fa-lock"></i></div>
+                </div>
+                <input type="password" class="form-control" id="password" name="password" placeholder="Passwort">
+            </div>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Anmelden</button>
+    </div>
+
+</form>

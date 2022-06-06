@@ -1,0 +1,21 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    frame: false,
+}) }}
+
+<form method="post" class="ajax" action="{{ v.getStaticUri('Core/Addresses/AssetManager', 'ajaxCreate', { pluginId: get.get('pluginId'), repository: get.get('repository') }) }}">
+
+    <div class="modal-body">
+
+        <div class="form-group">
+            <label for="title">Titel</label>
+            <input type="text" class="form-control" name="title" required id="title" placeholder="Titel">
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">neue Adresse erstellen</button>
+    </div>
+
+</form>

@@ -1,0 +1,44 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+	'frame' : false,
+}) }}
+
+<h2>
+	Inhalte bearbeiten „{{ page.getTitle }}“
+
+	<span class="headoptions">
+		<!--<a data-modal href="{{ v.getUri('Page', 'ajaxModalContentCompose', { 'pageId' : page.getId(), 'socket' : socket.socket } ) }}" data-title="Inhalt hinzufügen"><i class="fa fa-plus-circle"></i></a>-->
+
+		<span class="dropdown">
+			<i class="far fa-bars dropdown-toggle" data-toggle="dropdown"></i>
+
+			<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+				<a class="dropdown-item ajax" href="{{ v.getUri('Page', 'ajaxPanelTemplateImport', { pageId: page.getId() }) }}">Vorlage importieren</a>
+				<a class="dropdown-item ajax" href="{{ v.getUri('Page', 'ajaxPanelTemplateCreate', { pageId: page.getId() }) }}">Vorlage erstellen</a>
+			</div>
+		</span>
+	</span>
+</h2>
+
+{% if page.getConfig('pageType') == "Redirect" %}
+    <div class="message warning">Diese Seite ist eine Weiterleitung zu <a target="_blank" href="{{ page.getUri }}"><i class="fa fa-external-link"></i> {{ page.getUri }}</a>.</div>
+{% endif %}
+
+<div class="row">
+    <div class="col">
+        
+    	<div class="card">
+    		<div class="card-body">
+    		    			
+    			<div id="contentSocketsReceiver">
+                    {{ v.injectPartial('\\Frootbox\\Admin\\Controller\\Page\\Partials\\ListSockets', {
+						pageId : get.get('pageId')
+					}) | raw }}
+                </div>
+                    			
+    		</div>
+    	</div>
+    	
+    </div>
+</div>

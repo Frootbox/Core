@@ -1,0 +1,5 @@
+{% set i = view.getViewhelper('Delegator', { object: widget }) %}
+
+
+<iframe style="{% if widget.getConfig('contentMaxWidth') %}max-width: {{ widget.getConfig('contentMaxWidth') }}{% endif %}" width="{{ widget.getConfig('iframe_width') }}" height="{{ widget.getConfig('iframe_height') }}" src="{{ widget.getConfig('url') }}" frameborder="0" allowfullscreen="true"  allowtransparency="true"></iframe>
+

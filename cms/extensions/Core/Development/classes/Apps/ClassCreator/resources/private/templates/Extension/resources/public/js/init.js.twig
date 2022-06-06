@@ -1,0 +1,97 @@
+$(function ( ) {
+
+    /**
+     * Toggle offcanvas navigation
+     */
+    $(document).on('click', 'a.toggle-offcanvas', function ( event ) {
+
+        event.preventDefault();
+        event.stopImmediatePropagation();
+
+        $('body').toggleClass('offcanvas-visible');
+    });
+
+    /**
+     * Hide offcanvas navigation
+     */
+    $(document).on('click', '#offcanvas', function ( event ) {
+
+        if ($(event.target).attr('id') != 'offcanvas') {
+            return;
+        }
+
+        event.preventDefault();
+        event.stopImmediatePropagation();
+
+        $('body').removeClass('offcanvas-visible');
+    });
+
+
+    $(window).resize(function ( event ) {
+
+        $('[data-equalheight]').removeAttr('data-heightset');
+
+        $('[data-equalheight]').each(function ( ) {
+
+            let equalId = $(this).attr('data-equalheight');
+
+            if ($(window).width() < 420) {
+                $('[data-equalheight="' + equalId + '"]').css('height', 'auto');
+                return;
+            }
+
+            if ($(this).attr('data-heightset')) {
+                return;
+            }
+
+            // Get max height
+            let height = 0;
+
+            $('[data-equalheight="' + equalId + '"]').each(function ( ) {
+
+                if ($(this).outerHeight() > height) {
+                    height = $(this).outerHeight();
+                }
+            });
+
+            $('[data-equalheight="' + equalId + '"]').css('height', height + 'px');
+            $('[data-equalheight="' + equalId + '"]').attr('data-heightset', '1');
+        });
+
+        /**
+         * Set height of background image containers
+         */
+        $('.autoset-height').each(function ( ) {
+
+            var width = $(this).width();
+            var physicalWidth = parseInt($(this).data('physicalwidth'));
+            var physicalHeight = parseInt($(this).data('physicalheight'));
+
+            if (isNaN(physicalWidth) && isNaN(physicalHeight)) {
+
+                if (typeof $(this).data('width') != "undefined") {
+                    physicalWidth = parseInt($(this).data('width'));
+                }
+
+                if (typeof $(this).data('height') != "undefined") {
+                    physicalHeight = parseInt($(this).data('height'));
+                }
+            }
+
+
+            var ratio = width / physicalWidth;
+
+            var height = Math.floor(physicalHeight * ratio);
+
+            $(this).css('height', height + 'px');
+            $(this).parent('div').css('min-height', height + 'px');
+        });
+    });
+
+    window.setTimeout(function() {
+        console.log("RESIZE 2x");
+        $(window).trigger('resize');
+    }, 1000);
+
+    $(window).trigger('resize');
+});

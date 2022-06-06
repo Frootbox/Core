@@ -1,0 +1,9 @@
+{# {{ front.addTab('Apps', front.getUri('Apps')) }} #}
+
+{% if get.get('error') %}
+    <div class="message warning">
+        {{ get.get('error') }}
+    </div>
+{% endif %}
+
+{{ appHtml | raw }}

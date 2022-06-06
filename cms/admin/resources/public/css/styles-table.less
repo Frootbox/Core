@@ -1,0 +1,109 @@
+table.table {
+
+	thead {
+
+		th {
+			background: #FFF;
+		}
+	}
+
+	tbody {
+
+		tr.inactive {
+
+			td {
+				color: #CCC;
+
+				svg {
+					//color: red !important;
+				}
+			}
+		}
+
+		tr {
+
+			td {
+
+				a {
+					svg.visibility-0 {
+						color: red;
+					}
+
+					svg.visibility-1 {
+						color: orange;
+					}
+
+					svg.visibility-2 {
+						color: green;
+					}
+				}
+			}
+		}
+	}
+
+	tr[data-modal]:hover, tr[data-href]:hover, tr.active, tr.highlighted, tr.dragging {
+
+		td {
+			background: #d93f52;
+
+			color: #FFF;
+
+			>a, >svg, >i {
+				color: #FFF;
+			}
+			
+			a[data-toggle="dropdown"] {
+			    color: #FFF;
+			}
+		}
+	}
+
+	tr[data-modal] {
+		cursor: pointer;
+	}
+
+
+	tr {
+
+		td {
+
+			background: #FFF;
+
+			&.handle {
+				cursor: pointer;
+				color: #999;
+			}
+		}
+	}
+
+	tr {
+
+		td.level-2 {
+			padding-left: 30px;
+		}
+
+		td.level-3 {
+			padding-left: 60px;
+		}
+
+		td.level-4 {
+			padding-left: 90px;
+		}
+
+		td.level-5 {
+			padding-left: 120px;
+		}
+
+		td.level-6 {
+			padding-left: 150px;
+		}
+	}
+}
+
+.tab-pane>table.table {
+	tr:first-of-type  {
+		td{
+			border-top: none;
+		}
+	}
+}

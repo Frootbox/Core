@@ -1,0 +1,44 @@
+<div class="{{ data.colClass }} teaser vcard">
+    <div class="row">
+        <div class="col-4">
+            <picture class="round photo"  data-editable data-uid="{{ data.contact.getUid('image')}}">
+                <img width="{{ variables.image_width }}" height="{{ variables.image_height }}" src="{{ i.getDummyImage({ width: variables.image_width, height: variables.image_height }) }}" alt="" />
+            </picture>
+        </div>
+        <div class="col-8">
+
+            <h5 class="condensed fn">{{ data.contact.getName() }}</h5>
+
+            {% if data.contact.connConfig.position %}
+                <p class="position role">{{ data.contact.connConfig.position }}</p>
+            {% elseif data.contact.getCompany() or data.contact.getPosition() %}
+                <p>
+                    {% if data.contact.getCompany() %}
+                        {{ data.contact.getCompany() }}<br />
+                    {% endif %}
+
+                    {% if data.contact.getPosition() %}
+                        <span class="position role">{{ data.contact.getPosition() | nl2br }}</span>
+                    {% endif %}
+                </p>
+            {% endif %}
+
+            <p>
+                {% if data.contact.getPhone() %}
+                    <a href="tel:{{ data.contact.getPhone() }}"><i class="fa fa-fw fa-phone"></i>{{ data.contact.getPhone() }}</a><br />
+                {% endif %}
+
+                {% if data.contact.getEmail() %}
+                    <a class="email" href="mailto:{{ data.contact.getEmail() }}"><i class="fa fa-fw fa-envelope"></i>{% if variables.showFullEmail %}{{ data.contact.getEmail() }}{% else %}E-Mail{% endif %}</a><br />
+                {% endif %}
+
+                {% if data.contact.getFax() %}
+                    <i class="fa fa-fw fa-fax"></i>{{ data.contact.getFax() }}
+                    <br />
+                {% endif %}
+
+            </p>
+
+        </div>
+    </div>
+</div>

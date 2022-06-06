@@ -1,0 +1,25 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    'frame' : false,
+}) }}
+
+<form method="post" class="ajax" action="{{ plugin.getAdminUri('Products', 'ajaxVariantUpdate', { variantId: variant.getId() }) }}">
+
+    <div class="modal-body">
+
+        <div class="form-group">
+            <label for="title">Titel *</label>
+            <input type="text" required class="form-control" name="title" id="title" placeholder="Titel" value="{{ variant.getTitle() }}">
+        </div>
+        <div class="form-group">
+            <label for="price">Aufpreis (Brutto) *</label>
+            <input type="number" step="0.01" class="form-control" name="price" id="price" placeholder="Aufpreis" value="{{ variant.getPrice() }}">
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Speichern</button>
+    </div>
+
+</form>

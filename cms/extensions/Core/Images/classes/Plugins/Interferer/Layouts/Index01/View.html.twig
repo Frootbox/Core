@@ -1,0 +1,32 @@
+{# config
+
+title: Standard
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+<div class="row">
+    <div class="col-12 plugin Core Images Interferer Index01" data-href>
+
+        <div class="inner-wrapper" data-type="Images/Background" data-uid="{{ plugin.getUid('background') }}">
+
+            <div class="row align-items-center">
+                <div class="col-md-4">
+
+                    <picture class="fluid" data-editable {% if variables.noImageDummy %}data-skipempty="1"{% endif %} data-uid="{{ plugin.getUid('image') }}">
+                        <img src="{{ i.getDummyImage({ width: 500, height: null }) }}" alt="" />
+                    </picture>
+
+                </div>
+                <div class="col-md-8 text">
+                    <div data-nowidgets data-editable data-uid="{{ plugin.getUid('teaser') }}"></div>
+                    <p class="read-more"><a class="read-more" data-editable-link data-uid="{{ plugin.getUid('link') }}" href="#">weiterlesen</a></p>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+

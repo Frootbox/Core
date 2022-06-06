@@ -1,0 +1,258 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ front.addTab('Kreateur', app.getUri('index')) }}
+
+<h2>
+	Kreateur
+</h2>
+
+
+
+
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+	<li class="nav-item">
+		<a class="nav-link active" id="plugin-tab" data-toggle="tab" href="#plugin" role="tab" aria-controls="plugin aria-selected="true">Plugin</a>
+	</li>
+	<li class="nav-item">
+		<a class="nav-link" id="widget-tab" data-toggle="tab" href="#widget" role="tab" aria-controls="widget" aria-selected="false">Widget</a>
+	</li>
+	<li class="nav-item">
+		<a class="nav-link" id="extension-tab" data-toggle="tab" href="#extension" role="tab" aria-controls="extension" aria-selected="false">Extension</a>
+	</li>
+	<li class="nav-item">
+		<a class="nav-link" id="app-tab" data-toggle="tab" href="#app" role="tab" aria-controls="app" aria-selected="false">App</a>
+	</li>
+	<li class="nav-item">
+		<a class="nav-link" id="block-tab" data-toggle="tab" href="#block" role="tab" aria-controls="block" aria-selected="false">Layout-Block</a>
+	</li>
+</ul>
+
+<div class="tab-content" id="myTabContent">
+	<div class="tab-pane fade show active" id="plugin" role="tabpanel" aria-labelledby="plugin-tab">
+
+		<div class="card">
+			<div class="card-body">
+
+				<h3>Plugin erstellen</h3>
+
+				<form method="post" class="ajax" action="{{ app.getUri('ajaxCreatePlugin') }}">
+
+					<div class="form-group">
+						<label for="extensionId">Extension</label>
+						<select class="form-control" id="extensionId" name="extensionId">
+							<option value="">bitte wählen ...</option>
+
+							{% for extension in extensions %}
+								<option value="{{ extension.getId() }}">{{ extension.getVendorId() }}/{{ extension.getExtensionId() }}</option>
+							{% endfor %}
+
+						</select>
+					</div>
+					<div class="form-group">
+						<label for="pluginId">Plugin ID</label>
+						<input type="text" class="form-control" id="pluginId" name="pluginId" placeholder="Plugin ID">
+					</div>
+					<div class="form-group">
+						<label for="pluginTitle">Plugin Titel</label>
+						<input type="text" class="form-control" id="pluginTitle" name="pluginTitle" placeholder="Plugin Titel">
+					</div>
+
+					<button type="submit" class="btn btn-primary">Erstellen</button>
+
+				</form>
+
+			</div>
+		</div>
+
+	</div>
+	<div class="tab-pane fade" id="widget" role="tabpanel" aria-labelledby="widget-tab">
+
+		<div class="card">
+			<div class="card-body">
+
+				<h3>Widget erstellen</h3>
+
+				<form method="post" class="ajax" action="{{ app.getUri('ajaxCreateWidget') }}">
+
+					<div class="form-group">
+						<label for="extensionId">Extension</label>
+						<select required class="form-control" id="extensionId" name="extensionId">
+							<option value="">bitte wählen ...</option>
+
+							{% for extension in extensions %}
+								<option value="{{ extension.getId() }}">{{ extension.getVendorId() }}/{{ extension.getExtensionId() }}</option>
+							{% endfor %}
+
+						</select>
+					</div>
+					<div class="form-group">
+						<label for="title">Widget Titel</label>
+						<input type="text" required class="form-control" id="title" name="title" placeholder="Widget Titel">
+					</div>
+					<div class="form-group">
+						<label for="widgetId">Widget ID</label>
+						<input type="text" required class="form-control" id="widgetId" name="widgetId" placeholder="Widget ID">
+					</div>
+
+					<button type="submit" class="btn btn-primary">Erstellen</button>
+
+				</form>
+
+			</div>
+		</div>
+
+	</div>
+	<div class="tab-pane fade" id="extension" role="tabpanel" aria-labelledby="extension-tab">
+
+		<div class="card">
+			<div class="card-body">
+
+				<h3>Extension erstellen</h3>
+
+				<div class="row">
+					<div class="col-6">
+
+						<form method="post" class="ajax" action="{{ app.getUri('ajaxCreateExtension') }}">
+
+							<div class="form-group">
+								<label for="title">Extension Titel</label>
+								<input type="text" required class="form-control" id="title" name="title" placeholder="Extension Titel">
+							</div>
+							<div class="form-group">
+								<label for="extensionId">Extension ID</label>
+								<input type="text" required class="form-control" id="extensionId" name="extensionId" placeholder="Extension ID">
+							</div>
+							<div class="form-group">
+								<label for="vendorId">Vendor ID</label>
+								<input type="text" required class="form-control" id="vendorId" name="vendorId" placeholder="Vendor ID" value="Core">
+							</div>
+
+
+							<div class="form-group">
+								<label for="path">Pfad</label>
+								<input type="text" class="form-control" id="path" name="path" placeholder="Pfad" value="{{ extensionPath }}">
+							</div>
+
+							<div class="form-group">
+								<label for="pathFromConfig">Pfad</label>
+								<select class="form-control" id="pathFromConfig" name="pathFromConfig">
+									<option value="">bitte wählen ...</option>
+
+									{% if configuration.get('extensions.paths') %}
+										{% for path in configuration.get('extensions.paths') %}
+											<option value="{{ path }}">{{ path }}</option>
+										{% endfor %}
+									{% endif %}
+								</select>
+							</div>
+
+							<div class="form-group">
+								<label for="type">Typ</label>
+								<select class="form-control" id="type" name="type">
+									<option value="">bitte wählen ...</option>
+									<option value="Generic">generische Extension</option>
+									<option value="Template">Website-Template</option>
+								</select>
+							</div>
+
+
+							<button type="submit" class="btn btn-primary">Erstellen</button>
+
+						</form>
+
+					</div>
+				</div>
+
+
+
+			</div>
+		</div>
+
+	</div>
+	<div class="tab-pane fade" id="app" role="tabpanel" aria-labelledby="app-tab">
+
+		<div class="card">
+			<div class="card-body">
+
+				<h3>App erstellen</h3>
+
+				<div class="row">
+					<div class="col-6">
+
+						<form method="post" class="ajax" action="{{ app.getUri('ajaxCreateApp') }}">
+
+							<div class="form-group">
+								<label for="extensionId">Extension</label>
+								<select required class="form-control" id="extensionId" name="extensionId">
+									<option value="">bitte wählen ...</option>
+
+									{% for extension in extensions %}
+										<option value="{{ extension.getId() }}">{{ extension.getVendorId() }}/{{ extension.getExtensionId() }}</option>
+									{% endfor %}
+
+								</select>
+							</div>
+							<div class="form-group">
+								<label for="title">App Titel</label>
+								<input type="text" required class="form-control" id="title" name="title" placeholder="App Titel">
+							</div>
+							<div class="form-group">
+								<label for="appId">App ID</label>
+								<input type="text" required class="form-control" id="appId" name="appId" placeholder="App ID">
+							</div>
+
+							<button type="submit" class="btn btn-primary">Erstellen</button>
+
+						</form>
+
+					</div>
+				</div>
+
+			</div>
+		</div>
+
+	</div>
+	<div class="block-pane fade" id="block" role="tabpanel" aria-labelledby="block-tab">
+
+		<div class="card">
+			<div class="card-body">
+
+				<h3>Layout-Block erstellen</h3>
+
+				<div class="row">
+					<div class="col-6">
+
+						<form method="post" class="ajax" action="{{ app.getUri('ajaxCreateBlock') }}">
+
+							<div class="form-group">
+								<label for="extensionId">Extension</label>
+								<select required class="form-control" id="extensionId" name="extensionId">
+									<option value="">bitte wählen ...</option>
+
+									{% for extension in extensions %}
+										<option value="{{ extension.getId() }}">{{ extension.getVendorId() }}/{{ extension.getExtensionId() }}</option>
+									{% endfor %}
+
+								</select>
+							</div>
+							<div class="form-group">
+								<label for="title">Block Titel</label>
+								<input type="text" required class="form-control" id="title" name="title" placeholder="Block Titel">
+							</div>
+							<div class="form-group">
+								<label for="blockId">Block ID</label>
+								<input type="text" required class="form-control" id="blockId" name="blockId" placeholder="Block ID">
+							</div>
+
+							<button type="submit" class="btn btn-primary">Erstellen</button>
+
+						</form>
+
+					</div>
+				</div>
+
+			</div>
+		</div>
+
+	</div>
+</div>

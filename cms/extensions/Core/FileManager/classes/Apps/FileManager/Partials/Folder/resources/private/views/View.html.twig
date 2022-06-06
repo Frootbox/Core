@@ -1,0 +1,129 @@
+
+{% for child in folder.getTrace %}
+	{% if not loop.first %}
+		{{ front.addTab(child.getTitle, app.getUri('index', { folderId : child.getId } )) }}		
+	{% endif %}
+{% endfor %}
+
+
+<button type="button" class="btn btn-success" data-toggle="modal" data-target="#fileModal"><i class="fa fa-plus-circle"></i> Datei hinzufügen</button>
+<button type="button" class="btn btn-success" data-toggle="modal" data-target="#folderModal"><i class="fa fa-plus-circle"></i> Ordner hinzufügen</button>
+
+<a class="btn btn-primary" href="{{ app.getUri('index', { folderId: folder.getId()}) }}"><i class="fa fa-table"></i></a>
+<a class="btn btn-primary" href="{{ app.getUri('gallery', { folderId: folder.getId()}) }}"><i class="fa fa-grip-horizontal"></i></a>
+
+<br clear="all" /><br />
+
+{% if folder.getChildren.getCount == 0 and folder.getFiles.getCount == 0 %}
+	<div class="p-3 mb-2 bg-info text-white">Dieser Ordner enthält keine Objekte.</div>	
+{% else %}
+
+	<style>
+		table.files tr.file-missing td {
+			color: red;
+		}
+	</style>
+	
+		
+	<table class="table files">
+		<thead>
+			<tr>
+				<th>#</th>
+				<th>Dateiname</th>
+				<th>Größe</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+			
+			{% for child in folder.getChildren %}
+			
+				<tr data-href="{{ app.getUri('index', { folderId: child.getId }) }}">
+					<td></td>
+					<td><i class="far fa-folder fa-fw"></i> {{ child.getTitle }}</td>
+					<td>x</td>
+					<td class="text-right">
+						<a href="{{ app.getUri('ajaxFolderDelete', { folderId : child.getId } ) }}" class="ajax"><i class="fa fa-times"></i></a>
+					</td>
+				</tr>
+				
+			{% endfor %}
+			
+			{% for file in folder.getFiles %}
+				<tr class="{% if not file.isExistant() %}file-missing{% endif %}" data-href="{{ app.getUri('details', { folderId: folder.getId, fileId: file.getId() }) }}">
+					<td>{{ file.getId }}</td>
+					<td><i class="far fa-file fa-fw"></i> {{ file.getName }}</td>
+					<td>{{ file.getSize() }}</td>
+					<td class="text-right">
+						<a href="{{ app.getUri('ajaxFileDelete', { fileId : file.getId } ) }}" class="ajax"><i class="fa fa-times"></i></a>
+					</td>
+				</tr>
+			{% endfor %}		
+			
+		</tbody>	
+	</table>
+		
+{% endif %}
+
+
+
+<form enctype="multipart/form-data" method="post" action="{{ app.getUri('ajaxUpload', { folderId: folder.getId }) }}">
+	
+	<!-- Modal -->
+	<div class="modal fade" id="fileModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	  <div class="modal-dialog" role="document">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <h5 class="modal-title" id="exampleModalLabel">Datei hinzufügen</h5>
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+	          <span aria-hidden="true">&times;</span>
+	        </button>
+	      </div>
+	      <div class="modal-body">
+	      
+	      	<div class="custom-file">
+	      		<input multiple="true" type="file" class="custom-file-input" id="customFile" name="files[]" />
+	      		<label class="custom-file-label" for="customFile">Datei wählen</label>
+	      	</div>
+	      		
+	      </div>
+	      <div class="modal-footer">
+	        <button type="submit" class="btn btn-primary">Save changes</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+
+</form>
+
+
+
+<form method="post" action="{{ app.getUri('ajaxFolderCreate', { folderId: folder.getId }) }}">
+	
+	<!-- Modal -->
+	<div class="modal fade" id="folderModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	  <div class="modal-dialog" role="document">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <h5 class="modal-title" id="exampleModalLabel">Ordner erstellen</h5>
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+	          <span aria-hidden="true">&times;</span>
+	        </button>
+	      </div>
+	      <div class="modal-body">
+	      
+	      	<div class="form-group">
+	      		<label for="title">Ordner-Name</label>
+	      		<input type="text" class="form-control" id="title" placeholder="Ordner-Name" name="title">
+	      		{# <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small> #}
+	      	</div>
+	      		
+	      </div>
+	      <div class="modal-footer">
+	        <button type="submit" class="btn btn-primary">Ordner erstellen</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+
+</form>

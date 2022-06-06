@@ -1,0 +1,60 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ front.addTab('Alias-Verwaltung', app.getUri('index')) }}
+{{ front.addTab('Importieren', app.getUri('import')) }}
+
+{% if alias.getType() == 'Generic' %}
+    {{ front.addTab('generische Aliase', app.getUri('generic')) }}
+{% endif %}
+
+
+<h2>
+    Aliasse importieren
+</h2>
+
+<div class="row">
+    <div class="col-md-6">
+
+        <div class="card">
+            <div class="card-body">
+
+                <h3>Import-Datei hochladen</h3>
+
+                <form method="post" action="{{ app.getUri('uploadImportFile') }}" enctype="multipart/form-data">
+
+                    <div class="form-group">
+                        <label for="file">Example file input</label>
+                        <input type="file" class="form-control-file" id="file" name="file">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Speichern</button>
+
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+    <div class="col-md-6">
+
+        <div class="card">
+            <div class="card-body">
+
+                <h3>URLs aus Texten importieren</h3>
+
+                <form method="post" action="{{ app.getUri('searchTexts') }}">
+
+                    <div class="form-group">
+                        <label for="base">Link-Basis</label>
+                        <input type="text" class="form-control" id="base" name="base">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">URLs suchen</button>
+
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+</div>

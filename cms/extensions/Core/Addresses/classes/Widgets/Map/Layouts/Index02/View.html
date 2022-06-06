@@ -1,0 +1,36 @@
+{% set i = view.getViewhelper('Delegator', { object: widget }) %}
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css"
+      integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+      crossorigin=""/>
+
+<!-- Make sure you put this AFTER Leaflet's CSS -->
+<script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"
+        integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og=="
+        crossorigin=""></script>
+
+<style>
+    #mapid {
+        height: 380px;
+    }
+</style>
+
+<div id="mapid"></div>
+
+<script>
+    $(function ( ) {
+
+        var mymap = L.map('mapid').setView([{{ widget.getConfig('lng') }}, {{ widget.getConfig('lat') }}], 13);
+
+        var OpenStreetMap_DE = L.tileLayer('https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png', {
+            maxZoom: 18,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        });
+
+        OpenStreetMap_DE.addTo(mymap);
+
+        var marker = L.marker([{{ widget.getConfig('lng') }}, {{ widget.getConfig('lat') }}]).addTo(mymap);
+
+
+    });
+</script>

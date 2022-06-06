@@ -1,0 +1,39 @@
+{# config
+
+title: Standard
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+<div class="row">
+    <div class="col-12 plugin Core Gastronomy Recipes Index01">
+
+        {% if plugin.isFirst %}
+            <h1 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h1>
+        {% else %}
+            <h2 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+        {% endif %}
+
+        <div data-editable data-uid="{{ plugin.getUid('teaser') }}"></div>
+
+
+        {% set category = i.getRootCategory() %}
+
+        <div class="row">
+            {% for child in category.getChildren() %}
+                <div class="col-md-4">
+                    <div class="category" data-href>
+                        <picture class="fluid" data-editable data-uid="{{ child.getUid('image')}}">
+                            <img width="600" height="350" src="{{ i.getDummyImage({ width: 600, height: 350}) }}" alt="" />
+                        </picture>
+                        <div data-nowidgets data-editable data-uid="{{ child.getUid('teaser') }}"></div>
+                        <p><a href="{{ child.getUri() }}">{{ child.getTitle() }}</a></p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+    </div>
+</div>
+

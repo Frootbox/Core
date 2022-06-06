@@ -1,0 +1,30 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    'title' : 'Sitemap',
+}) }}
+
+{{ front.addTab('Sitemap', front.getUri('Sitemap')) }}
+{{ front.addTab('Checkliste', front.getUri('Sitemap')) }}
+
+<h2>Checkliste</h2>
+
+<style>
+    @media print {
+        table.printableSitemap {
+            font-size: 26pt;
+        }
+    }
+</style>
+
+<table class="table printableSitemap">
+    <tbody>
+
+        {% for page in tree %}
+            <tr>
+                <td class="level-{{ page.getLevel }}">{{ page.getTitle }}</td>
+            </tr>
+        {% endfor %}
+
+    </tbody>
+</table>

@@ -1,0 +1,14 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<h2 id="categoriesHead">
+    Buchungen
+</h2>
+
+<p><a class="ajax" href="{{ plugin.getAdminUri('Index', 'index') }}"><i class="fa fa-chevron-circle-left"></i> zurück</a></p>
+
+<div id="bookingdsReceiver">
+    {{ v.injectPartial('\\Frootbox\\Ext\\Core\\ShopSystem\\Plugins\\ShopSystem\\Admin\\Bookings\\Partials\\BookingsList', {
+        highlight: get.get('highlight'),
+        plugin : plugin
+    }) | raw }}
+</div>

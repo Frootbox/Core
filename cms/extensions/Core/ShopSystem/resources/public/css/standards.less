@@ -1,0 +1,32 @@
+.generic-shopcart-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  overflow-y: auto;
+
+  .shopcart-modal {
+    position: absolute;
+    width: 600px;
+    max-width: 100%;
+
+    @media (min-width: 768px) {
+      left: 50%;
+      top: 30%;
+      margin-left: -300px;
+    }
+
+    background: #FFF;
+    box-shadow: 0 0 20px rgba(0, 0, 0, .4);
+
+    .title {
+      padding: 20px;
+    }
+
+    .body {
+      padding: 20px;
+    }
+  }
+}

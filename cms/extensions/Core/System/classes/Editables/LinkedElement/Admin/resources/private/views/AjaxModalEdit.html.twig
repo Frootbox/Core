@@ -1,0 +1,103 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+
+<script>
+    var uid = "{{ get.get('uid') }}";
+
+    $(function () {
+
+        /**
+         *
+         */
+        $('#elementUpdateForm').submit(function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            $.ajax({
+                url: $(this).attr('action'),
+                data: $(this).serialize(),
+                type: 'POST',
+                success: function ( response ) {
+
+                    $('#fbxEditorGenericModal').modal('hide');
+
+                    $('[data-editable-link][data-uid="' + response.uid + '"]').attr('data-href', response.url);
+
+                    if (response.label.length > 0) {
+
+                        var link = $('[data-editable-link][data-uid="' + response.uid + '"]');
+
+                        if (link.find('.label').length) {
+                            $('[data-editable-link][data-uid="' + response.uid + '"] .label').html(response.label);
+                        }
+                        else {
+                            $('[data-editable-link][data-uid="' + response.uid + '"]').html(response.label);
+                        }
+                    }
+                }
+            });
+
+        });
+    });
+</script>
+
+
+
+<form id="elementUpdateForm" action="{{ controller.getActionUri('ajaxUpdate', { uid: get.get('uid') }) }}" method="post">
+
+    <div class="modal-header">
+        <h5 class="modal-title">Link bearbeiten</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+
+        <div class="form-group">
+            <label for="url">URL</label>
+            <input type="text" class="form-control" id="url" name="url" placeholder="URL" value="{{ text.getConfig('link') }}">
+        </div>
+        <div class="form-group">
+            <label for="email">E-Mail</label>
+            <input type="email" class="form-control" id="email" name="email" placeholder="E-Mail" value="{{ text.getConfig('email') }}">
+        </div>
+        <div class="form-group">
+            <label for="phone">Telefon</label>
+            <input type="text" class="form-control" id="phone" name="phone" placeholder="Telefon" value="{{ text.getConfig('phone') }}">
+        </div>
+        <div class="form-group">
+            <label for="fileId">Datei-ID</label>
+            <input type="text" class="form-control" id="fileId" name="fileId" placeholder="Datei-ID" value="{{ text.getConfig('filelink') }}">
+        </div>
+
+        <div class="form-group">
+            <label for="pageId">CMS-Seite</label>
+            <select class="form-control" name="pageId" id="pageId">
+                <option value="">keine Seite gewählt</option>
+
+                {% for child in pages %}
+                    <option {% if text.getConfig('pageId') == child.getId() %}selected{% endif %} value="{{ child.getId() }}">{{ child.getTitle() }}</option>
+                {% endfor %}
+
+            </select>
+        </div>
+
+        {% if not noLabel %}
+            <hr />
+
+            <div class="form-group">
+                <label for="label">Label</label>
+                <input type="text" class="form-control" id="label" name="label" placeholder="Label" value="{{ text.getConfig('label') }}">
+            </div>
+        {% endif %}
+
+        <div class="form-group">
+            <label for="conversionId">Conversion-ID</label>
+            <input type="text" class="form-control" id="conversionId" name="conversionId" placeholder="Conversion-ID" value="{{ text.getConfig('conversionId') }}">
+        </div>
+
+        <button type="submit" class="btn btn-primary">Speichern</button>
+
+    </div>
+</form>

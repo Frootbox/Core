@@ -1,0 +1,66 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ front.addTab('Formular-Verwaltung', app.getUri('index')) }}
+{{ front.addTab(form.title) }}
+
+<br />
+
+<ul class="nav nav-tabs">
+    <li class="nav-item">
+        <a class="nav-link" href="{{ app.getUri('details', { formId: form.getId() }) }}">Formularfelder</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{{ app.getUri('config', { formId: form.getId() }) }}">Konfiguration</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link active" href="{{ app.getUri('archive', { formId: form.getId() }) }}">Anfragen</a>
+    </li>
+</ul>
+
+<div class="tab-content" id="myTabContent">
+    <div class="tab-pane fade show active" id="info" role="tabpanel" aria-labelledby="info-tab">
+
+        <div class="card">
+            <div class="card-body">
+
+                <h2>
+                    Anfragen
+                </h2>
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Absender</th>
+                            <th>Datum</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        {% for log in logs %}
+
+                            {% set sender = log.getSender() %}
+                            <tr data-log="{{ log.getId() }}" data-href="{{ app.getUri('archiveLog', { logId: log.getId() }) }}">
+                                <td>
+                                    <i class="far fa-user"></i>&nbsp;
+                                    {{ sender.name }}
+                                    &lt;{{ sender.email }}&gt;
+                                </td>
+                                <td>{{ log.getDate() | date('d.m.Y H:i') }} Uhr</td>
+                                <td class="text-right">
+                                    <a class="ajax" href="{{ app.getUri('ajaxArchiveLogSend', { logId: log.getId() }) }}"><i class="fa fa-paper-plane icon"></i></a>
+                                    <a class="ajax" data-confirm="Soll diese Anfrage wirklich gelöscht werden?" href="{{ app.getUri('ajaxArchiveLogDelete', { logId: log.getId() }) }}"><i class="fa fa-times icon"></i></a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+
+                    </tbody>
+                </table>
+
+
+
+            </div>
+        </div>
+
+    </div>
+</div>

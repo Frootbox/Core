@@ -1,0 +1,80 @@
+{# config
+
+title: Kacheln
+variables:
+    img_width:
+        type: int
+        label: Bildbreite
+        default: 700
+    img_height:
+        type: int
+        label: Bildhöhe
+        default: 320
+    columns:
+        type: int
+        label: Spalten
+        default: 2
+    withHeadline:
+        type: bool
+        default: false
+        label: mit Überschrift
+    withContainer:
+        type: bool
+        default: false
+        label: mit Layout-Container
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+{% set children = i.getPages() %}
+
+{% if variables.columns == 1 %}
+    {% set colClass = "col-12" %}
+{% elseif variables.columns == 2 %}
+    {% set colClass = "col-md-6" %}
+{% elseif variables.columns == 3 %}
+    {% set colClass = "col-4" %}
+{% elseif variables.columns >= 4 %}
+    {% set colClass = "col-3" %}
+{% endif %}
+
+<div class="plugin Core Navigation SubNavigation Index04">
+
+    {% if variables.withContainer %}<div class="container">{% endif %}
+
+    <div class="row">
+        <div class="col-12">
+            <div class="inner-wrapper">
+
+                {% if variables.withHeadline %}
+                    <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+
+                    <div data-editable data-uid="{{ plugin.getUid('teaser-text') }}"></div>
+                {% endif %}
+
+                <div class="row justify-content-md-center">
+
+                    {% for child in children %}
+
+                        <div class="{{ colClass }} teaser" data-page="{{ child.getId() }}">
+                            <a href="{{ child.getUri }}">
+                                <picture class="fluid" data-editable data-uid="{{ child.getUid('image')}}">
+                                    <img width="{{ variables.img_width }}" height="{{ variables.img_height }}" src="{{ i.getDummyImage({ width: variables.img_width, height: variables.img_height }) }}" alt="" />
+                                </picture>
+
+                                <span>{{ child.getTitle(globalLanguage) }}</span>
+                            </a>
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    {% if variables.withContainer %}</div>{% endif %}
+
+</div>

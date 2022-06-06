@@ -1,0 +1,38 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{% if data.category.getDirectItems() | length > 0 %}
+
+    <table class="table" data-sort="{{ v.getUri('Assets/Categories', 'ajaxItemsSort', { parentId: data.category.getId() }) }}">
+        <thead>
+            <tr>
+                <th>Titel</th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+
+            {% for reference in data.category.getDirectItems() %}
+                <tr id="row-{{ reference.getConnId() }}" class="{% if data.highlight == reference.getId() %}highlighted{% endif %}" data-title="Referenz bearbeiten" data-modal="{{ data.plugin.getAdminUri('Contact', 'ajaxModalEdit', { contactId: reference.getId(), connId: contact.getConnId() }) }}">
+                    <td>{{ reference.getTitle() }}</td>
+                    <td class="handle">
+                        <i class="fa fa-grip-lines"></i>
+                    </td>
+                    <td class="text-right">
+                        <a href="{{ data.plugin.getAdminUri('Categories', 'ajaxItemDisconnect', { categoryId: data.category.getId(), itemId: reference.getId() }) }}" class="ajax"><i class="fa fa-times"></i></a>
+                    </td>
+                </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+
+{% else %}
+
+    <div class="card">
+        <div class="card-body">
+            <div class="message warning">Es wurden noch keine Referenzen mit dieser Kategorie verknüpft.</div>
+        </div>
+    </div>
+
+{% endif %}

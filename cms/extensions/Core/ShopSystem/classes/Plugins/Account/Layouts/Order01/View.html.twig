@@ -1,0 +1,117 @@
+{# config
+
+title: Standard
+
+/config #}
+
+{% set v = view.getViewhelper('View') %}
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set p = view.getViewhelper('Partials', { plugin: plugin }) %}
+{% set a = view.getViewhelper('Assets', {   }) %}
+
+{{ v.asset('EXT:Core/ShopSystem/icons/css/all.css') | raw }}
+
+<div class="plugin Core ShopSystem Account Account01">
+    <div class="container">
+
+        <div class="row">
+            <div class="col-12">
+                <div class="inner-wrapper">
+
+                    {% if plugin.isFirst %}
+                        <h1 data-editable data-uid="{{ plugin.getUid('title-orders') }}">Bestellung</h1>
+                    {% else %}
+                        <h2 data-editable data-uid="{{ plugin.getUid('title-orders') }}">Bestellung</h2>
+                    {% endif %}
+
+                    <br /><br />
+
+                    <div class="row">
+                        <div class="col-md-4">
+
+                            {{ p.renderPartial('Menu', { plugin: plugin }) | raw }}
+
+                        </div>
+                        <div class="col-md-8">
+
+                            <h3 class="first">Rechnungsadresse</h3>
+
+                            <p>
+                                {{ booking.getConfig('personal.firstname') }} {{ booking.getConfig('personal.lastname') }}<br />
+                                {{ booking.getConfig('personal.street') }} {{ booking.getConfig('personal.streetNumber') }}, {{ booking.getConfig('personal.postalCode') }} {{ booking.getConfig('personal.city') }}
+                            </p>
+
+                            <h3>Lieferadresse</h3>
+
+                            {% if booking.getConfig('shipping.type') == 'shipToBillingAddress' %}
+                                <p>wie Rechnungsadresse</p>
+                            {% else %}
+                                <p>
+                                    {{ booking.getConfig('shipping.firstname') }} {{ booking.getConfig('shipping.lastname') }}<br />
+                                    {{ booking.getConfig('shipping.street') }} {{ booking.getConfig('shipping.streetNumber') }}, {{ booking.getConfig('shipping.postalCode') }} {{ booking.getConfig('shipping.city') }}
+                                </p>
+                            {% endif %}
+
+                            <h3>Zahlungsart</h3>
+
+                            <p>{{ booking.getPaymentMethod().getTitle() }}</p>
+
+                            <h3>Artikel</h3>
+
+                            <br />
+
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th>Artikel</th>
+                                    <th class="text-right">Menge</th>
+                                    <th class="text-right">Preis</th>
+                                    <th class="text-right">Summe</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+
+                                {% for item in booking.getItems() %}
+                                    <tr>
+                                        <td>{{ item.getTitle() }}</td>
+                                        <td class="text-right">{{ item.getAmount() }} x</td>
+                                        <td class="text-right">{{ item.priceGross() | number_format(2, ",") }} EUR</td>
+                                        <td class="text-right">{{ item.getTotal() | number_format(2, ",") }} EUR</td>
+                                    </tr>
+                                {% endfor %}
+
+                                </tbody>
+                                <tfoot>
+                                <tr style="border-top: 3px solid #ccc;">
+                                    <td class="text-right" colspan="3">Versand &amp; Bearbeitung</td>
+                                    <td width="160" class="text-right">{{ booking.getShipping() | number_format(2, ",") }} EUR</td>
+                                </tr>
+
+                                {% for section in booking.getTaxSections() %}
+                                    <tr>
+                                        <td class="text-right" colspan="3">inkl. {{ section.taxrate }} % MwSt. auf {{ section.total | number_format(2, ",") }} EUR</td>
+                                        <td class="text-right" nowrap>{{ section.tax | number_format(2, ",") }} EUR</td>
+                                    </tr>
+                                {% endfor %}
+
+                                <tr>
+                                    <td class="text-right" colspan="3"><b>Summe</b></td>
+                                    <td class="text-right" nowrap><b>{{ booking.getTotal() | number_format(2, ",") }} EUR</b></td>
+                                </tr>
+                                </tfoot>
+                            </table>
+
+
+
+                        </div>
+                    </div>
+
+
+                    <br /><br /><br /><br /><br />
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

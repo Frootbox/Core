@@ -1,0 +1,166 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+
+
+<script src="{{ serverpath }}cms/admin/resources/public/libs/jquery/upload/js/vendor/jquery.ui.widget.js"></script>
+<script src="{{ serverpath }}cms/admin/resources/public/libs/jquery/upload/js/jquery.iframe-transport.js"></script>
+<script src="{{ serverpath }}cms/admin/resources/public/libs/jquery/upload/js/jquery.fileupload.js"></script>
+
+<script>
+
+    function refreshEditable ( rsp ) {
+
+        $.ajax({
+            url: "{{ controller.getActionUri('ajaxRefresh', { fileId: file.getId(), uid: get.get('uid'), width: get.get('width'), height: get.get('height') }) | raw }}",
+            success: function ( response ) {
+
+                $('picture[data-uid="' + response.uid + '"] img').attr('src', response.src);
+            }
+        });
+    }
+
+    $(function () {
+
+        /**
+         *
+         */
+        $('#pictureUpdateForm').submit(function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            $.ajax({
+                url: $(this).attr('action'),
+                data: $(this).serialize(),
+                type: 'POST',
+                success: function ( response ) {
+
+                    $('picture[data-uid="' + response.uid + '"] img').attr('src', response.src);
+
+                    $('#fbxEditorGenericModal').modal('hide');
+                },
+                error: function ( xhr ) {
+                    alert(xhr.responseText);
+                }
+            });
+
+        });
+    });
+</script>
+
+<form enctype="multipart/form-data" target="xxxxxxxx" id="pictureUpdateForm" action="{{ controller.getActionUri('ajaxUpdate', { fileId: file.getId(), uid: get.get('uid'), width: get.get('width'), height: get.get('height') }) }}" method="post" data-uid="{{ get.get('uid') }}">
+
+
+
+    <div class="modal-header">
+        <h5 class="modal-title">Bild bearbeiten</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+
+    {% if file %}
+
+        {% set dimensions = file.getDimensions() %}
+
+        <div class="modal-body">
+
+            <div class="row align-items-center">
+                <div class="col-3">
+                    <img class="img-fluid" src="{{ file.getUriThumbnail({ width: 150, height: 150 }) }}" alt="" />
+                </div>
+                <div class="col-9" style="line-height: 20px;">
+                    <b>{{ file.getName() }}</b><br />
+                    {{ dimensions.width }}x{{ dimensions.height }} Pixel<br />
+                    {{ file.getType() }}, {{ file.getSizeDisplay() }}
+
+                    <br />
+
+                    <div class="btn-group" role="group" aria-label="Basic example" style="margin-top: 5px">
+                        <a class="btn btn-primary btn-sm show-upload-options" href="#"><i class="far fa-upload"></i></a>
+                        <a class="btn btn-primary btn-sm" href="{{ file.getUriDownload() }}"><i class="far fa-download"></i></a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <script>
+            $(function ( ) {
+
+                $('.show-upload-options').click(function ( event ) {
+
+                    event.preventDefault();
+                    event.stopImmediatePropagation();
+
+                    $('.file-upload-panel').toggleClass('d-none');
+                })
+
+                $('.file-upload-panel').addClass('d-none');
+            });
+        </script>
+    {% endif %}
+
+    <div class="modal-body">
+
+        <div class="file-upload-panel">
+
+            {% if get.get('width') and get.get('height') %}
+                {% set helpText = "optimale Maße: " ~ get.get('width') ~ "x" ~ get.get('height') ~ " Pixel" %}
+            {% elseif get.get('width') %}
+                {% set helpText = "optimale Breite: " ~ get.get('width') ~ " Pixel" %}
+            {% elseif get.get('height') %}
+                {% set helpText = "optimale Höhe: " ~ get.get('height') ~ " Pixel" %}
+            {% endif %}
+
+            {{ v.injectPartial('Frootbox/Ext/Core/FileManager/Editor/Partials/FileUpload', {
+                multiple: false,
+                uid: get.get('uid'),
+                onComplete: 'refreshEditable',
+                helpText: helpText
+            }) | raw }}
+
+            <div class="form-group">
+                <label for="url">von URL importieren</label>
+                <input type="text" class="form-control" id="url" name="url" placeholder="URL" value="">
+            </div>
+
+        </div>
+
+
+        {% if file %}
+
+            <div class="form-row">
+                <div class="form-group col-6">
+                    <label for="width">Breite</label>
+                    <input type="number" class="form-control" id="width" name="width" placeholder="Breite" value="{{ file.getConfig('width') }}">
+                </div>
+                <div class="form-group col-6">
+                    <label for="height">Höhe</label>
+                    <input type="number" class="form-control" id="height" name="height" placeholder="Höhe" value="{{ file.getConfig('height') }}">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="caption">Bildunterschrift</label>
+                <textarea rows="5" class="form-control" id="caption" name="caption" placeholder="Bildunterschrift">{{ file.getConfig('caption') }}</textarea>
+            </div>
+            <div class="form-group">
+                <label for="copyright">Copyright</label>
+                <input class="form-control" id="copyright" name="copyright" placeholder="Copyright" value="{{ file.getCopyright() }}" />
+            </div>
+            <div class="form-group">
+                <label for="alt">Alternativ-Text</label>
+                <input class="form-control" id="alt" name="alt" placeholder="Alternativ-Text" value="{{ file.getConfig('alt') }}" aria-describedby="altHelp" />
+                <small id="altHelp" class="form-text text-muted">Alternativ-text wird automatisch durch Bildunterschrift ergänzt, wenn er nicht gesetzt wird.</small>
+            </div>
+            <div class="form-group">
+                <label for="link">Link</label>
+                <input class="form-control" id="link" name="link" placeholder="Link" value="{{ file.getConfig('link') }}" />
+            </div>
+        {% endif %}
+
+        <button type="submit" class="btn btn-primary">Speichern</button>
+
+    </div>
+</form>

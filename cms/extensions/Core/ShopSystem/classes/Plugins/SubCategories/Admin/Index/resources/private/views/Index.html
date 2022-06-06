@@ -1,0 +1,34 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<h2>
+    Unter-Kategorien Navigation
+</h2>
+
+<p><a class="ajax" href="{{ v.getUri('Page', 'ajaxPanelContent', { pageId: plugin.getPageId() }) }}"><i class="fa fa-chevron-circle-left"></i> zurück</a></p>
+
+<div class="row">
+    <div class="col">
+
+        <div class="card">
+            <div class="card-body">
+
+                <form method="post" class="ajax" action="{{ plugin.getAdminUri('Index', 'ajaxUpdate') }}">
+
+                    <div class="form-group">
+                        <label for="categoryId">Example select</label>
+                        <select class="form-control" id="categoryId" name="categoryId">
+                            {% for category in categories %}
+                                <option value="{{ category.getId() }}">{{ category.getTitle() }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Speichern</button>
+
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+</div>

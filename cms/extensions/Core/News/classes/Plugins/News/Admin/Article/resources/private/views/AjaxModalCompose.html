@@ -1,0 +1,73 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    'frame' : false,
+}) }}
+
+<script>
+    $(function ( ) {
+
+        /**
+         * Display more options
+         */
+        $('a.show-more-options').click(function ( event ) {
+
+            $('#composeNewPage .form-group.d-none').removeClass('d-none');
+            $('#composeNewPage .form-text.text-muted').remove();
+        });
+
+        /**
+         *
+         */
+        $('#multipleAtOne').on('change', function ( event ) {
+
+            if ($(this).is(':checked')) {
+
+                $('.form-group.multi').show();
+                $('.form-group.multi textarea').prop('required', true);
+
+                $('.form-group.single').hide();
+                $('.form-group.single input').prop('required', false);
+            }
+            else {
+
+                $('.form-group.multi').hide();
+                $('.form-group.multi textarea').prop('required', false);
+
+                $('.form-group.single').show();
+                $('.form-group.single input').prop('required', true);
+            }
+        });
+
+        $('#multipleAtOne').trigger('change');
+
+    });
+</script>
+
+<form id="composeNewPage" method="post" class="ajax" action="{{ plugin.getAdminUri('Article', 'ajaxCreate') }}">
+
+    <div class="modal-body">
+
+        <div class="form-group single">
+            <label for="title">Titel</label>
+            <input type="text" class="form-control" name="title" required id="title" placeholder="Titel">
+            <small id="titleHelp" class="form-text text-muted"><a class="show-more-options" href="#"><i class="far fa-chevron-down"></i> Optionen einblenden</a></small>
+        </div>
+        <div class="form-group multi">
+            <label for="titles">Artikelnamen getrennt mit Zeilenumbruch</label>
+            <textarea type="text" rows="10" class="form-control" name="titles" required id="titles" aria-describedby="titleHelp" placeholder="Titel"></textarea>
+            <small id="titleHelp2" class="form-text text-muted"><a class="show-more-options" href="#"><i class="far fa-chevron-down"></i> Optionen einblenden</a></small>
+        </div>
+        <div class="form-group form-check d-none">
+            <input type="checkbox" class="form-check-input" id="multipleAtOne">
+            <label class="form-check-label" for="multipleAtOne">mehrere Artikel auf einmal erstellen</label>
+        </div>
+
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Newsartikel erstellen</button>
+    </div>
+
+</form>
+

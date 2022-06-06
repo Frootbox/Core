@@ -1,0 +1,46 @@
+{# config
+
+title: Standard
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set p = view.getViewhelper('Partials', { plugin: plugin }) %}
+
+<div class="plugin Core ShopSystem Account Account01">
+    <div class="container">
+
+        <div class="row">
+            <div class="col-12">
+                <div class="inner-wrapper">
+
+                    {% if plugin.isFirst %}
+                        <h1 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h1>
+                    {% else %}
+                        <h2 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+                    {% endif %}
+
+                    <br /><br />
+
+                    <div class="row">
+                        <div class="col-md-4">
+
+
+                            {{ p.renderPartial('Menu', { plugin: plugin }) | raw }}
+
+
+                        </div>
+                        <div class="col-md-8">
+
+                        </div>
+                    </div>
+
+
+                    <br /><br /><br /><br /><br />
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

@@ -1,0 +1,141 @@
+
+<script>
+    $(function ( ) {
+
+        /**
+         * Show "edit physical file" button
+         */
+        $(document).on('mouseenter', 'picture[data-fileid]', function (event) {
+
+            if (isEditingFreeText) {
+                return;
+            }
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            // $('.popover').popover('hide');
+
+            var fileId = $(this).attr('data-fileid');
+
+            $(this).attr('data-content', '<span class="options edit-mode">' +
+                '<a class="images-physicalimage-rotate-left" href="#' + fileId + '"><i class="far fa-undo"><\/i><\/a>&nbsp;&nbsp;&nbsp;' +
+                '|&nbsp;&nbsp;&nbsp;' +
+                '<a class="images-physicalimage-rotate-right" href="#' + fileId + '"><i class="far fa-redo"><\/i><\/a>&nbsp;&nbsp;&nbsp;' +
+                '|&nbsp;&nbsp;&nbsp;' +
+                '<a class="images-physicalimage-edit" href="#' + fileId + '"><i class="far fa-pencil"><\/i><\/a>&nbsp;&nbsp;&nbsp;' +
+                '|&nbsp;&nbsp;&nbsp;' +
+                '<a class="images-physicalimage-delete" href="#' + fileId + '"><i class="far fa-trash-alt"><\/i><\/a>&nbsp;&nbsp;&nbsp;' +
+                '|&nbsp;&nbsp;&nbsp;' +
+                '<a class="popover-dismiss" href="#"><i class="far fa-times"><\/i><\/a>' +
+                '</span>'
+            );
+
+            $(this).popover({
+                placement: 'top',
+                html: true
+            });
+
+            $(this).popover('show');
+        });
+
+        /**
+         *
+         */
+        $(document).on('click', 'a.images-physicalimage-edit', function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            // Extract uid from href="#uid"
+            var fileId = $(this).attr('href').substr(1);
+
+            var img = $('picture[data-fileid="' + fileId + '"] img');
+
+            $('.popover').popover('hide');
+
+            fbxEditorOpenGenericModal();
+
+            $.ajax({
+                url: "{{ settings.serverpath }}cms/admin/Editor/callEditable",
+                data: {
+                    method: 'ajaxModalEdit',
+                    editable: 'Frootbox/Ext/Core/Images/Editables/PhysicalImage',
+                    fileId: fileId
+                },
+                success: function ( html ) {
+
+                    $('#fbxEditorGenericModal .modal-content').html(html);
+                }
+            });
+        })
+
+
+        /**
+         *
+         */
+        $(document).on('click', 'a.images-physicalimage-rotate-left', function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            // Extract uid from href="#uid"
+            var fileId = $(this).attr('href').substr(1);
+
+            var img = $('picture[data-fileid="' + fileId + '"] img');
+
+            $.ajax({
+                url: "{{ settings.serverpath }}cms/admin/Editor/callEditable",
+                data: {
+                    method: 'ajaxRotate',
+                    direction: 'left',
+                    editable: 'Frootbox/Ext/Core/Images/Editables/PhysicalImage',
+                    fileId: fileId
+                },
+                success: function ( html ) {
+
+                    var src = img.attr('src') + '&' + new Date().getTime();
+                    img.attr('src', src);
+                }
+            });
+
+        });
+
+
+        /**
+         *
+         */
+        $(document).on('click', 'a.images-physicalimage-rotate-right', function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            // Extract uid from href="#uid"
+            var fileId = $(this).attr('href').substr(1);
+
+            var img = $('picture[data-fileid="' + fileId + '"] img');
+
+
+            $.ajax({
+                url: "{{ settings.serverpath }}cms/admin/Editor/callEditable",
+                data: {
+                    method: 'ajaxRotate',
+                    direction: 'right',
+                    editable: 'Frootbox/Ext/Core/Images/Editables/PhysicalImage',
+                    fileId: fileId,
+                    width: Math.floor(img.width()),
+                    height: Math.floor(img.height())
+                },
+                success: function ( html ) {
+
+                    var src =  img.attr('src');
+
+                    src = src + (src.indexOf('?') == -1 ? '?' : '&') + new Date().getTime();
+
+                    img.attr('src', src);
+                }
+            });
+
+        });
+    });
+</script>

@@ -1,0 +1,47 @@
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+
+            <h1 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h1>
+
+            <div class="teaser-text" data-editable data-uid="{{ plugin.getUid('teaser') }}"></div>
+
+            <br />
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Salon</th>
+                        <th>Entfernung</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    {% for address in addresses %}
+                        <tr>
+                            <td>
+                                <b>{{ address.getTitle() }}</b><br />
+                                <span class="p-street-address">{{ address.getStreet() }} {{ address.getStreetNumber() }}</span><br />
+                                <span class="p-postal-code">{{ address.getZipcode() }}</span> <span class="p-locality">{{ address.getCity() }}</span><br />
+
+                                {% if address.getPhone() %}
+                                    <a class="p-phone" href="tel:{{ address.getPhone() }}">Telefon {{ address.getPhone() }}</a>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {{ address.getDistance() | number_format(2, ',', '.') }} km
+                            </td>
+                            <td>
+                                <a href="{{ address.getUri() }}">Details zum Salon</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+
+                </tbody>
+            </table>
+
+
+        </div>
+    </div>
+</div>

@@ -1,0 +1,92 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<h1>Erweiterung</h1>
+
+<p><a href="{{ v.getUri('Extensions', 'index') }}">zurück</a></p>
+
+<div class="row">
+    <div class="col-md-6">
+
+        <h2>App-Details</h2>
+
+        <table class="table">
+            <tbody>
+                <tr>
+                    <td width="33%"><b>Vendor</b></td>
+                    <td>{{ get.get('vendorId') }}</td>
+                </tr>
+                <tr>
+                    <td><b>Extension</b></td>
+                    <td>{{ get.get('extensionId') }}</td>
+                </tr>
+                <tr>
+                    <td><b>installierte Version</b></td>
+                    <td>{{ extensionController.getConfig('version') }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Apps der Extension</h2>
+
+        {% if apps | length == 0 %}
+            <div class="message warning">Es sind keine Apps verfügbar.</div>
+        {% else %}
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>App</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+
+
+                {% for app in apps %}
+                    <tr>
+                        <td>
+                            <i class="fal fa-fw {{ app.icon }}"></i> {{ app.title }}
+                        </td>
+                        <td class="text-right">
+                            <a class="ajax" href="{{ v.getUri('Extensions', 'ajaxAppSwitch', { vendorId: get.get('vendorId'), extensionId: get.get('extensionId'), app: app.id }) }}"><i class="fa fa-lightbulb icon"></i></a>
+                        </td>
+                    </tr>
+                {% endfor %}
+
+                </tbody>
+            </table>
+        {% endif %}
+
+    </div>
+    <div class="col-md-6">
+
+        <h2>Versionen</h2>
+
+        {% if versions | length == 0 %}
+            <div class="message warning">Es sind keine Updates verfügbar.</div>
+        {% else %}
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Version</th>
+                        <th>Inhalt</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                {% for version in versions %}
+                    <tr data-migration="{{ version.migration }}">
+                        <td>{{ version.version }}</td>
+                        <td>{{ version.description }}</td>
+                        <td class="text-right">
+                            <a class="ajax" data-toggle="tooltip" title="auf diese Version aktualisieren" href="{{ v.getUri('Extensions', 'ajaxMigrateUp', { vendorId: get.get('vendorId'), extensionId: get.get('extensionId'), migration: version.migration }) }}"><i class="fa fa-caret-square-up"></i></a>
+                        </td>
+                    </tr>
+                {% endfor %}
+
+                </tbody>
+            </table>
+        {% endif %}
+
+    </div>
+</div>

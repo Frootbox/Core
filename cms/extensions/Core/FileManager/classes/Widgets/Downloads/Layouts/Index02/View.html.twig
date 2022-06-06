@@ -1,0 +1,51 @@
+{# config
+
+title: mit Bild
+variables:
+    columns:
+        label: Spaltenzahl
+        type: int
+        default: 4
+    image_width:
+        label: Bildbreite
+        type: int
+        default: 400
+    image_height:
+        label: Bildhöhe
+        type: int
+        default: 400
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: widget }) %}
+{% set f = view.getViewhelper('Files') %}
+
+{% set files = i.getFiles() %}
+
+{% if variables.columns == 1 %}
+    {% set colClass = "col-12" %}
+{% elseif variables.columns == 2 %}
+    {% set colClass = "col-12 col-sm-6" %}
+{% elseif variables.columns == 3 %}
+    {% set colClass = "col-12 col-sm-4" %}
+{% elseif variables.columns == 4 %}
+    {% set colClass = "col-12 col-sm-3" %}
+{% else %}
+    {% set colClass = "col-12 col-md-2" %}
+{% endif %}
+
+<div class="row justify-content-center">
+
+    {% for file in files %}
+        <div class="{{ colClass }} file-preview">
+            <a href="{{ file.getUriDownload() }}">
+                <picture class="fluid" data-editable {% if variables.noImageDummy %}data-skipempty="1"{% endif %} data-uid="{{ file.getUid('image') }}">
+                    <img width="{{ variables.image_width }}" height="{{ variables.image_height }}" src="{{ i.getDummyImage({ width: variables.image_width, height: variables.image_height | default(300) }) }}" alt="" />
+                </picture>
+                <span class="title">{{ file.getTitle() }}</span>
+                <span class="size">{{ file.getExtension() }} / {{ f.parseFileSize(file.getSize()) }}</span>
+            </a>
+        </div>
+    {% endfor %}
+
+</div>

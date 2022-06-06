@@ -1,0 +1,59 @@
+<html>
+	<head>
+	
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+			}
+		</style>
+		
+	</head>
+	<body>
+	
+		<table width="100%">
+			<tbody>
+				<tr>
+					<td align="center">
+					
+						<table width="600">
+							<tr>
+								<td>
+								
+									<h1>Kontaktanfrage</h1>
+								
+									<p>
+										Hallo,<br />
+										Sie haben folgende Daten über unsere Website gesendet:
+									</p>
+								
+									<table>
+										<tbody>
+										
+											{% for field in form.getFields() %}					
+												<tr>
+													<td><b>{{ field.getLabel() }}</b></td>
+													<td>{{ field.getValueDisplay() }}</td>
+												</tr>
+											{% endfor %}
+										
+										</tbody>
+									</table>
+									
+									<p>Danke für Ihr Interesse!</p>
+								
+								
+								
+								
+								</td>
+							</tr>
+						</table>
+						
+						
+					</td>
+				</tr>
+			</tbody>
+		</table>
+					
+	
+	</body>
+</html>

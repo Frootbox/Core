@@ -1,0 +1,61 @@
+
+<script>
+    $(function ( ) {
+
+        $('#updateForm').submit(function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            $.ajax({
+                url: $(this).attr('action'),
+                data: $(this).serialize(),
+                type: 'POST',
+                headers: {
+                    Accept: "application/json; charset=utf-8",
+                },
+                success: function ( response ) {
+
+                    $('figure[data-id="' + response.widget.id + '"]').replaceWith(response.widget.html);
+
+                    $('#fbxEditorGenericModal').modal('hide');
+                },
+                error: function ( xhr ) {
+                    alert(xhr.responseText);
+                }
+            });
+
+        });
+    });
+</script>
+
+
+<form id="updateForm" action="{{ widgetController.getAdminUrl('ajaxUpdate') }}" method="post">
+
+    <div class="modal-header">
+        <h5 class="modal-title">Ansprechperson konfigurieren</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+
+
+        <div class="form-group">
+            <label for="contactId">Anprechperson wählen</label>
+            <select class="form-control" id="contactId" name="contactId">
+                <option value="">bitte wählen ...</option>
+
+                {% for contact in contacts %}
+                    <option {% if contact.getId() == widget.getConfig('contactId') %}selected{% endif %} value="{{ contact.getId() }}">{{ contact.getName() }}</option>
+                {% endfor %}
+
+            </select>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Speichern</button>
+    </div>
+
+</form>

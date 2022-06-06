@@ -1,0 +1,81 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+
+<script>
+    var uid = "{{ get.get('uid') }}";
+
+    $(function () {
+
+        /**
+         *
+         */
+        $('#elementUpdateForm').submit(function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            $.ajax({
+                url: $(this).attr('action'),
+                data: $(this).serialize(),
+                type: 'POST',
+                success: function ( response ) {
+
+                    $('#fbxEditorGenericModal').modal('hide');
+
+                    $('[data-editable-entity][data-uid="' + response.uid + '"] [data-property="' + response.property + '"]').html(response.value);
+                }
+            });
+
+        });
+
+        window.setTimeout(function () {
+            $('#value').focus();
+        }, 1000);
+    });
+
+    function updateDomAfterFileUpload() {
+
+        $.ajax({
+            url: window.location.href,
+            success: function ( html ) {
+
+                var el = document.createElement( 'html' );
+                el.innerHTML = html;
+
+                $('[data-uid="' + uid + '"]').replaceWith($(el).find('[data-uid="' + uid + '"]'));
+                // el.getElementsByTagName( 'a' ); // Live NodeList of your anchor elements
+
+            }
+        })
+
+    }
+</script>
+
+
+
+<div class="modal-header">
+    <h5 class="modal-title">Dateien bearbeiten</h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+{#
+<div class="modal-body">
+
+    <p>yxcyxc</p>
+
+</div>
+#}
+{{ v.injectPartial('Frootbox/Ext/Core/FileManager/Editor/Partials/FileManager', {
+    uid: uid
+}) | raw }}
+
+<div class="modal-body">
+
+    {{ v.injectPartial('Frootbox/Ext/Core/FileManager/Editor/Partials/FileUpload', {
+        multiple: true,
+        uid: uid,
+        onComplete: 'updateDomAfterFileUpload'
+    }) | raw }}
+
+</div>

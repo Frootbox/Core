@@ -1,0 +1,22 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    'frame' : false,
+}) }}
+
+<form method="post" class="ajax" action="{{ plugin.getAdminUri('Keyword', 'ajaxCreate') }}">
+
+    <div class="modal-body">
+
+        <div class="form-group">
+            <label for="title">Schlagwort</label>
+            <input type="text" class="form-control" name="title" required id="title" placeholder="Schlagwort">
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">neues Schlagwort erstellen</button>
+    </div>
+
+</form>
+

@@ -1,0 +1,24 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    'title' : 'Sitemap',
+}) }}
+
+{{ front.addTab('Navigationen', front.getUri('NavigationBars')) }}
+
+<h2>
+    Navigationen
+    <span class="headoptions">
+        <a data-modal href="{{ v.getUri('NavigationBars', 'ajaxModalCompose') }}" data-title="Navigation erstellen"><i class="fa fa-plus-circle"></i></a>
+    </span>
+</h2>
+
+<div class="row">
+    <div class="col-12">
+
+        <div id="navBarsReceiver">
+            {{ v.injectPartial('\\Frootbox\\Admin\\Controller\\NavigationBars\\Partials\\ListNavigations\\Partial') | raw }}
+        </div>
+
+    </div>
+</div>

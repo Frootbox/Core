@@ -1,0 +1,15 @@
+{% set p = view.getViewhelper('Partials') %}
+
+{% for npage in data.pages %}
+
+    <a class="{% if npage.getId() == page.getId() or page.isChildOf(npage) %}active{% endif %} level-{{ data.level }}" href="{{ npage.getUri() }}">{{ npage.getTitle() }}</a>
+
+    {% if plugin.getMaxDepth >= (data.level + 1) %}
+
+        {% if npage.getId() == page.getId() or page.isChildOf(npage) %}
+            {{ p.renderPartial('Pages', { pages: npage.getChildrenVisible(), level: data.level + 1 }) | raw }}
+        {% endif %}
+
+    {% endif %}
+
+{% endfor %}

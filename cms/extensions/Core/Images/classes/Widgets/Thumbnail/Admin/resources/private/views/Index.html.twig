@@ -1,0 +1,148 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<script src="{{ serverpath }}cms/admin/resources/public/libs/jquery/upload/js/vendor/jquery.ui.widget.js"></script>
+<script src="{{ serverpath }}cms/admin/resources/public/libs/jquery/upload/js/jquery.iframe-transport.js"></script>
+<script src="{{ serverpath }}cms/admin/resources/public/libs/jquery/upload/js/jquery.fileupload.js"></script>
+
+<script>
+    $(function () {
+
+        $('#fileupload').fileupload({
+            dataType: 'json',
+            done: function (e, data) {
+
+
+            }
+        });
+
+
+        /**
+         *
+         */
+        $('#thumbnailUpdateForm').submit(function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            $.ajax({
+                url: $(this).attr('action'),
+                data: $(this).serialize(),
+                type: 'POST',
+                headers: {
+                    Accept: "application/json; charset=utf-8",
+                },
+                success: function ( response ) {
+
+                    $('figure[data-id="' + response.widget.id + '"]').replaceWith(response.widget.html);
+
+                    $('#fbxEditorGenericModal').modal('hide');
+                },
+            });
+        });
+    });
+</script>
+
+
+
+
+
+<form id="thumbnailUpdateForm" action="{{ widgetController.getAdminUrl('ajaxUpdate') }}" method="post">
+
+    <div class="modal-header">
+        <h5 class="modal-title">Bild bearbeiten</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+
+        <div class="form-group">
+            <label for="fileupload">Datei</label>
+            <input class="form-control" id="fileupload" type="file" name="file" data-url="{{ v.getUri('Editor/File', 'ajaxUpload', { 'uid' : widget.getUid('image') }) }}" multiple />
+
+            <small id="emailHelp" class="form-text text-muted">
+                {% if get.get('width') and get.get('height') %}
+                    optimale Maße: {{ get.get('width') }}x{{ get.get('height') }} Pixel
+                {% elseif get.get('width') %}
+                    optimale Breite: {{ get.get('width') }} Pixel
+                {% elseif get.get('height') %}
+                    optimale Höhe: {{ get.get('height') }} Pixel
+                {% endif %}
+            </small>
+        </div>
+
+        {% if file %}
+            {{ v.injectPartial('Frootbox/Ext/Core/Images/Widgets/Thumbnail/Admin/Partials/ImageEditor', {
+                widget: widget,
+                file: file
+            }) | raw }}
+        {% endif %}
+
+        <div class="form-group">
+            <label for="width">Breite</label>
+            <div class="input-group">
+                <input type="number" class="form-control" id="width" name="image[width]" placeholder="Breite" value="{{ widget.getConfig('image.width') }}">
+                <div class="input-group-append">
+                    <div class="input-group-text">Pixel</div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="width">Höhe</label>
+            <div class="input-group">
+                <input type="number" class="form-control" id="height" name="image[height]" placeholder="Höhe" value="{{ widget.getConfig('image.height') }}">
+                <div class="input-group-append">
+                    <div class="input-group-text">Pixel</div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <div class="form-group row">
+            <div class="col-sm-3">
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" name="magnify" id="magnify" {% if widget.getConfig('magnify') %}checked{% endif %}>
+                    <label class="form-check-label" for="magnify">Lupe</label>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" name="image[rounded]" id="rounded" {% if widget.getConfig('image.rounded') %}checked{% endif %}>
+                    <label class="form-check-label" for="rounded">rund</label>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <label for="url">Verlinkung</label>
+            <input type="text" class="form-control" id="url" name="url" placeholder="Verlinkung" value="{{ widget.getConfig('url') }}">
+        </div>
+        <div class="form-group">
+            <label for="alt">ALT-Tag</label>
+            <input type="text" class="form-control" id="alt" name="alt" placeholder="ALT-Tag" value="{{ widget.getConfig('alt') }}">
+        </div>
+
+        {% if file %}
+            <div class="form-group">
+                <label for="caption">Bildunterschrift</label>
+                <textarea rows="3" class="form-control" id="caption" name="caption" placeholder="Bildunterschrift">{{ file.getConfig('caption') }}</textarea>
+            </div>
+            <div class="form-group">
+                <label for="copyright">Copyright</label>
+                <input type="text" class="form-control" id="copyright" name="copyright" placeholder="Copyright" value="{{ file.getCopyright() }}">
+            </div>
+        {% endif %}
+
+        <div class="form-group">
+            <label for="source">Quelle</label>
+            <input type="text" class="form-control" id="source" name="source" placeholder="Quelle" value="{{ widget.getConfig('source') }}">
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Speichern</button>
+    </div>
+
+</form>

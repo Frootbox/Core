@@ -1,0 +1,91 @@
+{# config
+
+title: Standard
+variables:
+    pluginWidth:
+        type: int
+        default: 12
+        label: Breite des Plugins (1-12)
+    fieldLabelsEditable:
+        type: bool
+        default: false
+        label: Label der Felder bearbeitbar
+    withLayoutContainer:
+        type: bool
+        label: mit Layout-Container
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set formRenderer = view.getViewhelper('Ext/Core/ContactForms/FormRenderer', {   }) %}
+
+<script>
+    $(function ( ) {
+
+        $(document).on('click', 'a[data-form]', function ( event ) {
+
+            event.preventDefault();
+
+            $('a[data-form]').removeClass('active');
+            $(this).addClass('active');
+
+            let url = window.location.href.split('#')[0];
+            url = url + '#' + $(this).data('form');
+
+            window.location.href = url;
+        });
+
+        /**
+         * Animate labels
+         */
+        $('.form-group input').focus(function(){
+            me = $(this) ;
+            $("label[for='" + me.attr('id')+"']").addClass("animate-label");
+        });
+
+        $('.form-group input').blur(function(){
+            me = $(this) ;
+            if ( me.val() == ""){
+                $("label[for='"+me.attr('id')+"']").removeClass("animate-label");
+            }
+        });
+
+        /**
+         * Init form view
+         */
+        let hash = window.location.hash;
+
+        if (hash.length > 0) {
+            $('a[data-form="' + hash.split('#')[1] + '"]').trigger('click');
+        }
+    });
+</script>
+
+<div class="plugin Core ContactForms FormTeaser Index03">
+
+        {% if variables.withLayoutContainer %}<div class="container">{% endif %}
+
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-{{ variables.pluginWidth }}">
+                <div class="inner-wrapper">
+
+                    <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle() }}</h2>
+
+                    <div data-editable data-uid="{{ plugin.getUid('text-1') }}"></div>
+
+                    {{ formRenderer.render({
+                        formId: form.getId(),
+                        options: {
+                            editable: variables.fieldLabelsEditable,
+                        },
+                        payload: {
+                            Seite: page.getTitle()
+                        }
+                    }) | raw }}
+
+                </div>
+            </div>
+        </div>
+
+        {% if variables.withLayoutContainer %}</div>{% endif %}
+</div>

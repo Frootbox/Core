@@ -1,0 +1,20 @@
+{{ view.set({
+    'frame' : false,
+}) }}
+
+
+<form method="post" action="{{ app.getUri('ajaxUserImport') }}" enctype="multipart/form-data">
+
+    <div class="modal-body">
+
+        <div class="form-group">
+            <label for="title">Import-Datei</label>
+            <input type="file" class="form-control" name="file" required id="title" placeholder="Import-Datei">
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Importieren</button>
+    </div>
+
+</form>

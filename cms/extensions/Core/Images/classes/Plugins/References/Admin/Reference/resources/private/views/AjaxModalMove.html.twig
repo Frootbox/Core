@@ -1,0 +1,29 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    'frame' : false,
+}) }}
+
+<form method="post" class="ajax" action="{{ plugin.getAdminUri('Reference', 'ajaxMove', { referenceId: reference.getId() }) }}">
+
+    <div class="modal-body">
+
+        <div class="form-group">
+            <label for="pluginId">Plugin</label>
+            <select class="form-control" name="pluginId" required id="pluginId">
+                <option value="">bitte wählen ...</option>
+
+                {% for plg in plugins %}
+                    <option {% if plg.getId() == plugin.getId() %}selected{% endif %} value="{{ plg.getId() }}">{{ plg.getTitle() }}</option>
+                {% endfor %}
+
+            </select>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Referenz verschieben</button>
+    </div>
+
+</form>
+

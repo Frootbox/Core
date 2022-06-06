@@ -1,0 +1,21 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<table class="table" id="table-{{ random(1000, 9999) }}">
+    <tbody>
+
+    {% for file in files %}
+        <tr id="files-{{ file.getId }}" data-file="{{ file.getId() }}" data-title="Datei beabreiten">
+            <td width="70"><img width="50" height="50" src="{{ file.getUri({ width: 50, height: 50 }) }}" alt="" /></td>
+            <td>
+                <a data-modal data-file="{{ file.getId() }}" href="{{ v.getUri('Ext/Core/FileManager/FileManager', 'ajaxModalEdit', { fileId: file.getId() }) }}">{{ file.getTitleReal() | default('kein Titel') }}</a>
+                <span style="display: block; font-size: 12px; color: #999;">
+                    {{ (file.getSize / 1024) | round }} kB, Dateiname: {{ file.getName }},
+                    <a href="{{ v.getUri('Ext/Core/FileManager/FileManager', 'serveOriginal', { fileId: file.getId() }) }}" style="color: #999;"><i class="fa fa-download"></i></a>
+                </span>
+            </td>
+            <td class="handle" style="cursor: pointer; vertical-align: middle;" width="40"><i class="fa fa-grip-lines"></i></td>
+        </tr>
+    {% endfor %}
+
+    </tbody>
+</table>

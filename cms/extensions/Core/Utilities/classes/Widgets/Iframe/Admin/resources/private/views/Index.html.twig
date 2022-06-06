@@ -1,0 +1,69 @@
+
+<script>
+    $(function ( ) {
+
+        $('#updateForm').submit(function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            $.ajax({
+                url: $(this).attr('action'),
+                data: $(this).serialize(),
+                type: 'POST',
+                headers: {
+                    Accept: "application/json; charset=utf-8",
+                },
+                success: function ( response ) {
+
+                    $('figure[data-id="' + response.widget.id + '"]').replaceWith(response.widget.html);
+
+                    $('#fbxEditorGenericModal').modal('hide');
+                },
+                error: function ( xhr ) {
+                    alert(xhr.responseText);
+                }
+            });
+
+        });
+    });
+</script>
+
+
+<form id="updateForm" action="{{ widgetController.getAdminUrl('ajaxUpdate') }}" method="post">
+
+    <div class="modal-header">
+        <h5 class="modal-title">Iframe konfigurieren</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+
+        <div class="form-group">
+            <label for="url">Adresse</label>
+            <input type="text" class="form-control" id="url" name="url" placeholder="Adresse" value="{{ widget.getConfig('url') }}">
+        </div>
+        <div class="form-group">
+            <label for="iframe_width">Breite</label>
+            <input type="text" class="form-control" id="iframe_width" name="iframe_width" placeholder="Breite" value="{{ widget.getConfig('iframe_width') }}">
+        </div>
+        <div class="form-group">
+            <label for="iframe_height">Höhe</label>
+            <input type="text" class="form-control" id="iframe_height" name="iframe_height" placeholder="Höhe" value="{{ widget.getConfig('iframe_height') }}">
+        </div>
+        <div class="form-group form-check">
+            <input type="checkbox" class="form-check-input" id="autoHeight" name="autoHeight" {% if widget.getConfig('autoHeight') %}checked{% endif %}>
+            <label class="form-check-label" for="autoHeight">mit automatischer Höhe</label>
+        </div>
+        <div class="form-group">
+            <label for="contentMaxWidth">Inhalt Breite max.</label>
+            <input type="text" class="form-control" id="contentMaxWidth" name="contentMaxWidth" placeholder="Breite" value="{{ widget.getConfig('contentMaxWidth') }}">
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Speichern</button>
+    </div>
+
+</form>

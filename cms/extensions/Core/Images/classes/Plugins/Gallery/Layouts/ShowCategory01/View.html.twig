@@ -1,0 +1,103 @@
+{# config
+
+title: Standard
+variables:
+    columns:
+        type: int
+        label: Spalten
+        default: 4
+    image_width:
+        type: int
+        label: Bildbreite
+        default: 600
+    image_height:
+        type: int
+        label: Bildhöhe
+        default: 400
+    withLayoutContainer:
+        type: bool
+        label: mit Layout-Container
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set categoryAdapter = view.getViewhelper('Delegator', { object: category }) %}
+{% set b = view.getViewhelper('Breadcrumb', { singleton: true }) %}
+{% set a = view.getViewhelper('Assets') %}
+
+{{ b.addSections(category, { skipfirst: true }) }}
+
+{{ view.set('hideGlobalBlocks', true) }}
+
+{% if variables.columns == 1 %}
+    {% set colClass = "col-12" %}
+{% elseif variables.columns == 2 %}
+    {% set colClass = "col-6" %}
+{% elseif variables.columns == 3 %}
+    {% set colClass = "col-4" %}
+{% elseif variables.columns == 4 %}
+    {% set colClass = "col-3" %}
+{% elseif variables.columns > 4 %}
+    {% set colClass = "col-2" %}
+{% endif %}
+
+{{ a.import('https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css') | raw }}
+{{ a.import('https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js') | raw }}
+
+<div class="plugin Core Images Gallery ShowCategory01">
+
+    {% if variables.withLayoutContainer %}<div class="container">{% endif %}
+
+    <div class="row">
+        <div class="col-12 ">
+
+            <h2 class="first main-title" data-editable data-uid="{{ category.getUid('title') }}">{{ category.getTitle }}</h2>
+
+            <p class="text-center"><a href="{{ category.getParent().getUri() }}">zurück</a></p>
+
+            <br /><br />
+
+            <div data-editable data-uid="{{ category.getUid('teaser') }}"></div>
+
+            <div class="row justify-content-center">
+
+                {% for child in categoryAdapter.getChildren() %}
+
+                    {% set c = view.getViewhelper('Delegator', { object: child }) %}
+
+                    <div class="{{ colClass }} category">
+                        <a href="{{ child.getUri }}">
+                            <picture class="fluid">
+                                <img width="{{ variables.image_width }}" height="{{ variables.image_height }}" src="{{ c.getDefaultImage({ width: variables.image_width, height: variables.image_height }) }}" alt="" />
+                            </picture>
+                            {{ child.getTitle }}
+                        </a>
+                    </div>
+                {% endfor %}
+
+            </div>
+            <div class="row justify-content-center">
+
+                {% for file in categoryAdapter.getImages() %}
+                    <div class="{{ colClass }}">
+                        <a href="{{ file.getUriThumbnail() }}" data-fancybox="gallery">
+                            <picture class="fluid" data-fileid="{{ file.getId() }}">
+                                <img src="{{ file.getUriThumbnail({ width: variables.image_width, height: variables.image_height }) }}" alt="" />
+
+                                {% if file.getConfig('caption') %}
+                                    <span class="caption">{{ file.getConfig('caption') }}</span>
+                                {% endif %}
+                            </picture>
+                        </a>
+                    </div>
+                {% endfor %}
+
+            </div>
+
+
+        </div>
+    </div>
+
+    {% if variables.withLayoutContainer %}</div>{% endif %}
+
+</div>

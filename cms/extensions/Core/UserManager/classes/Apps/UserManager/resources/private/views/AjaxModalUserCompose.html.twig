@@ -1,0 +1,19 @@
+{{ view.set({
+    'frame' : false,
+}) }}
+
+<form class="ajax" enctype="multipart/form-data" method="post" action="{{ app.getUri('ajaxUserCreate', { type: get.get('type') }) }}">
+
+    <div class="modal-body">
+
+        <div class="form-group">
+            <label for="email">E-Mail Adresse</label>
+            <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp" placeholder="E-Mail Adresse">
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Speichern</button>
+    </div>
+
+</form>

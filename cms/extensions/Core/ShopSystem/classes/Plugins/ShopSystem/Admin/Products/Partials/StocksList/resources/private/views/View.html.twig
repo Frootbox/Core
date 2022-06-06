@@ -1,0 +1,30 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{% if stocks.getCount() == 0 %}
+    <div class="message warning">Es wurden noch keine Warenbestände erstellt.</div>
+{% else %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Optionen</th>
+                <th>Bestand</th>
+                <th class="text-right">Preis</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+
+            {% for stock in stocks %}
+                <tr class="{% if stock.getId() == data.highlight %}highlighted{% endif %}" data-title="Warenbestand bearbeiten" data-modal="{{ data.plugin.getAdminUri('Products', 'ajaxModalStocksEdit', { stockId: stock.getId() }) }}">
+                    <td>{{ stock.getOptionsAsString() }}</td>
+                    <td>{{ stock.getAmount() }}</td>
+                    <td class="text-right">{{ stock.getPrice() | number_format(2, ',', '.') }} EUR</td>
+                    <td class="text-right">
+                        <a class="ajax" data-confirm="Soll dieser Warenbestand wirklich gelöscht werden?" href="{{ data.plugin.getAdminUri('Products', 'ajaxStocksDelete', { stockId: stock.getId() }) }}"><i class="fa fa-times"></i></a>
+                    </td>
+                </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+{% endif %}

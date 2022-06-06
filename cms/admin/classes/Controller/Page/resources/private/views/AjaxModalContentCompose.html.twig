@@ -1,0 +1,144 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    frame: false,
+}) }}
+
+<script>
+    $(function ( ) {
+
+        $(document).on('keyup', function ( event ) {
+
+            if (event.keyCode == 13 && $('#addTextButton').is(':visible')) {
+                $('#addTextButton').trigger('click');
+
+                event.stopImmediatePropagation();
+            }
+        });
+
+    });
+</script>
+
+<div class="modal-body">
+
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="text-tab" data-toggle="tab" href="#text" role="tab" aria-controls="text" aria-selected="true">Text</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="plugin-tab" data-toggle="tab" href="#plugin" role="tab" aria-controls="plugin" aria-selected="false">Plugin</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="grid-tab" data-toggle="tab" href="#grid" role="tab" aria-controls="grid" aria-selected="false">Spalten</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="copy-tab" data-toggle="tab" href="#copy" role="tab" aria-controls="copy" aria-selected="false">Kopieren</a>
+        </li>
+    </ul>
+    <div class="tab-content" id="myTabContent">
+        <div class="tab-pane fade show active" id="text" role="tabpanel" aria-labelledby="text-tab">
+
+            <br />
+
+            <form method="post" class="ajax" action="{{ v.getUri('Page', 'ajaxContentCreate', { pageId: page.getId(), socket: get.get('socket'), type: 'Plugin', main: get.get('main') }) }}">
+
+                <input type="hidden" name="model" value="Frootbox\Ext\Core\Editing\Plugins\Text\Plugin" />
+
+                <button id="addTextButton" type="submit" class="btn btn-primary">Inhalt hinzufügen</button>
+
+            </form>
+
+        </div>
+        <div class="tab-pane fade" id="plugin" role="tabpanel" aria-labelledby="plugin-tab">
+
+            <br />
+
+            <form method="post" class="ajax" action="{{ v.getUri('Page', 'ajaxContentCreate', { pageId: page.getId(), socket: get.get('socket'), type: 'Plugin', main: get.get('main') }) }}">
+
+                <div class="row">
+                    {% for extension in extensions %}
+
+                        {% if extension.getExtensionController().getPlugins() | length  > 0 %}
+                            <div class="col-6">
+                                <h4>{{ extension.getVendorId() }}/{{ extension.getExtensionId() }}</h4>
+
+                                {% for plugin in extension.getExtensionController().getPlugins() %}
+
+                                    <div class="form-group form-check">
+                                        <input type="radio" class="form-check-input" name="model" value="{{ plugin.id }}" id="plugin{{ plugin.id }}">
+                                        <label class="form-check-label" for="plugin{{ plugin.id }}">{{ plugin.title }}</label>
+                                    </div>
+
+                                {% endfor %}
+                            </div>
+
+                        {% endif %}
+
+                    {% endfor %}
+                </div>
+
+
+                <button type="submit" class="btn btn-primary">Inhalt hinzufügen</button>
+
+            </form>
+
+        </div>
+        <div class="tab-pane fade" id="grid" role="tabpanel" aria-labelledby="grid-tab">
+
+            <br />
+
+            <form method="post" class="ajax" action="{{ v.getUri('Page', 'ajaxContentCreate', { 'pageId' : page.getId(), 'socket': get.get('socket'), type: 'Grid' }) }}">
+
+                <input type="hidden" name="model" value="Frootbox\Persistence\Content\Elements\Grid" />
+
+                <div class="form-group">
+                    <label for="columns">Spalten</label>
+                    <select class="form-control" id="columns" name="columns">
+                        <option value="3-9">3/9</option>
+                        <option value="4-8">4/8</option>
+                        <option value="4-8">5/7</option>
+                        <option value="6-6">6/6</option>
+                        <option value="7-5">7/5</option>
+                        <option value="8-4">8/4</option>
+                        <option value="9-3">9/3</option>
+                        <option value="3-3-6">3/3/6</option>
+                        <option value="4-4-4">4/4/4</option>
+                        <option value="4-5-3">4/5/3</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Inhalt hinzufügen</button>
+
+            </form>
+
+        </div>
+        <div class="tab-pane fade" id="copy" role="tabpanel" aria-labelledby="copy-tab">
+
+            <br />
+
+            <form method="post" class="ajax" action="{{ v.getUri('Page', 'ajaxContentClone', { pageId: page.getId(), socket: get.get('socket'), type: 'Grid' }) }}">
+
+                {{ v.injectPartial('\\Frootbox\\Admin\\Controller\\Search\\Partials\\Input\\Page', {
+                    label : 'Quell-Seite suchen'
+                }) | raw }}
+
+                <div class="form-group form-check">
+                    <input type="checkbox" class="form-check-input" id="skipPlugins" name="skipPlugins">
+                    <label class="form-check-label" for="skipPlugins">Plugins nicht kopieren</label>
+                </div>
+                <div class="form-group form-check">
+                    <input type="checkbox" class="form-check-input" id="skipBlocks" name="skipBlocks">
+                    <label class="form-check-label" for="skipBlocks">Blöcke nicht kopieren</label>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Inhalte kopieren</button>
+
+            </form>
+
+        </div>
+    </div>
+
+
+
+
+</div>

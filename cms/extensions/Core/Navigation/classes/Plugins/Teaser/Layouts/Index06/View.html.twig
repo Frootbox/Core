@@ -1,0 +1,157 @@
+{# config
+
+title: Slider
+variables:
+    img_width:
+        type: int
+        label: Bildbreite
+        default: 1190
+    img_height:
+        type: int
+        label: Bildhöhe
+        default: 440
+    teaser_height:
+        type: int
+        label: Teaser-Höhe
+        default: 500
+    maxWidth:
+        type: int
+        label: max. Breite
+    skipGrid:
+        type: bool
+        label: kein Grid
+    crossFade:
+        type: bool
+        label: Bildwechsel als Cross-Fade
+    cloak:
+        type: bool
+        default: false
+        label: andere Plugins verdrängen
+    maxHeight100:
+        type: bool
+        label: Höhe max. 100 %
+    mobileHeight100:
+        type: bool
+        label: Höhe mobil 100 %
+    textPosition:
+        type: list
+        label: Text-Position
+        options:
+            Center: zentriert
+            Bottom: unten
+        default: Center
+
+/config #}
+
+{% if variables.cloak %}
+    <param name="cloak" value="true" />
+{% endif %}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+{% set teasers = i.getTeasers() %}
+
+{% set randomId = "carousel" ~ random() %}
+
+<style>
+    #{{ randomId }} .carousel-inner, #{{ randomId }} .carousel-item {
+        height: {{ variables.teaser_height }}px;
+    }
+
+    {% if variables.maxWidth %}
+        .plugin.plugin-{{ plugin.getId() }} {
+            max-width: {{ variables.maxWidth }}px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    {% endif %}
+
+</style>
+
+{% if variables.mobileHeight100 %}
+    <script>
+        $(function ( ) {
+
+            var originalHeight = $('.plugin.Core.Navigation.Teaser.Index06 .height-mobile-100 .carousel-item').height();
+
+            $(window).on('resize', function ( ) {
+
+                if ($(window).width() > 768) {
+                    $('.plugin.Core.Navigation.Teaser.Index06 .height-mobile-100 .carousel-inner').css('height', originalHeight + 'px');
+                    $('.plugin.Core.Navigation.Teaser.Index06 .height-mobile-100 .carousel-item').css('height', originalHeight + 'px');
+                }
+                else {
+                    $('.plugin.Core.Navigation.Teaser.Index06 .height-mobile-100 .carousel-inner').css('height', $(window).height() + 'px');
+                    $('.plugin.Core.Navigation.Teaser.Index06 .height-mobile-100 .carousel-item').css('height', $(window).height() + 'px');
+                }
+
+            });
+
+            $(window).trigger('resize');
+        });
+    </script>
+{% endif %}
+
+{% if not variables.skipGrid %}
+    <div class="row">
+        <div class="col-12 plugin Core Navigation Teaser Index06">
+{% else %}
+    <div class="plugin plugin-{{ plugin.getId() }} Core Navigation Teaser Index06">
+{% endif %}
+
+        <div id="{{ randomId }}" class="carousel slide {% if variables.crossFade %}carousel-fade{% endif %} {% if variables.mobileHeight100 %}height-mobile-100{% endif %} {% if variables.maxHeight100 %}height-max-100{% endif %}" data-ride="carousel">
+
+            {% if teasers | length > 1 %}
+                <ol class="carousel-indicators">
+                    {% for teaser in teasers %}
+                    <li data-target="#{{ randomId }}" data-slide-to="{{ loop.index0 }}" class="{% if loop.index == 1 %}active{% endif %}"></li>
+                    {% endfor %}
+                </ol>
+            {% endif %}
+
+            <div class="carousel-inner">
+
+                {% for teaser in teasers %}
+                    <div data-href class="carousel-item {% if loop.index == 1 %}active{% endif %}" data-type="Images/Background" data-uid="{{ teaser.getUid('background') }}">
+
+                        <div class="container h-100">
+                            <div class="row h-100 {% if variables.textPosition == "Bottom" %}align-items-end{% else %}align-items-center{% endif %}">
+                                <div class="col-12 carousel-item-content">
+
+                                    <div class="inner-wrapper">
+                                        <span class="caption">
+                                            <h4 data-editable data-uid="{{ teaser.getUid('title') }}">{{ teaser.getTitle() }}</h4>
+                                        </span>
+
+                                        {% if not teaser.isLinkDeactivated() %}
+                                            <a class="link-more-button" href="{{ teaser.getUri() }}">mehr lesen</a>
+                                        {% endif %}
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                {% endfor %}
+
+            </div>
+
+            {% if teasers | length > 1 %}
+                <a class="carousel-control-prev" data-norewrite="1" href="#{{ randomId }}" role="button" data-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Previous</span>
+                </a>
+
+                <a class="carousel-control-next" data-norewrite="1" href="#{{ randomId }}" role="button" data-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Next</span>
+                </a>
+            {% endif %}
+
+        </div>
+
+    {% if not variables.skipGrid %}
+        </div>
+    {% endif %}
+</div>

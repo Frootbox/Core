@@ -1,0 +1,40 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+{% set i = view.getViewhelper('\\Frootbox\\Admin\\Viewhelper\\Delegator', { object: data.group }) %}
+
+{% set fields = i.getFields() %}
+
+{% if fields.getCount() == 0 %}
+	<div class="message warning">Es wurden noch keine Formular-Felder erstellt für diese Gruppe.</div>
+{% else %}
+	<table id="xx" data-sort="{{ data.plugin.getAdminUri('Field', 'ajaxSort', { groupId: data.group.getId() }) }}" class="table">
+		<thead>
+			<tr>
+				<th>Titel</th>
+				<th>Typ</th>
+				<th></th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+
+			{% for field in fields %}
+				<tr id="row-{{ field.getId }}" class="{% if data.highlight == field.getId() %}highlighted{% endif %}">
+					<td>
+						<a data-field="{{ field.getId() }}" class="switch-required ajax" href="{{ data.plugin.getAdminUri('Field', 'ajaxSwitchRequired', { fieldId: field.getId() }) }}"><i class="icon {% if field.getConfig('isRequired') %}fas{% else %}fal{% endif %} fa-star"></i></a>
+						<a data-title="Feld bearbeiten" data-modal href="{{ data.plugin.getAdminUri('Field', 'ajaxModalEdit', { fieldId: field.getId() }) }}">
+							{{ field.getTitle | default('kein Titel') }}
+						</a>
+					</td>
+					<td width="130">
+						{{ field.getType }}
+					</td>
+					<td class="handle" width="40"><i class="fa fa-grip-lines"></i></td>
+					<td class="text-right" width="140">
+						<a data-confirm="Soll dieses Feld wirklich gelöscht werden?" class="ajax" href="{{ data.plugin.getAdminUri('Field', 'ajaxDelete', { fieldId: field.getId() }) }}"><i class="fa fa-times"></i></a>
+					</td>
+				</tr>
+			{% endfor %}
+
+		</tbody>
+	</table>
+{% endif %}

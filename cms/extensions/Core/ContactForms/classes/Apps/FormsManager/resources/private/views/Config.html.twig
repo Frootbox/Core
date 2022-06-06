@@ -1,0 +1,127 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ front.addTab('Formular-Verwaltung', app.getUri('index')) }}
+{{ front.addTab(form.title) }}
+
+<br />
+
+<ul class="nav nav-tabs">
+    <li class="nav-item">
+        <a class="nav-link" href="{{ app.getUri('details', { formId: form.getId() }) }}">Formularfelder</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link active" href="{{ app.getUri('config', { formId: form.getId() }) }}">Konfiguration</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{{ app.getUri('archive', { formId: form.getId() }) }}">Anfragen</a>
+    </li>
+</ul>
+
+<div class="tab-content" id="myTabContent">
+    <div class="tab-pane fade show active" id="info" role="tabpanel" aria-labelledby="info-tab">
+
+        <div class="card">
+            <div class="card-body">
+
+                <h2>
+                    Konfiguration
+                </h2>
+
+
+                <form method="post" action="{{ app.getUri('ajaxConfigUpdate', { formId: form.getId() }) }}" class="ajax">
+
+                    <div class="row">
+                        <div class="col-md-6">
+
+                            <h3>Allgemein</h3>
+
+                            <div class="form-group">
+                                <label for="title">Titel</label>
+                                <input type="text" class="form-control" name="title" id="title" placeholder="Titel" value="{{ form.getTitle() }}">
+                            </div>
+                            <div class="form-group">
+                                <label for="feedback">Feedback</label>
+                                <select class="form-control" name="feedback" id="feedback">
+                                    <option value="">bitte wählen ...</option>
+                                    <option {% if form.getConfig('feedback') == "Popup" or form.getConfig('feedback') == "" %}selected{% endif %} value="Popup">Popup</option>
+                                    <option {% if form.getConfig('feedback') == "Page" %}selected{% endif %} value="Page">Unterseite</option>
+                                </select>
+                            </div>
+
+                            <h3>E-Mail an den Betreiber</h3>
+
+                            <div class="form-group">
+                                <label for="recipients">Empfänger-Verteiler</label>
+                                <input data-role="tagsinput" type="text" class="form-control" name="recipients" id="recipients" placeholder="Empfänger" value="{{ form.getConfig('recipients') }}" aria-describedby="recipientsHelp">
+                                <small id="recipientsHelp" class="form-text text-muted">Jeder Empfänger im Verteiler bekommt eine Benachrichtigung über jedes Abgeschickte Formular.</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="modSubject">Betreff</label>
+                                <input type="text" class="form-control" name="modSubject" id="modSubject" placeholder="Betreff" value="{{ form.getConfig('modSubject') }}" aria-describedby="modSubjectHelp">
+                                <small id="modSubjectHelp" class="form-text text-muted">Der Betreff der E-Mail Benachrichtgung an den Verteiler.</small>
+                            </div>
+
+                        </div>
+                        <div class="col-md-6">
+
+                            <h3>E-Mail an den Besucher</h3>
+
+                            <div class="form-group">
+                                <label for="replyTo">Antwort-Adresse (optional)</label>
+                                <input type="email" class="form-control" name="replyTo" id="replyTo" placeholder="Antwortadresse" value="{{ form.getConfig('replyTo') }}" aria-describedby="replyToHelp">
+                                <small id="replyToHelp" class="form-text text-muted">Falls angegeben kann der Kunde an diese Adresse antworten. Dies ist hilfreich, falls die Adresse, über die zentral gesendet wird nicht die Antworten erhalten soll.</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="customSubject">Betreff</label>
+                                <input type="text" class="form-control" name="customSubject" id="customSubject" placeholder="Betreff" value="{{ form.getConfig('customSubject') }}" aria-describedby="customSubjectHelp">
+                                <small id="customSubjectHelp" class="form-text text-muted">Der Betreff der E-Mail Benachrichtgung an den Kunden. Wenn leer gelassen ist der Betreff „Anfrage: [Seitentitel]“</small>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-8">
+                                    <div class="form-group">
+                                        <label for="textAboveMail">Text über E-Mail</label>
+                                        <textarea rows="15" class="form-control" id="textAboveMail" name="textAboveMail" placeholder="Text über E-Mail" aria-describedby="textAboveMailHelp">{{ form.getConfig('textAboveMail') }}</textarea>
+                                        <small id="textAboveMailHelp" class="form-text text-muted">Dieser Text steht über dem Datenblock aus dem Formular.</small>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <img style="margin-top: 20px; max-width: 150px;" src="{{ app.getAssetUri('images/text-above.svg') }}" alt="" />
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-8">
+
+                                    <div class="form-group">
+                                        <label for="textBelowMail">Text unter E-Mail</label>
+                                        <textarea rows="15" class="form-control" id="textBelowMail" name="textBelowMail" placeholder="Text unter E-Mail" aria-describedby="textBelowMailHelp">{{ form.getConfig('textBelowMail') }}</textarea>
+                                        <small id="textBelowMailHelp" class="form-text text-muted">Dieser Text steht unter dem Datenblock aus dem Formular.</small>
+                                    </div>
+
+                                </div>
+                                <div class="col-4">
+                                    <img style="margin-top: 20px; max-width: 150px;" src="{{ app.getAssetUri('images/text-below.svg') }}" alt="" />
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+
+
+
+
+
+
+
+                    <button type="submit" class="btn btn-primary">Speichern</button>
+
+                </form>
+
+
+            </div>
+        </div>
+
+    </div>
+</div>

@@ -1,0 +1,9 @@
+<div class="form-group">
+    <label for="addressId">Adresse</label>
+    <select required class="form-control" id="addressId" name="addressId">
+        <option value="">bitte wählen ...</option>
+        {% for address in item.getAddresses() %}
+            <option {% if address.getId() == item.getConfig('addressId') %}selected{% endif %} value="{{ address.getId() }}">{{ address.getTitle() }}</option>
+        {% endfor %}
+    </select>
+</div>

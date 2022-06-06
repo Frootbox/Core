@@ -1,0 +1,46 @@
+.offcanvas.bars {
+  position: fixed;
+  z-index: 10000;
+  top: 21px;
+  right: 15px;
+
+  color: #FFF;
+  font-size: 32px;
+  text-shadow: 0 0 5px rgba(0, 0, 0, .5);
+}
+
+.offcanvas.plane {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  width: 100%;
+  min-height: 400px;
+  height: 100%;
+  background: rgba(10, 10, 10, .9);
+
+  overflow: scroll;
+
+  nav {
+    padding: 80px 0;
+
+    text-align: center;
+
+    a {
+      display: block;
+      padding: 10px 0;
+      color: #FFF;
+      font-size: 18px;
+    }
+
+    a.level-2 {
+      padding: 5px 0;
+      font-size: 14px;
+      color: rgba(255, 255, 255, .8);
+    }
+
+    .children {
+      margin: -5px 0 10px 0;
+    }
+  }
+}

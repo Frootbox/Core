@@ -1,0 +1,432 @@
+{# config
+
+title: Standard
+variables:
+    withContainer:
+        label: mit Layout-Container
+        type: bool
+        default: false
+
+/config #}
+
+{% set v = view.getViewhelper('View') %}
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set p = view.getViewhelper('Partials', { plugin: plugin }) %}
+{% set t = i.getTranslator() %}
+
+{{ i.injectScript({ path: 'Checkout01/public/init.js'}) | raw }}
+
+{{ v.asset('EXT:Core/ShopSystem/icons/css/all.css') | raw }}
+
+<script>
+    var fbxShoppingUrisUpdateShipping = "{{ i.getUriAjax({ action: 'updateShippingMethod' }) | raw }}";
+</script>
+
+<div class="plugin Core ShopSystem Checkout Checkout01">
+
+    {% if variables.withContainer %}<div class="container">{% endif %}
+
+    <div class="row">
+        <div class="col-12">
+
+            {% if plugin.isFirst %}
+                <h1 class="first" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h1>
+            {% else %}
+                <h2 class="first" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+            {% endif %}
+
+            <script>
+                $(function ( ) {
+
+                    $('#street').change(function ( event ) {
+
+                        if ($('#streetNumber').val() == '') {
+
+                            let match = $(this).val().match(/^(.*?)\s([0-9]+)$/);
+
+                            if (match) {
+                                $('#street').val(match[1]);
+                                $('#streetNumber').val(match[2]);
+                            }
+                        }
+                    });
+
+                });
+            </script>
+
+            <form action="{{ i.getUriAjax({ action: 'submitData' }) }}" method="post" class="ajax-checkout-form">
+
+                <div class="row">
+                    <div class="col-md-6">
+
+                        <h3>Rechnungsadresse</h3>
+
+
+                        {% if addresses | length %}
+
+                            <script>
+                                var addresses = {{ addresses | json_encode | raw }};
+
+                                $(function ( ) {
+
+                                    $('.addressesSelector').change(function ( event ) {
+
+                                        let target = $(this).data('target');
+
+                                        let index = $(this).find('option:selected').data('index');
+                                        let address = addresses[index];
+
+                                        console.log(address);
+
+                                        $('[name="' + target + '[addition]"]').val(address.addition);
+                                        $('[name="' + target + '[street]"]').val(address.street);
+                                        $('[name="' + target + '[streetNumber]"]').val(address.streetNumber);
+                                        $('[name="' + target + '[postalCode]"]').val(address.zipcode);
+                                        $('[name="' + target + '[city]"]').val(address.city);
+
+                                    });
+                                });
+
+                            </script>
+
+                            <div class="form-group">
+                                <label for="lastUsedAddressBilling">aus vorhandenen Adressen auswählen</label>
+                                <select data-target="personal" class="form-control addressesSelector" id="lastUsedAddressBilling" name="lastUsedAddressBilling">
+                                    <option value="">bitte wählen ...</option>
+                                    {% for address in addresses %}
+                                        <option {% if shopcart.getPersonal('gender') == 'Female' %}selected{% endif %} data-index="{{ loop.index0 }}" value="{{ address.getId }}">{{ address.getTitle | default('kein Titel') }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        {% endif %}
+
+
+                        <div class="form-row">
+                            <div class="form-group col-6">
+                                <label for="gender">Anrede *</label>
+                                <select required class="form-control" id="gender" name="personal[gender]">
+                                    <option value="">bitte wählen ...</option>
+                                    <option {% if shopcart.getPersonal('gender') == 'Female' %}selected{% endif %} value="Female">Frau</option>
+                                    <option {% if shopcart.getPersonal('gender') == 'Male' %}selected{% endif %} value="Male">Herr</option>
+                                    <option {% if shopcart.getPersonal('gender') == 'Diverse' %}selected{% endif %} value="Diverse">Divers</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-6">
+                                <label for="title">Titel</label>
+                                <input type="text" class="form-control" id="title" name="personal[title]" placeholder="Titel" value="{{ shopcart.getPersonal('title') }}">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-6 col-md-6">
+                                <label for="firstname">Vorname *</label>
+                                <input required type="text" class="form-control" id="firstname" name="personal[firstname]" placeholder="Vorname" value="{{ shopcart.getPersonal('firstname') }}">
+                            </div>
+                            <div class="form-group col-6 col-md-6">
+                                <label for="lastname">Nachname *</label>
+                                <input required type="text" class="form-control" id="lastname" name="personal[lastname]" placeholder="Nachname" value="{{ shopcart.getPersonal('lastname') }}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="addition">Adresszusatz</label>
+                            <input type="text" class="form-control" id="addition" name="personal[addition]" placeholder="Adresszusatz" value="{{ shopcart.getPersonal('addition') }}">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-8">
+                                <label for="street">Straße *</label>
+                                <input required type="text" class="form-control" id="street" name="personal[street]" placeholder="Straße" value="{{ shopcart.getPersonal('street') }}">
+                            </div>
+                            <div class="form-group col-4">
+                                <label for="streetNumber">Nr.*</label>
+                                <input required type="text" class="form-control" id="streetNumber" name="personal[streetNumber]" placeholder="Nr." value="{{ shopcart.getPersonal('streetNumber') }}">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-4">
+                                <label for="postalCode">PLZ *</label>
+                                <input required type="text" class="form-control" id="postalCode" name="personal[postalCode]" placeholder="PLZ" value="{{ shopcart.getPersonal('postalCode') }}">
+                            </div>
+                            <div class="form-group col-8">
+                                <label for="city">Ort *</label>
+                                <input required type="text" class="form-control" id="city" name="personal[city]" placeholder="Ort" value="{{ shopcart.getPersonal('city') }}">
+                            </div>
+                        </div>
+
+                        {% if config.get('shop.shipping.countries') %}
+                                <div class="form-group">
+                                    <label for="country">Land *</label>
+                                    <select required class="form-control" id="country" name="personal[country]">
+                                        <option value="">bitte wählen ...</option>
+                                        {% for isocode in config.get('shop.shipping.countries') %}
+                                            <option {% if shopcart.getPersonal('country') == isocode %}selected{% endif %} value="{{ isocode }}">{{ t.translate('Country.' ~ isocode) }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                        {% endif %}
+
+                        <div class="form-group">
+                            <label for="email">E-Mail *</label>
+                            <input required type="email" class="form-control" id="email" name="personal[email]" placeholder="E-Mail" value="{{ shopcart.getPersonal('email') | default(user.getEmail()) }}">
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Telefon</label>
+                            <input type="text" class="form-control" id="phone" name="personal[phone]" placeholder="Telefon" value="{{ shopcart.getPersonal('phone') }}">
+                        </div>
+
+                    </div>
+                    <div class="col-md-6">
+
+                        <h3>Lieferadresse</h3>
+
+                        <div data-editable data-uid="{{ plugin.getUid('text-shipping-top') }}"></div>
+
+                        <script>
+                            $(function ( ) {
+
+                                $('#shipToAddress, #shipToBillingAddress').change(function ( ) {
+
+                                    if ($(this).val()) {
+                                        $('input[value="Frootbox\\\\Ext\\\\Core\\\\ShopSystem\\\\PaymentMethods\\\\CashOnPickup\\\\Method"]').prop('checked', false);
+                                    }
+                                });
+
+                            });
+                        </script>
+
+                        <div class="form-check">
+                            <input {% if shopcart.getShipping('type') == "shipToBillingAddress" %}checked{% endif %} class="form-check-input" type="radio" name="shipping[type]" id="shipToBillingAddress" value="shipToBillingAddress" checked>
+                            <label class="form-check-label" for="shipToBillingAddress">Lieferung an Rechnungsadresse</label>
+                        </div>
+                        <div class="form-check">
+                            <input {% if shopcart.getShipping('type') == "shipToAddress" %}checked{% endif %} class="form-check-input" type="radio" name="shipping[type]" id="shipToAddress" value="shipToAddress">
+                            <label class="form-check-label" for="shipToAddress">Lieferung an nachfolgende Adresse</label>
+                        </div>
+
+                        {% if not plugin.getShopConfig('skipSelfpickup') %}
+                            <div class="form-check">
+                                <input {% if shopcart.getShipping('type') == "selfPickup" %}checked{% endif %} class="form-check-input" type="radio" name="shipping[type]" id="selfPickup" value="selfPickup">
+                                <label class="form-check-label" for="selfPickup">Selbstabholung</label>
+                            </div>
+                        {% endif %}
+
+                        <div class="shipping-form">
+
+                            <hr />
+
+                            {% if addresses | length %}
+                                <div class="form-group">
+                                    <label for="lastUsedAddressShipping">aus vorhandenen Adressen auswählen</label>
+                                    <select data-target="shipping" class="form-control addressesSelector" id="lastUsedAddressShipping" name="lastUsedAddressShipping">
+                                        <option value="">bitte wählen ...</option>
+                                        {% for address in addresses %}
+                                            <option {% if shopcart.getPersonal('gender') == 'Female' %}selected{% endif %} data-index="{{ loop.index0 }}" value="{{ address.getId }}">{{ address.getTitle | default('kein Titel') }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            {% endif %}
+
+
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label for="shipping_firstname">Vorname *</label>
+                                    <input required type="text" class="form-control" id="shipping_firstname" name="shipping[firstname]" placeholder="Vorname" value="{{ shopcart.getShipping('firstname') }}">
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="shipping_lastname">Nachname *</label>
+                                    <input required type="text" class="form-control" id="shipping_lastname" name="shipping[lastname]" placeholder="Nachname" value="{{ shopcart.getShipping('lastname') }}">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-8">
+                                    <label for="shipping_street">Straße *</label>
+                                    <input required type="text" class="form-control" id="shipping_street" name="shipping[street]" placeholder="Straße" value="{{ shopcart.getShipping('street') }}">
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label for="shipping_streetNumber">Nr. *</label>
+                                    <input required type="text" class="form-control" id="shipping_streetNumber" name="shipping[streetNumber]" placeholder="Nr." value="{{ shopcart.getShipping('streetNumber') }}">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="shipping_addition">Adresszusatz</label>
+                                <input type="text" class="form-control" id="shipping_addition" name="shipping[addition]" placeholder="Adresszusatz" value="{{ shopcart.getShipping('addition') }}">
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group col-md-4">
+                                    <label for="shipping_postalCode">PLZ *</label>
+                                    <input required type="text" class="form-control" id="shipping_postalCode" name="shipping[postalCode]" placeholder="PLZ" value="{{ shopcart.getShipping('postalCode') }}">
+                                </div>
+                                <div class="form-group col-md-8">
+                                    <label for="shipping_city">Ort *</label>
+                                    <input required type="text" class="form-control" id="shipping_city" name="shipping[city]" placeholder="Ort" value="{{ shopcart.getShipping('city') }}">
+                                </div>
+                            </div>
+
+                            {% if config.get('shop.shipping.countries') %}
+                                <div class="form-group">
+                                    <label for="shipping_country">Land *</label>
+                                    <select required class="form-control" id="shipping_country" name="shipping[country]">
+                                        <option value="">bitte wählen ...</option>
+                                        {% for isocode in config.get('shop.shipping.countries') %}
+                                            <option {% if shopcart.getShipping('country') == isocode %}selected{% endif %} value="{{ isocode }}">{{ t.translate('Country.' ~ isocode) }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            {% endif %}
+                        </div>
+
+
+                        <div data-editable data-uid="{{ plugin.getUid('text-shipping-below') }}"></div>
+
+
+                        {% if not config.get('shop.coupons.disabled') %}
+
+                            <script>
+                                $(function ( ) {
+
+                                    /**
+                                     *
+                                     */
+                                    $(document).on('keydown', '#couponCode', function ( event ) {
+
+                                        if (event.keyCode == 13) {
+
+                                            event.preventDefault();
+                                            event.stopImmediatePropagation();
+
+                                            $('a.submit-coupon').trigger('click');
+                                        }
+                                    });
+
+                                    /**
+                                     *
+                                     */
+                                    $(document).on('click', 'a.submit-coupon', function( event ) {
+
+                                        event.preventDefault();
+
+                                        if ($('#couponCode').val().length == 0) {
+                                            return;
+                                        }
+
+                                        $.ajax({
+                                            headers: {
+                                                Accept: "application/json; charset=utf-8",
+                                            },
+                                            url: $(this).attr('href'),
+                                            data: {
+                                                couponCode: $('#couponCode').val()
+                                            },
+                                            success: function ( response ) {
+
+                                                $('#itemsTableReceiver').html(response.html);
+                                            },
+                                            error: function ( xhr ) {
+
+                                                if (typeof xhr.responseJSON.error != "undefined") {
+                                                    alert(xhr.responseJSON.error);
+                                                }
+                                                else {
+                                                    alert(xhr.responseText);
+                                                }
+                                            }
+                                        })
+                                    });
+                                })
+                            </script>
+                            <br /><br />
+                            <div class="form-group">
+                                <label for="couponCode">Coupon einlösen</label>
+                                <div class="input-group mb-2">
+                                    <input type="text" class="form-control" name="couponCode" id="couponCode" placeholder="Coupon-Code">
+                                    <div class="input-group-append">
+                                        <div class="input-group-text">
+                                            <a class="submit-coupon" href="{{ i.getUriAjax({ action: 'redeemCoupon' }) }}"><i class="fal fa-check"></i></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                    </div>
+
+
+                    {% set paymentMethod = i.getPaymentMethod() %}
+                    {% if paymentMethod %}
+                        <div class="col-12">
+
+                            <h3>Zahlungsdaten</h3>
+
+                            <script>
+                                $(function( ) {
+
+                                    $('input.paymentmethod').change(function ( ) {
+
+                                        $.ajax({
+                                            url: '{{ i.getUriAjax({ action: "setPaymentMethod" }) | raw }}',
+                                            dataType: 'json',
+                                            data: {
+                                                paymentMethod: $(this).val()
+                                            },
+                                            success: function ( response ) {
+                                                $('#paymentMethodHtmlReceiver').html(response.method.html);
+                                            }
+                                        });
+                                    });
+                                });
+                            </script>
+
+                            <div class="row">
+                                <div class="col-6">
+
+                                    {% for xpaymentMethod in i.getPaymentMethods() %}
+                                        <div class="form-check">
+                                            <input class="form-check-input paymentmethod" type="radio" name="payment[method]" id="method_{{ loop.index }}" value="{{ xpaymentMethod.getClass() }}" {% if xpaymentMethod.isActive() %}checked{% endif %}>
+                                            <label class="form-check-label" for="method_{{ loop.index }}">{{ xpaymentMethod.getTitle() }}</label>
+                                        </div>
+                                    {% endfor %}
+
+                                </div>
+                                <div class="col-6">
+
+                                    {% set paymentMethodDelegator = view.getViewhelper('Delegator', { object: paymentMethod }) %}
+
+                                    <div id="paymentMethodHtmlReceiver">
+                                        {{ paymentMethodDelegator.renderInputHtml() | raw }}
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </div>
+                    {% endif %}
+
+                </div>
+
+                <hr />
+
+                <div id="itemsTableReceiver">
+                    {{ p.renderPartial('ItemsTable', { plugin: plugin, shopcart: shopcart, editable: true }) | raw }}
+                </div>
+
+                <div class="row justify-content-between align-items-center">
+                    <div class="col-6 col-md-3">
+                        <a href="{{ plugin.getActionUri('login', { back: 1 }) }}" class="btn btn-block btn-secondary">zurück</a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <button type="submit" class="btn btn-block btn-primary">weiter</button>
+                    </div>
+                </div>
+
+            </form>
+
+            {{ p.renderPartial('BasketFooter', { shopcart: shopcart, plugin: plugin }) | raw }}
+
+
+        </div>
+
+
+        {% if variables.withContainer %}</div>{% endif %}
+
+    </div>
+</div>

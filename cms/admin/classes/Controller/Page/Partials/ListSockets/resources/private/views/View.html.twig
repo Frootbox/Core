@@ -1,0 +1,109 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{% if sockets|length == 0 %}
+	Dem Template dieser Seite können keine Plugins hinzugefügt werden.
+{% endif %}
+
+<style>
+	a.visibility-Hidden {
+		color: #CCC;
+	}
+</style>
+
+{% for type, section in sockets %}
+
+	{% for socket in section %}
+		<h4>
+			{{ socket.attributes.title | default(socket.socket) }}
+
+			<span class="headoptions">
+				<a data-modal href="{{ v.getUri('Page', 'ajaxModalContentCompose', { pageId: page.getId(), socket: socket.socket, main: socket.attributes.main } ) }}" data-title="Inhalt hinzufügen"><i class="fa fa-plus-circle"></i></a>
+			</span>
+		</h4>
+
+		<table id="{{ page.getId() }}_{{ socket.socket }}" class="table" data-sort="{{ v.getUri('Page', 'ajaxSortElements', { pageId: page.getId(), socket: socket.socket } ) }}">
+			<tbody>
+
+				{% for contentElement in socket.elements %}
+					<tr id="row-{{ contentElement.getId() }}">
+						<td>
+							{% if contentElement.getType == 'Grid' %}
+								<table class="table">
+									<tbody>
+										<tr>
+											{{ contentElement.getColumns | length }}
+
+											{% for column in contentElement.getColumns %}
+												<td>
+													<h5>
+														Spalte {{ loop.index }}
+														<span class="headoptions">
+															<a data-modal href="{{ v.getUri('Page', 'ajaxModalContentCompose', { 'pageId' : page.getId(), 'socket' : column.socket } ) }}" data-title="Inhalt hinzufügen"><i class="fa fa-plus-circle"></i></a>
+														</span>
+													</h5>
+
+
+													<table>
+														<tbody>
+															{% for xel in column.elements %}
+																<tr>
+																	<td>
+																		<a class="ajax" href="{{ xel.getAdminUri('Index', 'index', { pageId: data.pageId }) }}">
+																			{{ xel.getTitle() | default('kein Titel') }}
+																		</a>
+																	</td>
+																	<td class="text-right">
+																		<a class="ajax" href="{{ v.getUri('Plugin', 'ajaxSwitchVisibility', { elementId: xel.getId() } ) }}"><i data-element="{{ xel.getId() }}" class="fa fa-lightbulb visibility {{ xel.getVisibilityString() }}"></i></a>&nbsp;&nbsp;
+
+																		<a class="ajax" href="{{ v.getUri('Plugin', 'ajaxPanelConfig', { 'pluginId' : xel.getId() } ) }}"><i class="fa fa-cog"></i></a>&nbsp;&nbsp;
+																		<a class="ajax" data-confirm="Soll dieses Plugin wirklich gelöscht werden?" href="{{ v.getUri('Plugin', 'ajaxDelete', { 'pluginId' : xel.getId() } ) }}"><i class="fa fa-times"></i></a>
+																	</td>
+																</tr>
+															{% endfor %}
+														</tbody>
+													</table>
+
+
+												</td>
+											{% endfor %}
+										</tr>
+									</tbody>
+								</table>
+							{% else %}
+								<a class="ajax visibility-{{ contentElement.getVisibility() }}" href="{{ contentElement.getAdminUri('Index', 'index', { pageId: data.pageId }) }}">
+
+
+									{% if page.getId() != contentElement.getPageId() %}
+										<i data-toggle="tooltip" label="kmllö" class="fa fa-arrow-alt-down"></i>
+									{% elseif contentElement.getVisibility() == 'Hidden' %}
+										<i data-toggle="tooltip" label="kmllö" class="fa fa-eye-slash"></i>
+									{% endif %}
+
+									{{ contentElement.getTitle() | default(contentElement) | escapePageTitle }}<br />
+									<span style="color: #CCC; font-size: 11px;">{{ contentElement.getTitleDefault() }}</span>
+								</a>
+							{% endif %}
+
+
+						</td>
+						<td class="handle" width="40"><i class="fa fa-grip-lines"></i></td>
+						<td class="text-right" width="100">
+
+							<a class="ajax" href="{{ v.getUri('Plugin', 'ajaxSwitchVisibility', { elementId: contentElement.getId() } ) }}"><i data-element="{{ contentElement.getId() }}" class="fa fa-lightbulb visibility {{ contentElement.getVisibilityString() }}"></i></a>&nbsp;&nbsp;
+
+							{% if contentElement.getType == 'Grid' %}
+								<a class="ajax" href="{{ v.getUri('Plugin', 'ajaxPanelConfigGrid', { gridId: contentElement.getId() } ) }}"><i class="fa fa-cog"></i></a>&nbsp;&nbsp;
+							{% else %}
+								<a class="ajax" href="{{ v.getUri('Plugin', 'ajaxPanelConfig', { pluginId: contentElement.getId() } ) }}"><i class="fa fa-cog"></i></a>&nbsp;&nbsp;
+							{% endif %}
+							<a class="ajax" data-confirm="Soll dieses Plugin wirklich gelöscht werden?" href="{{ v.getUri('Plugin', 'ajaxDelete', { pluginId: contentElement.getId() } ) }}"><i class="fa fa-times"></i></a>
+
+						</td>
+					</tr>
+				{% endfor %}
+
+			</tbody>
+		</table>
+	{% endfor %}
+
+{% endfor %}

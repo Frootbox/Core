@@ -1,0 +1,49 @@
+{# config
+
+title: Standard
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+{% set keywords = i.getKeywords() %}
+
+<div class="row">
+    <div class="col-12 plugin Core HelpAndSupport KeywordIndex Index01">
+
+        {% if plugin.isFirst %}
+            <h1 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h1>
+        {% else %}
+            <h2 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+        {% endif %}
+
+        <div data-editable data-uid="{{ plugin.getUid('teaser') }}"></div>
+
+        <br />
+
+        <div class="row">
+            <div class="col-4">
+
+                {% set keywordPerColumn = (keywords.getCount / 3) | round(0, 'ceil') %}
+
+                <ul>
+                    {% for keyword in keywords %}
+                        <li><a href="{{ keyword.getUri }}">{{ keyword.getTitle }}</a></li>
+
+                        {% if loop.index % keywordPerColumn == 0 %}
+                                </ul>
+                            </div>
+                            <div class="col-4">
+                                <ul>
+                        {% endif %}
+
+                    {% endfor %}
+                </ul>
+
+            </div>
+        </div>
+
+
+    </div>
+</div>
+

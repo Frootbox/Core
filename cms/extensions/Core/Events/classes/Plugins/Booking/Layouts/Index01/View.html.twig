@@ -1,0 +1,211 @@
+{# config
+
+title: Standard
+variables:
+    withContainer:
+        type: bool
+        label: mit Layout-Container
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set p = view.getViewhelper('Partials') %}
+{% set t = i.getTranslator() %}
+
+{{ i.injectScss({ path: 'Index01/public/css/standards.less'}) | raw }}
+
+{% set bookableEvents = i.getEventsBookable() %}
+
+<script>
+    $(function ( ) {
+
+        /**
+         * Submit form
+         */
+        $('#eventBookingForm').submit(function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            $.ajax({
+                url: $(this).attr('action'),
+                type: 'POST',
+                headers: {
+                    Accept: "application/json; charset=utf-8",
+                },
+                data: $(this).serialize(),
+                success: function ( response ) {
+
+                    var response = $.parseJSON(response);
+
+                    window.location.href = response.redirect;
+                },
+                error: function ( xhr ) {
+
+                    console.log(xhr.responseText);
+                    var response = $.parseJSON(xhr.responseText);
+
+                    alert(response.error);
+                }
+            })
+        });
+    });
+</script>
+
+<div class="plugin Core Events Booking Index01">
+
+    {% if variables.withContainer %}<div class="container">{% endif %}
+
+    <div class="row">
+        <div class="col-12 ">
+
+            <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+
+            <div data-editable data-uid="{{ plugin.getUid('teaser-text') }}"></div>
+
+            <div class="row justify-content-md-center">
+                <div class="col col-lg-6">
+
+                    <form id="eventBookingForm" method="post" action="{{ plugin.getUriAjax('submitBooking') }}">
+
+                        {% if not event %}
+                            <div class="form-group">
+                                <label for="eventId">Veranstaltung *</label>
+                                <select class="form-control" id="eventId" name="eventId" required>
+                                    <option value="">bitte wählen ...</option>
+
+                                    {% for event in bookableEvents %}
+                                        <option {% if plugin.getAttribute('eventId') == event.getId() %}selected{% endif %} value="{{ event.getId() }}">{{ event.getTitle() }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        {% else %}
+                            <input type="hidden" name="eventId" value="{{ event.getId() }}" />
+                        {% endif %}
+
+
+                        <div class="form-group">
+                            <label for="persons">Anzahl Personen *</label>
+                            <select required class="form-control" id="persons" name="persons">
+                                <option value="">bitte wählen ...</option>
+
+                                {% for i in 1..20 %}
+                                    <option value="{{ i }}">{{ i }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-6">
+
+                                <div class="form-group">
+                                    <label for="firstName">Vorname *</label>
+                                    <input type="text" class="form-control" id="firstName" name="owner[firstName]" placeholder="Vorname" required>
+                                </div>
+
+                            </div>
+                            <div class="col-6">
+
+                                <div class="form-group">
+                                    <label for="lastName">Nachname *</label>
+                                    <input type="text" class="form-control" id="lastName" name="owner[lastName]" placeholder="Nachname" required>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-8">
+
+                                <div class="form-group">
+                                    <label for="firstName">Straße *</label>
+                                    <input type="text" class="form-control" id="firstName" name="owner[street]" placeholder="Straße" required>
+                                </div>
+
+                            </div>
+                            <div class="col-4">
+
+                                <div class="form-group">
+                                    <label for="lastName">Hausnummer *</label>
+                                    <input type="text" class="form-control" id="lastName" name="owner[streetNumber]" placeholder="Hausnummer" required>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-4">
+
+                                <div class="form-group">
+                                    <label for="firstName">PLZ *</label>
+                                    <input type="text" class="form-control" id="firstName" name="owner[zipCode]" placeholder="PLZ" required>
+                                </div>
+
+                            </div>
+                            <div class="col-8">
+
+                                <div class="form-group">
+                                    <label for="lastName">Ort *</label>
+                                    <input type="text" class="form-control" id="lastName" name="owner[city]" placeholder="Ort" required>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">E-Mail *</label>
+                            <input type="email" class="form-control" id="email" name="owner[email]" placeholder="E-Mail" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Telefon *</label>
+                            <input type="text" class="form-control" id="phone" name="owner[phone]" placeholder="Telefon" required>
+                        </div>
+
+                        <h3>Zahlungsart</h3>
+
+                        <div class="form-group">
+                            <label for="paymentType">Zahlungsart wählen *</label>
+                            <select required class="form-control" id="paymentType" name="payment[type]">
+                                <option value="">bitte wählen ...</option>
+                                {% if plugin.getConfig('paymentmethods.Paypal') %}<option value="PayPal">PayPal</option>{% endif %}
+                                {% if plugin.getConfig('paymentmethods.CashOnPickup') %}<option value="CashOnPickup">Bar bei Abholung</option>{% endif %}
+                                {% if plugin.getConfig('paymentmethods.PaymentInAdvance') %}<option value="PaymentInAdvance">Vorkasse</option>{% endif %}
+                                {% if plugin.getConfig('paymentmethods.Debit') %}<option value="Debit">Lastschrift</option>{% endif %}
+                            </select>
+                        </div>
+
+                        <h3>Ihre Buchung</h3>
+
+                        <table class="table">
+                            <tr>
+                                <td>Veranstaltung</td>
+                                <td>{{ event.title }}</td>
+                            </tr>
+                            <tr>
+                                <td>Datum</td>
+                                <td>{{ event.getDateStart() | date('d.m.Y H:i')}} Uhr</td>
+                            </tr>
+                            <tr>
+                                <td>Preis</td>
+                                <td>{{ event.getConfig('bookable.price') | number_format(2, ",", ".") }} EUR pro Person</td>
+                            </tr>
+                        </table>
+
+
+                        <div class="form-group form-check">
+                            <input type="checkbox" class="form-check-input" id="privacyPolicy" name="privacyPolicy">
+                            <label class="form-check-label" for="privacyPolicy">{{ t.translate('AcceptPrivacyPolicy', [ i.getPrivacyPolicyLink() ]) | raw }}</label>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">kostenpflichtig buchen</button>
+
+                    </form>
+
+                </div>
+            </div>
+
+
+
+        </div>
+    </div>
+
+    {% if variables.withContainer %}</div>{% endif %}
+
+</div>

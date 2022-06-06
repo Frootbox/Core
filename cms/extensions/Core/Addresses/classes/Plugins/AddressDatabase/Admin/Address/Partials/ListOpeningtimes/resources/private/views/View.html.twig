@@ -1,0 +1,40 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+{% set t = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\Translator') %}
+
+{% if openingTimes.getCount == 0 %}
+	<div class="message warning">Es wurden noch keine Öffnungszeiten erstellt.</div>
+{% else %}
+
+	<table class="table" data-sort="{{ v.getUri('Assets', 'ajaxItemsSort') }}">
+		<thead>
+			<tr>
+				<th>Tag</th>
+				<th>Zeit</th>
+				<th></th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+
+			{% for openingTime in openingTimes %}
+				<tr id="row-{{ openingTime.getId() }}" data-address="{{ address.getId() }}" class="ajax {% if data.highlight == openingTime.getId %}highlighted{% endif %}" data-href="{{ data.plugin.getAdminUri('Address', 'ajaxModalDetails', { openingTimeId: openingTime.getId() }) }}">
+					<td>
+						{% for day,state in openingTime.getConfig('days') %}
+							{{ t.translate('Core.Addresses.Plugins.AddressDatabase.WeekdayShort' ~ day) }}
+						{% endfor %}
+					</td>
+					<td>
+						{{ openingTime.getConfig('timeFrom') }}–{{ openingTime.getConfig('timeTo') }} Uhr
+					</td>
+					<td class="handle"><i class="fa fa-grip-lines"></i></td>
+					<td class="text-right">
+						<a class="ajax" href="{{ v.getUri('Assets', 'ajaxSwitchVisibility', { assetId: openingTime.getId() }) }}"><i data-asset="{{ openingTime.getId() }}" class="fa fa-lightbulb visibility {{ openingTime.getVisibilityString() }} icon"></i></a>
+						<a class="ajax" data-confirm="Soll diese Öffnungszeit wirklich gelöscht werden?" href="{{ data.plugin.getAdminUri('Address', 'ajaxOpeningTimeDelete', { addressId: data.address.getId(), openingTimeId: openingTime.getId() }) }}"><i class="fa fa-times icon"></i></a>
+					</td>
+				</tr>
+			{% endfor %}
+
+		</tbody>
+	</table>
+
+{% endif %}

@@ -1,0 +1,110 @@
+
+
+<script>
+    var uid = "{{ get.get('uid') }}";
+
+    $(function ( ) {
+
+        /**
+         *
+         */
+        $('#updateBlockConfig').submit(function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            $.ajax({
+                url: "{{ settings.serverpath }}cms/admin/Editor/callEditable",
+                type: 'POST',
+                data: {
+                    method: 'ajaxUpdateConfig',
+                    editable: 'Frootbox/Ext/Core/System/Editables/Block',
+                    uid: uid,
+                    blockId: {{ block.getid }},
+                    variables: $(this).serialize()
+                },
+                headers: {
+                    Accept: "application/json; charset=utf-8"
+                },
+                success: function ( response ) {
+                    $('[data-blocks][data-uid="' + response.uid + '"] div[data-block="' + response.blockId + '"]').html(response.html);
+                    $('#fbxEditorGenericModal').modal('hide');
+                },
+                error: function ( xhr ) {
+
+                    alert(xhr.responseText);
+
+                    // $('#fbxEditorGenericModal .modal-content').html('<div class="modal-body">' + xhr.responseText + '<\/div>');
+                }
+            });
+        });
+    });
+</script>
+
+
+<div class="modal-header">
+    <h5 class="modal-title">Block konfigurieren</h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body">
+
+    <form method="post" id="updateBlockConfig">
+
+        {% if configuration.get('i18n.multiAliasMode') %}
+
+            <div class="form-group">
+                <label for="pluginClass">Block in folgenden Sprachen <b>nicht</b> zeigen</label>
+            </div>
+
+            {% for language in configuration.get('i18n.languages') %}
+                <div class="form-group form-check">
+                    <input type="checkbox" {% if block.getConfig('skipLanguages.' ~ language) %}checked{% endif %} class="form-check-input" id="{{ language }}" name="skipLanguages[{{ language }}]">
+                    <label class="form-check-label" for="{{ language }}">{{ language }}</label>
+                </div>
+            {% endfor %}
+
+        {% endif %}
+
+        {% set variables = template.getVariables() %}
+
+        {% for variable in variables %}
+
+            {% if variable.type == 'system' %}
+
+            {% elseif variable.type == 'bool' %}
+                <div class="form-group form-check">
+                    <input {% if variable.value %}checked{% endif %} name="variables[{{ variable.name }}]" type="checkbox" class="form-check-input" id="var__{{ variable.name }}">
+                    <label class="form-check-label" for="var__{{ variable.name }}">{{ variable.label }}</label>
+                </div>
+            {% elseif variable.type == 'list' %}
+                <div class="form-group">
+                    <label for="var__{{ variable.name }}">{{ variable.label }}</label>
+                    <select class="form-control" id="var__{{ variable.name }}" name="variables[{{ variable.name }}]">
+                        {% for value,label in variable.options %}
+                            <option {% if variable.value == value %}selected{% endif %} value="{{ value }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            {% elseif variable.type == 'int' %}
+                <div class="form-group">
+                    <label for="var__{{ variable.name }}">{{ variable.label }}</label>
+                    <input type="number" class="form-control" value="{{ variable.value }}" name="variables[{{ variable.name }}]" id="var__{{ variable.name }}" placeholder="{{ variable.label }}">
+                    {#<small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>#}
+                </div>
+            {% else %}
+                <div class="form-group">
+                    <label for="var__{{ variable.name }}">{{ variable.label }}</label>
+                    <input type="text" class="form-control" value="{{ variable.value }}" name="variables[{{ variable.name }}]" id="var__{{ variable.name }}" placeholder="{{ variable.label }}">
+                    {#<small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>#}
+                </div>
+            {% endif %}
+
+        {% endfor %}
+
+        <button type="submit" class="btn btn-primary">Speichern</button>
+
+    </form>
+
+</div>

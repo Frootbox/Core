@@ -1,0 +1,86 @@
+{# config
+
+title: Standard
+
+/config #}
+
+{% set v = view.getViewhelper('View') %}
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set p = view.getViewhelper('Partials', { plugin: plugin }) %}
+{% set a = view.getViewhelper('Assets', {   }) %}
+
+{{ v.asset('EXT:Core/ShopSystem/icons/css/all.css') | raw }}
+
+<div class="plugin Core ShopSystem Account Account01">
+    <div class="container">
+
+        <div class="row">
+            <div class="col-12">
+                <div class="inner-wrapper">
+
+                    {% if plugin.isFirst %}
+                        <h1 data-editable data-uid="{{ plugin.getUid('title-address-edit') }}">Adresse bearbeiten</h1>
+                    {% else %}
+                        <h2 data-editable data-uid="{{ plugin.getUid('title-address-edit') }}">Adresse bearbeiten</h2>
+                    {% endif %}
+
+                    <br /><br />
+
+                    <div class="row">
+                        <div class="col-md-4">
+
+                            {{ p.renderPartial('Menu', { plugin: plugin }) | raw }}
+
+                        </div>
+                        <div class="col-md-8">
+
+                            <form id="updateForm" method="post" action="{{ plugin.getUriAjax('addressUpdate', { addressId: address.getId() }) }}">
+
+                                <div class="form-group">
+                                    <label for="title">Name/Firma</label>
+                                    <input type="text" class="form-control" id="title" name="title" value="{{ address.getTitle() }}">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="addition">Adresszusatz</label>
+                                    <input type="text" class="form-control" id="addition" name="addition" value="{{ address.getAddition() }}">
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group col-8">
+                                        <label for="street">Straße</label>
+                                        <input type="text" class="form-control" id="street" name="street" value="{{ address.getStreet() }}">
+                                    </div>
+                                    <div class="form-group col-4">
+                                        <label for="streetNumber">Nr.</label>
+                                        <input type="text" class="form-control" id="streetNumber" name="streetNumber" value="{{ address.getStreetNumber() }}">
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group col-4">
+                                        <label for="zipcode">PLZ</label>
+                                        <input type="text" class="form-control" id="zipcode" name="zipcode" value="{{ address.getZipcode() }}">
+                                    </div>
+                                    <div class="form-group col-8">
+                                        <label for="city">Ort</label>
+                                        <input type="text" class="form-control" id="city" name="city" value="{{ address.getCity() }}">
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary">Speichern</button>
+
+                            </form>
+
+                        </div>
+                    </div>
+
+
+                    <br /><br /><br /><br /><br />
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

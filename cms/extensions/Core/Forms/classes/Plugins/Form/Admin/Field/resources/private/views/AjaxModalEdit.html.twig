@@ -1,0 +1,80 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    'frame' : false,
+}) }}
+
+<script>
+    $(function ( ) {
+
+        /**
+         *
+         */
+        $('#type').change(function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            $('.form-options').addClass('d-none');
+
+            let selectorClass = 'display-' + $(this).val();
+
+            $('.form-options.' + selectorClass).removeClass('d-none');
+        });
+
+        $('#type').trigger('change');
+    });
+</script>
+
+<form method="post" class="ajax" action="{{ plugin.getAdminUri('Field', 'ajaxUpdate', { fieldId: field.getId() }) }}">
+
+    <div class="modal-body">
+
+        <div class="form-group">
+            <label for="title">Titel</label>
+            <input type="text" class="form-control" name="field[title]" required id="title" placeholder="Titel" value="{{ field.getTitle }}">
+        </div>
+
+        <div class="form-group">
+            <label for="type">Typ</label>
+            <select class="form-control" id="type" name="field[config][type]">
+                <option value="">bitte wählen ...</option>
+
+                {% for type in field.getTypes() %}
+                    <option {% if field.getType == type %}selected{% endif %} value="{{ type }}">{{ type }}</option>
+                {% endfor %}
+
+            </select>
+        </div>
+
+        <div class="form-group form-check">
+            <input type="checkbox" class="form-check-input" id="isRequired" name="field[config][isRequired]" value="1" {% if field.getConfig('isRequired') %}checked{% endif %}>
+            <label class="form-check-label" for="isRequired">Pflichtfeld</label>
+        </div>
+
+        <div class="form-options form-group display-List display-Radio display-CheckboxMultiple display-CheckboxMultipleInline display-Channel d-none">
+            <label for="options">Optionen</label>
+            <textarea rows="10" class="form-control" name="field[config][options]" id="options" placeholder="Optionen">{{ field.getConfig('options') }}</textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="helpText">Hilfe-Text</label>
+            <input type="text" class="form-control" name="field[config][helpText]" id="helpText" placeholder="Hilfe-Text" value="{{ field.getConfig('helpText') }}">
+        </div>
+
+        <div class="form-group">
+            <label for="helpTextLink">Hilfe-Text Link</label>
+            <input type="text" class="form-control" name="field[config][helpTextLink]" id="helpTextLink" placeholder="Hilfe-Text Link" value="{{ field.getConfig('helpTextLink') }}">
+        </div>
+
+        <div class="form-group">
+            <label for="cssClass">CSS-Klasse</label>
+            <input type="text" class="form-control" name="field[config][cssClass]" id="cssClass" placeholder="CSS-Klasse" value="{{ field.getConfig('cssClass') }}">
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Speichern</button>
+    </div>
+
+</form>

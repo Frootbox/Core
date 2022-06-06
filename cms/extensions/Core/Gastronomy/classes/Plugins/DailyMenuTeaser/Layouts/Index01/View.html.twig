@@ -1,0 +1,55 @@
+{# config
+
+title: Standard
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+{% set t = i.getTranslator() %}
+
+<div class="row">
+    <div class="col-12 plugin Core Gastronomy DailyMenuTeaser Index01">
+
+        {% if plugin.isFirst %}
+            <h1 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h1>
+        {% else %}
+            <h2 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+        {% endif %}
+
+        <div data-editable data-uid="{{ plugin.getUid('text') }}"></div>
+
+        <div class="row justify-content-md-center">
+
+            {% for day in days %}
+                <div class="col-12 col-md-4 col-lg-20">
+
+                    <div class="menupanel h-100">
+
+                        <h5>
+                            {{ t.translate("\Core.Events.Weekday" ~ day.date | date('N')) }}
+                            <span class="subtitle">{{ day.date | date('d.m.') }}</span>
+                        </h5>
+
+                        {% for menuItem in day.items %}
+                            <div class="menu">
+                                {{ menuItem.getTitle() }}<br />
+                                {{ menuItem.getConfig('addition') }}
+
+                                <em>{{ menuItem.getConfig('price') | number_format(2, ',', '.') }} EUR</em>
+                            </div>
+                        {% endfor %}
+
+                    </div>
+
+                </div>
+            {% endfor %}
+
+        </div>
+
+
+        <div data-editable data-uid="{{ plugin.getUid('text-bottom') }}"></div>
+
+    </div>
+</div>
+

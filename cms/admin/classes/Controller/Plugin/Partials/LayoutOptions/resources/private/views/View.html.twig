@@ -1,0 +1,35 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<div class="row">
+    {% for layout in data.layouts %}
+        <div class="col-3 text-center">
+            <a class="ajax" href="{{ v.getUri('Plugin', 'ajaxSetLayout', { pluginId: data.plugin.getId(), action: data.action, layoutId: layout.getTemplateId } ) }}">
+
+                <img style="border: 1px solid #ccc;" class="img-fluid" width="150" height="200" src="{{ layout.getThumbnail }}" alt="" /><br />
+
+                #{{ layout.getTemplateNumber }}<br />
+                {{ layout.getName }}
+
+                {% if layout.getTemplateId == data.plugin.getConfig('layout.' ~ data.action) | default('Index01') %}(active){% endif %}
+            </a>
+            <br /><br />
+        </div>
+    {% endfor %}
+</div>
+
+<div id="layoutConfigReceiver">
+    {{ v.injectPartial('/Frootbox/Admin/Controller/Plugin/Partials/LayoutConfig', {
+        plugin: data.plugin,
+        action: data.action
+    }) | raw }}
+</div>
+
+{% if user.getType() == 'SuperAdmin' %}
+    <h3>Admin-Options</h3>
+
+    <ul>
+        <li><a href="{{ v.getUri('Plugin', 'ajaxViewIndividualize', { pluginId: data.plugin.getId(), action: data.action } ) }}" class="ajax">aktuelles Template individualisieren</a></li>
+        <li><a href="{{ v.getUri('Plugin', 'ajaxViewIndividualizeStyles', { pluginId: data.plugin.getId(), action: data.action } ) }}" class="ajax">aktuelles Stylesheet individualisieren</a></li>
+        <li><a href="{{ v.getUri('Plugin', 'ajaxViewAdd', { pluginId: data.plugin.getId(), action: data.action } ) }}" class="ajax">neues individuelles Template hinzufügen</a></li>
+    </ul>
+{% endif %}

@@ -1,0 +1,106 @@
+<script>
+    $(function ( ) {
+
+        $(document).on('submit', 'form.set-items-options', function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            $.ajax({
+                url: $(this).attr('action'),
+                method: 'POST',
+                data: $(this).serialize(),
+                success: function ( response ) {
+
+                    $('#itemsTableReceiver').html(response.html);
+
+                    localStorage.setItem('fbxShopCartItemCount', response.shopcart.items);
+                    $('.fbxShopCartItemCounter').show();
+                    $('.fbxShopCartItemCounter').html(response.shopcart.items);
+
+                    $('.generic-shopcart-modal').remove();
+                }
+            });
+        });
+    });
+</script>
+
+
+<script>
+    $(function ( ) {
+
+        $('.product-options').change(function ( event ) {
+
+            $.ajax({
+                url: "{{ plugin.getUriAjax('getOptionsInStock') | raw }}",
+                data: {
+                    optionId: $(this).val()
+                },
+                success: function ( response ) {
+
+                    $('.product-options option[value!=""]').each(function ( ) {
+                        $(this).text($(this).data('title'));
+                        $(this).attr('data-amount', 0);
+                    });
+
+                    $.each(response.stocks, function(optionId, amount) {
+
+                        console.log(optionId);
+                        let option = $('option[data-option="' + optionId + '"]');
+
+                        option.html(option.attr('data-title') + ' (verfügbar)');
+                        option.attr('data-amount', amount);
+                    });
+
+                    $('.product-options option:selected').each(function ( ) {
+
+                        if ($(this).attr('data-amount') == 0) {
+                            $(this).parents('select').val('');
+                        }
+                    });
+                }
+            });
+        });
+    });
+</script>
+
+<form method="post" class="set-items-options" action="{{ plugin.getUriAjax('setOptions', { key: item.getKey() }) }}">
+
+    <div class="shopcart-modal">
+        <div class="title">
+            <b>Optionen bearbeiten</b>
+        </div>
+        <div class="body">
+
+            {% for group in product.getDatasheet().getGroups() %}
+                <div class="form-group">
+
+                    <div class="row">
+                        <div class="col-md-5">
+                            <label for="group_{{ group.getId() }}">{{ group.getTitle() }}</label>
+                        </div>
+                        <div class="col-md-7">
+                            <select required class="form-control product-options" name="options[{{ group.getId() }}]" id="group_{{ group.getId() }}">
+                                <option value="">bitte wählen ...</option>
+                                {% for option in group.getOptionsForProduct(product) %}
+
+                                    {% set amount = product.getStocksForOption(option) %}
+
+                                    {% if amount > 0 %}
+                                        <option {% if item.getFieldOption(group.getId()) == option.getId() %}selected{% endif %} data-option="{{ option.getId() }}" data-title="{{ option.getTitle() }} {% if option.getSurcharge() %} (+ {{ option.getSurcharge() }} &euro;){% endif %}" data-amount="{{ amount }}" value="{{ option.getId() }}">{{ option.getTitle() }}{% if option.getSurcharge() %} (+ {{ option.getSurcharge() }} &euro;){% endif %}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+
+        </div>
+        <div class="body">
+            <a class="generic-modal-close btn btn-secondary" href="#">schließen</a>
+            <button type="submit" class="btn btn-primary">Speichern</button>
+        </div>
+    </div>
+
+</form>

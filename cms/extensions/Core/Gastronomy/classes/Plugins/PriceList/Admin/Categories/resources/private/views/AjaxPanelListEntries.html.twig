@@ -1,0 +1,18 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<h4>
+    Positionen
+
+    <span class="headoptions">
+		<a data-toggle="tooltip" data-modal data-title="neue Position hinzufügen" href="{{ plugin.getAdminUri('Positions', 'ajaxModalCompose', { categoryId: category.getId() }) }}"><i class="fa fa-plus-circle"></i></a>
+	</span>
+</h4>
+
+<div id="listEntriesCategoryListReceiver">
+
+    {{ v.injectPartial('\\Frootbox\\Ext\\Core\\Gastronomy\\Plugins\\PriceList\\Admin\\Categories\\Partials\\ListEntries', {
+        'category' : category,
+        'plugin' : plugin
+    }) | raw }}
+
+</div>

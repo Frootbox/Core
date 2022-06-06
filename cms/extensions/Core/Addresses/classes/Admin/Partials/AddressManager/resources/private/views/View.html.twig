@@ -1,0 +1,16 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<h3>
+	Adressen
+
+	<span class="headoptions">
+		<a data-toggle="tooltip" data-modal data-title="neue Adresse hinzufügen" href="{{ v.getStaticUri('Core/Addresses/AssetManager', 'ajaxModalCompose', { pluginId: partial.getData('plugin').getId(), repository: data.repository }) }}"><i class="fa fa-plus-circle"></i></a>
+	</span>
+</h3>
+
+<div id="addressesReceiver">
+	{{ v.injectPartial('/Frootbox/Ext/Core/Addresses/Admin/Partials/AddressList', {
+		plugin: plugin,
+		repository: data.repository,
+	}) | raw }}
+</div>

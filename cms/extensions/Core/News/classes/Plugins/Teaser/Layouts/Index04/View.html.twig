@@ -1,0 +1,96 @@
+{# config
+
+title: Carousel
+variables:
+    image_width:
+        type: int
+        label: Bildbreite
+        default: 1400
+    image_height:
+        type: int
+        label: Bildhöhe
+        default: 800
+    skipArrows:
+        type: bool
+        label: keine Pfeilnavigation
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+{% set articles = i.getArticles() %}
+
+<div class="row">
+    <div class="col-12 plugin Core News Teaser Index04">
+
+        <div id="carouselNewsTeaser{{ plugin.getId() }}" class="carousel slide carousel-fade" data-ride="carousel">
+
+            {% if articles.getCount() > 1 %}
+                <ol class="carousel-indicators">
+
+                    {% for article in articles %}
+                        <li data-target="#carouselNewsTeaser{{ plugin.getId() }}" data-slide-to="{{ loop.index0 }}" class="{% if loop.index == 1 %}active{% endif %}"></li>
+                    {% endfor %}
+
+                </ol>
+            {% endif %}
+
+            <div class="carousel-inner">
+
+                {% for article in articles %}
+                    <div class="carousel-item {% if loop.index == 1 %}active{% endif %}" data-href="{{ article.getUri() }}">
+                        <picture class="fluid" data-editable {% if variables.noImageDummy %}data-skipempty="1"{% endif %} data-uid="{{ article.getUid('image')}}">
+                            <img class="d-block w-100" width="{{ variables.image_width }}" height="{{ variables.image_height }}" src="{{ i.getDummyImage({ width: variables.image_width, height: variables.image_height | default(300) }) }}" alt="" />
+                        </picture>
+
+                        <div class="carousel-caption">
+                            <h5>{{ article.getTitle() }}</h5>
+                            <div data-nowidgets data-editable data-uid="{{ article.getUid('teaser') }}"></div>
+                        </div>
+                    </div>
+                {% endfor %}
+
+            </div>
+
+            {% if not variables.skipArrows and articles.getCount() > 1 %}
+                <a class="carousel-control-prev" data-norewrite="1" href="#carouselNewsTeaser{{ plugin.getId() }}" role="button" data-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Previous</span>
+                </a>
+                <a class="carousel-control-next" data-norewrite="1" href="#carouselNewsTeaser{{ plugin.getId() }}" role="button" data-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Next</span>
+                </a>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+
+
+
+{#
+
+        <h2 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+
+        <div data-editable data-uid="{{ plugin.getUid('teaser-text') }}"></div>
+
+        {% for article in articles %}
+            <div class="row news-teaser">
+                <div class="col-12">
+                    <h3 data-editable data-uid="{{ article.getUid('title') }}">{{ article.getTitle }}</h3>
+                </div>
+                <div class="col-6 order-2">
+                    <picture class="fluid" data-skipempty="true" data-editable data-uid="{{ article.getUid('image')}}">
+                        <img width="600" height="350" src="{{ i.getDummyImage({ width: 600, height: 350}) }}" alt="" />
+                    </picture>
+                </div>
+                <div class="col-6 order-1">
+                    <div data-nowidgets data-editable data-uid="{{ article.getUid('teaser') }}"></div>
+                    <p><a href="{{ article.getUri }}"><i class="fa fa-chevron-circle-right icon"></i> weiterlesen</a></p>
+                </div>
+            </div>
+
+
+
+#}

@@ -1,0 +1,15 @@
+
+{% set partialId = "LayoutInput" ~ random(10000, 99999) %}
+
+<div class="form-group">
+    <label for="{{ partialId }}">Layout wählen</label>
+    <select class="form-control" id="{{ partialId }}" name="layoutId">
+        <option value="">bitte wählen ...</option>
+
+
+        {% for layout in layouts %}
+            <option {% if data.selected == layout.getTemplateId() %}selected{% endif %} value="{{ layout.getTemplateId() }}">{{ layout.getName() }} (#{{ layout.getTemplateNumber }})</option>
+        {% endfor %}
+
+    </select>
+</div>

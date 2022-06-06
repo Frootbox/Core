@@ -1,0 +1,73 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    'frame' : false,
+}) }}
+
+<form method="post" class="ajax" action="{{ plugin.getAdminUri('Positions', 'ajaxPriceUpdate', { priceId: price.getId() }) }}">
+
+    <div class="modal-body">
+
+        <div class="form-row">
+            <div class="col-6">
+
+                <div class="form-group">
+                    <label for="price">Preis</label>
+                    <input type="number" min="0" step="0.01" class="form-control" name="price" id="price" placeholder="Preis" value="{{ price.getConfig('price') | number_format(2, '.', '') }}">
+                </div>
+
+            </div>
+            <div class="col-6">
+
+                <div class="form-group">
+                    <label for="unit">pro Einheit</label>
+                    <select class="form-control" id="unit" name="unit">
+                        <option value="">keine Angabe</option>
+                        <optgroup label="Stückzahl">
+                            <option {% if price.getConfig('unit') == "Each" %}selected{% endif %} value="Each">Stück</option>
+                            <option {% if price.getConfig('unit') == "Person" %}selected{% endif %} value="Person">Person</option>
+                        </optgroup>
+                        <optgroup label="Gewicht">
+                            <option {% if price.getConfig('unit') == "WeightTons" %}selected{% endif %} value="WeightTons">Tonnen</option>
+                        </optgroup>
+                        <optgroup label="Volumen">
+                            <option {% if price.getConfig('unit') == "VolumeCubicMeters" %}selected{% endif %} value="VolumeCubicMeters">Kubikmeter</option>
+                        </optgroup>
+                    </select>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="title">Info</label>
+            <textarea type="text" class="form-control" name="title" id="title" placeholder="Titel">{{ price.getTitle() }}</textarea>
+        </div>
+        <div class="form-group">
+            <label for="addition">Zusatz</label>
+            <textarea type="text" class="form-control" name="addition" id="addition" placeholder="Zusatz">{{ price.getConfig('addition') }}</textarea>
+        </div>
+        <div class="form-group form-check">
+            <input type="checkbox" class="form-check-input" id="priceFrom" name="priceFrom">
+            <label class="form-check-label" for="priceFrom">Preis „ab“</label>
+        </div>
+
+        {% if additives.getCount() > 0 %}
+            <div class="form-group">
+                <label for="additives">Zusatzstoffe</label>
+                <select multiple="true" size="{{ additives.getCount() }}" class="form-control" aria-describedby="additivesHelp" id="additives" name="additives[]">
+
+                    {% for additive in additives %}
+                        <option {% if price.hasAdditive(additive) %}selected{% endif %} value="{{ additive.getId() }}">{{ additive.getOrderId() }}: {{ additive.getTitle() }}</option>
+                    {% endfor %}
+                </select>
+                <small id="additivesHelp" class="form-text text-muted">Mehrfach-Selektion durch gleichzeitiges Halten der Command-Taste und Klicken möglich.</small>
+            </div>
+        {% endif %}
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Speichern</button>
+    </div>
+
+</form>

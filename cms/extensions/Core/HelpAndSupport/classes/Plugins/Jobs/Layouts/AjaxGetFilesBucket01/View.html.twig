@@ -1,0 +1,19 @@
+{% set f = view.getViewhelper('Files') %}
+
+{% if files | length > 0 %}
+    <table class="table">
+        <tbody>
+
+            {% for file in files %}
+                <tr data-file="{{ file.getId() }}">
+                    <td>{{ file.getName() }}</td>
+                    <td class="text-right">{{ f.parseFileSize(file.getSize()) }}</td>
+                    <td class="text-right">
+                        <a class="drop-uploaded-file" data-field="{{ field.getId() }}" data-file="{{ file.getId() }}" href="{{ plugin.getUriAjax('removeTempFile', { fieldId: field.getId(), fileId: file.getId() }) }}"><i class="fa fa-times"></i></a>
+                    </td>
+                </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+{% endif %}

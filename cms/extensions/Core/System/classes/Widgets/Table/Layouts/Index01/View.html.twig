@@ -1,0 +1,40 @@
+{% set i = view.getViewhelper('Delegator', { object: widget }) %}
+
+{% set tabledata = widget.getTableData() %}
+
+<div class="table-responsive">
+    <table class="table">
+
+        {% if widget.getConfig('withHeader') %}
+            <thead>
+            <tr>
+                {% for colIndex, col in tabledata.header %}
+                    <th>
+                        {{ col }}
+                    </th>
+                {% endfor %}
+            </tr>
+            </thead>
+        {% endif %}
+
+        <tbody>
+
+        {% for rowIndex, row in tabledata.rows %}
+            <tr>
+                {% for colIndex, col in row %}
+                    <td>
+                        {{ col }}
+                    </td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+
+        </tbody>
+    </table>
+</div>
+
+{% if widget.getConfig('annotation') %}
+    <div class="annotation">
+        <p>{{ widget.getConfig('annotation') | nl2br }}</p>
+    </div>
+{% endif %}

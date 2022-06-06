@@ -1,0 +1,73 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+'frame' : false,
+}) }}
+
+<script>
+    $(function ( ) {
+
+    });
+</script>
+
+<form method="post" class="ajax" action="{{ plugin.getAdminUri('Index', 'ajaxListEntryUpdate', { listEntryId: listEntry.getId() }) }}">
+
+    <div class="modal-body">
+
+        <a class="btn btn-success ajax" href="{{ plugin.getAdminUri('Index', 'ajaxPriceCreate', { listEntryId: listEntry.getId() }) }}">Preis hinzufügen</a>
+
+        <br /><br />
+
+        <div id="pricesReceiver">
+            {{ v.injectPartial('\\Frootbox\\Ext\\Core\\Gastronomy\\Plugins\\PriceList\\Admin\\Categories\\Partials\\Prices', {
+                listEntry: listEntry,
+                plugin: plugin
+            }) | raw }}
+        </div>
+
+        <br /><br />
+
+        <div class="form-row">
+            <div class="col-5">
+
+                <div class="form-group">
+                    <label for="title">Titel</label>
+                    <input required type="text" class="form-control" name="title" id="title" placeholder="Titel" value="{{ listEntry.getTitle() }}">
+                </div>
+
+            </div>
+            <div class="col-3">
+
+                <div class="form-group">
+                    <label for="price">Preis</label>
+                    <input type="number" min="0" step="0.01" class="form-control" name="price" id="price" placeholder="Preis" value="{{ listEntry.getConfig('price') | number_format(2, '.', '') }}">
+                </div>
+
+            </div>
+            <div class="col-4">
+
+                <div class="form-group">
+                    <label for="unit">pro Einheit</label>
+                    <select class="form-control" id="unit" name="unit">
+                        <option value="">keine Angabe</option>
+                        <optgroup label="Stückzahl">
+                            <option {% if listEntry.getConfig('unit') == "Each" %}selected{% endif %} value="Each">Stück</option>
+                        </optgroup>
+                        <optgroup label="Gewicht">
+                            <option {% if listEntry.getConfig('unit') == "WeightTons" %}selected{% endif %} value="WeightTons">Tonnen</option>
+                        </optgroup>
+                        <optgroup label="Volumen">
+                            <option {% if listEntry.getConfig('unit') == "VolumeCubicMeters" %}selected{% endif %} value="VolumeCubicMeters">Kubikmeter</option>
+                        </optgroup>
+                    </select>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Speichern</button>
+    </div>
+
+</form>

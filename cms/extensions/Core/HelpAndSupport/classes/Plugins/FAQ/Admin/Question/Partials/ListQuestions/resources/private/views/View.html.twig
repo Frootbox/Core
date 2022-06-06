@@ -1,0 +1,32 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{% if questions.getCount() == 0 %}
+	<div class="message warning">Es wurden noch keine Fragen erstellt.</div>
+{% else %}
+
+	<table class="table" data-sort="{{ plugin.getAdminUri('Question', 'ajaxSort') }}">
+		<thead>
+			<tr>
+				<th>Frage</th>
+				<th></th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+
+			{% for question in questions %}
+
+				<tr id="row-{{ question.getId }}" class="{% if data.highlight == question.getId() %}highlighted{% endif %} ajax" data-href="{{ plugin.getAdminUri('Question', 'details', { questionId: question.getId() }) }}">
+					<td>{{ question.getTitle() }}</td>
+					<td class="handle"><i class="fa fa-grip-lines"></i></td>
+					<td class="text-right">
+						<a class="ajax" data-confirm="Soll diese Frage wirklich gelöscht werden?" href="{{ data.plugin.getAdminUri('Question', 'ajaxDelete', { questionId: question.getId() }) }}"><i class="fa fa-times"></i></a>
+					</td>
+				</tr>
+
+			{% endfor %}
+
+		</tbody>
+	</table>
+
+{% endif %}

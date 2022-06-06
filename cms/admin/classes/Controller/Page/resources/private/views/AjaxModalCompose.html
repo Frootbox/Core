@@ -1,0 +1,85 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    'frame' : false,
+}) }}
+
+<script>
+    $(function ( ) {
+
+        /**
+         * Display more options
+         */
+        $('a.show-more-options').click(function ( event ) {
+
+            $('#composeNewPage .form-group.d-none').removeClass('d-none');
+            $('#composeNewPage .form-text.text-muted').remove();
+        });
+
+        /**
+         *
+         */
+        $('#multipleAtOne').on('change', function ( event ) {
+
+            if ($(this).is(':checked')) {
+
+                $('.form-group.multi').show();
+                $('.form-group.multi textarea').prop('required', true);
+
+                $('.form-group.single').hide();
+                $('.form-group.single input').prop('required', false);
+            }
+            else {
+
+                $('.form-group.multi').hide();
+                $('.form-group.multi textarea').prop('required', false);
+
+                $('.form-group.single').show();
+                $('.form-group.single input').prop('required', true);
+            }
+        });
+
+        $('#multipleAtOne').trigger('change');
+
+    });
+</script>
+
+<form method="post" id="composeNewPage" class="ajax" action="{{ v.getUri('Page', 'ajaxCreate', { parentId: parent.getId() }) }}">
+
+    <div class="modal-body">
+
+        <p>Neue Unterseite unterhalb von „{{ parent.getTitle() }}“ erstellen.</p>
+
+        <div class="form-group single">
+            <label for="title">Titel</label>
+            <input type="text" class="form-control" name="title" required id="title" aria-describedby="titleHelp" placeholder="Titel">
+            <small id="titleHelp" class="form-text text-muted"><a class="show-more-options" href="#"><i class="far fa-chevron-down"></i> Optionen einblenden</a></small>
+        </div>
+        <div class="form-group multi">
+            <label for="titles">Seitennamen getrennt mit Zeilenumbruch</label>
+            <textarea type="text" rows="10" class="form-control" name="titles" required id="titles" aria-describedby="titleHelp" placeholder="Titel"></textarea>
+            <small id="titleHelp2" class="form-text text-muted"><a class="show-more-options" href="#"><i class="far fa-chevron-down"></i> Optionen einblenden</a></small>
+        </div>
+
+        <div class="form-group d-none">
+            <label for="cloneFromPage">neue Seite klonen von ...</label>
+            <select class="form-control" id="cloneFromPage" name="cloneFromPage">
+                <option value="">bitte wählen ...</option>
+
+                {% for xpage in tree %}
+                    <option value="{{ xpage.getId() }}">{{ xpage.getTitle }}</option>
+                {% endfor %}
+
+            </select>
+        </div>
+        <div class="form-group form-check d-none">
+            <input type="checkbox" class="form-check-input" id="multipleAtOne">
+            <label class="form-check-label" for="multipleAtOne">mehrere Unterseiten auf einmal erstellen</label>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Seite erstellen</button>
+    </div>
+
+</form>

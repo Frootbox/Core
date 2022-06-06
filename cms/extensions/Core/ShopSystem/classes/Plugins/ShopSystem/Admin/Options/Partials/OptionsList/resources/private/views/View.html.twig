@@ -1,0 +1,32 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{% if options | length == 0 %}
+    <div class="message warning">Diese Optionsgruppe hat derzeit noch keine Optionen.</div>
+{% else %}
+
+    <table class="table" data-sort="{{ plugin.getAdminUri('Datasheets', 'ajaxGroupSort', { datasheetId: data.datasheet.getId() }) }}">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th width="50"></th>
+                <th width="50"></th>
+            </tr>
+        </thead>
+        <tbody>
+
+            {% for option in options %}
+                <tr id="row-{{ option.getId() }}" data-title="Option bearbeiten" class="ajax {% if option.getId() == data.highlight %}highlighted{% endif %}" data-modal="{{ data.plugin.getAdminUri('Options', 'ajaxModalDetails', { optionId: option.getId() }) }}">
+                    <td>{{ option.getTitle() }}</td>
+                    <td class="handle">
+                        <i class="fa fa-grip-lines"></i>
+                    </td>
+                    <td class="text-right">
+                        <a class="ajax" data-confirm="Soll diese Option wirklich gelöscht werden?" href="{{ data.plugin.getAdminUri('Options', 'ajaxDelete', { optionId: option.getId() }) }}"><i class="fa fa-times"></i></a>
+                    </td>
+                </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+
+{% endif %}

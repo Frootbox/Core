@@ -1,0 +1,61 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<h2>
+    Fotogalerie
+
+    {#
+    <span class="headoptions">
+		<a data-toggle="tooltip" data-modal data-title="neue Formulargruppe hinzufügen" href="{{ plugin.getAdminUri('Group', 'ajaxModalCompose') }}"><i class="fa fa-plus-circle"></i></a>
+	</span>
+    #}
+</h2>
+
+<p><a class="ajax" href="{{ v.getUri('Page', 'ajaxPanelContent', { 'pageId' : plugin.getPageId() }) }}"><i class="fa fa-chevron-circle-left"></i> zurück</a></p>
+
+<script>
+    $(function ( ) {
+
+        $(document).on('click', '#categoriesTreeReceiver tr[data-cat]', function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            $('#categoriesTreeReceiver tr[data-cat]').removeClass('highlighted');
+            $(this).addClass('highlighted');
+
+            $.ajax({
+                url: "{{ plugin.getAdminUri('Index', 'ajaxCategoryDetails') | raw }}",
+                data: {
+                    categoryId: $(this).attr('data-cat')
+                },
+                success: function ( html ) {
+
+                    $('#galleriesReceiver').html(html);
+
+                }
+            });
+        });
+    });
+</script>
+
+<div class="row">
+    <div class="col-4">
+    
+        <h4>Kategorien</h4>
+        
+        {{ v.injectPartial('\\Frootbox\\Admin\\Controller\\Assets\\Categories\\Partials\\CategoriesManager', {
+            plugin: plugin,
+            uid: plugin.getUid('categories'),
+            className : 'Frootbox\\Ext\\Core\\Images\\Persistence\\Category'
+        }) | raw }}
+        
+    </div>
+    <div class="col-8">
+
+        <div id="galleriesReceiver">
+
+        </div>
+
+    </div>
+</div>
+    

@@ -1,0 +1,160 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<script>
+    $(function ( ) {
+
+        /**
+         *
+         */
+        $('a.toggle-extended-config').click(function ( event ) {
+
+            event.preventDefault();
+
+            $('.extended-config').toggleClass('d-none');
+        });
+
+        /**
+         *
+         */
+        $('#updateForm').submit(function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            var form = $(this);
+
+            $.ajax({
+                url : $(this).attr('action'),
+                data : $(this).serialize(),
+                type : 'POST',
+                success : function ( response ) {
+
+                    $('#fbxEditorGenericModal').modal('hide');
+
+                    if ($('header[data-uid="' + form.attr('data-uid') + '"]').length > 0) {
+                        var element = $('header[data-uid="' + form.attr('data-uid') + '"]');
+                    }
+                    else {
+                        var element = $('[data-editable][data-uid="' + form.attr('data-uid') + '"]');
+                    }
+
+                    var tagName = response.headline.level ? response.headline.level : element.find('h1, h2, h3, h4, h5').prop("tagName").toLowerCase();
+
+                    var html = '<header class="' + element.attr('class') + '" data-uid="' + form.attr('data-uid') + '"><p class="supertitle">' + (response.headline.supertitle ? response.headline.supertitle : '') + '</p><' + tagName + ' data-editable data-uid="' + form.attr('data-uid') + '">' + response.headline.text + '</' + tagName + '><p class="subtitle">' + (response.headline.subtitle ? response.headline.subtitle : '') + '</p></header>';
+
+
+                    /*
+                    if (response.headline.subTitleAbove) {
+                        var html = '<' + tagName + ' data-editable data-uid="' + form.attr('data-uid') + '"><span class="subtitle">' + (response.headline.subtitle ? response.headline.subtitle : '') + '</span><span class="head">' + response.headline.text + '</span></' + tagName + '>';
+                    }
+                    else {
+                        var html = '<' + tagName + ' data-editable data-uid="' + form.attr('data-uid') + '"><span class="head">' + response.headline.text + '</span><span class="subtitle">' + (response.headline.subtitle ? response.headline.subtitle : '') + '</span></' + tagName + '>';
+                    }
+                    */
+
+
+                    element.replaceWith(html);
+                },
+                error: function ( xhr ) {
+                    alert(xhr.responseText);
+                }
+            });
+        });
+    });
+</script>
+
+<form id="updateForm" action="{{ controller.getActionUri('ajaxUpdate', { uid: get.get('uid') }) }}" method="post" data-uid="{{ get.get('uid') }}">
+
+    {% set headlineLevel = (text.getConfig('level') | default(get.get('headlineTag'))) %}
+
+    <div class="modal-header">
+        <h5 class="modal-title">Überschrift bearbeiten</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+
+        <div class="form-group">
+            <label for="headline"><b>Überschrift</b></label>
+            <textarea class="form-control" id="headline" name="headline" placeholder="Überschrift">{{ get.get('headline') }}</textarea>
+        </div>
+        <div class="form-group">
+            <label for="supertitle">Übertitel</label>
+            <textarea class="form-control" id="supertitle" name="supertitle" placeholder="Übertitel">{{ get.get('supertitle') }}</textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="subtitle">Untertitel</label>
+            <textarea type="text" class="form-control" id="subtitle" name="subtitle" placeholder="Untertitel">{{ get.get('subtitle') }}</textarea>
+        </div>
+
+        <p><a class="toggle-extended-config" href="#">erweiterte Einstellungen</a></p>
+
+        <div class="extended-config d-none">
+
+
+            {{ text.getConfig('headlineLevel') }}
+
+            <div class="form-row">
+                <div class="form-group col-6">
+                    <label for="headlineLevel">Überschrift-Ordnung</label>
+                    <select class="form-control" id="headlineLevel" name="headlineLevel">
+                        <option value="">unverändert</option>
+                        <option {% if text.getConfig('level') == "H1" %}selected{% endif %} value="H1">1</option>
+                        <option {% if text.getConfig('level') == "H2" %}selected{% endif %} value="H2">2</option>
+                        <option {% if text.getConfig('level') == "H3" %}selected{% endif %} value="H3">3</option>
+                        <option {% if text.getConfig('level') == "H4" %}selected{% endif %} value="H4">4</option>
+                        <option {% if text.getConfig('level') == "H5" %}selected{% endif %} value="H5">5</option>
+                        <option {% if text.getConfig('level') == "H6" %}selected{% endif %} value="H6">6</option>
+                    </select>
+                </div>
+                <div class="form-group col-6">
+                    <label for="textAlign">Text-Ausrichtung</label>
+                    <select class="form-control" id="textAlign" name="textAlign">
+                        <option value="">unverändert</option>
+                        <option {% if text.getConfig('style.textAlign') == "left" %}selected{% endif %} value="left">links</option>
+                        <option {% if text.getConfig('style.textAlign') == "center" %}selected{% endif %} value="center">zentriert</option>
+                        <option {% if text.getConfig('style.textAlign') == "right" %}selected{% endif %} value="right">rechts</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group col-6">
+                    <label for="color">Schriftfarbe</label>
+                    <input type="text" class="form-control" id="fontColor" name="color" placeholder="Schriftfarbe" value="{{ text.getConfig('style.color') }}" />
+                </div>
+                <div class="form-group col-6">
+                    <label for="fontSize">Schriftgröße</label>
+                    <input type="text" class="form-control" id="fontSize" name="fontSize" placeholder="Schriftgröße" value="{{ text.getConfig('style.fontSize') }}" />
+                </div>
+            </div>
+
+
+            <div class="form-group">
+                <label for="elementId">Element-ID</label>
+                <input type="text" class="form-control" id="elementId" name="elementId" placeholder="Element-ID" value="{{ text.getConfig('elementId') }}" />
+            </div>
+
+            {#
+            <div class="form-row">
+                <div class="col">
+                    <div class="form-group">
+                        <label for="elementId">Margin</label>
+                        <input type="text" class="form-control" id="elementId" name="elementId" placeholder="Element-ID" value="{{ text.getConfig('elementId') }}" />
+                    </div>
+                </div>
+                <div class="col">
+                    <input type="text" class="form-control" placeholder="Last name">
+                </div>
+            </div>
+            #}
+
+        </div>
+
+        <button type="submit" class="btn btn-primary">Speichern</button>
+
+    </div>
+
+</form>

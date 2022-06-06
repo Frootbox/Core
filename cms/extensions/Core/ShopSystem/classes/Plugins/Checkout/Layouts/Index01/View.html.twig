@@ -1,0 +1,72 @@
+{# config
+
+title: Standard
+variables:
+    withContainer:
+        label: mit Layout-Container
+        type: bool
+        default: false
+
+/config #}
+
+{% set v = view.getViewhelper('View') %}
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set p = view.getViewhelper('Partials', { plugin: plugin }) %}
+
+{{ i.injectScript({ path: 'Checkout01/public/init.js'}) | raw }}
+
+{{ v.asset('EXT:Core/ShopSystem/icons/css/all.css') | raw }}
+
+<script>
+    gtag('event', 'begin_checkout', {
+        "items": [
+            {% for item in items %}
+            {
+            {% if not loop.first %},{% endif %}{
+                "id": "{{ item.getItemNumber() | default(item.getProductId()) }}",
+                "name": "{{ item.getTitle() }}",
+                "quantity": {{ item.getAmount() }},
+                "price": '{{ item.priceGross() | number_format(2, ".") }}'
+            }
+            {% endfor %}
+        ],
+        "coupon": ""
+    });
+</script>
+
+<div class="plugin Core ShopSystem Checkout Index01">
+
+    {% if variables.withContainer %}<div class="container">{% endif %}
+
+    <div class="row">
+        <div class="col-12">
+
+            <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+
+            <div data-editable data-uid="{{ plugin.getUid('teaser') }}"></div>
+
+            <div id="itemsTableReceiver">
+                {{ p.renderPartial('ItemsTable', { plugin: plugin, shopcart: shopcart, editable: true }) | raw }}
+            </div>
+
+            <div class="row justify-content-between align-items-center">
+                <div class="col-6">
+                    <a href="{{ plugin.getActionUri('continueShopping') }}" class="btn btn-secondary">zurück</a>
+                </div>
+
+                {%  if shopcart.getItemCount() > 0 %}
+                    <div class="col-6 text-right">
+                        <a href="{{ plugin.getActionUri('login') }}" class="btn btn-primary">weiter zum Bezahlen</a>
+                    </div>
+                {% endif %}
+
+            </div>
+
+            {{ p.renderPartial('BasketFooter', { shopcart: shopcart, plugin: plugin }) | raw }}
+
+        </div>
+    </div>
+
+    {% if variables.withContainer %}</div>{% endif %}
+
+</div>

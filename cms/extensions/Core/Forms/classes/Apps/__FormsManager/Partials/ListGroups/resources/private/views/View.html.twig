@@ -1,0 +1,37 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{% set groups = data.form.getGroups() %}
+
+{% if groups.getCount == 0 %}
+	<div class="message warning">Es wurden noch keine Formulargruppen erstellt.</div>
+{% else %}
+
+	{% for group in groups %}
+		<div class="form-group-container" id="{{ group.getId() }}">
+			<h4>
+				<span data-group="{{ group.getId() }}">{{ group.getTitle }}</span>
+
+				<span class="headoptions">
+					<a data-toggle="tooltip" data-modal data-title="neues Formularfeld hinzufügen" href="{{ plugin.getAdminUri('Field', 'ajaxModalCompose', { groupId: group.getId() }) }}"><i class="fa fa-plus-circle"></i></a>
+
+					<span class="dropdown">
+						<i class="far fa-bars dropdown-toggle" data-toggle="dropdown"></i>
+
+						<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+							<a class="dropdown-item" data-modal href="{{ plugin.getAdminUri('Group', 'ajaxModalEdit', { groupId: group.getId() }) }}">Gruppe bearbeiten</a>
+							<a data-confirm="Soll diese Gruppe wirklich gelöscht werden?" class="dropdown-item ajax" href="{{ plugin.getAdminUri('Group', 'ajaxDelete', { groupId: group.getId() }) }}">Gruppe löschen</a>
+						</div>
+					</span>
+
+					<a href="#" class="drag-handle" style="cursor: grab; position: absolute; right: 0;"><i class="fa fa-grip-lines"></i></a>
+
+				</span>
+			</h4>
+
+			<div id="fieldsReciever_{{ group.getId() }}">
+				{{ v.injectPartial('\\Frootbox\\Ext\\Core\\Forms\\Apps\\FormsManager\\Partials\\ListColumns', { group: group }) | raw }}
+			</div>
+		</div>
+	{% endfor %}
+
+{% endif %}

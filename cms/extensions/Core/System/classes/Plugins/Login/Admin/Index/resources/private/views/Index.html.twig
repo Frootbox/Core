@@ -1,0 +1,39 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<h2>
+    Login-Seite
+    <span class="headoptions">
+		<a data-toggle="tooltip" data-modal data-title="neue Einheit hinzufügen" href="{{ plugin.getAdminUri('Entity', 'ajaxModalCompose') }}"><i class="fa fa-plus-circle"></i></a>
+	</span>
+</h2>
+
+<p><a class="ajax" href="{{ v.getUri('Page', 'ajaxPanelContent', { pageId: plugin.getPageId() }) }}"><i class="fa fa-chevron-circle-left"></i> zurück</a></p>
+
+<div class="row">
+    <div class="col">
+
+        <div class="card">
+            <div class="card-body">
+
+                <form method="post" class="ajax" action="{{ plugin.getAdminUri('Index', 'ajaxUpdate') }}">
+
+                    <div class="form-group">
+                        <label for="pageId">Ziel-Seite nach erfolgreichem Login</label>
+                        <select class="form-control" name="pageId" id="pageId">
+                            <option value="">bitte wählen ...</option>
+
+                            {% for npage in pages %}
+                                <option {% if npage.getId() == plugin.getConfig('pageId') %}selected{% endif %} value="{{ npage.getId() }}">{{ npage.getTitle() }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Speichern</button>
+
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+</div>

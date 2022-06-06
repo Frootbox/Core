@@ -1,0 +1,29 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<h2>
+    Formular
+</h2>
+
+<p><a class="ajax" href="{{ v.getUri('Page', 'ajaxPanelContent', { pageId: plugin.getPageId() }) }}"><i class="fa fa-chevron-circle-left"></i> zurück</a></p>
+
+<div class="card">
+    <div class="card-body">
+
+        <form method="post" class="ajax" action="{{ plugin.getAdminUri('Index', 'ajaxUpdate') }}">
+
+            <div class="form-group">
+                <label for="formId">Formular</label>
+                <select class="form-control" id="formId" name="formId" size="1">
+                    <option value="">bitte wählen ...</option>
+                    {% for form in forms %}
+                        <option {% if form.getId() == plugin.getConfig('formId') %}selected{% endif %} value="{{ form.getId() }}">{{ form.getTitle() }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Speichern</button>
+
+        </form>
+
+    </div>
+</div>

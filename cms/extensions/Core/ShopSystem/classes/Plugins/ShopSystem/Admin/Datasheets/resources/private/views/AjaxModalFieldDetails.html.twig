@@ -1,0 +1,44 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    'frame' : false,
+}) }}
+
+<form method="post" class="ajax" action="{{ plugin.getAdminUri('Datasheets', 'ajaxFieldUpdate', { fieldId: get.get('fieldId') }) }}">
+
+    <div class="modal-body">
+
+        <div class="form-group">
+            <label for="title">Titel *</label>
+            <input type="text" required class="form-control" name="title" id="title" placeholder="Titel" value="{{ field.getTitle() }}">
+        </div>
+        <div class="form-group">
+            <label for="type">Typ</label>
+            <select class="form-control" name="type" id="type" size="1">
+                <optgroup label="Text">
+                    <option value="Text">Text</option>
+                </optgroup>
+                <optgroup label="Gewicht">
+                    <option {% if field.getType() == "Gram" %}selected{% endif %} value="Gram">Gramm</option>
+                </optgroup>
+                <optgroup label="Energie">
+                    <option {% if field.getType() == "Kilojoule" %}selected{% endif %} value="Kilojoule">Kilojoule</option>
+                </optgroup>
+                <optgroup label="Optional">
+                    <option {% if field.getType() == "OptionalList" %}selected{% endif %} value="OptionalList">Liste</option>
+                </optgroup>
+
+
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="section">Sektion</label>
+            <input type="text" class="form-control" name="section" id="section" placeholder="Sektion" value="{{ field.getSection() }}">
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Speichern</button>
+    </div>
+
+</form>

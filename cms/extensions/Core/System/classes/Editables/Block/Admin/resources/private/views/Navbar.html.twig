@@ -1,0 +1,367 @@
+<script>
+    $(function ( ) {
+
+        /**
+         *
+         */
+        $(document).on('click', 'a.block-compose', function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            $('.popover').popover('hide');
+
+            var uid = $(this).attr('data-uid');
+
+
+            var container = $('[data-blocks][data-uid="' + uid + '"]');
+
+            fbxEditorOpenGenericModal('lg');
+
+            var data = {};
+
+            $.each(container.data(), function (index, value) {
+
+                if (typeof value != 'string') {
+                    return;
+                }
+
+                data[index] = value;
+            });
+
+            $.ajax({
+                url: "{{ settings.serverpath }}cms/admin/Editor/callEditable",
+                data: {
+                    pageId: {{ page.getId() }},
+                    method: 'ajaxModalCompose',
+                    editable: 'Frootbox/Ext/Core/System/Editables/Block',
+                    uid: uid,
+                    attributes: data
+                },
+                headers: {
+                    Accept: "application/json; charset=utf-8"
+                },
+                success: function ( response ) {
+
+                    $('#fbxEditorGenericModal .modal-content').html(response);
+                },
+                error: function ( xhr ) {
+
+                    $('#fbxEditorGenericModal .modal-content').html('<div class="modal-body">' + xhr.responseText + '<\/div>');
+                }
+            });
+
+        });
+
+
+        /**
+         *
+         */
+        $(document).on('click', 'a.block-list', function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            // Extract uid from href="#uid"
+            var uid = $(this).attr('data-uid');
+
+            var container = $('[data-blocks][data-uid="' + uid + '"]');
+
+            fbxEditorOpenGenericModal();
+
+            var data = {};
+
+            $.each(container.data(), function (index, value) {
+
+                if (typeof value != 'string') {
+                    return;
+                }
+
+                data[index] = value;
+            });
+
+            $.ajax({
+                url: "{{ settings.serverpath }}cms/admin/Editor/callEditable",
+                data: {
+                    method: 'ajaxModalList',
+                    editable: 'Frootbox/Ext/Core/System/Editables/Block',
+                    uid: uid,
+                    attributes: data
+                },
+                headers: {
+                    Accept: "application/json; charset=utf-8"
+                },
+                success: function ( response ) {
+
+                    $('#fbxEditorGenericModal .modal-content').html(response);
+
+                },
+                error: function ( xhr ) {
+
+                    $('#fbxEditorGenericModal .modal-content').html('<div class="modal-body">' + xhr.responseText + '<\/div>');
+                }
+            });
+
+        });
+
+        /**
+         * Show "block edit" buttons
+         */
+        $(document).on('mouseenter', '[data-editable-block][data-block]', function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            if (isEditingFreeText) {
+                return;
+            }
+
+            if (!$('.frootbox-raise-tooltips').hasClass('active')) {
+                $('.popover').popover('hide');
+            }
+
+            var blockId = $(this).attr('data-block');
+
+            $(this).attr('data-content', '<span class="options edit-mode">Block bearbeiten' +
+                '&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;' +
+                ($(this).attr('data-class') ? '<a class="block-edit" href="#' + blockId + '"><i class="far fa-pencil"><\/i><\/a>&nbsp;&nbsp;&nbsp;' : '') +
+                '<a class="block-config" href="#' + blockId + '"><i class="far fa-cog"><\/i><\/a>&nbsp;&nbsp;&nbsp;' +
+                '<a class="block-clone" href="#' + blockId + '"><i class="far fa-clone"><\/i><\/a>&nbsp;&nbsp;&nbsp;' +
+                '<a class="block-delete" href="#' + blockId + '"><i class="far fa-trash"><\/i><\/a>&nbsp;&nbsp;&nbsp;' +
+                '|&nbsp;&nbsp;&nbsp;' +
+                '<a class="popover-dismiss" href="#"><i class="far fa-times"><\/i><\/a>' +
+                '<\/span>'
+            );
+
+            $(this).popover({
+                placement: 'top',
+                html: true
+            });
+
+            $(this).popover('show');
+        });
+
+        /**
+         * Raise config modal for block
+         */
+        $(document).on('click', 'a.block-config', function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            $('.popover').popover('hide');
+
+            // Extract blockId from href="#blockId"
+            var blockId = $(this).attr('href').substr(1);
+            var element = $('[data-block="' + blockId + '"]');
+
+            fbxEditorOpenGenericModal('lg');
+
+            $.ajax({
+                url: "{{ settings.serverpath }}cms/admin/Editor/callEditable",
+                data: {
+                    method: 'ajaxModalConfig',
+                    editable: 'Frootbox/Ext/Core/System/Editables/Block',
+                    blockId: blockId
+                },
+                success: function (response) {
+
+                    if (typeof response == "string") {
+                        $('#fbxEditorGenericModal .modal-content').html(response);
+                    }
+                    else {
+                        $('#fbxEditorGenericModal .modal-content').html(response.modal.html);
+                    }
+                },
+                error: function (xhr) {
+                    $('#fbxEditorGenericModal .modal-content').html(xhr.responseText);
+                }
+            });
+        });
+
+        /**
+         *
+         */
+        $(document).on('click', 'a.block-edit', function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            $('.popover').popover('hide');
+
+            // Extract blockId from href="#blockId"
+            var blockId = $(this).attr('href').substr(1);
+            var element = $('[data-block="' + blockId + '"]');
+
+            fbxEditorOpenGenericModal();
+
+            $.ajax({
+                url: "{{ settings.serverpath }}cms/admin/Editor/callEditable",
+                data: {
+                    method: 'ajaxModalEdit',
+                    editable: 'Frootbox/Ext/Core/System/Editables/Block',
+                    blockId: blockId
+                },
+                success: function ( response ) {
+
+                    if (typeof response == "string") {
+                        $('#fbxEditorGenericModal .modal-content').html(response);
+                    }
+                    else {
+                        $('#fbxEditorGenericModal .modal-content').html(response.modal.html);
+                    }
+                }
+            });
+        });
+
+        /**
+         *
+         */
+        $(document).on('click', 'a.block-delete', function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            if (!confirm(unescape('Soll dieser Block wirklich gel%F6scht werden?'))) {
+                return;
+            }
+
+            // Extract blockId from href="#blockId"
+            var blockId = $(this).attr('href').substr(1);
+            var element = $('[data-block="' + blockId + '"]');
+
+            $.ajax({
+                url: "{{ settings.serverpath }}cms/admin/Editor/callEditable",
+                data: {
+                    method: 'ajaxBlockDelete',
+                    editable: 'Frootbox/Ext/Core/System/Editables/Block',
+                    blockId: blockId
+                },
+                success: function ( html ) {
+
+                    $('[data-editable-block][data-block="' + blockId + '"]').fadeOut();
+
+                }
+            });
+
+        });
+
+        /**
+         *
+         */
+        $(document).on('click', 'a.block-clone', function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            // Extract blockId from href="#blockId"
+            var blockId = $(this).attr('href').substr(1);
+            var element = $('[data-block="' + blockId + '"]');
+
+            $.ajax({
+                url: "{{ settings.serverpath }}cms/admin/Editor/callEditable",
+                data: {
+                    method: 'ajaxBlockCopy',
+                    editable: 'Frootbox/Ext/Core/System/Editables/Block',
+                    blockId: blockId
+                },
+                success: function ( html ) {
+
+
+                }
+            });
+
+        });
+
+
+        /**
+         *
+         */
+        $(document).on('click', 'a.block-controller-action', function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            $.ajax({
+                url: $(this).attr('href'),
+                success: function ( response ) {
+
+                    $('#fbxEditorGenericModal .modal-content').html(response.modal.html);
+
+                    $('[data-blocks][data-uid="' + response.blocks.uid + '"] .blocks-content').html(response.blocks.html);
+                }
+            });
+        });
+
+        /**
+         *
+         */
+        $(document).on('submit', 'form.block-controller-action', function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            var form = $(this);
+
+            $.ajax({
+                url: form.attr('action'),
+                method: 'POST',
+                data: form.serialize(),
+                success: function ( response ) {
+
+                    if (typeof response.modal != "undefined" && typeof response.modal.html != "undefined") {
+                        $('#fbxEditorGenericModal .modal-content').html(response.modal.html);
+                    }
+
+                    if (typeof response.blocks != "undefined" && typeof response.blocks.html != "undefined") {
+                        $('[data-blocks][data-uid="' + response.blocks.uid + '"] .blocks-content').html(response.blocks.html);
+                    }
+                },
+                error: function ( ) {
+                    alert("error");
+                }
+            });
+        });
+
+    });
+</script>
+
+<style>
+    .editable-navbar {
+        z-index: 999;
+        position: relative;
+        margin: 30px 0;
+        text-align: center;
+    }
+
+    .editable-navbar nav {
+        display: inline-block !important;
+        padding: 0 0 0 10px !important;
+        background: #888 !important;
+        border-radius: 3px !important;
+
+        color: #FFF !important;
+        font-size: 12px !important;
+    }
+
+    .editable-navbar nav span.title {
+        padding: 0 10px 0 0 !important;
+    }
+
+    body .editable-navbar.frootbox-editor-element nav a {
+        padding: 0 10px 0 0 !important;
+        border: none !important;
+        color: #FFF !important;
+        text-decoration: none !important;
+    }
+</style>
+
+<div class="frootbox-editor-element editable-navbar">
+
+    <nav>
+        <span class="title">{{ label | default("Blöcke")}}</span>
+        <a class="block-compose" href="#" data-uid="{{ uid }}"><i class="fa fa-plus"></i></a>
+        <a class="block-list" href="#" data-uid="{{ uid }}"><i class="fa fa-sort-alt"></i></a>
+    </nav>
+
+</div>

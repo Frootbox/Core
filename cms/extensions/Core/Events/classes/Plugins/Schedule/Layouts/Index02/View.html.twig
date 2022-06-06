@@ -1,0 +1,73 @@
+{# config
+
+title: Kalenderblätter
+variables:
+    columns:
+        type: int
+        label: Spalten
+        default: 4
+    count:
+        default: 10
+        type: int
+        label: Anzahl Teaser
+    image_width:
+        type: int
+        label: Bildbreite
+        default: 300
+    image_height:
+        type: int
+        label: Bildhöhe
+        default: 400
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set events = i.getEvents() %}
+
+{% if variables.columns == 1 %}
+    {% set colClass = "col-12" %}
+{% elseif variables.columns == 2 %}
+    {% set colClass = "col-md-6" %}
+{% elseif variables.columns == 3 %}
+    {% set colClass = "col-md-4" %}
+{% elseif variables.columns >= 4 %}
+    {% set colClass = "col-md-3" %}
+{% endif %}
+
+<div class="row">
+    <div class="col-12 plugin Core Events Schedule Index02">
+
+        {% if plugin.isFirst %}
+            <h1 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h1>
+        {% else %}
+            <h2 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+        {% endif %}
+
+        <div data-editable data-uid="{{ plugin.getUid('text') }}"></div>
+
+        {% if events | length == 0 %}
+            <div>
+                <p>Derzeit sind keine Veranstaltungen geplant.</p>
+            </div>
+        {% else %}
+            <div class="row">
+
+                {% for event in events %}
+                    <div class="{{ colClass }}">
+                        <a href="{{ event.getUri }}" class="teaser">
+                            <picture class="fluid" data-editable data-uid="{{ event.getUid('image')}}">
+                                <img width="{{ variables.image_width }}" height="{{ variables.image_height }}" src="{{ i.getDummyImage({ width: variables.image_width, height: variables.image_height | default(300) }) }}" alt="" />
+                            </picture>
+
+                            <span class="caption">
+                                <em>{{ event.getDateStart().format('%d.%m.') }}</em>
+                                <span class="title" data-editable-headline data-uid="{{ event.getUid('title') }}">{{ event.getTitle() }}</span>
+                            </span>
+                        </a>
+                    </div>
+                {% endfor %}
+
+            </div>
+        {% endif %}
+
+    </div>
+</div>

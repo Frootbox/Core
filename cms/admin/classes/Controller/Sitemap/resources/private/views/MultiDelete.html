@@ -1,0 +1,29 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<h1>Massenlöschung</h1>
+
+<div class="row">
+    <div class="col-6">
+
+        <table class="table">
+            <tbody>
+
+                {% for page in tree %}
+                    <tr data-href>
+                        <td class="level-{{ page.getLevel() }}">{{ page.getTitle }}</td>
+                        <td class="text-right">
+                            <a class="ajax" data-confirm="Soll wirklich DER GESAMTE ZWEIG ab hier gelöscht werden?" href="{{ v.getUri('Page', 'ajaxDeleteBranch', { pageId: page.getId() } ) }}"><i class="fa fa-times icon"></i></a>
+                        </td>
+                    </tr>
+                {% endfor %}
+
+            </tbody>
+        </table>
+
+
+    </div>
+    <div class="col-6">
+
+    </div>
+</div>
+

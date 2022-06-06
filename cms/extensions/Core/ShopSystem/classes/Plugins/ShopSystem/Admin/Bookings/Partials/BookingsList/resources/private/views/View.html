@@ -1,0 +1,35 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{% if bookings.getCount == 0 %}
+    <div class="message warning">Es wurden noch keine Buchungen getätigt.</div>
+{% else %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Name</th>
+                <th>E-Mail</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            {% for booking in bookings %}
+                <tr class="ajax {% if booking.getId == data.highlight %}highlighted{% endif %}" data-href="{{ data.plugin.getAdminUri('Bookings', 'details', { bookingId: booking.getId() }) }}">
+                    <td>{{ booking.getDate() | date('d.m. H:i') }} Uhr</td>
+                    <td>
+                        {{ booking.getConfig('personal.firstname') }} {{ booking.getConfig('personal.lastname') }}
+                    </td>
+                    <td>
+                        {{ booking.getConfig('personal.email') }}
+                    </td>
+                    <!--
+                    <td class="text-right">
+                        <a class="ajax" data-confirm="Soll dieses Datenblatt wirklich gelöscht werden?" href="{{ data.plugin.getAdminUri('Datasheets', 'ajaxDelete', { datasheetId: datasheet.getId() }) }}"><i class="fa fa-times"></i></a>
+                    </td>
+                    -->
+                </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+{% endif %}

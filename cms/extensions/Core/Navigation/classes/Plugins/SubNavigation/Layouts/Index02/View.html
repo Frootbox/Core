@@ -1,0 +1,19 @@
+{# config
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+{% set children = i.getPages() %}
+
+<div class="row">
+    <div class="col-12 plugin Core Navigation SubNavigation Index02">
+
+        <nav>
+            {% for child in children %}
+                <a class="{% if child.getId() == page.getId() %}active{% endif %}" href="{{ child.getUri }}">{{ child.getTitle() }}</a>
+            {% endfor %}
+        </nav>
+
+    </div>
+</div>

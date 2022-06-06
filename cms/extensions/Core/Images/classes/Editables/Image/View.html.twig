@@ -1,0 +1,140 @@
+<script>
+    $(function ( ) {
+
+
+        /**
+         * Show "picture edit" buttons
+         */
+        $(document).on('mouseover', 'picture[data-editable][data-uid]', function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            if (!$('.frootbox-raise-tooltips').hasClass('active')) {
+                $('.popover').popover('hide');
+            }
+
+            var uid = $(this).attr('data-uid');
+
+            if ($(this).parents('[data-href]').length) {
+
+                var parent = $($(this).parents('[data-href]')[0]);
+
+                if (parent.attr('data-href').length > 0) {
+                    var href = parent.attr('data-href');
+                }
+                else {
+                    var href = parent.find('[href]').attr('href');
+                }
+            }
+            else if ($(this).parents('[href]').length) {
+                var href = $(this).parents('[href]').attr('href');
+            }
+            else if (typeof $(this).attr('data-href') != 'undefined') {
+                var href = $(this).attr('data-href');
+            }
+            else {
+                var href = null;
+            }
+
+            $(this).attr('data-content', '<span class="options edit-mode">Bild' +
+                '&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;' +
+                '<a class="picture-edit" href="#' + uid + '"><i class="far fa-pencil"><\/i><\/a>&nbsp;&nbsp;&nbsp;' +
+                '|&nbsp;&nbsp;&nbsp;' +
+                '<a class="picture-delete" href="#' + uid + '"><i class="far fa-trash"><\/i><\/a>&nbsp;&nbsp;&nbsp;' +
+                '|&nbsp;&nbsp;&nbsp;' +
+                '<a class="popover-dismiss" href="#"><i class="far fa-times"><\/i><\/a>' +
+                (href ? '&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;<a class="follow-parent-href" href="' + href + '"><i class="far fa-link"><\/i><\/a>' : '') +
+                '</span>'
+            );
+
+            $(this).popover({
+                placement: 'top',
+                html: true
+            });
+
+            $(this).popover('show');
+        });
+
+        /**
+         *
+         */
+        $(document).on('click', 'a.picture-delete', function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            if (!confirm('Soll dieses Bild wirklich gelöscht werden?')) {
+                return;
+            }
+
+            // Extract uid from href="#uid"
+            var uid = $(this).attr('href').substr(1);
+
+            var img = $('picture[data-uid="' + uid + '"] img');
+
+            $.ajax({
+                url: "{{ settings.serverpath }}cms/admin/Editor/callEditable?{{ SID }}",
+                data: {
+                    method: 'ajaxDelete',
+                    editable: 'Frootbox/Ext/Core/Images/Editables/Image',
+                    uid: uid,
+                },
+                success: function ( response ) {
+
+                    img.attr('src', img.attr('data-default'));
+                }
+            });
+        });
+
+        /**
+         *
+         */
+        $(document).on('click', 'a.picture-edit', function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            $('.popover').popover('hide');
+
+            // Extract uid from href="#uid"
+            var uid = $(this).attr('href').substr(1);
+
+            var img = $('picture[data-uid="' + uid + '"] img');
+
+            fbxEditorOpenGenericModal();
+
+            /*
+            $.ajax({
+                url: editorconfig.urls.pictures.edit,
+                data: {
+                    uid: uid,
+                    width: img.attr('width'),
+                    height: img.attr('height')
+                },
+                success: function ( response ) {
+
+                    $('#fbxEditorGenericModal .modal-content').html(response.modal.html);
+                }
+            });
+            */
+
+            $.ajax({
+                url: "{{ settings.serverpath }}cms/admin/Editor/callEditable?{{ SID }}",
+                data: {
+                    method: 'ajaxModalEdit',
+                    editable: 'Frootbox/Ext/Core/Images/Editables/Image',
+                    uid: uid,
+                    width: img.attr('width'),
+                    height: img.attr('height')
+                },
+                success: function ( html ) {
+
+                    $('#fbxEditorGenericModal .modal-content').html(html);
+
+                }
+            });
+        });
+
+    });
+</script>

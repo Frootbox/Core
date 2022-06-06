@@ -1,0 +1,26 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    'frame' : false,
+}) }}
+
+<form method="post" class="ajax" action="{{ plugin.getAdminUri('Index', 'ajaxCreate', { date: get.get('date') }) }}">
+
+    <div class="modal-body">
+
+        <div class="form-group">
+            <label for="menuTemplateId">Menü-Vorlage</label>
+            <select name="menuTemplateId" id="menuTemplateId" class="form-control">
+                <option value="">bitte wählen ...</option>
+                {% for menuTemplate in menuTemplates %}
+                    <option value="{{ menuTemplate.getId() }}">{{ menuTemplate.getTitle() }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Menü-Vorlage erstellen</button>
+    </div>
+
+</form>

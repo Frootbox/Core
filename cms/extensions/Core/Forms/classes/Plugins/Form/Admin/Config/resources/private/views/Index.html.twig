@@ -1,0 +1,193 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<h2>
+    Kontaktformular
+
+    <span class="headoptions">
+		<a data-toggle="tooltip" data-modal data-title="neue Formulargruppe hinzufügen" href="{{ plugin.getAdminUri('Index', 'ajaxModalGroupCompose') }}"><i class="fa fa-plus-circle"></i></a>
+	</span>
+
+</h2>
+
+<p><a class="ajax" href="{{ plugin.getAdminUri('Index', 'index') }}"><i class="fa fa-chevron-circle-left"></i> zurück</a></p>
+
+<div class="row">
+    <div class="col">
+
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Einstellungen</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="export-tab" data-toggle="tab" href="#export" role="tab" aria-controls="export" aria-selected="false">Export</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="import-tab" data-toggle="tab" href="#import" role="tab" aria-controls="import" aria-selected="false">Import</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="texts-tab" data-toggle="tab" href="#texts" role="tab" aria-controls="import" aria-selected="false">Texte</a>
+            </li>
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content">
+            <div class="tab-pane active" id="home" role="tabpanel" aria-labelledby="home-tab">
+
+                <div class="card">
+                    <div class="card-body">
+
+                        <form method="post" class="ajax" action="{{ plugin.getAdminUri('Config', 'ajaxUpdate') }}">
+
+
+                            <h3>Formular</h3>
+
+                            <div class="form-group">
+                                <label for="captcha">CAPTCHA</label>
+                                <select class="form-control" id="captcha" name="config[captcha]">
+                                    <option value="">kein CAPTCHA</option>
+                                    {% for captcha in captchas %}
+                                        <option {% if plugin.getConfig('captcha') == captcha.captchaClass %}selected{% endif %} value="{{ captcha.captchaClass }}">{{ captcha.title }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="feedback">Feedback</label>
+                                <select class="form-control" id="feedback" name="config[feedback]">
+                                    <option {% if plugin.getConfig('feedback') == 'NewPage' %}selected{% endif %} value="NewPage">neue Seite</option>
+                                    <option {% if plugin.getConfig('feedback') == 'Popup' %}selected{% endif %} value="Popup">Popup</option>
+                                </select>
+                            </div>
+
+
+                            <div class="form-group">
+                                <label for="customButtonLabel">Button-Label (optional)</label>
+                                <input type="text" class="form-control" name="config[customButtonLabel]" id="customButtonLabel" placeholder="Button-Label" value="{{ plugin.getConfig('customButtonLabel') }}" aria-describedby="customButtonLabelHelp">
+                                <small id="recipientsHelp" class="form-text text-muted">Wenn angegeben ersetzt dieser Text die Beschriftung auf dem "Senden"-Button.</small>
+                            </div>
+
+
+                            <h3>E-Mail an den Betreiber</h3>
+
+                            <div class="form-group">
+                                <label for="recipients">Empfänger-Verteiler</label>
+                                <input data-role="tagsinput" type="text" class="form-control" name="config[recipients]" id="recipients" placeholder="Empfänger" value="{{ plugin.getConfig('recipients') }}" aria-describedby="recipientsHelp">
+                                <small id="recipientsHelp" class="form-text text-muted">Jeder Empfänger im Verteiler bekommt eine Benachrichtigung über jedes Abgeschickte Formular.</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="modSubject">Betreff</label>
+                                <input type="text" class="form-control" name="config[modSubject]" id="modSubject" placeholder="Betreff" value="{{ plugin.getConfig('modSubject') }}" aria-describedby="modSubjectHelp">
+                                <small id="modSubjectHelp" class="form-text text-muted">Der Betreff der E-Mail Benachrichtgung an den Verteiler.</small>
+                            </div>
+
+
+                            <h3>E-Mail an den Kunden</h3>
+
+                            <div class="form-group">
+                                <label for="replyTo">Antwort-Adresse (optional)</label>
+                                <input type="text" class="form-control" name="config[replyTo]" id="replyTo" placeholder="Antwortadresse" value="{{ plugin.getConfig('replyTo') }}" aria-describedby="replyToHelp">
+                                <small id="replyToHelp" class="form-text text-muted">Falls angegeben kann der Kunde an diese Adresse antworten. Dies ist hilfreich, falls die Adresse, über die zentral gesendet wird nicht die Antworten erhalten soll.</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="customSubject">Betreff</label>
+                                <input type="text" class="form-control" name="config[customSubject]" id="customSubject" placeholder="Betreff" value="{{ plugin.getConfig('customSubject') }}" aria-describedby="customSubjectHelp">
+                                <small id="customSubjectHelp" class="form-text text-muted">Der Betreff der E-Mail Benachrichtgung an den Kunden. Wenn leer gelassen ist der Betreff „Anfrage: [Seitentitel]“</small>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-8">
+                                    <div class="form-group">
+                                        <label for="textAboveMail">Text über E-Mail</label>
+                                        <textarea rows="15" class="form-control" id="textAboveMail" name="config[textAboveMail]" placeholder="Text über E-Mail" aria-describedby="textAboveMailHelp">{{ plugin.getConfig('textAboveMail') }}</textarea>
+                                        <small id="textAboveMailHelp" class="form-text text-muted">Dieser Text steht über dem Datenblock aus dem Formular.</small>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <img style="margin-top: 20px; max-width: 150px;" src="{{ controller.getAssetUri('images/text-above.svg') }}" alt="" />
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-8">
+
+                                    <div class="form-group">
+                                        <label for="textBelowMail">Text unter E-Mail</label>
+                                        <textarea rows="15" class="form-control" id="textBelowMail" name="config[textBelowMail]" placeholder="Text unter E-Mail" aria-describedby="textBelowMailHelp">{{ plugin.getConfig('textBelowMail') }}</textarea>
+                                        <small id="textBelowMailHelp" class="form-text text-muted">Dieser Text steht unter dem Datenblock aus dem Formular.</small>
+                                    </div>
+
+                                </div>
+                                <div class="col-4">
+                                    <img style="margin-top: 20px; max-width: 150px;" src="{{ controller.getAssetUri('images/text-below.svg') }}" alt="" />
+                                </div>
+                            </div>
+
+
+                            <button type="submit" class="btn btn-primary">Speichern</button>
+
+                        </form>
+
+                    </div>
+                </div>
+
+            </div>
+            <div class="tab-pane" id="export" role="tabpanel" aria-labelledby="export-tab">
+
+                <div class="card">
+                    <div class="card-body">
+
+                        <div class="form-group">
+                            <label for="export">Export</label>
+                            <textarea rows="10" class="form-control" id="export" placeholder="Export">{{ exportData }}</textarea>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+            <div class="tab-pane" id="import" role="tabpanel" aria-labelledby="import-tab">
+
+                <div class="card">
+                    <div class="card-body">
+
+                        <form method="post" class="ajax" action="{{ plugin.getAdminUri('Config', 'ajaxImport') }}">
+
+                            <div class="form-group">
+                                <label for="import">Import-Daten</label>
+                                <textarea rows="10" class="form-control" id="import" name="import" placeholder="Import-Daten"></textarea>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">Formular importieren</button>
+
+                        </form>
+
+                    </div>
+                </div>
+
+            </div>
+            <div class="tab-pane" id="texts" role="tabpanel" aria-labelledby="texts-tab">
+
+                <div class="card">
+                    <div class="card-body">
+
+                        <form method="post" class="ajax" action="{{ plugin.getAdminUri('Config', 'ajaxUpdateTexts') }}">
+
+                            <div class="form-group">
+                                <label for="textsPrivacy">alternativer Datenschutztext</label>
+                                <textarea rows="15" class="form-control" id="textsPrivacy" name="config[texts][privacy]" placeholder="alternativer Datenschutztext">{{ plugin.getConfig('texts.privacy') }}</textarea>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">Speichern</button>
+
+                        </form>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+
+
+    </div>
+</div>

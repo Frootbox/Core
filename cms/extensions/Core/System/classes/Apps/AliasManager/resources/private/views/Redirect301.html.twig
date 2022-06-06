@@ -1,0 +1,40 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ front.addTab('Alias-Verwaltung', app.getUri('index')) }}
+{{ front.addTab('301 Umleitungen') }}
+
+<h2>
+    301 Weiterleitungen
+    <span class="headoptions">
+		<a class="ajax" data-confirm="Sollen wirklich alle 301-Aliases gelöscht werden?" data-toggle="tooltip" href="{{ app.getUri('ajaxPurge301') }}" data-title="Aliase löschen"><i class="fa fa-times"></i></a>
+	</span>
+</h2>
+
+{% if aliases.getCount() == 0 %}
+    <div class="message info">Es wurde noch kein Alias erstellt.</div>
+{% else %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Alias</th>
+                <th>Status</th>
+                <th>Ziel</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+
+        {% for alias in aliases %}
+            <tr data-alias="{{alias.getId() }}" data-title="Alias bearbeiten" data-modal="{{ app.getUri('ajaxModalEdit', { aliasId: alias.getId() }) }}">
+                <td>{{ alias.getAlias() }}</td>
+                <td>{{ alias.getStatus() }}</td>
+                <td>{{ alias.getConfig('target') }}</td>
+                <td class="text-right">
+                    <a class="ajax" data-confirm="Soll dieser Alias wirklich gelöscht werden?" href="{{ app.getUri('ajaxDelete', { aliasId: alias.getId() }) }}"><i class="fa fa-times"></i></a>
+                </td>
+            </tr>
+        {% endfor %}
+
+        </tbody>
+    </table>
+{% endif %}

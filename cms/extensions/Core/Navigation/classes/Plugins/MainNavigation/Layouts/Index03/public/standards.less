@@ -1,0 +1,50 @@
+$colorSpot1: red default;
+
+.Plugin.Navigation.MainNavigation.Index03 {
+
+  nav {
+
+    span {
+
+      display: inline-block;
+
+      ul {
+        display: none;
+        position: absolute;
+        z-index: 100000;
+
+        margin: 0;
+        padding: 0 10px;
+
+        list-style: none;
+
+        li {
+          margin: 0;
+          padding: 0;
+
+          left: 0;
+          background: $colorSpot1;
+
+          a {
+            display: block;
+            text-align: left;
+
+            color: #FFF;
+          }
+
+          a:hover {
+            background: rgba(0, 0, 0, .2);
+          }
+        }
+
+
+      }
+    }
+
+    span:hover {
+      ul {
+        display: block;
+      }
+    }
+  }
+}

@@ -1,0 +1,143 @@
+{% set t = view.getViewhelper('Translator') %}
+
+{% if config.get('recaptcha.v3.key') %}
+    <script type="text/plain" onload="setRecaptcha();" data-consent="google-recaptcha" src="https://www.google.com/recaptcha/api.js?render={{ config.get('recaptcha.v3.key') }}"></script>
+
+    <script>
+        var forceReCaptcha = false;
+        var recaptchaSiteKey = "{{ config.get('recaptcha.v3.key') }}";
+
+        function setRecaptcha ( ) {
+
+            $('.cookie-consent-message').remove();
+            forceReCaptcha = true;
+        }
+    </script>
+{% endif %}
+
+<script>
+    var _messageYourDataHasBeenSend = "{{ t.translate('YourDataHasBeenSend') }}";
+    var _messageFormHasAlreadyBeenSent = "{{ t.translate('FormHasAlreadyBeenSent') }}";
+    var _messageDataCouldNotBeSent = "{{ t.translate('DataCouldNotBeSent') }}";
+
+    $(function ( ) {
+
+        /**
+         *
+         */
+        $(document).on('submit', '.contactform.ajax.form', function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            var form = $(this);
+
+            if (form.hasClass('is-buisy')) {
+                alert(_messageFormHasAlreadyBeenSent);
+                return;
+            }
+
+            form.addClass('is-buisy');
+
+            if (typeof forceReCaptcha != "undefined" && forceReCaptcha) {
+
+                grecaptcha.ready(function() {
+                    grecaptcha.execute(recaptchaSiteKey, { action: 'submit' }).then(function(token) {
+
+                        form.append('<input type="hidden" id="recaptchaToken" name="token" />');
+                        $('#recaptchaToken').val(token);
+
+                        _contactFormSubmitForm(form);
+                    });
+                });
+            }
+            else {
+                _contactFormSubmitForm(form);
+            }
+        });
+    });
+
+    function _contactFormSubmitForm(form) {
+
+        $.ajax({
+            url: form.attr('action'),
+            data: form.serialize(),
+            method: 'post',
+            dataType: 'json',
+            success: function ( response ) {
+
+                if (typeof response.redirect != "undefined") {
+                    window.location.href = response.redirect;
+                    return;
+                }
+
+                alert(_messageYourDataHasBeenSend);
+
+                form.find('input:not([type=hidden], [type=checkbox]), textarea').val('');
+                form.find('input[type="checkbox"]').prop('checked', false);
+                form.find('.dz-preview').remove();
+                form.find('.filesReceiver').html('');
+
+                form.removeClass('is-buisy');
+                $('#recaptchaToken').remove();
+            },
+            error: function ( xhr ) {
+
+                var response = xhr.responseText;
+
+                if (response.charAt(0) != '{') {
+                    console.log(response);
+                    alert(_messageDataCouldNotBeSent);
+                }
+                else {
+                    response = $.parseJSON(response);
+                    alert(response.error);
+                }
+
+                form.removeClass('is-buisy');
+                $('#recaptchaToken').remove();
+            }
+        });
+    }
+</script>
+
+<form method="post" class="contactform ajax form" id="form{{ form.getId() }}" action="{{ form.getAction({ pluginId: plugin.getId() }) }}">
+
+    {% if config.get('recaptcha.v3.key') %}
+        <div style="border: 3px solid red; padding: 20px; margin-bottom: 40px;" class="cookie-consent-message">
+            Um das Formular nutzen zu können, müssen Sie unseren <a class="pxf-raise-cookieconsentmanager" href="#">Cookie-Richtlinien</a> zustimmen.
+        </div>
+    {% endif %}
+
+    {% if addedPayload %}
+        <input type="hidden" name="addedPayload" value="{{ addedPayload | json_encode }}" />
+    {% endif %}
+
+    {% set requiredFields = false %}
+
+    {% for group in form.getGroups() %}
+        <div class="row {% if group.getConfig('alignItemsEnd') %}align-items-end{% endif %}">
+            {% for column in group.getColumns() %}
+                <div class="col-md-{{ column.columns }}">
+
+                    {% for field in column.fields %}
+                        {{ renderer.renderField(field) | raw }}
+
+                        {% if field.isRequired() %}
+                            {% set requiredFields = true %}
+                        {% endif %}
+
+                    {% endfor %}
+
+                </div>
+            {% endfor %}
+        </div>
+    {% endfor %}
+
+    {% if requiredFields %}
+        <div class="info-required-fields" style="margin-top: 20px; font-size: 16px; color: #999;">
+            {{ t.translate('MarkedFieldsAreMendatory') }}
+        </div>
+    {% endif %}
+
+</form>

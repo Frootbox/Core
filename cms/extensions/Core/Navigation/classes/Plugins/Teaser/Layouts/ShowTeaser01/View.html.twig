@@ -1,0 +1,30 @@
+{# config
+
+title: Standard
+variables:
+    repeatTeaser:
+        type: bool
+        label: Teaser-Text wiederholen
+        default: false
+/config #}
+
+{{ view.set({ pagedata: { title: teaser.getTitle(globalLanguage) } }) }}
+
+<param name="cloak" value="1" />
+
+<div class="row">
+    <div class="col-12 plugin Core Navigation Teaser ShowTeaser01">
+
+        <h1 data-editable data-uid="{{ teaser.getUid('title')}}">{{ teaser.getTitle }}</h1>
+
+        <p class="backlink"><a href="{{ page.getUri({ fragment: 'teaser-' ~ teaser.getId() }) }}">zurück</a></p>
+
+        {% if variables.repeatTeaser %}
+            <div class="teaser-text" data-editable data-uid="{{ teaser.getUid('teaser-text') }}"></div>
+        {% endif %}
+
+        <div data-editable data-uid="{{ teaser.getUid('text') }}"></div>
+
+
+    </div>
+</div>

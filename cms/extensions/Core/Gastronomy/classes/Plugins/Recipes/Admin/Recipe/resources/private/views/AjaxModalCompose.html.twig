@@ -1,0 +1,56 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    'frame' : false,
+}) }}
+
+<script>
+    $(function ( ) {
+
+        $('#firstName').on('paste', function ( event ) {
+
+            if ($(this).val().length > 0) {
+                return;
+            }
+
+            var pastedData = event.originalEvent.clipboardData.getData('text');
+
+            var match = pastedData.match(/^(.*?) (.*?)\s*$/);
+
+            if (match) {
+
+                $('#firstName').val(match[1]);
+                $('#lastName').val(match[2]);
+
+                event.preventDefault(); 
+
+                $('#submitForm').focus();
+            }
+        });
+    });
+</script>
+
+<form method="post" class="ajax" action="{{ plugin.getAdminUri('Recipe', 'ajaxCreate', { categoryId: get.get('categoryId') }) }}">
+
+    <div class="modal-body">
+
+        <div class="form-group">
+            <label for="title">Titel</label>
+            <input type="text" class="form-control" name="title" id="title" placeholder="Titel">
+        </div>
+        <div class="form-group">
+            <label for="recipeId">oder Rezept wählen</label>
+            <select class="form-control" id="recipeId" name="recipeId">
+                <option value="">bitte wählen ...</option>
+                {% for recipe in recipes %}
+                    <option value="{{ recipe.getId() }}">{{ recipe.getTitle() }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" id="submitForm" class="btn btn-primary">Rezept erstellen</button>
+    </div>
+
+</form>

@@ -1,0 +1,9 @@
+{% set i = view.getViewhelper('Delegator', { object: field }) %}
+{% set t = view.getViewhelper('Translator') %}
+
+<div class="form-group form-check small-text">
+    <input type="checkbox" required class="form-check-input" id="field-{{ field.getId() }}" name="fields[{{ field.getId() }}]">
+    <label class="form-check-label" for="field-{{ field.getId() }}">
+        {{ t.translate('AcceptPrivacyPolicy', [ i.getPrivacyPolicyLink() ]) | raw }}
+    </label>
+</div>

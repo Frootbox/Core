@@ -1,0 +1,32 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    'frame' : false,
+}) }}
+
+<form method="post" class="ajax" action="{{ plugin.getAdminUri('Venues', 'ajaxUpdate', { venueId: venue.getId() }) }}">
+
+    <div class="modal-body">
+
+        {% if not configuration.get('i18n.multiAliasMode') %}
+            <div class="form-group">
+                <label for="title">Titel</label>
+                <input type="text" class="form-control" id="title" name="title" placeholder="Titel" value="{{ venue.getTitle() }}">
+            </div>
+        {% else %}
+            {% for language in configuration.get('i18n.languages') %}
+                <div class="form-group">
+                    <label for="title_{{ loop.index }}">Titel ({{ language }}){% if settings.default_language == language %}*{% endif %}</label>
+                    <input type="text" {% if settings.default_language == language %}required{% endif %} class="form-control" id="title_{{ loop.index }}" name="titles[{{ language }}]" placeholder="Titel ({{ language }})" value="{{ venue.getTitleWithoutFallback(language) }}">
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {{ venue }}
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Speichern</button>
+    </div>
+
+</form>

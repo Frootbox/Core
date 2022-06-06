@@ -1,0 +1,33 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    'frame' : false,
+}) }}
+
+<script>
+    $(function ( ) {
+
+    });
+</script>
+
+<form method="post" class="ajax" action="{{ plugin.getAdminUri('Link', 'ajaxCreate') }}">
+
+    <div class="modal-body">
+
+
+        <div class="form-group">
+            <label for="title">Titel</label>
+            <input type="text" class="form-control" name="title" id="title" placeholder="Titel">
+        </div>
+        <div class="form-group">
+            <label for="url">URL</label>
+            <input type="text" required class="form-control" name="url" id="url" placeholder="URL">
+        </div>
+
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Link erstellen</button>
+    </div>
+
+</form>

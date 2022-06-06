@@ -1,0 +1,67 @@
+{# config
+
+title: tabellarisch
+variables:
+    count:
+        default: 10
+        type: int
+        label: Anzahl Teaser
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set p = view.getViewhelper('Pages') %}
+
+{% set events = i.getEvents({ limit: variables.count }) %}
+
+<div class="row">
+    <div class="col-12 plugin Core Events Teaser Index04">
+
+        <h2 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+
+        <table class="table">
+            <tbody>
+
+                {% set xEvent = "" %}
+
+                {% for event in events %}
+                    <tr>
+                        <td>
+                            <strong>{{ event.getTitle }}</strong>
+                            <span class="time">
+                                {% if not event.hasOneDay() %}
+                                    {{ event.getDateStart.format('%d.%m.%Y') }}–{{ event.getDateEnd.format('%d.%m.%Y') }}
+                                {% else %}
+                                    {{ event.getDateStart.format('%d.%m.%Y') }}
+
+                                    {% if event.getDateStart.format('%H:%M') != event.getDateEnd.format('%H:%M') %}
+                                        {{ event.getDateStart.format('%H:%M') }}–{{ event.getDateEnd.format('%H:%M') }} Uhr
+                                    {% elseif event.getDateStart.format('%H:%M') != "00:00" %}
+                                        {{ event.getDateStart.format('%H:%M') }} Uhr
+                                    {% endif %}
+
+                                {% endif %}
+                            </span>
+
+                            {% set venue = event.getVenue() %}
+
+                            {% if venue %}
+                                {{ venue.getTitle() }}
+                            {% endif %}
+                        </td>
+                    </tr>
+
+                    {% set xEvent = event %}
+
+                {% endfor %}
+
+            </tbody>
+        </table>
+
+        {% if events.getCount < events.getTotal %}
+            <p><a href="{{ p.getPage(xEvent.getPageId()).getUri() }}"><i class="fa fa-chevron-circle-right"></i> alle Termine im Überblick</a></p>
+        {% endif %}
+
+    </div>
+</div>
+

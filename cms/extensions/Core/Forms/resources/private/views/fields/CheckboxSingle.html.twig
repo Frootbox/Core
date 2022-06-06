@@ -1,0 +1,11 @@
+<div class="form-group form-check {{ field.getConfig('cssClass ') }}">
+
+    <input {% if parameters.value %}checked{% endif %} type="checkbox" class="form-check-input" id="field_{{ field.getId() }}" name="fields[{{ field.getId() }}]">
+    <label class="form-check-label" name="fields[{{ field.getId() }}]" for="field_{{ field.getId() }}">
+        {{ field.getLabel }}{% if field.isRequired %}*{% endif %}
+
+        {% if field.getConfig('helpText') %}
+            <small id="fieldHelp_{{ field.getId() }}" class="form-text text-muted">{{ field.getHelpText() | raw }}</small>
+        {% endif %}
+    </label>
+</div>

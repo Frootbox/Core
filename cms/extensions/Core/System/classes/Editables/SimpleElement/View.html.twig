@@ -1,0 +1,79 @@
+<script>
+    $(function ( ) {
+        /**
+         * Show "simple eleabbo
+         * ment edit" buttons
+         */
+        $(document).on('mouseover', '[data-editable-element][data-uid]', function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            if (isEditingFreeText) {
+                return;
+            }
+
+            if (!$('.frootbox-raise-tooltips').hasClass('active')) {
+                $('.popover').popover('hide');
+            }
+
+            var uid = $(this).attr('data-uid');
+
+            // Generate label
+            var label = 'Element';
+
+            if (typeof $(this).data('label') != 'undefined') {
+                label = $(this).data('label');
+            }
+
+            $(this).attr('data-content', '<span class="options edit-mode">' + label +
+                '&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;' +
+                '<a class="simpleelement-edit" href="#' + uid + '"><i class="far fa-pencil"><\/i><\/a>&nbsp;&nbsp;&nbsp;' +
+                '|&nbsp;&nbsp;&nbsp;' +
+                '<a class="popover-dismiss" href="#"><i class="far fa-times"><\/i><\/a>' +
+                '<\/span>'
+            );
+
+            $(this).popover({
+                placement: 'top',
+                html: true
+            });
+
+            $(this).popover('show');
+        });
+
+
+        /**
+         *
+         */
+        $(document).on('click', 'a.simpleelement-edit', function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            // Extract uid from href="#uid"
+            var uid = $(this).attr('href').substr(1);
+
+            var element = $('[data-uid="' + uid + '"]');
+
+            fbxEditorOpenGenericModal();
+
+            $.ajax({
+                url: "{{ settings.serverpath }}cms/admin/Editor/callEditable",
+                data: {
+                    method: 'ajaxModalEdit',
+                    editable: 'Frootbox/Ext/Core/System/Editables/SimpleElement',
+                    uid: uid,
+                    content: element.html()
+                },
+                success: function ( html ) {
+
+                    $('#fbxEditorGenericModal .modal-content').html(html);
+
+                }
+            });
+
+        });
+    });
+
+</script>

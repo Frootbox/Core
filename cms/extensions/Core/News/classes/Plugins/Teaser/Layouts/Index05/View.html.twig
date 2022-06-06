@@ -1,0 +1,43 @@
+{# config
+
+title: tabellarisch
+variables:
+    limit:
+        type: int
+        label: Anzahl Beiträge
+        default: 5
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+{% set articles = i.getArticles({ limit: variables.limit }) %}
+
+<div class="row">
+    <div class="col-12 plugin Core News Teaser Index05">
+
+        <h2 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+
+        <div data-editable data-uid="{{ plugin.getUid('teaser-text') }}"></div>
+
+        <table class="table teasers">
+            <tbody>
+
+                {% for article in articles %}
+                    <tr data-href>
+                        <td>
+                            <a href="{{ article.getUri() }}" class="read-more">{{ article.getTitle }}</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+
+            </tbody>
+        </table>
+
+        {% if articles.getTotal() > variables.limit %}
+            {{ articles.rewind() }}
+            <p><a class="read-more" href="{{ articles.current().getPlugin().getUri() }}">weitere Artikel finden Sie im Archiv</a></p>
+        {% endif %}
+
+    </div>
+</div>

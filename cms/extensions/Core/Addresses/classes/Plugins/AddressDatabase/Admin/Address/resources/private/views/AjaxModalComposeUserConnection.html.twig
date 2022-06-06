@@ -1,0 +1,27 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+'frame' : false,
+}) }}
+
+<form method="post" class="ajax" action="{{ plugin.getAdminUri('Address', 'ajaxUserConnectionCreate', { addressId: get.get('addressId') }) }}">
+
+    <div class="modal-body">
+
+        <div class="form-group">
+            <label for="userId">Benutzer</label>
+            <select class="form-control" name="userId" required id="userId">
+                <option value="" selected>bitte wählen ...</option>
+
+                {% for xuser in users %}
+                    <option value="{{ xuser.getId() }}">{{ xuser.getName() }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">neuen Benutzer verknüpfen</button>
+    </div>
+
+</form>

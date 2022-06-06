@@ -1,0 +1,30 @@
+{# config
+
+title: Standard
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+<div class="plugin Core ContactForms FormTeaser Complete01">
+
+    <div class="container">
+
+        <div class="row">
+            <div class="col-12">
+                <div class="inner-wrapper">
+
+                    <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title-complete') }}">Anfrage gesendet</h2>
+
+                    <div data-editable data-uid="{{ plugin.getUid('text-complete') }}">
+                        <p>Vielen Dank für die Anfrage, wir melden uns in Kürze!</p>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>

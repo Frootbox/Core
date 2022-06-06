@@ -1,0 +1,33 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{% if fields | length == 0 %}
+	<div class="message warning">Es wurden noch keine Datenfelder erstellt.</div>
+{% else %}
+
+	<table class="table" data-sort="{{ plugin.getAdminUri('Fields', 'ajaxSort') }}">
+		<thead>
+			<tr>
+				<th>Titel</th>
+				<th></th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+
+			{% for field in fields %}
+
+				<tr id="row-{{ field.getId() }}" class="{% if data.highlight == field.getid() %}highlighted{% endif %} ajax" data-title="Datenfeld bearbeiten" data-modal="{{ plugin.getAdminUri('Fields', 'ajaxModalDetails', { fieldId: field.getId() }) }}">
+					<td>{{ field.getTitle() }}</td>
+					<td class="handle" style="cursor: pointer; vertical-align: middle;" width="40"><i class="fa fa-grip-lines"></i></td>
+					<td class="text-right">
+						<!--<a class="ajax" href="{{ v.getUri('Assets', 'ajaxSwitchVisibility', { assetId: article.getId() } ) }}"><i data-asset="{{ article.getId() }}" class="fa fa-lightbulb visibility {{ article.getVisibilityString() }} icon"></i></a>-->
+						<a class="ajax" data-confirm="Soll dieses Datenfeld wirklich gelöscht werden?" href="{{ data.plugin.getAdminUri('Fields', 'ajaxDelete', { fieldId: field.getId() }) }}"><i class="icon fa fa-times"></i></a>
+					</td>
+				</tr>
+
+			{% endfor %}
+
+		</tbody>
+	</table>
+
+{% endif %}

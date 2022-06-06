@@ -1,0 +1,34 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    'frame' : false,
+}) }}
+
+<form method="post" class="ajax" action="{{ plugin.getAdminUri('Categories', 'ajaxFilterCriteriaCreate', { categoryId: get.get('categoryId') }) }}">
+
+    <div class="modal-body">
+
+        <div class="form-group">
+            <label for="fieldId">Filterkriterium *</label>
+            <select class="form-control" id="fieldId" name="fieldId" required>
+                <option value="">bitte wählen ...</option>
+
+                {% for datasheet in datasheets %}
+                    <optgroup label="{{ datasheet.getTitle() }}">
+
+                        {% for field in datasheet.getFields() %}
+                            <option value="{{ field.getId }}">{{ field.getTitle() }}</option>
+                        {% endfor %}
+
+                    </optgroup>
+                {% endfor %}
+
+            </select>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Filterkriterium hinzufügen</button>
+    </div>
+
+</form>

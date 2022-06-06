@@ -1,0 +1,43 @@
+<?php 
+/**
+ * 
+ */
+
+namespace Frootbox\Ext\{{ extension.getVendorId() }}\{{ extension.getExtensionId() }}\Plugins\{{ pluginId }}\Admin\Entity\Partials\ListEntities;
+
+/**
+ * 
+ */
+class Partial extends \Frootbox\Admin\View\Partials\AbstractPartial
+{
+    /**
+     * 
+     */
+    public function getPath(): string
+    {
+        return __DIR__ . DIRECTORY_SEPARATOR;
+    }
+
+    /**
+     *
+     */
+    public function onBeforeRendering (
+        \Frootbox\Admin\View $view,
+        \Frootbox\Ext\{{ extension.getVendorId() }}\{{ extension.getExtensionId() }}\Plugins\{{ pluginId }}\Persistence\Repositories\Entities $entitiesRepository
+    )
+    {
+        // Fetch plugin
+        $plugin = $this->getData('plugin');
+
+        $result = $entitiesRepository->fetch([
+            'where' => [
+                'pluginId' => $plugin->getId()
+            ],
+            'order' => [ 'date DESC' ]
+        ]);
+
+        return new \Frootbox\Admin\Controller\Response('html', 200, [
+            'entities' => $result
+        ]);
+    }
+}

@@ -1,0 +1,42 @@
+{# config
+
+title: Tiles
+variables:
+    skipContainer:
+        type: bool
+        label: ohne Layout-Container
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set p = view.getViewhelper('Partials', { basePath: viewFolder }) %}
+
+{% if variables.columns == 1 %}
+    {% set colClass = "col-12" %}
+{% elseif variables.columns == 2 %}
+    {% set colClass = "col-md-6" %}
+{% elseif variables.columns == 3 %}
+    {% set colClass = "col-md-4" %}
+{% elseif variables.columns >= 4 %}
+    {% set colClass = "col-md-3" %}
+{% endif %}
+
+<div class="plugin Core HelpAndSupport ContactPersons Index09">
+
+    {% if not variables.skipContainer %}<div class="container">{% endif %}
+
+        <div class="row">
+            <div class="col-12">
+
+                <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+
+            </div>
+        </div>
+
+    {% if not variables.skipContainer %}</div>{% endif %}
+
+
+    {{ p.renderPartial('Category', { category: i.getCategory(), colClass: colClass, skipContainer: variables.skipContainer }) | raw }}
+
+
+</div>

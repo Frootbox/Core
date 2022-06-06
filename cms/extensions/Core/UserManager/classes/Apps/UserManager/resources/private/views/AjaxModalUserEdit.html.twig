@@ -1,0 +1,49 @@
+{{ view.set({
+    'frame' : false,
+}) }}
+
+
+<form method="post" class="ajax" action="{{ app.getUri('ajaxUserUpdate', { userId: user.getId() }) }}">
+
+    <div class="modal-body">
+
+        <div class="form-group">
+            <label for="title">E-Mail</label>
+            <input type="text" class="form-control" name="email" value="{{ user.getEmail() }}" required id="title" placeholder="E-Mail">
+        </div>
+        <div class="form-group">
+            <label for="role">Rolle</label>
+            <select class="form-control" id="role" name="role" size="1">
+                <option value="">bitte wählen ...</option>
+                <option {% if user.getType() == 'SuperAdmin' %}selected{% endif%} value="SuperAdmin">Super-Admin</option>
+                <option {% if user.getType() == 'Admin' %}selected{% endif%} value="Admin">Admin</option>
+                <option {% if user.getType() == 'Editor' %}selected{% endif%} value="Editor">Redakteur</option>
+                <option {% if user.getType() == 'User' %}selected{% endif%} value="User">Benutzer</option>
+            </select>
+        </div>
+		<div class="form-group">
+            <label for="password">Passwort</label>
+            <input type="password" class="form-control" name="password" value="" id="password" placeholder="Passwort">
+        </div>        
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="firstName">Vorname</label>
+                    <input type="text" class="form-control" name="firstName" id="firstName" value="{{ user.getFirstName() }}" placeholder="Vorname">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="lastName">Nachname</label>
+                    <input type="text" class="form-control" name="lastName" id="lastName" value="{{ user.getLastName() }}" placeholder="Nachname">
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Speichern</button>
+    </div>
+
+</form>

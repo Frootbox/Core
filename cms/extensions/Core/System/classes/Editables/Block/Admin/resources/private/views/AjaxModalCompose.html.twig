@@ -1,0 +1,124 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<script>
+    $(function ( ) {
+
+        /**
+         *
+         */
+        $('#blockCreateForm').submit(function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            $.ajax({
+                url: $(this).attr('action'),
+                data: $(this).serialize(),
+                type: 'POST',
+                headers: {
+                    Accept: "application/json; charset=utf-8"
+                },
+                success: function ( response ) {
+
+                    $('[data-blocks][data-uid="' + response.uid + '"] .blocks-content').html(response.html);
+                    $('#fbxEditorGenericModal').modal('hide');
+                },
+                error: function ( xhr ) {
+                    alert(xhr.responseText);
+                }
+            });
+        });
+
+    });
+</script>
+
+<style>
+
+</style>
+
+<form id="blockCreateForm" action="{{ controller.getActionUri('ajaxCreate', { uid: uid, pageId: get.get('pageId') }) }}" method="post" data-uid="{{ uid }}">
+
+    <div class="modal-header">
+        <h5 class="modal-title">Block-Vorlage hinzufügen</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+
+    {% if copied %}
+        <div class="modal-body">
+
+            <div class="row">
+                <div class="col-3">
+                    <img style="box-shadow: 0 0 10px rgba(0, 0, 0, .2); width: 100%; height: auto;" src="{{ copied.getThumbnailSrc() }}" alt="" />
+                </div>
+                <div class="col-9">
+
+                    <p>Einfügen aus der Zwischenablage:</p>
+
+                    <label>
+                        <input name="block" value="fromClipboard" type="radio" />
+                        Diesen Block samt Inhalt kopieren und einfügen
+                    </label>
+
+                    <label>
+                        <input type="checkbox" name="keepClipboard" />
+                        Block nach Einfügen in der Zwischenablage behalten
+                    </label>
+                </div>
+            </div>
+
+            <hr />
+
+        </div>
+    {% endif %}
+
+    <div class="modal-body">
+
+        {% if blocksList | length == 0 %}
+            <div class="message">Es sind keine Blöcke vorhanden.</div>
+        {% else %}
+
+            <div class="row">
+                {% for extension in blocksList %}
+
+                    {% if blocksList | length > 1 %}
+                        <div class="col-12">
+                            <h3>{{ extension.extension }}</h3>
+                        </div>
+                    {% endif %}
+
+                    {% for section, blocks in extension.blocks %}
+
+                        {% if section != "Default" %}
+                            <div class="col-12">
+                                <p><b>{{ section }}</b></p>
+                            </div>
+                        {% endif %}
+
+                        {% for block in blocks %}
+                            <div class="col-3">
+                                <label>
+                                    <img style="box-shadow: 0 0 10px rgba(0, 0, 0, .2); width: 100%; height: auto;" src="{{ block.template.getThumbnailSrc() }}" alt="" />
+
+                                    <input style="float: left; margin-top: 9px;" name="block" value="{{ block.vendorId }}-{{ block.extensionId }}-{{ block.blockId }}" type="radio" />
+                                    <span style="display: bock; float: left; margin: 5px 0 10px 8px; font-size: 16px; line-height: 20px;">
+                                        <b>{{ block.template.getTitle() }}</b>
+                                        <br />{{ block.template.getSubtitle() }}
+                                    </span>
+
+                                </label>
+                            </div>
+                        {% endfor %}
+
+                    {% endfor %}
+
+                {% endfor %}
+            </div>
+
+            <button type="submit" class="btn btn-primary">Block hinzufügen</button>
+
+        {% endif %}
+
+    </div>
+</form>

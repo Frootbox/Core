@@ -1,0 +1,23 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<h2>
+	Text #{{ text.getId() }} bearbeiten
+</h2>
+
+
+<div class="card">
+	<div class="card-body">
+
+		<form method="post" class="ajax" action="{{ app.getUri('ajaxUpdate', { textId: text.getId() } ) }}">
+
+			<div class="form-group">
+				<label for="text">Text</label>
+				<textarea rows="20" class="form-control" name="text" id="text" rows="3">{{ text.getText() }}</textarea>
+			</div>
+
+			<button type="submit" class="btn btn-primary">Speichern</button>
+
+		</form>
+
+	</div>
+</div>

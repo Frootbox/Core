@@ -1,0 +1,80 @@
+<script>
+    $(function ( ) {
+
+        $('#updateForm').submit(function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            $.ajax({
+                url: $(this).attr('action'),
+                data: $(this).serialize(),
+                type: 'POST',
+                headers: {
+                    Accept: "application/json; charset=utf-8",
+                },
+                success: function ( response ) {
+
+                    $('figure[data-id="' + response.widget.id + '"]').replaceWith(response.widget.html);
+
+                    $('#fbxEditorGenericModal').modal('hide');
+                },
+                error: function ( xhr ) {
+                    alert(xhr.responseText);
+                }
+            });
+
+        });
+    });
+</script>
+
+<form id="updateForm" action="{{ widgetController.getAdminUrl('ajaxUpdate') }}" method="post">
+
+    <div class="modal-header">
+        <h5 class="modal-title">Widget konfigurieren</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+
+        <div class="form-group">
+            <label for="categoryId">Anprechpartner-Gruppe wählen</label>
+            <select class="form-control" id="categoryId" name="categoryId">
+                <option value="">bitte wählen ...</option>
+
+                {% for category in categories %}
+                    <option {% if category.getId() == widget.getConfig('categoryId') %}selected{% endif %} value="{{ category.getId() }}">{{ category.getTitle() }}</option>
+                {% endfor %}
+
+            </select>
+        </div>
+
+    </div>
+
+    {% set template = widget.getViewTemplate() %}
+
+    <div class="modal-body">
+        {% for variable in template.getVariables() %}
+
+
+                {% if variable.type == 'bool' %}
+                    <div class="form-group form-check">
+                        <input type="checkbox" class="form-check-input" name="variables[{{ variable.name }}]" id="{{ variable.name }}" {% if variable.value %}checked{% endif %}>
+                        <label class="form-check-label" for="{{ variable.name }}">{{ variable.label }}</label>
+                    </div>
+                {% else %}
+                    <div class="form-group">
+                        <label for="{{ variable.name }}">{{ variable.label }}</label>
+                        <input type="text" class="form-control" id="{{ variable.name }}" name="variables[{{ variable.name }}]" placeholder="{{ variable.label }}" value="{{ variable.value }}">
+                    </div>
+                {% endif %}
+
+        {% endfor %}
+    </div>
+
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Speichern</button>
+    </div>
+
+</form>

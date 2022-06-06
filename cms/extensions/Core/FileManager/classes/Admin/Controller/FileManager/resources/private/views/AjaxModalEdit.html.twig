@@ -1,0 +1,30 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    'frame' : false,
+}) }}
+
+<form id="fbxModalEditFileForm" method="post" class="ajax" action="{{ v.getUri('Ext/Core/FileManager/FileManager', 'ajaxUpdateFile', { fileId: file.getId() }) }}">
+
+    <div class="modal-body">
+
+        <div class="form-group">
+            <label for="title">Titel</label>
+            <input type="text" class="form-control" name="title" required id="title" placeholder="Titel" value="{{ file.getTitle }}">
+        </div>
+        <div class="form-group">
+            <label for="caption">Bildunterschrift</label>
+            <textarea rows="3" class="form-control" name="caption" id="caption" placeholder="Bildunterschrift">{{ file.getConfig('caption') }}</textarea>
+        </div>
+        <div class="form-group">
+            <label for="copyright">Copyright</label>
+            <input type="text" class="form-control" name="copyright" id="copyright" placeholder="Copyright" value="{{ file.getCopyright }}">
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <a href="{{ v.getUri('Ext/Core/FileManager/FileManager', 'ajaxFileDelete', { fileId: file.getId() }) }}" data-confirm="Soll diese Datei wirklich gelöscht werden?" class="ajax btn btn-danger mr-auto">Datei löschen</a>
+        <button type="submit" class="btn btn-primary">Speichern</button>
+    </div>
+
+</form>

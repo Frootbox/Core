@@ -1,0 +1,58 @@
+<script>
+    var uid = "{{ get.get('uid') }}";
+
+    $(function () {
+
+        /**
+         *
+         */
+        $('#pictureUpdateForm').submit(function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            $.ajax({
+                url: $(this).attr('action'),
+                data: $(this).serialize(),
+                type: 'POST',
+                success: function ( response ) {
+
+                    $('#fbxEditorGenericModal').modal('hide');
+
+                    refreshEditable();
+                }
+            });
+
+        });
+    });
+</script>
+
+<form id="pictureUpdateForm" action="{{ controller.getActionUri('ajaxUpdate', { fileId: get.get('fileId') }) }}" method="post">
+
+    <div class="modal-header">
+        <h5 class="modal-title">Bild bearbeiten</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+
+        <div class="{% if not file %}d-none{% endif %}">
+            <div class="form-group">
+                <label for="title">Titel</label>
+                <input type="text" class="form-control" id="title" name="title" placeholder="Titel" value="{{ file.getTitleReal() }}">
+            </div>
+            <div class="form-group">
+                <label for="caption">Bildunterschrift</label>
+                <textarea rows="5" class="form-control" id="caption" name="caption" placeholder="Bildunterschrift">{{ file.getConfig('caption') }}</textarea>
+            </div>
+            <div class="form-group">
+                <label for="copyright">Copright</label>
+                <input type="text" class="form-control" id="copyright" name="copyright" placeholder="Copyright" value="{{ file.getCopyright }}">
+            </div>
+
+            <button type="submit" class="btn btn-primary">Speichern</button>
+        </div>
+
+    </div>
+</form>

@@ -1,0 +1,119 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<!DOCTYPE html>
+<html>
+    <head>
+        
+        {{ v.injectPartial('\\Frootbox\\Admin\\View\\Partials\\Head\\Partial')|raw }}
+
+		<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+		<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+
+		<script type="text/javascript" src="{{ serverpath }}cms/admin/resources/public/libs/bootstrap-tagsinput/src/bootstrap-tagsinput.js"></script>
+		<link rel="stylesheet" type="text/css" href="{{ serverpath }}cms/admin/resources/public/libs/bootstrap-tagsinput/src/bootstrap-tagsinput.css" />
+
+		<script>
+			var user = {
+				email : "{{ user.getEmail() }}"
+			}
+
+			var sessionCheckAjaxUrl = "{{ v.getUri('Session', 'ajaxCheckLogin') }}";
+		</script>
+
+	</head>
+	<body>
+
+		<div id="wrapper">
+			<div id="sidebar">
+
+				<div class="sticky-top">
+					<a class="logo" href="{{ serverpath }}cms/admin/">frootbox::cms</a>
+
+					<div id="mainMenuReceiver">
+						{{ v.injectPartial('\\Frootbox\\Admin\\View\\Partials\\Menu\\Partial')|raw }}
+					</div>
+				</div>
+
+			</div>
+			<div id="content">
+
+				<div class="container-fluid">
+
+					<div class="row" id="top">
+						<div class="col profile-col">
+
+							<div class="dropdown">
+
+								<a href="#" class="profile-pic" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+									<img style="width: 50px; height: 50px;" src="{{ user.getGravatarUrl() }}" />
+									{{ user.getEmail }}
+							   	</a>
+
+							   	<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+									<a class="dropdown-item" href="{{ v.getUri('Session/Profile') }}">Profil bearbeiten</a>
+							   	</div>
+						   	</div>
+
+					   	</div>
+					   	<div class="col options-col text-right">
+
+							<a href="{{ front.getUri('Session', 'ajaxLogout') }}" class="ajax">Abmelden <i class="fa fa-power-off"></i></a>
+							<a href="{{ front.getUri('Help', 'index') }}"><i class="fa fa-question-circle"></i></a>
+							<a href="#"><i class="fa fa-bars"></i></a>
+
+						</div>
+
+						<div class="col-12">
+							<hr />
+						</div>
+
+					</div>
+
+					<div class="row">
+					   <div class="col">
+
+
+						   {% if front.getTabs() | length > 0 %}
+							   <nav aria-label="breadcrumb" id="breadcrumb">
+								   <ol class="breadcrumb">
+
+									   {% for tab in front.getTabs() %}
+											<li class="breadcrumb-item"><a href="{{ tab.uri }}">{{ tab.title }}</a></li>
+									   {% endfor %}
+
+								   </ol>
+							   </nav>
+						   {% endif %}
+
+						   {{ controllerHtml|raw }}
+					   </div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+
+
+		<div class="modal fade" id="genericModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+
+					<div id="genericModalContent"></div>
+
+				</div>
+			</div>
+		</div>
+
+
+		{{ v.injectPartial('\\Frootbox\\Admin\\View\\Partials\\Footer\\Partial') | raw }}
+
+
+	</body>
+</html>

@@ -1,0 +1,68 @@
+{# config
+
+title: Bubbles
+variables:
+    columns:
+        type: int
+        label: Spalten
+        default: 4
+    withDetailsPage:
+        type: bool
+        label: mit Detailseite
+    withContainer:
+        type: bool
+        label: mit Layout-Container
+    skipCategories:
+        type: bool
+        label: Unterkategorien verbergen
+    skipContactData:
+        type: bool
+        label: Kontaktdaten verbergen
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set p = view.getViewhelper('Partials', { file: viewFile }) %}
+
+
+{% if variables.columns == 1 %}
+    {% set colClass = "col-12" %}
+{% elseif variables.columns == 2 %}
+    {% set colClass = "col-md-6" %}
+{% elseif variables.columns == 3 %}
+    {% set colClass = "col-md-4" %}
+{% elseif variables.columns >= 4 %}
+    {% set colClass = "col-md-3" %}
+{% endif %}
+
+<div class="plugin Core HelpAndSupport ContactPersons Index04">
+
+    {% if variables.withContainer %}<div class="container">{% endif %}
+
+    <div class="row">
+        <div class="col-12">
+            <div class="inner-wrapper">
+
+                <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+
+                <div data-editable data-uid="{{ plugin.getUid('text') }}"></div>
+
+                <div class="categories">
+
+                    {{ p.renderPartial('category', { category: i.getCategory(), colClass: colClass, skipContactData: variables.skipContactData }) | raw }}
+
+                    {% if not variables.skipCategories %}
+                        {% for category in i.getTopCategories() %}
+                            {{ p.renderPartial('category', { category: category, colClass: colClass, skipContactData: variables.skipContactData }) | raw }}
+                        {% endfor %}
+                    {% endif %}
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    {% if variables.withContainer %}</div>{% endif %}
+
+</div>

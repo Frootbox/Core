@@ -1,0 +1,119 @@
+$colorEditFrame: rgba(200, 200, 200, .2);
+
+.popover {
+  z-index: 10000 !important;
+}
+
+div[data-editable][data-uid] {
+  padding-top: 20px;
+}
+
+.options.edit-mode {
+
+  text-shadow: none;
+
+  a {
+    color: #999;
+  }
+
+  a:hover {
+    color: #18bfdf;
+  }
+}
+
+#fbxEditorGenericModal {
+  text-shadow: none;
+  z-index: 10000;
+  color: #333;
+  font-weight: 300;
+  font-style: normal;
+
+  font-size: 16px;
+  font-family: 'Open Sans', sans-serif;
+  font-family: 'Open Sans Condensed', sans-serif;
+
+  h5 {
+    margin: 0;
+    padding: 0;
+
+    border: none;
+
+    letter-spacing: 0;
+    text-transform: none;
+
+    color: inherit;
+  }
+
+  .btn {
+
+    text-transform: none;
+
+    &.btn-primary {
+      background: #2980b9;
+      border-color: #2980b9;
+    }
+
+
+    &::before {
+      display: none !important;
+    }
+
+    &::after {
+      display: none !important;
+    }
+  }
+}
+
+.options.edit-mode a.active i {
+  color: blue;
+}
+
+figure.widget {
+  padding: 20px;
+  border: 5px dashed $colorEditFrame;
+}
+
+div[data-editable] figure.widget:first-of-type {
+  padding-top: 0px;
+}
+
+h2.disabled-headline {
+  display: block;
+  opacity: .3;
+}
+
+[data-editable-entity][data-uid] [data-property]:empty {
+  border: 5px dashed $colorEditFrame;
+  display: inline-block;
+  min-height: 25px;
+  min-width: 25px;
+}
+
+div[data-editable][data-uid]:empty {
+  border: 5px dashed $colorEditFrame;
+  min-height: 50px;
+}
+
+div[data-blocks][data-uid] {
+  padding-top: 10px;
+}
+
+div[data-blocks][data-uid]:empty {
+  border: 5px dashed $colorEditFrame;
+  min-height: 50px;
+}
+
+div[data-editable] + div[data-blocks] {
+  margin-top: 30px;
+}
+
+body {
+
+  h1, h2, h3, h4, h5, h6, header.h1, header.h2, header.h3, header.h4, header.h5, header.h6 {
+
+    &.disabled-headline {
+      display: block;
+      opacity: .5;
+    }
+  }
+}

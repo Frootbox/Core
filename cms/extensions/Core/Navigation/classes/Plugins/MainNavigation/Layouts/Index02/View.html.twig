@@ -1,0 +1,67 @@
+{# config
+
+title: Simpel
+variables:
+    withPopdownMenu:
+        label: mit Popdown-Menü
+        type: bool
+    responsiveBurgerMenu:
+        label: mit Burger-Menü
+        type: bool
+
+/config #}
+
+<script>
+    $(function ( ) {
+
+        $('#responsiveBurgerInput').change(function ( ) {
+
+            let nav = $('.plugin.Core.Navigation.MainNavigation.Index02 .nav-container');
+
+            if ($(this).is(':checked')) {
+                nav.addClass('visible');
+            }
+            else {
+                nav.removeClass('visible');
+            }
+        });
+
+
+    });
+</script>
+
+
+<div class="plugin Core Navigation MainNavigation Index02 {% if variables.responsiveBurgerMenu %}responsive-burger-menu{% endif %} {% if variables.withPopdownMenu %}popdown-menu{% endif %}">
+
+    {% if variables.responsiveBurgerMenu %}
+        <div class="burger-container">
+            <input type="checkbox" id="responsiveBurgerInput">
+            <label for="responsiveBurgerInput">
+                <span></span>
+                <span></span>
+                <span></span>
+            </label>
+        </div>
+    {% endif %}
+
+    <div class="nav-container">
+        <nav>
+            {% for npage in pages %}
+                <span class="link-wrapper">
+                    <a class="link {% if npage.getParentId() != 0 and npage.hasChildren() %}has-children{% endif %} link-{{ loop.index }} {% if npage.getIsActive() %}active{% endif %}" href="{{ npage.getUri() }}"><span>{{ npage.getTitle }}</span></a>
+
+                    {% if variables.withPopdownMenu and npage.getParentId() != 0 and npage.hasChildren() %}
+                        <ul>
+
+                            {% for child in npage.getChildrenVisible() %}
+                                <li><a href="{{ child.getUri() }}">{{ child.getTitle() }}</a></li>
+                            {% endfor %}
+
+                        </ul>
+                    {% endif %}
+                </span>
+
+            {% endfor %}
+        </nav>
+    </div>
+</div>

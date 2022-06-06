@@ -1,0 +1,58 @@
+{# config
+
+title: mit Bild
+variables:
+    columns:
+        label: Spaltenzahl
+        type: int
+        default: 4
+    image_width:
+        label: Bildbreite
+        type: int
+        default: 400
+    image_height:
+        label: Bildhöhe
+        type: int
+        default: 400
+    showFullEmail:
+        label: E-Mail Adresse zeigen
+        type: bool
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: widget }) %}
+{% set sp = view.getViewhelper('SimplePartials') %}
+
+<style>
+    img.round {
+        height: auto;
+    }
+</style>
+
+{% if variables.columns == 1 %}
+    {% set colClass = "col-12" %}
+{% elseif variables.columns == 2 %}
+    {% set colClass = "col-12 col-sm-6" %}
+{% elseif variables.columns == 3 %}
+    {% set colClass = "col-12 col-sm-4" %}
+{% else %}
+    {% set colClass = "col-3" %}
+{% endif %}
+
+{% set category = i.getCategory() %}
+
+
+{% for child in category.getChildren() %}
+    <h3>{{ child.getTitle() }}</h3>
+
+    <div class="row">
+        {% for contact in child.getContacts() %}
+            {{ sp.renderPartial('partials/Contact', { fromfile: __FILE__, colClass: colClass, contact: contact }) | raw }}
+        {% endfor %}
+    </div>
+{% endfor %}
+
+<div class="row">
+    {% for contact in category.getContacts() %}
+        {{ sp.renderPartial('partials/Contact', { fromfile: __FILE__, colClass: colClass, contact: contact }) | raw }}
+    {% endfor %}
+</div>

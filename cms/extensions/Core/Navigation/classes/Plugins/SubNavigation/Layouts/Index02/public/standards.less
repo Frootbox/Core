@@ -1,0 +1,31 @@
+$colorSpot1: 'red' !default;
+$colorSpot2: $colorSpot1 !default;
+
+.plugin.Core.Navigation.SubNavigation.Index02 {
+
+  margin-bottom: 30px;
+
+  nav {
+
+    background: $colorSpot2;
+
+    a {
+      display: block;
+      padding: 5px 20px;
+      color: #FFF;
+      font-size: 1.25em;
+    }
+
+    a:first-of-type {
+      padding-top: 15px;
+    }
+
+    a:last-of-type {
+      padding-bottom: 15px;
+    }
+
+    a.active {
+      background: rgba(0, 0, 0, .1);
+    }
+  }
+}

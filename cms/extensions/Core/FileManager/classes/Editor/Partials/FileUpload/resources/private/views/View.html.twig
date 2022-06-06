@@ -1,0 +1,145 @@
+<style>
+    .file-preview {
+        min-height: 90px;
+        margin-top: 10px;
+        padding: 10px;
+        border: 2px dashed #CCC;
+    }
+
+    .file-preview.completed {
+        border: 2px solid green;
+    }
+
+    .file-preview.error {
+        border: 2px solid red;
+    }
+
+    .file-preview img {
+        float: left;
+        margin-right: 15px;
+    }
+
+    .file-preview progress {
+        width: 350px;
+    }
+</style>
+<script>
+
+    function frootboxExtCoreFileManagerUploadFile ( fileInput, file ) {
+
+        var formData = new FormData();
+
+        formData.append('file', file);
+
+        var reader = new FileReader();
+        var group = fileInput.parents('.form-group');
+        var preview = $('<div class="file-preview"></div>');
+
+        reader.onload = (function( nfile ) {
+            return function( event ) {
+                preview.html('<img width="65" height="65" class="thumb" src="' + event.target.result + '" />\
+                    <b>' + escape(nfile.name) + '</b><br />\
+                    ' + nfile.size + ' Bytes, ' + nfile.type + '<br />\
+                    <progress value="0"></progress>');
+
+                group.append(preview);
+            };
+        })(file);
+
+        // Read in the image file as a data URL.
+        reader.readAsDataURL(file);
+
+        var request = new XMLHttpRequest();
+
+        function monitorProgress ( event ) {
+
+            var progress = preview.find('progress');
+
+            progress.attr('max', event.total);
+            progress.attr('value', event.loaded);
+        }
+
+        request.upload.onprogress = monitorProgress;
+
+        request.addEventListener("load", function ( event ) {
+
+            if (request.status > 300) {
+                var response = $.parseJSON(request.responseText);
+
+                preview.addClass('error');
+
+                var progress = preview.find('progress');
+
+                progress.after('<div style="color: red; font-size: 12px; line-height: 16px;">' + response.error + '</div>');
+            }
+            else {
+                preview.addClass('completed');
+
+                {% if data.onComplete %}
+                    {{ data.onComplete }}();
+                {% endif %}
+            }
+        });
+
+        request.open('POST', fileInput.attr('data-upload'));
+        request.setRequestHeader('Accept', 'application/json');
+
+        request.send(formData);
+    }
+
+
+    var maxUploadSize = {{ maxUploadInBytes }};
+
+    $(function ( ) {
+
+        $('input[data-upload]').change(function (event) {
+
+            event.stopImmediatePropagation();
+
+            if (window.FileReader) {
+
+                var input = document.getElementById($(this).attr('id'));
+
+                if (input.files[0]) {
+
+                    var file = input.files[0];
+
+                    if (file.size > maxUploadSize) {
+                        $('#uploadErrorMessage').removeClass('d-none');
+                        $('#uploadErrorMessage').html("Die Datei <b>" + file.name + "</b> ist zu groß (" + (Math.round(file.size / 1000 / 10) / 100) + " MB, maximal {{ maxUploadSize }} MB).");
+                        return;
+                    }
+                }
+            }
+
+            for (i = 0; i < $(this)[0].files.length; ++i) {
+                frootboxExtCoreFileManagerUploadFile($(this), $(this)[0].files[i]);
+            }
+        });
+
+
+    });
+</script>
+
+<style>
+    #uploadHelp {
+        line-height: 17px;
+    }
+</style>
+
+{% set random = random(1000, 9999) %}
+
+<div class="form-group">
+    <label for="fileInput{{ random }}">Datei hinzufügen</label>
+    <input aria-describedby="uploadHelp" data-upload="{{ serverpath }}static/Ext/Core/FileManager/Editor/upload?uid={{ data.uid }}&multiple={% if data.multiple %}1{% endif %}" {% if data.multiple %}multiple{% endif %} type="file" id="fileInput{{ random }}" class="form-control" />
+
+    <small id="uploadHelp" class="form-text text-muted">
+        {% if data.helpText %}
+            {{ data.helpText }}<br />
+        {% endif %}
+        maximal {{ maxUploadSize }} MB
+    </small>
+
+</div>
+
+<div style="border: 1px solid red; color: red; padding: 10px 15px; margin: 20px 0;" id="uploadErrorMessage" class="d-none"></div>

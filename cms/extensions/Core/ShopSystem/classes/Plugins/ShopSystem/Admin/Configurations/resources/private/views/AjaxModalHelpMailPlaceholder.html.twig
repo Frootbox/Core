@@ -1,0 +1,29 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    'frame' : false,
+}) }}
+
+<style>
+    .table.placeholders code {
+        user-select: all;
+    }
+</style>
+
+
+<table class="table placeholders">
+    <thead>
+        <tr>
+            <th>Platzhalter</th>
+            <th>Wert</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+                <code>{name}</code>
+            </td>
+            <td>vollständiger Name des Kunden</td>
+        </tr>
+    </tbody>
+</table>

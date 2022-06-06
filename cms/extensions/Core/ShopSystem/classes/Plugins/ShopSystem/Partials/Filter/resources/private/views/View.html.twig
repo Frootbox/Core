@@ -1,0 +1,39 @@
+
+
+{% if filters | length > 0 %}
+    <nav class="Partial Core ShopSystem ShopSystem Filter">
+        <div class="filter-head">
+            <a class="icon" href="#"><i class="fa fa-sliders-v"></i>Filter</a>
+
+            {% for filter in filters %}
+                {% if filter.aggregation | length > 0 %}
+                    <a href="#" data-field="{{ filter.field.getId() }}" class="show-filter">
+                        {{ filter.field.getTitle() }}
+
+                        {% if filter.aggregations > 0 %}
+                            <span class="badge badge-secondary">{{ filter.aggregations }}</span>
+                        {% endif %}
+                    </a>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        {% for filter in filters %}
+
+            {% if filter.aggregation | length > 0 %}
+                <div class="filter-body" data-field="{{ filter.field.getId() }}">
+
+                    <h6>{{ filter.field.getTitle() }}</h6>
+
+                    {% for agg in filter.aggregation %}
+                        <a class="{% if agg.active %}active{% endif %}" href="{{ category.getUri({ payload: { filter: [ { id: filter.field.getId(), key: agg.valueText } ] }}) }}">
+                            {{ agg.valueText }} <span class="badge badge-secondary">{{ agg.count }}</span>
+                        </a>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+        {% endfor %}
+
+    </nav>
+{% endif %}

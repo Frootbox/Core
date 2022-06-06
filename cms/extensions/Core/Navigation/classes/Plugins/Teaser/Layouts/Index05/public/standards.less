@@ -1,0 +1,57 @@
+$colorSpot: 'red' !default;
+
+.plugin.Core.Navigation.Teaser.Index05 {
+
+  padding-bottom: 15px;
+
+  .pillow {
+    margin-top: 15px;
+    padding: 15px;
+
+    background: $colorSpot;
+    color: #FFF;
+    text-align: center;
+
+    h1 {
+      @include condensed();
+
+      margin: 30px 0;
+
+      font-weight: bold;
+
+      .subtitle {
+        color: rgba(255, 255, 255, .8);
+      }
+    }
+  }
+
+
+  .teaser-nav {
+    display: flex;
+    flex-direction: column;
+  }
+
+      a {
+
+        flex: 1;
+
+        display: flex;
+        justify-content: center; /* align horizontal */
+        align-items: center; /* align vertical */
+
+        margin-top: 15px;
+        padding: 20px 0;
+
+        background-color: $colorSpot;
+
+        color: #FFF;
+        text-align: center;
+      }
+
+  @media (min-width: 768px) {
+
+    a {
+      padding: 0;
+    }
+  }
+}

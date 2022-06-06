@@ -1,0 +1,6 @@
+{% set i = view.getViewhelper('Delegator', { object: widget }) %}
+
+<a href="{{ widget.getConfig('link') | default('#') }}" class="btn btn-primary">
+    <span>{{ widget.getConfig('label') | default('mehr erfahren') }}</span>
+</a>
+

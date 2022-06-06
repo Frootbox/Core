@@ -1,0 +1,23 @@
+
+<form id="" method="post" class="ajax" action="{{ plugin.getAdminUri('Import', 'ajaxImport', { categoryId: get.get('categoryId') }) }}">
+
+    <div class="modal-body">
+
+        <div class="form-group single">
+            <label for="sourceId">Quell-Kategorie</label>
+            <select class="form-control" name="sourceId" id="sourceId">
+                <option value="">bitte wählen ...</option>
+                {% for category in categories %}
+                    <option value="{{ category.getId() }}">{{ category.getTitle() }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Bilder importieren</button>
+    </div>
+
+</form>
+

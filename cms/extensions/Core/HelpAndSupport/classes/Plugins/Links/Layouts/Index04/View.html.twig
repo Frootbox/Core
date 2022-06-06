@@ -1,0 +1,43 @@
+{# config
+
+title: Standard
+variables:
+    withDescription:
+        type: bool
+        label: mit Beschreibungstext
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+{{ i.injectScss({ path: 'Index01/public/standards.less'}) | raw }}
+
+<div class="row">
+    <div class="col-12 plugin Core HelpAndSupport Links Index04">
+
+        <div class="inner-wrapper">
+            {% if plugin.isFirst %}
+                <h1 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h1>
+            {% else %}
+                <h2 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+            {% endif %}
+
+            <div data-editable data-uid="{{ plugin.getUid('teaser') }}"></div>
+
+            <div class="row links">
+                {% for link in i.getLinks() %}
+                    <div class="link col-12" data-href>
+                        <a class="read-more" target="_blank" href="{{ link.getConfig('url') }}">{{ link.getTitle }}</a>
+
+                        {% if variables.withDescription %}
+                            <div data-nowidgets  data-editable data-uid="{{ link.getUid('text')}}"></div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div data-editable data-uid="{{ plugin.getUid('text-below') }}"></div>
+        </div>
+
+    </div>
+</div>
+

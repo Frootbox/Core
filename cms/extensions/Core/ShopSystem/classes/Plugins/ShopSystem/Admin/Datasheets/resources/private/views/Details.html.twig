@@ -1,0 +1,66 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<h2>
+    Datenblatt „{{ datasheet.getTitle }}“
+
+
+</h2>
+
+<p><a class="ajax" href="{{ plugin.getAdminUri('Datasheets', 'index') }}"><i class="fa fa-chevron-circle-left"></i> zurück</a></p>
+
+<h3>
+    Datenfelder
+    <span class="headoptions">
+		<a data-toggle="tooltip" data-modal data-title="neues Datenfeld hinzufügen" href="{{ plugin.getAdminUri('Datasheets', 'ajaxModalFieldCompose', { datasheetId: datasheet.getId }) }}"><i class="fa fa-plus-circle"></i></a>
+	</span>
+</h3>
+
+<div id="datasheetFieldsReceiver">
+
+    {{ v.injectPartial('\\Frootbox\\Ext\\Core\\ShopSystem\\Plugins\\ShopSystem\\Admin\\Datasheets\\Partials\\FieldsList', {
+        datasheet: datasheet,
+        plugin: plugin
+    }) | raw }}
+
+</div>
+
+<h3>
+    Optionsgruppen
+    <span class="headoptions">
+		<a data-toggle="tooltip" data-modal data-title="neue Optionsgruppe hinzufügen" href="{{ plugin.getAdminUri('Datasheets', 'ajaxModalGroupCompose', { datasheetId: datasheet.getId }) }}"><i class="fa fa-plus-circle"></i></a>
+	</span>
+</h3>
+
+<div id="datasheetGroupsReceiver">
+
+    {{ v.injectPartial('\\Frootbox\\Ext\\Core\\ShopSystem\\Plugins\\ShopSystem\\Admin\\Datasheets\\Partials\\GroupsList', {
+        datasheet: datasheet,
+        plugin: plugin
+    }) | raw }}
+
+</div>
+
+<h3>Voreinstellungen</h3>
+
+<div class="card">
+    <div class="card-body">
+
+        <form method="post" class="ajax" action="{{ plugin.getAdminUri('Datasheets', 'ajaxUpdatePresets', { datasheetId: datasheet.getId() }) }}">
+
+            {% if productDetailsTemplates | length > 1 %}
+                <div class="form-group">
+                    <label for="templateId">Layout für Produktdetails</label>
+                    <select class="form-control" id="templateId" name="templateId">
+                        {% for tempalte in productDetailsTemplates %}
+                            <option {% if datasheet.getConfig('products.templateId') == tempalte.getTemplateNumber %}selected {% endif %} value="{{ tempalte.getTemplateNumber }}">{{ tempalte.getName }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            {% endif %}
+
+            <button type="submit" class="btn btn-primary">Speichern</button>
+
+        </form>
+
+    </div>
+</div>

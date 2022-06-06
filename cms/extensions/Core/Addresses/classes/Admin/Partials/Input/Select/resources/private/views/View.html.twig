@@ -1,0 +1,18 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{% if addresses | length %}
+
+	<div class="form-group">
+		<label for="venueId">Veranstaltungsort</label>
+		<select class="form-control" id="venueId" name="venueId">
+			<option value="">bitte wählen ...</option>
+
+			{% for address in addresses %}
+				<option {% if clone.getParentId == address.getId %}selected{% endif %} value="{{ address.getId }}">{{ address.getTitle }}</option>
+			{% endfor %}
+
+		</select>
+	</div>
+
+
+{% endif %}

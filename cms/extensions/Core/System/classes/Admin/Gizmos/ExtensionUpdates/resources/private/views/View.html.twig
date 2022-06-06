@@ -1,0 +1,41 @@
+<style>
+    .Gizmo.Core.System.ExtensionUpdates {
+        min-height: 140px;
+        text-align: center;
+    }
+
+    .Gizmo.Core.System.ExtensionUpdates table {
+        text-align: left;
+    }
+
+    .Gizmo.Core.System.ExtensionUpdates .message.warning {
+        margin-bottom: 0;
+    }
+</style>
+
+<h4>Extension Updates</h4>
+
+{% if extensions.getCount() == 0 %}
+    <div class="message warning">Alles auf dem aktuellen Stand ;-)</div>
+{% else %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Vendor</th>
+                <th>Extension</th>
+                <th>Ist</th>
+                <th>Soll</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for extension in extensions %}
+                <tr data-href="{{ front.getUri('Extensions', 'details', { vendorId: extension.getVendorId(), extensionId: extension.getExtensionId() }) }}">
+                    <td>{{ extension.getVendorId() }}</td>
+                    <td>{{ extension.getExtensionId() }}</td>
+                    <td>{{ extension.getVersion() }}</td>
+                    <td>{{ extension.getExtensionController().getConfig('version') }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endif %}

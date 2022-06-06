@@ -1,0 +1,99 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<h2 id="categoriesHead">
+    Kategorien
+    <!--
+    <span class="headoptions d-none">
+		<a data-toggle="tooltip" data-modal data-title="neues Produkt hinzufügen" href="{{ plugin.getAdminUri('Products', 'ajaxModalCompose') }}"><i class="fa fa-plus-circle"></i></a>
+	</span>
+	-->
+</h2>
+
+<p><a class="ajax" href="{{ plugin.getAdminUri('Index', 'index') }}"><i class="fa fa-chevron-circle-left"></i> zurück</a></p>
+
+<div class="row">
+    <div class="col-6">
+
+        <h4>Kategorien</h4>
+
+        <script>
+            $(function ( ) {
+
+                $(document).on('click', '#categoriesTreeReceiver tr[data-cat]', function ( event ) {
+
+                    if (event.target.tagName == 'A') {
+                        return;
+                    }
+
+                    event.preventDefault();
+                    event.stopImmediatePropagation();
+
+                    $('#categoriesTreeReceiver tr[data-cat]').removeClass('highlighted');
+
+                    $(this).addClass('highlighted');
+
+                    var categoryId = $(this).attr('data-cat');
+
+                    $.ajax({
+                        url: "{{ plugin.getAdminUri('Categories', 'ajaxPanelDetails') | raw }}",
+                        data: {
+                            categoryId: categoryId
+                        },
+                        success: function ( html ) {
+
+                            $('#categoryContentReceiver').html(html);
+
+                            $('#categoriesHead .headoptions').removeClass('d-none');
+
+                            var url = $('#categoriesHead .headoptions a').attr('href');
+
+                            $('#categoriesHead .headoptions a').attr('href', url + '&categoryId=' + categoryId);
+
+
+                            $('table[data-xxsortsort]').tableDnD({
+                                dragHandle: '.handle',
+                                serializeParamName: 'row',
+                                onDragClass: 'dragging',
+                                onDrop: function (table, row) {
+
+                                    var list = [];
+
+                                    $(table).find('tbody').find('tr').each(function ( ) {
+
+                                        list.push($(this).attr('id'));
+                                    });
+
+                                    $.ajax({
+                                        url: $(table).attr('data-xxsortsort'),
+                                        data: {
+                                            products: list
+                                        }
+                                    });
+                                }
+                            });
+
+
+                        }
+                    });
+                });
+            });
+        </script>
+
+        {{ v.injectPartial('\\Frootbox\\Admin\\Controller\\Assets\\Categories\\Partials\\CategoriesManager', {
+            categoryId: get.get('categoryId'),
+            uid: plugin.getUid('categories'),
+            plugin: plugin,
+            className : 'Frootbox\\Ext\\Core\\ShopSystem\\Persistence\\Category'
+        }) | raw }}
+
+    </div>
+    <div class="col-6">
+
+        <div id="categoryContentReceiver">
+
+        </div>
+
+
+
+    </div>
+</div>

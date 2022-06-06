@@ -1,0 +1,41 @@
+{# config
+
+title: Jumbotron
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+{{ i.injectScss({ path: 'Index05/public/standards.less'}) | raw }}
+
+<div class="row">
+    <div class="col-12 plugin Core Navigation Teaser Index05">
+
+            <div class="row row-eq-height">
+                <div class="col-12 col-md-8">
+
+                    <div class="pillow">
+
+                        <h1 data-editable data-uid="{{ plugin.getUid('title') }}">Überschrift</h1>
+
+                        <div data-editable data-uid="{{ plugin.getUid('teaser-text') }}"></div>
+
+                    </div>
+
+                </div>
+                <div class="col-12 col-md-4 teaser-nav">
+
+                    {% set teasers = i.getTeasers({ test: 'sdsdf', sddsf: 'dsfsdf' }) %}
+
+                    {% for teaser in teasers %}
+
+                        <a class="" href="{{ teaser.getUri() }}">{{ teaser.getTitle }}</a>
+
+                    {% endfor %}
+
+                </div>
+            </div>
+
+        </div>
+
+</div>

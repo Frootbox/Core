@@ -1,0 +1,33 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    'frame' : false,
+}) }}
+
+<form method="post" class="ajax" action="{{ plugin.getAdminUri('Index', 'ajaxUpdate', { teaserId: teaser.getId() }) }}">
+
+    <div class="modal-body">
+
+        <div class="form-group">
+            <label for="title">Titel</label>
+            <input type="text" class="form-control" name="teaser[title]" required id="title" placeholder="Titel" value="{{ teaser.getTitle() }}">
+        </div>
+        <div class="form-group">
+            <label for="type">Verhalten</label>
+            <select class="form-control" id="type" name="type">
+                <option value="">bitte wählen ...</option>
+                <option {% if teaser.getPageType == 'Default' %}selected{% endif %} value="Default">Standardseite</option>
+                <option {% if teaser.getPageType == 'Redirect' %}selected{% endif %} value="Redirect">Weiterleitung</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="target">Weiterleitungs-Ziel</label>
+            <input type="text" class="form-control" id="target" name="target" placeholder="Weiterleitungs-Ziel" value="{{ teaser.getConfig('redirect.target') }}">
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Speichern</button>
+    </div>
+
+</form>

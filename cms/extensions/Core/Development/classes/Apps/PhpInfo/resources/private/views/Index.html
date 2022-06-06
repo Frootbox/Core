@@ -1,0 +1,10 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ front.addTab('Datenbankverwaltung', app.getUri('index')) }}
+
+<h2>
+	PHP Info
+</h2>
+
+<iframe src="{{ app.getUri('phpinfo') }}" width="100%" height="1000"></iframe>
+

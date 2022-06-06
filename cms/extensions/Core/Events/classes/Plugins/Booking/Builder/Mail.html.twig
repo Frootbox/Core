@@ -1,0 +1,171 @@
+<html>
+    <head>
+
+        <style>
+            body {
+                font-family: Arial;
+            }
+
+            table.datagrid {
+                width: 100%;
+                margin: 30px 0;
+                border-spacing: 0px;
+            }
+
+            table tbody tr:first-of-type td {
+                border-top: 1px solid #CCC;
+            }
+
+            table tbody td {
+                border-bottom: 1px solid #CCC;
+                padding: 10px 0;
+            }
+
+            table tbody td.title {
+                padding-right: 15px;
+                font-weight: bold;
+            }
+
+        </style>
+    </head>
+    <body>
+
+        <p>
+            Hallo {{ booking.getConfig('owner.firstName') }} {{ booking.getConfig('owner.lastName') }},
+        </p>
+        <p>
+            Sie haben über unsere Website folgende Veranstaltung gebucht:
+        </p>
+
+        <table class="datagrid">
+            <tbody>
+                <tr>
+                    <td width="30%">Veranstaltung</td>
+                    <td>{{ event.getTitle }}</td>
+                </tr>
+                <tr>
+                    <td>Datum</td>
+                    <td>{{ event.getDateStart.format('%d.%m.%Y') }}</td>
+                </tr>
+                <tr>
+                    <td>Plätze</td>
+                    <td>{{ booking.getConfig('persons') }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p>
+            <b>Persönliche Daten</b>
+        </p>
+
+        <table class="datagrid">
+            <tbody>
+                <tr>
+                    <td width="30%">Name</td>
+                    <td>
+                        {{ booking.getConfig('owner.firstName') }} {{ booking.getConfig('owner.lastName') }}
+                    </td>
+                </tr>
+
+                {% if booking.getConfig('owner.company') %}
+                    <tr>
+                        <td>Firma</td>
+                        <td>
+                            {{ booking.getConfig('owner.company') }}
+                        </td>
+                    </tr>
+                {% endif %}
+
+                <tr>
+                    <td>Straße</td>
+                    <td>
+                        {{ booking.getConfig('owner.street') }} {{ booking.getConfig('owner.streetNumber') }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Ort</td>
+                    <td>
+                        {{ booking.getConfig('owner.zipCode') }} {{ booking.getConfig('owner.city') }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>E-Mail</td>
+                    <td>
+                        {{ booking.getConfig('owner.email') }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Telefon</td>
+                    <td>
+                        {{ booking.getConfig('owner.phone') }}
+                    </td>
+                </tr>
+            </tbody>
+        <table>
+
+
+        {% if booking.getConfig('payment') %}
+
+            <p>
+                <b>Zahlungsinformationen</b>
+            </p>
+
+            {% if booking.getConfig('payment.type') == 'CashOnPickup' %}
+                <table class="datagrid">
+                    <tbody>
+                        <tr>
+                            <td width="30%" class="title">Zahlungsart</td>
+                            <td>Bar bei Abholung</td>
+                        </tr>
+                    </tbody>
+                </table>
+            {% elseif booking.getConfig('payment.type') == 'PaymentInAdvance' %}
+                <table class="datagrid">
+                    <tbody>
+                    <tr>
+                        <td width="30%" class="title">Zahlungsart</td>
+                        <td>
+                            <p><b>Vorkasse</b></p>
+
+                            {% if translator.hasKey('Core.Events.PaymentMethods.PaymentInAdvance.Summary') %}
+                                <p>{{ translator.translate('Core.Events.PaymentMethods.PaymentInAdvance.Summary', [ (booking.getTotal()|number_format(2, ',', '.')), orderNumber ]) | raw }}</p>
+                            {% else %}
+                                <p>Überweisen Sie den Rechnungsbetrag an die angegebene Kontonummer in der Buchungsbestätigung.</p>
+                            {% endif %}
+
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            {% elseif booking.getConfig('payment.type') == 'Debit' %}
+
+                <table class="datagrid">
+                    <tbody>
+                        <tr>
+                            <td width="30%" class="title">Zahlungsart</td>
+                            <td>Zahlung per Lastschrift</td>
+                        </tr>
+                        <tr>
+                            <td class="title">Konto</td>
+                            <td>{{ booking.getConfig('payment.account.iban') }}</td>
+                        </tr>
+                        <tr>
+                            <td class="title">BIC</td>
+                            <td>{{ booking.getConfig('payment.account.bic') }}</td>
+                        </tr>
+                        <tr>
+                            <td class="title">Bank</td>
+                            <td>{{ booking.getConfig('payment.account.bank') }}</td>
+                        </tr>
+                        <tr>
+                            <td class="title">Kontoinhaber</td>
+                            <td>{{ booking.getConfig('payment.account.owner') }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            {% endif %}
+
+        {% endif %}
+
+    </body>
+</html>

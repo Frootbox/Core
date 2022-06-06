@@ -1,0 +1,18 @@
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set t = i.getTranslator() %}
+
+<div class="form-row">
+    <div class="form-group col-md-8">
+        {% if not parameters.hideLabel %}
+            <label for="field_{{ field.getId() }}_street">{{ t.translate('Street') }}{% if field.isRequired %}*{% endif %}</label>
+        {% endif %}
+        <input type="text" class="form-control" id="field_{{ field.getId() }}_street" name="fields[{{ field.getId() }}][street]" placeholder="{% if parameters.placeholder %}{{ parameters.placeholder }}{% else %}{{ parameters.t.translate('Core.Forms.Plugins.Form.PleaseFill') }}{% endif %}" {% if field.isRequired %}required{% endif %}>
+    </div>
+    <div class="form-group col-md-4">
+        {% if not parameters.hideLabel %}
+            <label for="field_{{ field.getId() }}_number">{{ t.translate('Number') }}{% if field.isRequired %}*{% endif %}</label>
+        {% endif %}
+        <input type="text" class="form-control" id="field_{{ field.getId() }}_number" name="fields[{{ field.getId() }}][number]" placeholder="{% if parameters.placeholder %}{{ parameters.placeholder }}{% else %}{{ parameters.t.translate('Core.Forms.Plugins.Form.PleaseFill') }}{% endif %}" {% if field.isRequired %}required{% endif %}>
+    </div>
+</div>
+

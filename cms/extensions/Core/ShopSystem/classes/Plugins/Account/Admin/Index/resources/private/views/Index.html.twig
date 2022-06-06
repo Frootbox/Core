@@ -1,0 +1,16 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<h2>
+    Benutzer-Profil
+    <span class="headoptions">
+		<a data-toggle="tooltip" data-modal data-title="neue Einheit hinzufügen" href="{{ plugin.getAdminUri('Entity', 'ajaxModalCompose') }}"><i class="fa fa-plus-circle"></i></a>
+	</span>
+</h2>
+
+<p><a class="ajax" href="{{ v.getUri('Page', 'ajaxPanelContent', { pageId: plugin.getPageId() }) }}"><i class="fa fa-chevron-circle-left"></i> zurück</a></p>
+
+<div id="entitiesReceiver">
+    {{ v.injectPartial('/Frootbox/Ext/Core/ShopSystem/Plugins/Account/Admin/Entity/Partials/ListEntities', {
+        plugin : plugin
+    }) | raw }}
+</div>

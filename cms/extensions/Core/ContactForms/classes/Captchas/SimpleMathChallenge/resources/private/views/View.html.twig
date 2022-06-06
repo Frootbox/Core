@@ -1,0 +1,22 @@
+<div class="Form Captcha SimpleMathChallenge">
+    <div class="form-row">
+
+        <div class="form-group col-md-9">
+            <label for="age">
+                {{ t.translate('Core.Forms.Captchas.SimpleMathChallenge.ShowUs') }}<br />
+                <b>
+                    {{ t.translate('Core.Forms.Captchas.SimpleMathChallenge.HowMuch') }}
+                    {{ t.translate('Core.Forms.Captchas.SimpleMathChallenge.' ~ a) }}
+                    {{ t.translate('Core.Forms.Captchas.SimpleMathChallenge.' ~ operator) }}
+                    {{ t.translate('Core.Forms.Captchas.SimpleMathChallenge.' ~ b) }}
+                    ?
+                </b>
+                <small id="ageHelp" class="form-text text-muted">{{ t.translate('Core.Forms.Captchas.SimpleMathChallenge.Annotation') }}</small>
+            </label>
+        </div>
+        <div class="form-group col-md-3">
+            <input required type="number" class="form-control" id="age" name="age[{{ key }}]" aria-describedby="ageHelp" placeholder="{{ t.translate('Core.Forms.Captchas.SimpleMathChallenge.Result') }}">
+        </div>
+
+    </div>
+</div>

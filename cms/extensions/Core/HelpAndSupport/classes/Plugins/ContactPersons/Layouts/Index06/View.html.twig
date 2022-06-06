@@ -1,0 +1,111 @@
+{# config
+
+title: Accordeon
+variables:
+    noImages:
+        type: bool
+        label: keine Bilder
+    columns:
+        type: int
+        label: Spalten
+        default: 2
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set p = view.getViewhelper('Partials') %}
+
+{% if variables.columns == 1 %}
+    {% set colClass = "col-12" %}
+{% elseif variables.columns == 2 %}
+    {% set colClass = "col-md-6" %}
+{% elseif variables.columns == 3 %}
+    {% set colClass = "col-md-4" %}
+{% elseif variables.columns >= 4 %}
+    {% set colClass = "col-md-3" %}
+{% endif %}
+
+
+<div class="row">
+    <div class="col-12 plugin Core HelpAndSupport ContactPersons Index06">
+
+        {% if plugin.isFirst %}
+            <h1 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h1>
+        {% else %}
+            <h2 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+        {% endif %}
+
+        <div class="top-teaser" data-editable data-uid="{{ plugin.getUid('teaser-text') }}"></div>
+
+        <div class="accordion" id="contactsAccordion{{ plugin.getId() }}">
+
+            {% for category in i.getTopCategories() %}
+                <div class="card">
+                    <div class="card-header" id="collapseHead{{ category.getId() }}">
+                        <h2 class="mb-0 collapsed" data-toggle="collapse" data-target="#collapse{{ category.getId() }}" aria-expanded="true" aria-controls="collapse{{ category.getId() }}">
+                            {{ category.getTitle() }}
+                            <span>
+                                <i class="down fa fa-arrow-down"></i>
+                                <i class="up fa fa-arrow-up"></i>
+                            </span>
+                        </h2>
+                    </div>
+
+                    <div id="collapse{{ category.getId() }}" class="collapse" aria-labelledby="collapseHead{{ category.getId() }}" data-parent="#contactsAccordion{{ plugin.getId() }}">
+                        <div class="card-body">
+                            {% set contacts = category.getContacts() %}
+
+                            {% if contacts.getCount() > 0 %}
+
+                                <div class="row">
+
+                                    {% for contact in contacts %}
+                                        <div class="{{ colClass }} vcard">
+
+                                            <div class="row">
+
+                                                {% if not variables.noImages %}
+                                                    <div class="col-md-6">
+                                                        <picture  data-editable data-uid="{{ contact.getUid('image')}}">
+                                                            <img class="round" width="400" height="400" src="{{ i.getDummyImage({ width: 400, height: 400 }) }}" alt="" />
+                                                        </picture>
+                                                    </div>
+                                                {% endif %}
+
+                                                <div class="{% if not variables.noImages %}col-md-6 align-self-end{% else %}col-12{% endif %}">
+
+                                                    <p>
+                                                        <b>{{ contact.getName() }}</b>
+                                                        {% if contact.getPosition() %}
+                                                            <br />{{ contact.getPosition() }}
+                                                        {% endif %}
+                                                    </p>
+                                                    <p>
+                                                        {% if contact.getPhone() %}
+                                                            <a href="mailto:{{ contact.getEmail() }}">{{ contact.getEmail() }}</a>
+                                                        {% endif %}
+                                                        {% if contact.getPhone() %}
+                                                            <br /><a href="tel:{{ contact.getPhone() }}">{{ contact.getPhone() }}</a>
+                                                        {% endif %}
+                                                    </p>
+
+
+
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    {% endfor %}
+
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+
+        </div>
+
+    </div>
+</div>
+

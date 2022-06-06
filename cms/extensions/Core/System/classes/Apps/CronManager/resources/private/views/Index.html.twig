@@ -1,0 +1,38 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ front.addTab('Cron-Verwaltung', app.getUri('index')) }}
+
+
+<h2>
+	Cron-Verwaltung
+</h2>
+
+<div class="card">
+	<div class="card-body">
+		<code>php {{ cronCommand }}cms/tools/cronjobs.php</code>
+	</div>
+</div>
+
+
+<table class="table">
+	<thead>
+		<tr>
+			<th>Cronjob</th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody>
+
+		{% for cronjob in cronjobs %}
+			<tr>
+				<td>{{ cronjob.getTitle() }}</td>
+				<td class="text-right">
+					<a target="_runCronjob{{ loop.index }}" href="{{ settings.serverpath_absolute }}cms/tools/cronjobs.php?cron={{ cronjob.getClass() }}"><i class="fa fa-play icon"></i></a>
+				</td>
+			</tr>
+		{% endfor %}
+
+
+	</tbody>
+</table>
+

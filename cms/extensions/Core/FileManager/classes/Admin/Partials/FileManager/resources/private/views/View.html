@@ -1,0 +1,175 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+{% set random = random(1000, 9999) %}
+
+<style>
+	.file-preview {
+		min-height: 90px;
+		margin-top: 10px;
+		padding: 10px;
+		border: 2px dashed #CCC;
+	}
+
+	.file-preview.completed {
+		border: 2px solid green;
+	}
+
+	.file-preview.error {
+		border: 2px solid red;
+	}
+
+	.file-preview img {
+		float: left;
+		margin-right: 15px;
+	}
+
+	.file-preview progress {
+		width: calc(100% - 100px);
+	}
+</style>
+
+<script>
+
+	function frootboxExtCoreFileManagerUploadFile ( fileInput, file ) {
+
+		var formData = new FormData();
+
+		formData.append('file', file);
+
+		var reader = new FileReader();
+		var group = fileInput.parents('.form-group');
+		var preview = $('<div class="file-preview"></div>');
+
+		reader.onload = (function( nfile ) {
+			return function( event ) {
+				preview.html('<img width="65" height="65" class="thumb" src="' + event.target.result + '" />\
+                    <b>' + escape(nfile.name) + '</b><br />\
+                    ' + nfile.size + ' Bytes, ' + nfile.type + '<br />\
+                    <progress value="0"></progress>');
+
+				group.append(preview);
+			};
+		})(file);
+
+		// Read in the image file as a data URL.
+		reader.readAsDataURL(file);
+
+		var request = new XMLHttpRequest();
+
+		function monitorProgress ( event ) {
+
+			var progress = preview.find('progress');
+
+			progress.attr('max', event.total);
+			progress.attr('value', event.loaded);
+		}
+
+		request.upload.onprogress = monitorProgress;
+
+		request.addEventListener("load", function ( event ) {
+
+			if (request.status > 300) {
+				var response = $.parseJSON(request.responseText);
+
+				preview.addClass('error');
+
+				var progress = preview.find('progress');
+
+				progress.after('<div style="color: red; font-size: 12px; line-height: 16px;">' + response.error + '</div>');
+			}
+			else {
+				preview.addClass('completed');
+
+				// Refresh files list
+				$.ajax({
+					url : "{{ serverpath }}cms/admin/Ext/Core/FileManager/FileManager/list",
+					data: {
+						uid: fileInput.attr('data-uid')
+					},
+					success : function ( response ) {
+
+						$('.files-list[data-uid="' + fileInput.attr('data-uid') + '"]').html(response.replace.html);
+
+						// $('.file-preview.completed').fadeOut();
+
+						{% if data.callback %}
+
+							{{ data.callback.function }}(
+								{% if data.callback.parameters %}{
+									{% for parameter, value in data.callback.parameters %}
+										{{ parameter }}: {{ value }}
+									{% endfor %}
+									}
+								{% endif %}
+							);
+						{% endif %}
+					}
+				});
+			}
+		});
+
+		request.open('POST', fileInput.attr('data-upload'));
+		request.setRequestHeader('Accept', 'application/json');
+
+		request.send(formData);
+	}
+
+
+	$(function ( ) {
+
+		$('input[data-upload]').change(function (event) {
+
+			event.stopImmediatePropagation();
+
+			for (i = 0; i < $(this)[0].files.length; ++i) {
+				frootboxExtCoreFileManagerUploadFile($(this), $(this)[0].files[i]);
+			}
+		});
+	});
+</script>
+
+<div class="form-group">
+	<label for="fileInput{{ random }}">Datei hinzufügen</label>
+	<input max-size=32154 data-uid="{{ data.uid }}" data-upload="{{ serverpath }}static/Ext/Core/FileManager/Editor/upload?uid={{ data.uid }}&multiple={% if data.multiple %}1{% endif %}" {% if data.multiple %}multiple{% endif %} type="file" id="fileInput{{ random }}" class="form-control" />
+</div>
+
+<script>
+	$(function ( ) {
+
+
+		/**
+		 * Sort files
+		 */
+		$('#fileManagerFilesList{{ random }} table').tableDnD({
+			dragHandle: '.handle',
+			serializeParamName: 'files',
+			onDragClass: 'dragging',
+			onDrop: function (table, row) {
+
+				$.ajax({
+					url: '{{ serverpath }}static/Ext/Core/FileManager/Editor/sort?uid={{ data.uid }}',
+					data: $.tableDnD.serialize()
+				});
+			}
+		});
+	});
+</script>
+
+<style>
+	input.inplace {
+		width: 100%;
+		border-width: 0 0 1px 0;
+	}
+
+	input.inplace:focus {
+		outline: none;
+	}
+</style>
+
+<div id="fileManagerFilesList{{ random }}" class="files-list" data-uid="{{ data.uid }}">
+
+	{{ v.injectPartial('Frootbox/Ext/Core/FileManager/Admin/Partials/FileManager/ListFiles', {
+		uid : data.uid
+	}) | raw }}
+
+</div>
+

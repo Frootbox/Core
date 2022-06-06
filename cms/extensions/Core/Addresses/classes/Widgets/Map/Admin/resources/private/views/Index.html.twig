@@ -1,0 +1,83 @@
+
+<script>
+    $(function ( ) {
+
+        /**
+         * Extract maps link
+         */
+        $('#mapUrl').change(function(event) {
+
+            if (matches = $(this).val().match(/ll=(.*?),(.*?)&/)) {
+                $('#lng').val(matches[1]);
+                $('#lat').val(matches[2]);
+                $(this).val('');
+            }
+            else if (matches = $(this).val().match(/@([0-9\.\-]{1,}),([0-9\.\-]{1,})/)) {
+                $('#lng').val(matches[1]);
+                $('#lat').val(matches[2]);
+                $(this).val('');
+            }
+        });
+
+
+        $('#updateForm').submit(function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            $.ajax({
+                url: $(this).attr('action'),
+                data: $(this).serialize(),
+                type: 'POST',
+                headers: {
+                    Accept: "application/json; charset=utf-8",
+                },
+                success: function ( response ) {
+
+                    $('figure[data-id="' + response.widget.id + '"]').replaceWith(response.widget.html);
+
+                    $('#fbxEditorGenericModal').modal('hide');
+                },
+                error: function ( xhr ) {
+                    alert(xhr.responseText);
+                }
+            });
+
+        });
+    });
+</script>
+
+
+<form id="updateForm" action="{{ widgetController.getAdminUrl('ajaxUpdate') }}" method="post">
+
+    <div class="modal-header">
+        <h5 class="modal-title">Karte konfigurieren</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+
+        <div class="form-group">
+            <label for="mapUrl">Karten-Link</label>
+            <input type="text" class="form-control" id="mapUrl" name="mapUrl" placeholder="Karten-Link" value="{{ widget.getConfig('lng') }}">
+        </div>
+        <div class="form-group">
+            <label for="lng">Lng</label>
+            <input type="text" class="form-control" id="lng" name="lng" placeholder="Lng" value="{{ widget.getConfig('lng') }}">
+        </div>
+        <div class="form-group">
+            <label for="lat">Lat</label>
+            <input type="text" class="form-control" id="lat" name="lat" placeholder="Lat" value="{{ widget.getConfig('lat') }}">
+        </div>
+        <div class="form-group">
+            <label for="height">Höhe</label>
+            <input type="text" class="form-control" id="height" name="height" placeholder="Höhe" value="{{ widget.getConfig('height') }}">
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Speichern</button>
+    </div>
+
+</form>

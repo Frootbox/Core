@@ -1,0 +1,17 @@
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set t = i.getTranslator() %}
+
+<div class="form-row">
+    <div class="form-group col-md-4">
+        {% if not parameters.hideLabel %}
+            <label for="field_{{ field.getId() }}_street">{{ t.translate('PostalCode') }}{% if field.isRequired %}*{% endif %}</label>
+        {% endif %}
+        <input type="text" class="form-control" id="field_{{ field.getId() }}_street" name="fields[{{ field.getId() }}][zipcode]" placeholder="{{ t.translate('PostalCode') }}" {% if field.isRequired %}required{% endif %}>
+    </div>
+    <div class="form-group col-md-8">
+        {% if not parameters.hideLabel %}
+            <label for="field_{{ field.getId() }}_number">{{ t.translate('City') }}{% if field.isRequired %}*{% endif %}</label>
+        {% endif %}
+        <input type="text" class="form-control" id="field_{{ field.getId() }}_number" name="fields[{{ field.getId() }}][city]" placeholder="{{ t.translate('City') }}" {% if field.isRequired %}required{% endif %}>
+    </div>
+</div>

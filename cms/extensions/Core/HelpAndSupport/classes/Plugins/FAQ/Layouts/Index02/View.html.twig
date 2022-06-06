@@ -1,0 +1,91 @@
+{# config
+
+title: Accordeon
+variables:
+    noHeadline:
+        type: bool
+        label: keine Überschrift
+    noIndex:
+        type: bool
+        label: kein Inhaltsverzeichnis
+        default: 1
+    withContainer:
+        type: bool
+        label: mit Layout-Container
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+{{ i.injectScss({ path: 'Index01/public/standards.less'}) | raw }}
+
+<div class="plugin Core HelpAndSupport FAQ Index02">
+
+    {% if variables.withContainer %}<div class="container">{% endif %}
+
+    <div class="row">
+        <div class="col-12">
+
+            {% if not variables.noHeadline %}
+                {% if plugin.isFirst %}
+                    <h1 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h1>
+                {% else %}
+                    <h2 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+                {% endif %}
+            {% endif %}
+
+            <div data-editable data-uid="{{ plugin.getUid('teaser') }}"></div>
+
+            {% set questions = i.getQuestions() %}
+
+            {% if questions.getCount > 0 %}
+                {% if not variables.noIndex %}
+                    <ul>
+                        {% for question in questions %}
+                            <li><a href="#{{ question.getStringUrlSanitized( question.getTitle ) }}">{{ question.getTitle }}</a></li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+
+                <div class="accordion" id="accordionExample">
+
+                    {% for question in questions %}
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="mb-0">
+                                    <span data-toggle="collapse" data-target="#collapse{{ question.getId() }}" aria-expanded="true" aria-controls="collapseOne" class="collapsed">
+                                        <span data-editable-element data-uid="{{ question.getUid('title') }}">{{ question.getTitle }}</span>
+
+                                        <span class="icons">
+                                            <i class="down fa fa-arrow-down"></i>
+                                            <i class="up fa fa-arrow-up"></i>
+                                        </span>
+                                    </span>
+                                </h3>
+                            </div>
+                            <div id="collapse{{ question.getId() }}" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
+                                <div class="card-body">
+
+                                    <div data-editable data-uid="{{ question.getUid('teaser') }}"></div>
+
+                                    {% if question.getConfig('link') %}
+                                        <p><a href="{{ question.getConfig('link') }}">weiterlesen</a></p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+
+                </div>
+
+            {% endif %}
+
+            <div data-editable data-uid="{{ plugin.getUid('text-bottom') }}"></div>
+
+
+        </div>
+    </div>
+
+    {% if variables.withContainer %}</div>{% endif %}
+
+</div>

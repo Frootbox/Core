@@ -1,0 +1,109 @@
+{% set v =  view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+
+{{ view.set({
+    'frame' : false,
+}) }}
+
+<html>
+    <head>
+
+        {{ v.injectPartial('\\Frootbox\\Admin\\View\\Partials\\Head\\Partial')|raw }}
+
+        <script>
+
+            function startEditorNav ( ) {
+
+                $('.loading').remove();
+                $('.toolbar').removeClass('d-none');
+
+                $(document).on('click', '.start-editing', function ( event ) {
+
+                    event.preventDefault();
+
+                    parent.document.getElementById('contentFrame').contentWindow.igniteEditing();
+
+                    $('.end-editing').removeClass('d-none');
+                    $('.start-editing').addClass('d-none');
+                });
+
+                $(document).on('click', '.end-editing', function ( event ) {
+
+                    event.preventDefault();
+
+                    parent.document.getElementById('contentFrame').contentWindow.endEditing();
+
+                    $.each(parent.document.getElementById('contentFrame').contentWindow.editors, function ( index, editor ) {
+
+                        if (editor == null) {
+                            return;
+                        }
+
+                        editor.destroy();
+
+                        parent.document.getElementById('contentFrame').contentWindow.editors[index] = null;
+
+                        $('.end-editing').addClass('d-none');
+                        $('.start-editing').removeClass('d-none');
+
+
+                        $.ajax({
+                            url : '{{ serverpath }}cms/admin/Editor/ajaxUpdateText',
+                            type: 'POST',
+                            data : {
+                                uid : $(editor.sourceElement).attr('data-uid'),
+                                text : editor.getData()
+                            },
+                            success : function ( html ) {
+
+                                console.log(html);
+                            }
+                        });
+                    });
+
+                });
+
+            }
+
+        </script>
+
+        <style>
+            body {
+                background: #303640;
+                color: #FFF;
+            }
+
+            a {
+                color: #21a9e1;
+            }
+
+        </style>
+
+    </head>
+    <body>
+
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col" style="padding-top: 10px;">
+
+                    {% if not user %}
+                        Willkommen im Bearbeitungsmodus dieser Seite. Sie sind nicht angemeldet. <a target="_top" href="{{ serverpath }}cms/admin/Session/login?redirect={{ get.get('target') |e('url') }}">Jetzt Anmelden</a>.
+                    {% else %}
+
+                        <div class="loading">
+                            Editor wird geladen ...
+                        </div>
+                        <div class="toolbar d-none">
+                            <a class="btn btn-sm btn-info start-editing" href="#"><i class="fa fa-pencil"></i> Bearbeitung starten</a>
+                            <a class="btn btn-sm btn-success end-editing d-none" href="#"><i class="fa fa-check"></i> Bearbeitung beenden</a>
+                        </div>
+
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+
+
+    </body>
+</html>

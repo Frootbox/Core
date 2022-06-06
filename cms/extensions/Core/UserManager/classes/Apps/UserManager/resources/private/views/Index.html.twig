@@ -1,0 +1,63 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ front.addTab('Benutzerverwaltung', app.getUri('index')) }}
+
+<h2>
+	Benutzerverwaltung
+</h2>
+
+<h3>
+	Super-Admins
+	<span class="headoptions">
+		<a href="{{ app.getUri('ajaxModalUserCompose', { type: 'SuperAdmin' }) }}" data-modal data-title="Super-Admin hinzufügen"><i class="fa fa-plus-circle"></i></a>
+		<a href="{{ app.getUri('ajaxModalUserImport') }}" data-modal data-title="Benutzer importieren"><i class="fal fa-file-import"></i></a>
+	</span>
+</h3>
+
+<div id="superadminReceiver">
+	{{ v.injectPartial('\\Frootbox\\Ext\\Core\\UserManager\\Apps\\UserManager\\Partials\\ListUsers', {
+		type: 'SuperAdmin'
+	}) | raw }}
+</div>
+
+<h3>
+	Admins
+	<span class="headoptions">
+		<a href="{{ app.getUri('ajaxModalUserCompose', { type: 'Admin' }) }}" data-modal data-title="Admin hinzufügen"><i class="fa fa-plus-circle"></i></a>
+		<a href="{{ app.getUri('ajaxModalUserImport') }}" data-modal data-title="Benutzer importieren"><i class="fal fa-file-import"></i></a>
+	</span>
+</h3>
+
+<div id="adminReceiver">
+	{{ v.injectPartial('\\Frootbox\\Ext\\Core\\UserManager\\Apps\\UserManager\\Partials\\ListUsers', {
+		type: 'Admin'
+	}) | raw }}
+</div>
+
+<h3>
+	Redakteur
+	<span class="headoptions">
+		<a href="{{ app.getUri('ajaxModalUserCompose', { type: 'Editor' }) }}" data-modal data-title="Redakteur hinzufügen"><i class="fa fa-plus-circle"></i></a>
+		<a href="{{ app.getUri('ajaxModalUserImport') }}" data-modal data-title="Benutzer importieren"><i class="fal fa-file-import"></i></a>
+	</span>
+</h3>
+
+<div id="editorReceiver">
+	{{ v.injectPartial('\\Frootbox\\Ext\\Core\\UserManager\\Apps\\UserManager\\Partials\\ListUsers', {
+		type: 'Editor'
+	}) | raw }}
+</div>
+
+<h3>
+	Benutzer
+	<span class="headoptions">
+		<a href="{{ app.getUri('ajaxModalUserCompose', { type: 'User' }) }}" data-modal data-title="Benutzer hinzufügen"><i class="fa fa-plus-circle"></i></a>
+		<a href="{{ app.getUri('ajaxModalUserImport') }}" data-modal data-title="Benutzer importieren"><i class="fal fa-file-import"></i></a>
+	</span>
+</h3>
+
+<div id="userReceiver">
+	{{ v.injectPartial('\\Frootbox\\Ext\\Core\\UserManager\\Apps\\UserManager\\Partials\\ListUsers', {
+		type: 'User'
+	}) | raw }}
+</div>

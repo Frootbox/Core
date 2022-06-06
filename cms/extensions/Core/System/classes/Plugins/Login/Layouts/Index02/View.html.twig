@@ -1,0 +1,61 @@
+{# config
+
+title: Standard
+variables:
+    withLayoutContainer:
+        type: bool
+        label: mit Layout-Container
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+<div class="plugin Core System Login Index02">
+
+    {% if variables.withLayoutContainer %}<div class="container">{% endif %}
+
+    <div class="row">
+        <div class="col-12">
+            <div class="inner-wrapper">
+
+                {% if plugin.isFirst %}
+                    <h1 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h1>
+                {% else %}
+                    <h2 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+                {% endif %}
+
+                <div data-editable data-uid="{{ plugin.getUid('teaser') }}"></div>
+
+                <div class="row">
+                    <div class="col-md-6">
+
+                        <form id="loginForm" method="post" action="{{ plugin.getUriAjax('submit') }}">
+
+                            <div class="form-group">
+                                <label for="username">Benutzername</label>
+                                <input type="text" name="username" id="username" class="form-control" placeholder="Benutzername" />
+                            </div>
+                            <div class="form-group">
+                                <label for="password">Passwort</label>
+                                <input type="password" name="password" id="password" class="form-control" placeholder="Passwort" />
+                            </div>
+
+                            <button class="btn btn-primary" type="submit">Anmelden</button>
+
+                        </form>
+
+                    </div>
+                    <div class="col-md-6">
+
+                        <div data-editable data-uid="{{ plugin.getUid('text-2') }}"></div>
+
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+    {% if variables.withLayoutContainer %}</div>{% endif %}
+
+</div>

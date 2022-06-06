@@ -1,0 +1,47 @@
+{# config
+
+title: Akkordeon
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+<div class="row">
+    <div class="col-12 plugin Core News News Index04">
+
+        {% if plugin.isFirst %}
+            <h1 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h1>
+        {% else %}
+            <h2 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+        {% endif %}
+
+        <div data-editable data-uid="{{ plugin.getUid('teaser-text') }}"></div>
+
+        {% set articles = i.getArticles() %}
+
+
+        <div class="accordion articles" id="newAccordion{{ plugin.getId() }}">
+
+            {% for article in articles %}
+                <div class="card article">
+                    <div class="card-header" id="heading{{ article.getId() }}">
+                        <h3 class="mb-0">
+                            <a class="" data-toggle="collapse" data-target="#collapse{{ article.getId() }}" aria-expanded="true" aria-controls="collapseOne">
+                                {{ article.getDateStart() | date('Y') }} | <span data-editable-element data-uid="{{ article.getUid('title') }}">{{ article.getTitle }}</span>
+                            </a>
+                        </h3>
+                    </div>
+
+                    <div id="collapse{{ article.getId() }}" class="collapse" aria-labelledby="heading{{ article.getId() }}" data-parent="#newAccordion{{ plugin.getId() }}">
+                        <div class="card-body">
+                            <div data-nowidgets data-editable data-uid="{{ article.getUid('teaser') }}"></div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+
+        </div>
+
+    </div>
+</div>
+

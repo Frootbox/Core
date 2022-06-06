@@ -1,0 +1,44 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+{% set t = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\Translator') %}
+{{ t.setScope(data.plugin) }}
+
+<script>
+    $(function ( ) {
+
+        /**
+         *
+         */
+        $('select.switch-layouts-section').change(function ( event ) {
+            $(this).parent('form').trigger('submit');
+        });
+
+    });
+</script>
+
+
+<h3>Layout wählen</h3>
+
+<form method="post" class="ajax" action="{{ v.getUri('Plugin', 'ajaxSwitchLayoutOptions', { pluginId: data.plugin.getId() } ) }}">
+
+    <select class="form-control switch-layouts-section" name="action">
+        <option value="">bitte wählen ...</option>
+
+        {% for layoutKey, layout in layouts %}
+            <option {% if layoutKey == data.action %}selected{% endif %} value="{{ layoutKey }}">{{ t.translate('LayoutAction.' ~ layoutKey | ucfirst ) }}</option>
+        {% endfor %}
+    </select>
+
+</form>
+
+
+<br />
+
+<div id="layoutOptionsReceiver">
+    {{ v.injectPartial('/Frootbox/Admin/Controller/Plugin/Partials/LayoutOptions', {
+        plugin: data.plugin,
+        layouts: layouts[data.action],
+        action: data.action
+    }) | raw }}
+</div>
+
+

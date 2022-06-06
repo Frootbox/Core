@@ -1,0 +1,19 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<h2>
+    Erweiterungen
+    <span class="headoptions">
+        <a data-modal href="{{ v.getUri('Extensions', 'ajaxModalCompose') }}" data-title="Extension installieren"><i class="fa fa-plus-circle"></i></a>
+        <a class="ajax" href="{{ v.getUri('Extensions', 'ajaxReload') }}"><i class="fa fa-sync"></i></a>
+    </span>
+</h2>
+
+<div class="row">
+    <div class="col-8">
+
+        <div id="extensionsReceiver">
+            {{ v.injectPartial('\\Frootbox\\Admin\\Controller\\Extensions\\Partials\\ListExtensions\\Partial') | raw }}
+        </div>
+
+    </div>
+</div>

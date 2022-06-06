@@ -1,0 +1,15 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ front.addTab('Formular-Verwaltung', app.getUri('index')) }}
+
+<h2>
+	Formular-Verwaltung
+	<span class="headoptions">
+		<a data-toggle="tooltip" data-modal data-title="neue Formulargruppe hinzufügen" href="{{ app.getUri('ajaxModalCompose') }}"><i class="fa fa-plus-circle"></i></a>
+	</span>
+</h2>
+
+<div id="formsReceiver">
+	{{ v.injectPartial('\\Frootbox\\Ext\\Core\\Forms\\Apps\\FormsManager\\Partials\\ListForms') | raw }}
+</div>
+

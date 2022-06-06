@@ -1,0 +1,62 @@
+{# config
+
+title: Standard
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set p = view.getViewhelper('Partials') %}
+
+<div class="row">
+    <div class="col-12 plugin Core HelpAndSupport ContactPersons ShowCategory01">
+
+        {% if plugin.isFirst %}
+            <h1 data-editable data-uid="{{ category.getUid('title') }}">{{ category.getTitle }}</h1>
+        {% else %}
+            <h2 data-editable data-uid="{{ category.getUid('title') }}">{{ category.getTitle }}</h2>
+        {% endif %}
+
+        <p class="text-center"><a href="{{ plugin.getUri('index') }}">zurück</a></p>
+
+        <div class="font-weight-bold text-center">
+
+            <div data-editable data-uid="{{ category.getUid('text-teaser') }}"></div>
+        </div>
+
+        {% set contacts = category.getContacts() %}
+
+        {% if contacts.getCount > 0 %}
+            <div class="row justify-content-md-center contact-persons">
+
+                {% for contact in contacts %}
+                    <div class="col-2">
+
+                        <style>
+                            img.round {
+                                height: auto;
+                            }
+                        </style>
+
+                        <picture  data-editable data-uid="{{ contact.getUid('image')}}">
+                            <img class="round" width="400" height="400" src="{{ settings.serverpath }}cms/resources/public/images/dummy/square.png" alt="" />
+                        </picture>
+
+                        <h5 style="margin: 20px; text-align: center;">{{ contact.getName() }}</h5>
+
+                        <p class="text-center">
+                            {% if contact.getPhone() %}
+                            <a href="tel:{{ contact.getPhone() }}"><i class="fa fa-phone"></i> {{ contact.getPhone() }}</a>
+                            {% endif %}
+                        </p>
+                    </div>
+                {% endfor %}
+
+            </div>
+        {% endif %}
+
+
+
+        <div data-editable data-uid="{{ category.getUid('text') }}"></div>
+
+    </div>
+</div>

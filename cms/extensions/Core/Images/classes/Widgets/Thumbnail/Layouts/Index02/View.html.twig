@@ -1,0 +1,70 @@
+{% set i = view.getViewhelper('Delegator', { object: widget }) %}
+
+<style>
+    figure.widget picture[data-widget="{{ widget.getId }}"] img {
+        width: 100%;
+        height: auto;
+        {% if widget.getConfig('image.width') %}
+            max-width: {{ widget.getConfig('image.width') }}px !important;
+        {% endif %}
+    }
+
+    figure.widget picture .caption {
+        padding: 20px 0 0 0;
+        text-align: center;
+        font-size: 0.8em;
+        line-height: 1.5em;
+        font-style: italic;
+    }
+
+    figure.widget picture .caption .copyright {
+        display: block;
+        padding: 4px 0 0 0;
+        color: #ccc;
+        font-size: 20px;
+        line-height: 24px;
+    }
+
+    figure.widget picture img.x-rounded {
+        border-radius: 100%;
+    }
+</style>
+
+
+{% if file %}
+    {% set src = file.getUri({ crop: widget.getConfig('crop'), width: widget.getConfig('image.width'), height: widget.getConfig('image.height') }) %}
+{% else %}
+    {% set src = i.getDummyImage({ width: 600, height: 300 }) %}
+{% endif %}
+
+<div class="Widget Core Images Thumbnail Index02">
+    <picture data-widget="{{ widget.getId }}">
+
+        <div class="row align-items-center">
+            <div class="col-md-8">
+
+                {% if widget.getConfig('url') %}<a href="{{ widget.getConfig('url') }}">{% endif %}
+
+                <img class="{% if widget.getConfig('image.rounded') %}x-rounded{% endif %}" src="{{ src }}" alt="{{ widget.getConfig('alt') }}" />
+
+                {% if widget.getConfig('url') %}</a>{% endif %}
+            </div>
+            <div class="col-md-4">
+                {% if file.getConfig('caption') %}
+                    <p class="caption">
+                        {{ file.getConfig('caption') | nl2br }}
+
+                        {% if widget.getConfig('source') %}
+                            <span class="copyright">{{ widget.getConfig('source') }}</span>
+                        {% endif %}
+                    </p>
+                {% endif %}
+
+                {% if file.getCopyright() %}
+                    <!-- Copyright {{ file.getCopyright() }} -->
+                {% endif %}
+            </div>
+        </div>
+
+    </picture>
+</div>

@@ -1,0 +1,74 @@
+{# config
+
+title: Standard
+
+/config #}
+
+{% set v = view.getViewhelper('View') %}
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set p = view.getViewhelper('Partials', { plugin: plugin }) %}
+{% set a = view.getViewhelper('Assets', {   }) %}
+
+{{ v.asset('EXT:Core/ShopSystem/icons/css/all.css') | raw }}
+
+<div class="plugin Core ShopSystem Account Account01">
+    <div class="container">
+
+        <div class="row">
+            <div class="col-12">
+                <div class="inner-wrapper">
+
+                    {% if plugin.isFirst %}
+                        <h1 data-editable data-uid="{{ plugin.getUid('title-addresses') }}">Adressbuch</h1>
+                    {% else %}
+                        <h2 data-editable data-uid="{{ plugin.getUid('title-addresses') }}">Adressbuch</h2>
+                    {% endif %}
+
+                    <br /><br />
+
+                    <div class="row">
+                        <div class="col-md-4">
+
+                            {{ p.renderPartial('Menu', { plugin: plugin }) | raw }}
+
+                        </div>
+                        <div class="col-md-8">
+
+                            {% if addresses | length == 0 %}
+                                <div class="message">Es wurden noch keine Adressen erstellt.</div>
+                            {% else %}
+                                <table class="table">
+                                    <tbody>
+
+                                        {% for address in addresses %}
+                                            <tr>
+                                                <td>
+                                                    <a href="{{ plugin.getActionUri('addressEdit', { addressId: address.getId() }) }}">{{ address.getTitle() | default('neue Adresse') }}</a>
+                                                </td>
+                                                <td class="text-right">
+                                                    <a href="{{ plugin.getActionUri('addressEdit', { addressId: address.getId() }) }}"><i class="icon fal fa-pencil"></i></a>
+                                                    <a href="{{ plugin.getUriAjax('addressDelete', { addressId: address.getId() }) }}"><i class="icon fal fa-times-square"></i></a>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+
+                                    </tbody>
+                                </table>
+                            {% endif %}
+
+                            <br />
+
+                            <p><a class="btn btn-primary" href="{{ plugin.getActionUri('ajaxAddressCreate') }}">neue Adresse hinzufügen</a></p>
+
+                        </div>
+                    </div>
+
+
+                    <br /><br /><br /><br /><br />
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

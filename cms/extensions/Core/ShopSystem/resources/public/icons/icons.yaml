@@ -1,0 +1,15 @@
+projectName: icons
+version: 5.15.1
+icons:
+  - pencil:
+      - light
+  - times-square:
+      - light
+  - check:
+      - light
+  - print:
+      - light
+  - times:
+      - light
+  - shield-check:
+      - light

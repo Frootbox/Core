@@ -1,0 +1,32 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    'frame' : false,
+}) }}
+
+<form method="post" class="ajax" action="{{ plugin.getAdminUri('Categories', 'ajaxUpdateConfig', { categoryId: get.get('categoryId') }) }}">
+
+    <div class="modal-body">
+
+        <div class="form-group">
+            <label for="url">URL-Weiterleitung</label>
+            <input type="text" class="form-control" value="{{ category.getConfig('url') }}" name="url" id="url" />
+        </div>
+        <div class="form-group">
+            <label for="targetCategoryId">Kategorie-Weiterleitung</label>
+            <select class="form-control" name="targetCategoryId" id="targetCategoryId">
+                <option value="">bitte wählen ...</option>
+
+                {% for child in categories %}
+                    <option {% if category.getConfig('targetCategoryId') %}selected{% endif %} value="{{ child.getId() }}">{{ child.getTitle() }}</option>
+                {% endfor %}
+            </select>
+
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Speichern</button>
+    </div>
+
+</form>

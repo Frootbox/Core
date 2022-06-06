@@ -1,0 +1,97 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    'frame' : false,
+}) }}
+
+<script>
+    $(function ( ) {
+
+        $('#linkageDeactivated').change(function ( ) {
+
+            if ($(this).is(':checked')) {
+                $('.linkage').hide();
+            }
+            else {
+                $('.linkage').show();
+            }
+        });
+
+        $('#linkageDeactivated').trigger('change');
+    });
+</script>
+
+<form method="post" class="ajax" action="{{ plugin.getAdminUri('Index', 'ajaxUpdate', { teaserId: teaser.getId() }) }}">
+
+    <div class="modal-body">
+
+        {% if not configuration.get('i18n.multiAliasMode') %}
+            <div class="form-group">
+                <label for="title">Titel</label>
+                <input type="text" class="form-control" id="title" name="title" placeholder="Titel" value="{{ teaser.getTitle() }}">
+            </div>
+        {% else %}
+            {% for language in configuration.get('i18n.languages') %}
+
+                <div class="form-group">
+                    <label for="title_{{ loop.index }}">Titel ({{ language }}){% if settings.default_language == language %}*{% endif %}</label>
+                    <input type="text" {% if settings.default_language == language %}required{% endif %} class="form-control" id="title_{{ loop.index }}" name="titles[{{ language }}]" placeholder="Titel ({{ language }})" value="{{ teaser.getTitleWithoutFallback(language) }}">
+                </div>
+
+            {% endfor %}
+        {% endif %}
+
+
+        <div class="form-group form-check">
+            <input type="checkbox" class="form-check-input" id="linkageDeactivated" name="linkageDeactivated" {% if teaser.getConfig('linkageDeactivated') %}checked{% endif %}>
+            <label class="form-check-label" for="linkageDeactivated">Verlinkung deaktiviert</label>
+        </div>
+
+        <div class="linkage">
+            <div class="form-group">
+                <label for="target">URL Weiterleitungs-Ziel</label>
+                <input type="text" class="form-control" id="target" name="target" placeholder="externes Weiterleitungs-Ziel" value="{{ teaser.getConfig('redirect.target') }}">
+            </div>
+
+            <div class="form-group">
+                <label for="email">E-Mail Adresse</label>
+                <input type="text" class="form-control" id="email" name="email" placeholder="E-Mail Adresse" value="{{ teaser.getConfig('redirect.email') }}">
+            </div>
+
+            {{ v.injectPartial('\\Frootbox\\Admin\\Controller\\Search\\Partials\\Input\\Link', {
+                label : 'interne Seite',
+                value : teaser.getConfig('redirect.pageId')
+            }) | raw }}
+
+            {% if v.isExtensionInstalled('Core', 'News') %}
+                {{ v.injectPartial('\\Frootbox\\Ext\\Core\\News\\Admin\\Partials\\LinkArticle', {
+                    value: teaser.getConfig('redirect.article.id'),
+                    valueTitle: teaser.getConfig('redirect.article.title'),
+                }) | raw }}
+            {% endif %}
+        </div>
+
+
+        {% if configuration.get('i18n.multiAliasMode') %}
+
+            <hr />
+
+            <div class="form-group">
+                <label for="pluginClass">Teaser in folgenden Sprachen <b>nicht</b> zeigen</label>
+            </div>
+
+            {% for language in configuration.get('i18n.languages') %}
+                <div class="form-group form-check">
+                    <input type="checkbox" {% if teaser.getConfig('skipLanguages.' ~ language) %}checked{% endif %} class="form-check-input" id="{{ language }}" name="skipLanguages[{{ language }}]">
+                    <label class="form-check-label" for="{{ language }}">{{ language }}</label>
+                </div>
+            {% endfor %}
+
+        {% endif %}
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Speichern</button>
+    </div>
+
+</form>

@@ -1,0 +1,28 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    'frame' : false,
+}) }}
+
+<form method="post" class="ajax" action="{{ plugin.getAdminUri('Products', 'ajaxRecommendationAdd', { productId: get.get('productId') }) }}">
+
+    <div class="modal-body">
+
+        <div class="form-group">
+            <label for="productId">empfohlenes Produkt *</label>
+            <select class="form-control" id="productId" name="productId" required>
+                <option value="">bitte wählen ...</option>
+
+                {% for product in products %}
+                    <option value="{{ product.getId }}">{{ product.getTitle() }}</option>
+                {% endfor %}
+
+            </select>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Empfehlung hinzufügen</button>
+    </div>
+
+</form>

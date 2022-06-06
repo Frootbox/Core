@@ -1,0 +1,125 @@
+{# config
+
+title: Standard
+variables:
+    withContainer:
+        type: bool
+        label: mit Layout-Container
+    imageWidth:
+        default: 600
+        type: int
+    imageHeight:
+        default: 300
+        type: int
+    columns:
+        type: int
+        label: Spalten
+        default: 4
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set p = view.getViewhelper('Partials', { plugin: plugin }) %}
+{% set b = view.getViewhelper('Breadcrumb', { singleton: true }) %}
+
+{{ b.addSections(category, { skipfirst: true }) }}
+
+{% if variables.columns == 1 %}
+    {% set colClass = "col-12" %}
+{% elseif variables.columns == 2 %}
+    {% set colClass = "col-md-6" %}
+{% elseif variables.columns == 3 %}
+    {% set colClass = "col-6 col-md-4" %}
+{% elseif variables.columns >= 4 %}
+    {% set colClass = "col-md-3" %}
+{% endif %}
+
+{% if category %}
+    {{ view.set('overrideImageUid', category.getUid('image-top') ) }}
+{% endif %}
+
+<div class="plugin Core ShopSystem ShopSystem ShowCategory02">
+    {% if variables.withContainer %}<div class="container">{% endif %}
+
+    <div class="row">
+        <div class="col-12 ">
+
+            <h2 class="first main-title" data-editable data-uid="{{ category.getUid('title') }}">{{ category.getTitle }}</h2>
+
+            <div class="row">
+                <div class="col-md-3">
+
+                    <div class="categories-panel">
+                        <h3>Kategorien</h3>
+
+                        {% set children = category.getChildrenVisible() %}
+
+                        {% if children.getCount() == 0 %}
+                            {% set children = category.getParent().getChildrenVisible() %}
+                        {% endif %}
+
+                        <ul class="categories">
+                            {% for child in children %}
+                                <li>
+                                    <a class="{% if category.getId() == child.getId() %}active{% endif %}" href="{{ child.getUri() }}">{{ child.getTitle() }}</a>
+
+                                    {% set children = child.getChildrenVisible() %}
+
+                                    {% if children.getCount() > 0 %}
+                                        <ul>
+
+                                            {% for child in children %}
+                                                <li><a href="{{ child.getUri() }}">{{ child.getTitle() }}</a></li>
+                                            {% endfor %}
+
+                                        </ul>
+                                    {% endif %}
+
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                </div>
+                <div class="col-md-9">
+
+                    <div class="row">
+                        <div class="col-4">
+
+                            <picture class="fluid" data-editable data-skipempty="1" data-uid="{{ category.getUid('teaser1-image')}}">
+                                <img width="500" src="{{ i.getDummyImage({ width: 500, height: null }) }}" alt="" />
+                            </picture>
+
+                        </div>
+                        <div class="col-8">
+
+                            <div data-editable data-uid="{{ category.getUid('teaser1-text') }}"></div>
+
+                        </div>
+                    </div>
+
+                    <div data-editable data-uid="{{ category.getUid('teaser2-text') }}"></div>
+
+                    {{ p.renderPartial('\\Frootbox\\Ext\\Core\\ShopSystem\\Plugins\\ShopSystem\\Partials\\Filter', { category: category }) | raw }}
+
+                    <div class="row products">
+
+                        {% for product in category.getItems({ filter: get.get('filter') }) %}
+                            <div class="{{ colClass}} product">
+                                {{ p.renderPartial('/Frootbox/Ext/Core/ShopSystem/Plugins/ShopSystem/ProductTeaser', { product: product, colClass: colClass, i: i, image: { width: variables.imageWidth, height: variables.imageHeight } }) | raw }}
+                            </div>
+                        {% endfor %}
+
+                    </div>
+
+                    <div data-editable data-uid="{{ category.getUid('text-below') }}"></div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    {% if variables.withContainer %}</div>{% endif %}
+
+</div>

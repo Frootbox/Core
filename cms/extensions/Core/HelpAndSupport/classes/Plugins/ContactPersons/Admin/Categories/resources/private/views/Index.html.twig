@@ -1,0 +1,60 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<h2 id="categoriesHead">
+    Ansprechpersonen
+</h2>
+
+<p><a class="ajax" href="{{ plugin.getAdminUri('Index', 'index') }}"><i class="fa fa-chevron-circle-left"></i> zurück</a></p>
+
+<div class="row">
+    <div class="col-6">
+
+        <h4>Kategorien</h4>
+
+        <script>
+            $(function ( ) {
+
+                $(document).on('click', '#categoriesTreeReceiver tr[data-cat]', function ( event ) {
+
+                    event.preventDefault();
+                    event.stopImmediatePropagation();
+
+                    $('#categoriesTreeReceiver tr[data-cat]').removeClass('highlighted');
+                    $(this).addClass('highlighted');
+
+                    var categoryId = $(this).attr('data-cat');
+
+
+                    $.ajax({
+                        url: "{{ plugin.getAdminUri('Categories', 'ajaxPanelContacts') | raw }}",
+                        data: {
+                            categoryId: categoryId
+                        },
+                        success: function ( html ) {
+
+                            $('#contactsReceiver').html(html);
+
+                            initElements();
+                        }
+                    });
+                });
+
+                $('#categoriesTreeReceiver tr[data-cat]').first().trigger('click');
+            });
+        </script>
+
+        {{ v.injectPartial('\\Frootbox\\Admin\\Controller\\Assets\\Categories\\Partials\\CategoriesManager', {
+            uid: plugin.getUid('categories'),
+            plugin: plugin,
+            className : 'Frootbox\\Ext\\Core\\HelpAndSupport\\Persistence\\Category'
+        }) | raw }}
+
+    </div>
+    <div class="col-6">
+
+        <div id="contactsReceiver">
+
+        </div>
+
+    </div>
+</div>

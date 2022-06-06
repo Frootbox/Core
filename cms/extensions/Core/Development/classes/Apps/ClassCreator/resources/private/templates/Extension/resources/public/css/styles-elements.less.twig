@@ -1,0 +1,121 @@
+body {
+  font-family: $fontDefault;
+
+  h1, h2, h3, h4 {
+    clear: both;
+  }
+
+  header.h1, h1 {
+
+    margin: 100px 0 60px 0;
+
+    h1 {
+      margin: 0;
+      padding: 0;
+    }
+
+    &.first {
+      margin-top: 0;
+    }
+  }
+
+  header.h2, h2 {
+
+    margin: 60px 0 40px 0;
+
+    h2 {
+      margin: 0;
+      padding: 0;
+    }
+
+    &.first {
+      margin-top: 0;
+    }
+  }
+
+  header.h3, h3 {
+
+    margin: 60px 0 40px 0;
+
+    h3 {
+      margin: 0;
+      padding: 0;
+    }
+
+    &.first {
+      margin-top: 0;
+    }
+  }
+
+  header.h4, h4 {
+
+    margin: 60px 0 40px 0;
+
+    h4 {
+      margin: 0;
+      padding: 0;
+    }
+
+    &.first {
+      margin-top: 0;
+    }
+  }
+
+  a {
+    color: $colorSpot1;
+  }
+
+  .btn {
+    &.btn-primary {
+      background: $colorSpot1;
+      border-color: $colorSpot1;
+    }
+  }
+
+  [data-href] {
+    cursor: pointer;
+  }
+
+  div[data-blocks] {
+
+    .EditableBlock:last-of-type {
+      margin-bottom: 0;
+    }
+
+    p:last-child, ul:last-child {
+      margin-bottom: 0;
+    }
+
+    ul:first-child {
+      margin-top: 0;
+    }
+  }
+
+  .plugin, .EditableBlock {
+    margin-top: var(--element-space);;
+    margin-bottom: var(--element-space);;
+  }
+
+  .top-blocks {
+
+    .EditableBlock:first-of-type {
+      margin-top: 0;
+    }
+
+    .EditableBlock:last-of-type {
+      margin-bottom: 0;
+    }
+  }
+
+  .bottom-blocks {
+    .EditableBlock:first-of-type {
+      margin-top: 0;
+    }
+  }
+
+  .emotional {
+    .plugin {
+      margin-top: 0;
+    }
+  }
+}

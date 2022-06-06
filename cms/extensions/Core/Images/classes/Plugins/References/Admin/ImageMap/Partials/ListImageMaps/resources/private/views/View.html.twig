@@ -1,0 +1,39 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{% if entities | length == 0 %}
+	<div class="message warning">Es wurden noch keine Einheiten erstellt.</div>
+{% else %}
+
+	<table class="table" data-sort="{{ plugin.getAdminUri('ImageMap', 'ajaxSort') }}">
+		<thead>
+			<tr>
+				<th>Titel</th>
+				<th></th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+
+			{% for entity in entities %}
+				<tr id="row-{{ entity.getId() }}" class="{% if data.highlight == entity.getId() %}highlighted{% endif %} ajax" data-href="{{ plugin.getAdminUri('ImageMap', 'details', { imageMapId: entity.getId() }) }}">
+					<td>
+						{{ entity.getTitle() }}
+
+						{% for tag in entity.getTags() %}
+							<span class="badge badge-info">{{ tag.getTag() }}</span>
+						{% endfor %}
+					</td>
+					<td class="handle" style="cursor: pointer; vertical-align: middle;" width="40"><i class="fa fa-grip-lines"></i></td>
+					<td class="text-right">
+						<a class="ajax" href="{{ v.getUri('Assets', 'ajaxSwitchVisibility', { assetId: entity.getId() } ) }}"><i data-asset="{{ entity.getId() }}" class="fa fa-lightbulb visibility {{ entity.getVisibilityString() }} icon"></i></a>
+						<a class="ajax" data-confirm="Soll diese Image-Map wirklich gelöscht werden?" href="{{ data.plugin.getAdminUri('ImageMap', 'ajaxDelete', { imageMapId: entity.getId() }) }}"><i class="icon fa fa-times"></i></a>
+					</td>
+				</tr>
+
+			{% endfor %}
+
+		</tbody>
+	</table>
+
+{% endif %}
+
