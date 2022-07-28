@@ -233,9 +233,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         $view->set('translator', $translator);
 
         $builder->setPlugin($this)->setTemplate('Mail');
-        $file = $builder->getFile($this->getConfig('mailTemplate'));
-
-        $source = $view->render($file);
+        $source = $builder->render($this->getConfig('mailTemplate'));
 
         // Init mailer
         // TODO: Wrap this into frootbox class

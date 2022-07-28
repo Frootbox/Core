@@ -18,6 +18,7 @@ class Block extends \Frootbox\Persistence\AbstractConfigurableRow
 
     use \Frootbox\Persistence\Traits\DummyImage;
     use \Frootbox\Persistence\Traits\Uid;
+    use \Frootbox\Persistence\Traits\Visibility;
 
     /**
      *

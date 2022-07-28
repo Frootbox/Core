@@ -22,6 +22,14 @@ abstract class AbstractItem extends \Frootbox\Persistence\AbstractRow
     /**
      *
      */
+    public function addClass(string $class): void
+    {
+        $this->classes[] = $class;
+    }
+
+    /**
+     *
+     */
     public function getClasses(): array
     {
         return $this->classes;

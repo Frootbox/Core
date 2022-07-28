@@ -41,14 +41,14 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         return self::response('json');
     }
 
-
     /**
      *
      */
     public function indexAction (
         \Frootbox\Admin\View $view,
         \Frootbox\Persistence\Repositories\ContentElements $plugins,
-        \Frootbox\Builder $builder
+        \Frootbox\Builder $builder,
+        \Frootbox\Persistence\Repositories\Extensions $extensionsRepository,
     ): \Frootbox\Admin\Controller\Response
     {
         // Fetch news plugins
@@ -57,12 +57,37 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         ]);
         $view->set('plugins', $result);
 
-
         // Gather mail templates
         $templates = $builder->setPlugin($this->plugin)->getTemplates('Mail');
         $view->set('mailTemplates', $templates);
 
+        // Gather payment methods
+        $paymentMethods = [];
+        $path = realpath($this->getPath() . '../../') . '/PaymentMethods/';
 
-        return self::response();
+        $directory = new \Frootbox\FileSystem\Directory($path);
+
+        foreach ($directory as $file) {
+            $paymentMethods[] = $file;
+        }
+
+        foreach ($extensionsRepository->fetch() as $extension) {
+
+            $path = $extension->getExtensionController()->getPath() . 'classes/Events/Booking/PaymentMethods/';
+
+            if (!file_exists($path)) {
+                continue;
+            }
+
+            $directory = new \Frootbox\FileSystem\Directory($path);
+
+            foreach ($directory as $file) {
+                $paymentMethods[] = $file;
+            }
+        }
+
+        return self::getResponse('html', 200, [
+            'paymentMethods'=> $paymentMethods,
+        ]);
     }
 }

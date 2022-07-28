@@ -134,7 +134,8 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
 
             $event->addConfig([
                 'bookable' => [
-                    'seats' => $cloneFrom->getConfig('bookable.seats')
+                    'seats' => $cloneFrom->getConfig('bookable.seats'),
+                    'price' => $cloneFrom->getConfig('bookable.price'),
                 ]
             ]);
             $event->save();

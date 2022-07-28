@@ -10,31 +10,41 @@ class Builder
     protected $pluginsFolders = [ ];
     protected $plugin;
     protected $template;
+    protected $view;
 
     /**
      *
      */
     public function __construct (
-        \Frootbox\Config\Config $config
+        \Frootbox\Config\Config $config,
+        \Frootbox\View\Engines\Interfaces\Engine $view,
     ) {
+        $this->view = $view;
         $this->pluginsFolders[] = $config->get('pluginsRootFolder');
     }
 
+    /**
+     *
+     */
+    public function getBasePath(): string
+    {
+        return $this->plugin->getPath() . 'Builder/';
+    }
 
     /**
      *
      */
     protected function getPaths ( )
     {
-        $paths = [
-            $this->plugin->getPath() . 'Builder/'
-        ];
+        $paths = [];
 
         preg_match('#^Frootbox\\\\Ext\\\\(.*?)\\\\(.*?)\\\\Plugins\\\\(.*?)\\\\Plugin$#', get_class($this->plugin), $match);
 
         foreach ($this->pluginsFolders as $path) {
             $paths[] = $path . $match[1] . '/' . $match[2] . '/' . $match[3] . '/Builder/';
         }
+
+        $paths[] = $this->plugin->getPath() . 'Builder/';
 
         return $paths;
     }
@@ -119,5 +129,19 @@ class Builder
     public function setTemplate ( $template )
     {
         $this->template = $template;
+    }
+
+    /**
+     *
+     */
+    public function render(string $file): string
+    {
+        $file = $this->getFile($file);
+
+        $source = $this->view->render($file, [
+            'builder' => $this,
+        ]);
+
+        return $source;
     }
 }

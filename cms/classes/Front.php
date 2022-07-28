@@ -66,7 +66,7 @@ class Front
         }
         */
 
-        define('IS_SSL', $protocol == 'https');
+        define('IS_SSL', $protocol === 'https');
 
         define('SERVER_PATH_PROTOCOL', $protocol . '://' . $host . SERVER_PATH);
 

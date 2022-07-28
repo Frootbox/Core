@@ -96,13 +96,17 @@ class References extends \Frootbox\View\Viewhelper\AbstractViewhelper
 
             foreach ($tags as $tag) {
 
+                if (is_object($tag)) {
+                    $tag = $tag->getTag();
+                }
+
                 $sql .= $and . '(
                     t.itemId = a.id AND
                     t.itemClass = a.className AND
                     t.tag = :tag_' . ++$loop . ' 
                 )';
 
-                $params[':tag_' . $loop] = $tag->getTag();
+                $params[':tag_' . $loop] = $tag;
 
                 $and = ' OR ';
             }
@@ -112,7 +116,7 @@ class References extends \Frootbox\View\Viewhelper\AbstractViewhelper
                 GROUP BY
 			        a.id
                 HAVING
-			        counter = ' . $tags->getCount();
+			        counter = ' . (is_array($tags) ? count($tags) : $tags->getCount());
         }
         else {
             $sql .= ' GROUP BY a.id ';

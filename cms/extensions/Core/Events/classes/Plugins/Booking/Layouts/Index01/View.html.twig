@@ -164,10 +164,20 @@ variables:
                             <label for="paymentType">Zahlungsart wählen *</label>
                             <select required class="form-control" id="paymentType" name="payment[type]">
                                 <option value="">bitte wählen ...</option>
+
+
+                                {% for paymentMethod, xx in plugin.getConfig('paymentmethods') %}
+                                    <option value="{{ paymentMethod }}">{{ t.translate(paymentMethod) }}</option>
+                                {% endfor %}
+
+                                {#
+
                                 {% if plugin.getConfig('paymentmethods.Paypal') %}<option value="PayPal">PayPal</option>{% endif %}
                                 {% if plugin.getConfig('paymentmethods.CashOnPickup') %}<option value="CashOnPickup">Bar bei Abholung</option>{% endif %}
                                 {% if plugin.getConfig('paymentmethods.PaymentInAdvance') %}<option value="PaymentInAdvance">Vorkasse</option>{% endif %}
                                 {% if plugin.getConfig('paymentmethods.Debit') %}<option value="Debit">Lastschrift</option>{% endif %}
+
+                                #}
                             </select>
                         </div>
 

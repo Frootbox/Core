@@ -61,15 +61,18 @@ class Shopcart
     public function addItem(
         \Frootbox\Ext\Core\ShopSystem\Persistence\Product $product,
         array $options = null
-    ): void
+    ): ShopcartItem
     {
         // Generate item key
         $key = $product->getId();
 
         if (!empty($options['variant'])) {
-
             $variant = $options['variant'];
             $key .= '-' . $variant->getId();
+        }
+
+        if (!empty($options['unique'])) {
+            $key .= '-' . rand(1000, 9999);
         }
 
         $key = substr(md5($key), 0, 7);
@@ -86,8 +89,12 @@ class Shopcart
                 'priceGross' => $product->getPriceGross(),
                 'taxRate' => $product->getTaxrate(),
                 'uri' => $product->getUri(),
-                'shippingId' => $product->getShippingId()
+                'shippingId' => $product->getShippingId(),
             ];
+
+            if (!empty($options['customNote'])) {
+                $item['customNote'] = $options['customNote'];
+            }
 
 
             if (!empty($options['variant'])) {
@@ -128,6 +135,8 @@ class Shopcart
 
         // Increase amount of product
         ++$_SESSION['cart']['products'][$key]['amount'];
+
+        return $this->getItem($key);
     }
 
     /**

@@ -29,11 +29,9 @@ variables:
     <div class="row">
         <div class="col-12">
 
-            {% if plugin.isFirst %}
-                <h1 class="first" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h1>
-            {% else %}
-                <h2 class="first" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
-            {% endif %}
+            <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+
+            <div data-editable data-uid="{{ plugin.getUid('text-checkout') }}"></div>
 
             <script>
                 $(function ( ) {

@@ -27,11 +27,7 @@ variables:
             <div class="col-12 col-md-{{ variables.pluginWidth }}">
                 <div class="inner-wrapper">
 
-                    {% if plugin.isFirst %}
-                        <h1 class="first" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle() }}</h1>
-                    {% else %}
-                        <h2 class="first" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle() }}</h2>
-                    {% endif %}
+                    <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle() }}</h2>
 
                     <div data-editable data-uid="{{ plugin.getUid('text-1') }}"></div>
 

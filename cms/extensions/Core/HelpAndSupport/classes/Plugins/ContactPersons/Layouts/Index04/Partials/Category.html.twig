@@ -35,8 +35,12 @@
                             <a class=email" href="tel:{{ contact.getPhone() }}">{{ icons.render('phone') | raw }}{{ contact.getPhone() }}</a><br />
                         {% endif %}
 
+                        {% if contact.getPhone2() %}
+                            <a class=email" href="tel:{{ contact.getPhone2() }}">{{ icons.render('mobile') | raw }}{{ contact.getPhone2() }}</a><br />
+                        {% endif %}
+
                         {% if contact.getEmail() %}
-                            <a class="phone" href="mailto:{{ contact.getEmail() }}">{{ icons.render('envelope') | raw }}E-Mail</a><br />
+                            <a class="phone" href="mailto:{{ contact.getEmail() }}">{{ icons.render('envelope') | raw }}{% if not variables.showFullEmail %}E-Mail{% else %}{{ contact.getEmail() }}{% endif %}</a><br />
                         {% endif %}
                     </p>
                 {% endif %}

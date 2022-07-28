@@ -33,7 +33,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
      *
      */
     public function indexAction(
-        \Frootbox\Ext\Core\ContactForms\Persistence\Repositories\Forms $formsRepository
+        \Frootbox\Ext\Core\ContactForms\Persistence\Repositories\Forms $formsRepository,
     ): Response
     {
         if (!empty($this->getConfig('formId'))) {

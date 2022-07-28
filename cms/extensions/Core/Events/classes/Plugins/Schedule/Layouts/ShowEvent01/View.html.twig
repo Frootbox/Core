@@ -45,7 +45,7 @@ variables:
 
                         <div class="row">
                             <div class="col-2">
-                                {{ icons.add('calendar') | raw }}
+                                {{ icons.render('calendar') | raw }}
                             </div>
                             <div class="col-10">
                                 {% if event.hasOneDay() %}
@@ -59,7 +59,7 @@ variables:
                         {% if event.getDateStart().format('%H:%M') != "00:00" %}
                             <div class="row">
                                 <div class="col-2">
-                                    {{ icons.add('clock') | raw }}
+                                    {{ icons.render('clock') | raw }}
                                 </div>
                                 <div class="col-10">
                                     {% if event.hasOneDay() %}
@@ -78,12 +78,18 @@ variables:
                         {% if venue %}
                             <div class="row">
                                 <div class="col-2">
-                                    {{ icons.add('location-dot') | raw }}
+                                    {{ icons.render('location-dot') | raw }}
                                 </div>
                                 <div class="col-10">
-                                    {{ venue.getTitle() }}<br />
-                                    {{ venue.getStreet() }} {{ venue.getStreetNumber() }}<br />
-                                    {{ venue.getZipcode() }} {{ venue.getCity() }}
+                                    {{ venue.getTitle() }}
+
+                                    {% if venue.getStreet() or venue.getStreetNumber() %}
+                                        <br />{{ venue.getStreet() }} {{ venue.getStreetNumber() }}
+                                    {% endif %}
+
+                                    {% if enue.getZipcode() or venue.getCity() %}
+                                        <br />{{ venue.getZipcode() }} {{ venue.getCity() }}
+                                    {% endif %}
                                 </div>
                             </div>
                         {% endif %}
@@ -91,7 +97,7 @@ variables:
                         {% if event.getConfig('onlineOnly') %}
                             <div class="row">
                                 <div class="col-2">
-                                    {{ icons.add('signal-stream') | raw }}
+                                    {{ icons.render('signal-stream') | raw }}
                                 </div>
                                 <div class="col-10">
                                     <p>
@@ -107,7 +113,33 @@ variables:
                         {% endif %}
 
 
+                        {% if event.isBookable() and event.getConfig('bookable.seats') > 0 %}
+                            <div class="row">
+                                <div class="col-2">
+                                    {{ icons.render('users') | raw }}
+                                </div>
+                                <div class="col-10">
+                                    <p>
+                                        {% if event.getFreeSeats() > 0 %}
+                                            {{ event.getFreeSeats() }} von {{ event.getConfig('bookable.seats') }} Plätzen frei
+                                        {% else %}
+                                            leider ausgebucht
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        {% endif %}
+
+
                     </div>
+
+                    {% if event.isBookable() and event.getFreeSeats() > 0 %}
+                        {% set bookingPlugin = plugin.getBookingPlugin() %}
+
+                        {% if bookingPlugin %}
+                            <p><a class="btn btn-primary btn-block" href="{{ bookingPlugin.getActionUri('index', { eventId: event.getId() }) }}">zur Buchung</a></p>
+                        {% endif %}
+                    {% endif %}
 
                     <p><a href="{{ page.getUri() }}">{{ icons.add('click-back') | raw }}zurück</a></p>
 

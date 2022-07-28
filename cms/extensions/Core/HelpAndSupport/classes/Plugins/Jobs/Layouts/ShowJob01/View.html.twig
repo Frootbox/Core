@@ -48,7 +48,6 @@ variables:
 
             <h2 class="first main-title" data-editable data-uid="{{ job.getUid('title') }}">{{ job.getTitle(globalLanguage) }}</h2>
 
-            <p class="back-button"><a href="{{ plugin.getActionUri('index') }}">{{ icons.render('angle-left') | raw }}zurück</a></p>
 
             <div class="content-teaser">
                 <div data-editable data-uid="{{ job.getUid('teaser') }}"></div>
@@ -137,7 +136,14 @@ variables:
                 </div>
             </div>
 
+        </div>
+        <div class="col-12">
+            <div class="content-teaser-below">
+                <div data-editable data-uid="{{ job.getUid('text-below') }}"></div>
+            </div>
 
+
+            <p class="back-button"><a href="{{ plugin.getActionUri('index') }}">{{ icons.render('angle-left') | raw }}zurück</a></p>
 
         </div>
     </div>

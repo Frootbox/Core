@@ -55,6 +55,29 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
     /**
      *
      */
+    public function setPageId(int $pageId): void
+    {
+        // Fetch jobs
+        $jobsRepository = $this->getDb()->getRepository(Persistence\Repositories\Jobs::class);
+        $jobs = $jobsRepository->fetch([
+            'where' => [
+                'pluginId' => $this->getId(),
+            ],
+        ]);
+
+        foreach ($jobs as $job) {
+
+            $job->setPageId($pageId);
+            $job->save();
+        }
+
+        parent::setPageId($pageId);
+    }
+
+
+    /**
+     *
+     */
     public function cloneContentFromAncestor(
         \DI\Container $container,
         \Frootbox\Persistence\AbstractRow $ancestor

@@ -98,9 +98,12 @@ class Renderer
 
             $children = $item->getItems();
 
-            if ($children->getCount()) {
+            if ($children and $children->getCount()) {
+
+                $html = str_replace('class="', 'class="has-children ', $html);
 
                 foreach ($children as $item) {
+                    $item->addClass('child');
                     $html .= $this->getItemHtml($item);
                 }
             }

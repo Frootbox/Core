@@ -74,6 +74,7 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         $this->plugin->addConfig([
             'noPersonsDetailPage' => $post->get('noPersonsDetailPage'),
             'noCategoriesDetailPage' => $post->get('noCategoriesDetailPage'),
+            'defaultSorting' => $post->get('defaultSorting'),
         ]);
 
         $this->plugin->save();

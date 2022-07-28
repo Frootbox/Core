@@ -26,7 +26,6 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
         $crawler = \Wa72\HtmlPageDom\HtmlPageCrawler::create($html);
         $crawler->filter('[data-blocks][data-uid]')->each(function ( $element ) use (&$html, $view) {
 
-
             $uid = $element->getAttribute('data-uid');
 
             // Fetch editor
@@ -69,7 +68,8 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
 
             $result = $blocks->fetch([
                 'where' => [
-                    'uid' => $uid
+                    'uid' => $uid,
+                    new \Frootbox\Db\Conditions\GreaterOrEqual('visibility',(IS_EDITOR ? 1 : 2)),
                 ],
                 'order' => [ 'orderId DESC' ]
             ]);

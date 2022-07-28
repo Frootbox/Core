@@ -214,6 +214,29 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
     /**
      *
      */
+    public function ajaxBlockSwitch(
+        \Frootbox\Http\Get $get,
+        \DI\Container $container,
+        \Frootbox\View\Engines\Interfaces\Engine $view,
+        \Frootbox\Persistence\Content\Repositories\Blocks $blocksRepository,
+        \Frootbox\Persistence\Repositories\Extensions $extensionsRepository,
+    ): \Frootbox\Admin\Controller\Response
+    {
+        // Fetch block
+        $block = $blocksRepository->fetchById($get->get('blockId'));
+
+        $block->visibilityPush();
+
+        return self::getResponse('json', 200, [
+            'blockId' => $block->getId(),
+            'uid' => $block->getUidRaw(),
+            'visibility' => $block->getVisibilityString(),
+        ]);
+    }
+
+    /**
+     *
+     */
     public function ajaxModalCompose(
         \Frootbox\Http\Get $get,
         \Frootbox\Config\Config $config,

@@ -34,18 +34,12 @@
 
                             <h3>Zahlungsarten</h3>
 
-                            <div class="form-group form-check">
-                                <input type="checkbox" class="form-check-input" id="paymentmethodsPaymentInAdvance" name="paymentmethods[PaymentInAdvance]" {% if plugin.getConfig('paymentmethods.PaymentInAdvance') %}checked{% endif %}>
-                                <label class="form-check-label" for="paymentmethodsPaymentInAdvance">Vorkasse</label>
-                            </div>
-                            <div class="form-group form-check">
-                                <input type="checkbox" class="form-check-input" id="paymentmethodsPaypal" name="paymentmethods[Paypal]" {% if plugin.getConfig('paymentmethods.Paypal') %}checked{% endif %}>
-                                <label class="form-check-label" for="paymentmethodsPaypal">Paypal</label>
-                            </div>
-                            <div class="form-group form-check">
-                                <input type="checkbox" class="form-check-input" id="paymentmethodsCashOnPickup" name="paymentmethods[CashOnPickup]" {% if plugin.getConfig('paymentmethods.CashOnPickup') %}checked{% endif %}>
-                                <label class="form-check-label" for="paymentmethodsCashOnPickup">Bar bei Abholung</label>
-                            </div>
+                            {% for paymentMethod in paymentMethods %}
+                                <div class="form-group form-check">
+                                    <input type="checkbox" class="form-check-input" id="paymentmethods_{{ paymentMethod }}" name="paymentmethods[{{ paymentMethod }}]" {% if plugin.getConfig('paymentmethods.' ~ paymentMethod) %}checked{% endif %}>
+                                    <label class="form-check-label" for="paymentmethods_{{ paymentMethod }}">{{ paymentMethod }}</label>
+                                </div>
+                            {% endfor %}
 
 
                         </div>

@@ -99,7 +99,7 @@ class Session {
     /**
      *
      */
-    public function logout ( ): Session
+    public function logout(): Session
     {
         // Kill user session
         $this->user = null;

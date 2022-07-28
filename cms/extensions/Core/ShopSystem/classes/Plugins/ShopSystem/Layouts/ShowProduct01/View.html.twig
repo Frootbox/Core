@@ -311,6 +311,9 @@ variables:
                     </div>
 
                     {% if variables.showLowerBasketButton %}
+
+                        xx{{ product.getConfig('directLink') }}xxx
+
                         {% if basketPlugin %}
                             <a class="btn btn-block btn-primary shopsystem-product-add-to-cart" href="{{ sp.getUri('Core/ShopSystem/Basket', 'addProduct', { productId: product.getId() }) }}">in den Warenkorb legen</a>
                         {% elseif variables.useRequestAlternative %}

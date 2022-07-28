@@ -1,2 +1,4 @@
-RewriteEngine on  
+RewriteEngine on
+# IONOS
+# RewriteBase /
 RewriteRule . index.php

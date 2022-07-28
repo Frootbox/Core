@@ -23,7 +23,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         \Frootbox\Session $session
     ): \Frootbox\Db\Result
     {
-        $tags = array_filter($this->getConfig('tags'));
+        $tags = array_filter($this->getConfig('tags') ?? []);
 
         $minVisibility = $session->isLoggedIn() ? 1 : 2;
 

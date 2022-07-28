@@ -9,7 +9,7 @@
         "frootbox/mail":"dev-master",
         "frootbox/translation":"dev-master",
         "frootbox/date":"dev-master",
-        "godbout/htmlpagedom": "3.0.0",
+        "wa72/htmlpagedom": "3.0.0",
         "scssphp/scssphp": "1.8.1",
         "php-di/php-di":"6.3.5",
         "twig/twig":"3.*",
@@ -23,7 +23,10 @@
         "tijsverkoyen/css-to-inline-styles": "*"
     },
 	"config": {
-        "vendor-dir": "lib"
+        "vendor-dir": "lib",
+        "platform": {
+            "php": "8.0.8"
+        }
     },
     "minimum-stability":"stable"
 }

@@ -117,17 +117,28 @@
 
     {% for group in form.getGroups() %}
         <div class="row {% if group.getConfig('alignItemsEnd') %}align-items-end{% endif %}">
+
+            {% if group.getTitle() %}
+                <div class="col-md-12">
+                    <h3>{{ group.getTitle() }}</h3>
+                </div>
+            {% endif %}
+
             {% for column in group.getColumns() %}
                 <div class="col-md-{{ column.columns }}">
 
-                    {% for field in column.fields %}
-                        {{ renderer.renderField(field) | raw }}
+                    <div class="group-details">
 
-                        {% if field.isRequired() %}
-                            {% set requiredFields = true %}
-                        {% endif %}
 
-                    {% endfor %}
+                        {% for field in column.fields %}
+                            {{ renderer.renderField(field) | raw }}
+
+                            {% if field.isRequired() %}
+                                {% set requiredFields = true %}
+                            {% endif %}
+
+                        {% endfor %}
+                    </div>
 
                 </div>
             {% endfor %}

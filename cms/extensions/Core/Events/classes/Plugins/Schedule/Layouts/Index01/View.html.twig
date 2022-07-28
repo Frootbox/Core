@@ -58,6 +58,12 @@ variables:
                                 {% endif %}
                             </p>
 
+                            {% set venue = event.getVenue() %}
+
+                            {% if venue %}
+                                <p>{{ venue.getTitle() }}, {{ venue.getStreet() }} {{ venue.getStreetNumber() }}</p>
+                            {% endif %}
+
                             <div data-editable data-uid="{{ event.getUid('teaser') }}"></div>
 
                             {% if event.hasUri() %}

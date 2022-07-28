@@ -335,6 +335,20 @@ abstract class AbstractPlugin extends AbstractRow
     /**
      *
      */
+    public function getPageUri(string $page, string $action, array $payload = null ): string
+    {
+        $url = SERVER_PATH_PROTOCOL . 'static/' . $page . '/' . $action;
+
+        if (!empty($payload)) {
+            $url .= '?' . http_build_query($payload);
+        }
+
+        return $url;
+    }
+
+    /**
+     *
+     */
     public function getUriAjax($action, array $payload = null ): string
     {
         $payload['pluginId'] = $this->getId();

@@ -94,22 +94,28 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
             $url = \Frootbox\Admin\Front::getUri('Session', 'passwordReset', [ 'login' => $user->getEmail(), 'token' => $user->getSecureToken() ]);
         }
 
-        $view->set('url', $url);
-        $view->set('serverpath', SERVER_PATH_PROTOCOL);
-        $view->set('title', 'Zugang aktivieren');
+        try {
+            $view->set('url', $url);
+            $view->set('serverpath', SERVER_PATH_PROTOCOL);
+            $view->set('title', 'Zugang aktivieren');
 
-        $viewFile = $this->getPath() . 'resources/private/builder/mail/PasswordActivate.html.twig';
+            $viewFile = $this->getPath() . 'resources/private/builder/mail/PasswordActivate.html.twig';
 
-        $source = $view->render($viewFile);
+            $source = $view->render($viewFile);
 
-        $mail = new \Frootbox\Mail\Envelope;
-        $mail->setSubject('Zugang aktivieren');
-        $mail->setBodyHtml($source);
+            $mail = new \Frootbox\Mail\Envelope;
+            $mail->setSubject('Zugang aktivieren');
+            $mail->setBodyHtml($source);
 
-        $mail->clearTo();
-        $mail->addTo($user->getEmail());
+            $mail->clearTo();
+            $mail->addTo($user->getEmail());
 
-        $mailTransport->send($mail);
+            $mailTransport->send($mail);
+        }
+        catch ( \Exception $e ) {
+            d($e);
+        }
+
 
         return self::getResponse('json', 200, [
             'success' => 'Der Zugang wurde gesendet an ' . $user->getEmail(),

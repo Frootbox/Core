@@ -607,7 +607,8 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         $product->setMinimumAge($post->get('minimumAge'));
 
         $product->addConfig([
-            'priceOld' => $post->get('priceOld')
+            'priceOld' => $post->get('priceOld'),
+            'directLink' => $post->get('directLink'),
         ]);
 
         if (!empty($post->get('titles'))) {

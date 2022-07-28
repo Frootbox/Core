@@ -75,7 +75,7 @@ variables:
 
                     <div class="row references">
                         {% for reference in i.getReferences() %}
-                            <div class="reference col-md-4" data-href>
+                            <div class="reference col-md-4" {% if not variables.skipReadmore and not variables.skipDetailsPage %}data-href{% endif %}>
 
                                 {% if variables.withMagnifier %}<a href="{{ f.getFileByUid(reference.getUid('image')).getUriThumbnail() }}" data-fancybox="references-{{ plugin.getId() }}">{% endif %}
                                     <picture class="fluid" data-editable {% if variables.noImageDummy %}data-skipempty="1"{% endif %} data-uid="{{ reference.getUid('image') }}">

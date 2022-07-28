@@ -33,7 +33,12 @@ class Localhost extends AbstractTransport
             ini_set('sendmail_from', $this->config->get('mail.defaults.from.address'));
 
             $this->mailer->setFrom($this->config->get('mail.defaults.from.address'), $this->config->get('mail.defaults.from.name'), false);
-            // $this->mailer->Sender = 'bounces@huelsmann-wein.de';
+
+            // Debug mode is optional
+            if (!empty($this->config->get('mail.smtp.debug'))) {
+                // $this->mailer->SMTPDebug  = \PHPMailer\PHPMailer\SMTP::DEBUG_SERVER;
+                $this->mailer->SMTPDebug  = \PHPMailer\PHPMailer\SMTP::DEBUG_CONNECTION;
+            }
 
             // Content
             $this->mailer->isHTML(true);

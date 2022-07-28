@@ -38,8 +38,8 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
             'where' => [
                 'uid' => $this->getUid('categories'),
                 new \Frootbox\Db\Conditions\MatchColumn('rootId', 'parentId'),
-                'visibility' => 1
-            ]
+                new \Frootbox\Db\Conditions\GreaterOrEqual('visibility',(IS_LOGGED_IN ? 1 : 2)),
+            ],
         ]);
 
         return $result;

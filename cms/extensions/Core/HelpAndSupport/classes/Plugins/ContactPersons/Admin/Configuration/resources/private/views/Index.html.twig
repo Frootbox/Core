@@ -28,6 +28,13 @@
                         <input {% if plugin.getConfig('noCategoriesDetailPage') %}checked{% endif %} type="checkbox" class="form-check-input" id="noCategoriesDetailPage" name="noCategoriesDetailPage">
                         <label class="form-check-label" for="noCategoriesDetailPage">keine Detailseite für Kategorien</label>
                     </div>
+                    <div class="form-group">
+                        <label for="defaultSorting">Standard Sortierung</label>
+                        <select class="form-control" id="defaultSorting" name="defaultSorting">
+                            <option {% if plugin.getConfig('defaultSorting') == "Manually" %}selected{% endif %} value="Manually">manuell</option>
+                            <option {% if plugin.getConfig('defaultSorting') == "LastnameAsc" %}selected{% endif %} value="LastnameAsc">Nachname, auftseigend</option>
+                        </select>
+                    </div>
 
                     <button type="submit" class="btn btn-primary">Speichern</button>
 

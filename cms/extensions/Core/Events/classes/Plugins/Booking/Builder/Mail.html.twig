@@ -2,8 +2,9 @@
     <head>
 
         <style>
-            body {
+            body, td, th {
                 font-family: Arial;
+                font-size: 14px;
             }
 
             table.datagrid {
@@ -30,12 +31,15 @@
     </head>
     <body>
 
-        <p>
-            Hallo {{ booking.getConfig('owner.firstName') }} {{ booking.getConfig('owner.lastName') }},
-        </p>
-        <p>
-            Sie haben über unsere Website folgende Veranstaltung gebucht:
-        </p>
+        {% block textTop %}
+            <p>
+                Hallo {{ booking.getConfig('owner.firstName') }} {{ booking.getConfig('owner.lastName') }},
+            </p>
+
+            <p>
+                Sie haben über unsere Website folgende Veranstaltung gebucht:
+            </p>
+        {% endblock %}
 
         <table class="datagrid">
             <tbody>
@@ -119,6 +123,15 @@
                         </tr>
                     </tbody>
                 </table>
+            {% elseif booking.getConfig('payment.type') == 'Voucher' %}
+                    <table class="datagrid">
+                        <tbody>
+                        <tr>
+                            <td width="30%" class="title">Zahlungsart</td>
+                            <td>Gutschein ist vorhanden. Bitte zum Kurs mitbringen.</td>
+                        </tr>
+                        </tbody>
+                    </table>
             {% elseif booking.getConfig('payment.type') == 'PaymentInAdvance' %}
                 <table class="datagrid">
                     <tbody>
@@ -128,7 +141,7 @@
                             <p><b>Vorkasse</b></p>
 
                             {% if translator.hasKey('Core.Events.PaymentMethods.PaymentInAdvance.Summary') %}
-                                <p>{{ translator.translate('Core.Events.PaymentMethods.PaymentInAdvance.Summary', [ (booking.getTotal()|number_format(2, ',', '.')), orderNumber ]) | raw }}</p>
+                                <p>{{ translator.translate('Core.Events.PaymentMethods.PaymentInAdvance.Summary', [ (booking.getTotal()|number_format(2, ',', '.')), booking.getId() ]) | raw }}</p>
                             {% else %}
                                 <p>Überweisen Sie den Rechnungsbetrag an die angegebene Kontonummer in der Buchungsbestätigung.</p>
                             {% endif %}
@@ -166,6 +179,10 @@
             {% endif %}
 
         {% endif %}
+
+        {% block textBottom %}
+
+        {% endblock %}
 
     </body>
 </html>

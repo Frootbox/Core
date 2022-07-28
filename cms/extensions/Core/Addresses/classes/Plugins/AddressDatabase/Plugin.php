@@ -102,9 +102,14 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         \Frootbox\Ext\Core\Addresses\Persistence\Repositories\Addresses $addressesRepository
     ): Response
     {
-
         $lat = $get->get('lat');
         $lon = $get->get('lng');
+
+        if (empty($lat) or empty($lon)) {
+            http_response_code(422);
+            die("Parameter Missing");
+        }
+
 
         $sf = 3.14159 / 180; // scaling factor
         $er = 6350; // earth radius in miles, approximate

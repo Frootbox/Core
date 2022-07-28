@@ -87,13 +87,30 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
      */
     public function getContacts(): \Frootbox\Db\Result
     {
+        $order = [ 'orderId DESC', 'id ASC' ];
+
+        if (!empty($this->getConfig('defaultSorting'))) {
+
+            switch($this->getConfig('defaultSorting')) {
+
+                case 'LastnameAsc':
+                    $order = [ 'lastName ASC' ];
+                    break;
+
+                case 'LastnameDesc':
+                    $order = [ 'lastName DESC' ];
+                    break;
+            }
+        }
+
         $contactRepository = $this->getDb()->getRepository(\Frootbox\Ext\Core\HelpAndSupport\Persistence\Repositories\Contacts::class);
 
         // Fetch contacts
         $contacts = $contactRepository->fetch([
             'where' => [
                 'pluginId' => $this->getId(),
-            ]
+            ],
+            'order' => $order,
         ]);
 
         return $contacts;

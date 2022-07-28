@@ -55,6 +55,7 @@ class Partials extends AbstractViewhelper
 
             $files[] = $config->get('partialsRootFolder') . $match[1] . '/' . $match[2] . '/' . $match[3] . '/' . $match[4] . '/View.html.twig';
             $files[] = $extController->getPath() . 'classes/Plugins/' . $match[3] . '/resources/private/partials/' . $match[4] . '/View.html.twig';
+            $files[] = $extController->getPath() . 'classes/Plugins/' . $match[3] . '/' . $match[4] . '/resources/private/views/View.html.twig';
         }
         else {
 

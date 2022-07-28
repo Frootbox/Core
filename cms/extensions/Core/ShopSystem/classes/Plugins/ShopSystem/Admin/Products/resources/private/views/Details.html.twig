@@ -261,6 +261,13 @@
                         <input type="text" class="form-control" id="minimumAge" name="minimumAge" value="{{ product.getMinimumAge() }}">
                     </div>
 
+                    <div class="form-group">
+                        <label for="directLink">direkter Link</label>
+                        <input type="text" class="form-control" id="directLink" name="directLink" value="{{ product.getConfig('directLink') }}" aria-describedby="directLink">
+                        <small id="directLink" class="form-text text-muted">Wenn ein direkter Link gesetzt wird, dann wird dieser anstelle des Warenkorb-Buttons angezeigt.</small>
+
+                    </div>
+
                     <button type="submit" class="btn btn-primary">Speichern</button>
 
                 </form>

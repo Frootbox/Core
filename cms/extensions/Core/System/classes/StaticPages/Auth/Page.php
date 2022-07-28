@@ -47,7 +47,7 @@ class Page
         $session->setUser($user);
 
         return new \Frootbox\View\ResponseJson([
-
+            'redirect' => $get->get('redirect'),
         ]);
     }
 

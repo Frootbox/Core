@@ -14,8 +14,8 @@
         </div>
 
         {{ v.injectPartial('\\Frootbox\\Admin\\View\\Partials\\Input\\Daterange', {
-            startDate: clone.getDateStart().format('%d.%m.%Y %H:%M'),
-            endDate: clone.getDateEnd().format('%d.%m.%Y %H:%M')
+            startDate: clone.getDateStart().format('%d.%m.%y %H:%M'),
+            endDate: clone.getDateEnd().format('%d.%m.%y %H:%M')
         }) | raw }}
 
         {% if v.isExtensionInstalled('Core', 'Addresses') %}

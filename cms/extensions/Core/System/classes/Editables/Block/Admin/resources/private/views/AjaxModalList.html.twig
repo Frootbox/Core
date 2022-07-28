@@ -40,6 +40,21 @@
             });
         });
 
+        /**
+         *
+         */
+        $('a.block-switch').click(function ( event ) {
+
+            event.preventDefault();
+
+            $.ajax({
+                url: $(this).attr('href'),
+                success: function ( response ) {
+                    $('#blockstable tr[data-block="' + response.blockId + '"] i.visibility').removeClass('visibility-0 visibility-1 visibility-2');
+                    $('#blockstable tr[data-block="' + response.blockId + '"] i.visibility').addClass(response.visibility);
+                }
+            });
+        });
     });
 </script>
 
@@ -58,6 +73,24 @@
     </div>
 {% else %}
 
+    <style>
+        #blockstable a i.xicon {
+            margin-left: 10px;
+        }
+
+        #blockstable a i.xicon.visibility-0 {
+            color: red;
+        }
+
+        #blockstable a i.xicon.visibility-1 {
+            color: orange;
+        }
+
+        #blockstable a i.xicon.visibility-2 {
+            color: green;
+        }
+    </style>
+
     <table class="table" id="blockstable">
         <tbody>
 
@@ -66,7 +99,8 @@
                 <td>{{ block.getTitle() | default(block.getBlockId()) }}</td>
                 <td class="handle"><a href="#"><i class="fa fa-grip-lines"></i></a></td>
                 <td class="text-right">
-                    <a class="block-delete" href="{{ controller.getActionUri('ajaxBlockDelete', { blockId: block.getId() }) }}"><i class="fa fa-times"></i></a>
+                    <a class="block-switch" href="{{ controller.getActionUri('ajaxBlockSwitch', { blockId: block.getId() }) }}"><i class="fa fa-lightbulb xicon visibility {{ block.getVisibilityString() }}"></i></a>
+                    <a class="block-delete" href="{{ controller.getActionUri('ajaxBlockDelete', { blockId: block.getId() }) }}"><i class="fa fa-times xicon"></i></a>
                 </td>
             </tr>
         {% endfor %}
