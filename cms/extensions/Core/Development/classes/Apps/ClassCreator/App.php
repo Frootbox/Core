@@ -89,6 +89,7 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
         $view->set('extension', $extension);
         $view->set('blockId', $post->get('blockId'));
         $view->set('title', $post->get('title'));
+        $view->set('subtitle', $post->get('subtitle'));
 
         foreach ($files as $file) {
 

@@ -93,6 +93,8 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
             }
         }
 
+        $result->rewind();
+
         return $result;
     }
 

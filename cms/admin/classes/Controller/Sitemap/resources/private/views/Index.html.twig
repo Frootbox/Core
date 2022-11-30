@@ -48,7 +48,7 @@
 {% if get.get('jumpTo') %}
     <a class="ajax" id="jlkjll" href="{{ get.get('jumpTo') }}">xxxx</a>
 
-    <script>
+    <script nonce="{{ settings.nonce }}">
         $(function ( ) {
             $('#jlkjll').trigger('click');
             $('#jlkjll').remove();

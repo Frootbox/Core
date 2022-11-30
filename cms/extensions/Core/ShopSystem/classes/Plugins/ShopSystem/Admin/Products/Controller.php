@@ -181,7 +181,8 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
             'pageId' => $this->plugin->getPageId(),
             'pluginId' => $this->plugin->getId(),
             'datasheetId' => $datasheet->getId(),
-            'title' => $post->get('title')
+            'title' => $post->get('title'),
+            'visibility' => (DEVMODE ? 2 : 1),
         ]));
 
         if (!empty($get->get('categoryId'))) {

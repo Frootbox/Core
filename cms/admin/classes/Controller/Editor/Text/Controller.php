@@ -63,7 +63,7 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
             // xxx
             $textString = preg_replace('#href="' . SERVER_PATH_PROTOCOL . 'edit\/#', 'href="', $textString);
 
-            $textString = str_replace('href="' . SERVER_PATH_PROTOCOL, 'href="', $textString);
+            $textString = str_replace('href="' . SERVER_PATH_PROTOCOL, 'href="/', $textString);
 
             // xxx
             // $textString = str_replace('href="' . SERVER_PATH_PROTOCOL, 'href="', $textString);

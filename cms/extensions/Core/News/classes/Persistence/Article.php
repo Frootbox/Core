@@ -17,6 +17,37 @@ class Article extends \Frootbox\Persistence\AbstractAsset implements \Frootbox\P
     /**
      *
      */
+    public function getCategory(): ?\Frootbox\Ext\Core\News\Persistence\Category
+    {
+        $sql = 'SELECT
+            c.*
+        FROM
+            categories c,
+            assets a,
+            categories_2_items x
+        WHERE
+            x.categoryId = c.id AND
+            x.itemId = a.id AND
+            x.itemClass = :itemClass AND
+            a.id = ' . $this->getId() . ' 
+        LIMIT 1';
+
+
+        $categoryRepository = $this->getDb()->getRepository(\Frootbox\Ext\Core\News\Persistence\Repositories\Categories::class);
+        $result = $categoryRepository->fetchByQuery($sql , [
+            'itemClass' => get_class($this),
+        ]);
+
+        if ($result->getCount() == 0) {
+            return null;
+        }
+
+        return $result->current();
+    }
+
+    /**
+     *
+     */
     public function getDateDisplay(): string
     {
         if (empty($this->getConfig('dateDisplay'))) {

@@ -6,7 +6,7 @@
         <div class="xmessage">Sie haben aktuell keine Artikel im Warenkorb.</div>
     {% else %}
 
-        <script>
+        <script nonce="{{ settings.nonce }}">
             $(function ( ) {
 
                 /**
@@ -247,14 +247,23 @@
                         {% if data.editable %}<td></td>{% endif %}
                     </tr>
 
-                    {% for section in data.shopcart.getTaxSections() %}
+                    {% if data.shopcart.getTaxSections() %}
+                        {% for section in data.shopcart.getTaxSections() %}
+                            <tr>
+                                <td class="d-none d-md-table-cell"></td>
+                                <td class="text-right tax" colspan="2">inkl. {{ section.taxrate }} % MwSt. auf {{ section.total | number_format(2,',','.') }} EUR</td>
+                                <td class="text-right tax">{{ section.tax | number_format(2,',','.') }} EUR</td>
+                                {% if data.editable %}<td></td>{% endif %}
+                            </tr>
+                        {% endfor %}
+                    {% else %}
                         <tr>
                             <td class="d-none d-md-table-cell"></td>
-                            <td class="text-right tax" colspan="2">inkl. {{ section.taxrate }} % MwSt. auf {{ section.total | number_format(2,',','.') }} EUR</td>
-                            <td class="text-right tax">{{ section.tax | number_format(2,',','.') }} EUR</td>
+                            <td class="text-right tax" colspan="2">inkl. 0 % MwSt. auf {{ section.total | number_format(2,',','.') }} EUR</td>
+                            <td class="text-right tax">0,00 EUR</td>
                             {% if data.editable %}<td></td>{% endif %}
                         </tr>
-                    {% endfor %}
+                    {% endif %}
 
                     <tr>
                         <td class="d-none d-md-table-cell"></td>

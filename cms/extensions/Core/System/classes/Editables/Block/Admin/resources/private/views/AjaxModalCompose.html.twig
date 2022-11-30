@@ -1,6 +1,6 @@
 {% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
 
-<script>
+<script nonce="{{ settings.nonce }}">
     $(function ( ) {
 
         /**
@@ -97,7 +97,7 @@
                         {% endif %}
 
                         {% for block in blocks %}
-                            <div class="col-3">
+                            <div class="col-2">
                                 <label>
                                     <img style="box-shadow: 0 0 10px rgba(0, 0, 0, .2); width: 100%; height: auto;" src="{{ block.template.getThumbnailSrc() }}" alt="" />
 

@@ -1,7 +1,7 @@
 {% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
 
 
-<script>
+<script nonce="{{ settings.nonce }}">
     var uid = "{{ get.get('uid') }}";
 
     $(function () {

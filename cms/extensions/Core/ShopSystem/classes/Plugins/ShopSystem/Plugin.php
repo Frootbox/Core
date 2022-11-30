@@ -280,15 +280,25 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
      *
      */
     public function getProducts(
-        \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Products $productsRepository
+        array $parameters = null,
+        \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Products $productsRepository,
     ): \Frootbox\Db\Result
     {
-        $result = $productsRepository->fetch([
+
+        $params = [
             'where' => [
                 'pluginId' => $this->getId(),
-                new \Frootbox\Db\Conditions\GreaterOrEqual('visibility',(IS_LOGGED_IN ? 1 : 2)),
+                new \Frootbox\Db\Conditions\GreaterOrEqual('visibility', (IS_LOGGED_IN ? 1 : 2)),
             ],
-        ]);
+        ];
+
+        if (!empty($parameters['order'])) {
+            $params['order'] = [ $parameters['order'] ];
+        }
+
+        $result = $productsRepository->fetch($params);
+
+
 
         return $result;
     }

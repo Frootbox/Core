@@ -160,7 +160,7 @@ class DatasheetField extends \Frootbox\Persistence\AbstractAsset
                 break;
 
             default:
-                $value = $this->getValueText() . ' ' . $this->getSuffix();
+                $value = trim($this->getValueText() . ' ' . $this->getSuffix());
         }
 
         return $value;

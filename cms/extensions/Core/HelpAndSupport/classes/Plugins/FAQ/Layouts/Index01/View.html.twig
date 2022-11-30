@@ -1,47 +1,58 @@
 {# config
 
 title: Standard
+variables:
+    withContainer:
+        type: bool
+        label: mit Layout-Container
+    skipTableOfContents:
+        type: bool
+        label: ohne Inhaltsverzeichnis
 
 /config #}
 
 {% set i = view.getViewhelper('Delegator', { object: plugin }) %}
 
-<div class="row">
-    <div class="col-12 plugin Core HelpAndSupport FAQ Index01">
 
-        {% if plugin.isFirst %}
-            <h1 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h1>
-        {% else %}
-            <h2 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
-        {% endif %}
+<div class="plugin Core HelpAndSupport FAQ Index01">
+    {% if variables.withContainer %}<div class="container">{% endif %}
 
-        <div data-editable data-uid="{{ plugin.getUid('teaser') }}"></div>
+        <div class="row">
+            <div class="col-12">
+
+                <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+
+                <div data-editable data-uid="{{ plugin.getUid('teaser') }}"></div>
 
 
-        {% set questions = i.getQuestions() %}
+                {% set questions = i.getQuestions() %}
 
-        {% if questions.getCount > 0 %}
+                {% if questions.getCount > 0 %}
 
-            <ul>
-                {% for question in questions %}
-                    <li><a href="#{{ question.getStringUrlSanitized( question.getTitle ) }}">{{ question.getTitle }}</a></li>
-                {% endfor %}
-            </ul>
+                    {% if not variables.skipTableOfContents %}
+                        <ul>
+                            {% for question in questions %}
+                                <li><a href="#{{ question.getStringUrlSanitized( question.getTitle ) }}">{{ question.getTitle }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
 
-            {% for question in questions %}
-                <h3 data-editable data-uid="{{ question.getUid('title') }}" id="{{ question.getStringUrlSanitized( question.getTitle ) }}">{{ question.getTitle }}</h3>
+                    {% for question in questions %}
+                        <h3 data-editable data-uid="{{ question.getUid('title') }}" id="{{ question.getStringUrlSanitized( question.getTitle ) }}">{{ question.getTitle }}</h3>
 
-                {% set seeAlso = question.getSeeAlso() %}
+                        {% set seeAlso = question.getSeeAlso() %}
 
-                {% if seeAlso | length > 0 %}
-                    <p>Siehe auch: {% for xquestion in seeAlso %}{% if loop.index > 1 %}, {% endif %}<a href="{{ xquestion.getUri() }}">{{ xquestion.getTitle() }}</a>{% endfor %}</p>
+                        {% if seeAlso | length > 0 %}
+                            <p>Siehe auch: {% for xquestion in seeAlso %}{% if loop.index > 1 %}, {% endif %}<a href="{{ xquestion.getUri() }}">{{ xquestion.getTitle() }}</a>{% endfor %}</p>
+                        {% endif %}
+
+                        <div data-editable data-uid="{{ question.getUid('teaser') }}"></div>
+                    {% endfor %}
+
                 {% endif %}
 
-                <div data-editable data-uid="{{ question.getUid('teaser') }}"></div>
-            {% endfor %}
+            </div>
+        </div>
 
-        {% endif %}
-
-    </div>
+    {% if variables.withContainer %}</div>{% endif %}
 </div>
-

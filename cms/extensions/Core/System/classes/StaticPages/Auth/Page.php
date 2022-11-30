@@ -40,6 +40,10 @@ class Page
             throw new \Frootbox\Exceptions\AccessDenied();
         }
 
+        if ($user->getType() == 'Disabled') {
+            throw new \Frootbox\Exceptions\AccessDenied();
+        }
+
         if (!password_verify($post->get('password'), $user->getPassword())) {
             throw new \Frootbox\Exceptions\AccessDenied();
         }

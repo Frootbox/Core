@@ -19,6 +19,14 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
     /**
      *
      */
+    public function getPath ( ): string
+    {
+        return __DIR__ . DIRECTORY_SEPARATOR;
+    }
+
+    /**
+     *
+     */
     public function getBookingHistory (
         \Frootbox\Ext\Core\Events\Plugins\Booking\Persistence\Repositories\Bookings $bookings
     ): \Frootbox\Db\Result
@@ -84,9 +92,9 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
      *
      */
     public function getEventsBookable(
-        \Frootbox\Ext\Core\Events\Persistence\Repositories\Events $events
-    ) {
-
+        \Frootbox\Ext\Core\Events\Persistence\Repositories\Events $events,
+    ): array
+    {
         if (empty($this->getConfig('source'))) {
             return [ ];
         }
@@ -147,23 +155,118 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         return $list;
     }
 
-
     /**
      *
      */
-    public function getPath ( ): string
+    public function getPaymentMethods(
+        \DI\Container $container,
+    ): array
     {
-        return __DIR__ . DIRECTORY_SEPARATOR;
+        if (empty($this->getConfig('paymentmethods'))) {
+            return [];
+        }
+
+        $methods = [];
+
+        foreach ($this->getConfig('paymentmethods') as $method => $state) {
+
+            $methodClass = '\\Frootbox\\Ext\\Core\\Events\\Plugins\\Booking\\PaymentMethods\\' . $method . '\\PaymentMethod';
+
+            $methods[] = $container->get($methodClass);
+        }
+
+        return $methods;
     }
 
     /**
      *
      */
-    public function ajaxSubmitBookingAction (
+    public function getPersonsMin(): int
+    {
+        return !empty($this->getConfig('minPersons')) ? $this->getConfig('minPersons') : 1;
+    }
+
+    /**
+     *
+     */
+    public function ajaxPrepareBookingAction(
+        \DI\Container $container,
+        \Frootbox\Http\Post $post,
+        \Frootbox\Ext\Core\Events\Persistence\Repositories\Events $eventRepository,
+    ): Response
+    {
+        // Validate required input
+        $post->require([
+            'eventId',
+            'persons',
+            'payment',
+        ]);
+
+        // Fetch event
+        $event = $eventRepository->fetchById($post->get('eventId'));
+
+        if ($this->getConfig('alwaysBookCompleteEvent')) {
+            $total = $event->getPrice();
+            $persons = $event->getConfig('bookable.seats');
+        }
+        else {
+            $total = $post->get('persons') * $event->getPrice();
+            $persons = $post->get('persons');
+        }
+
+        $payment = $post->get('payment');
+
+        if ($post->get('differentInvoiceRecipient')) {
+            $payment['differentInvoiceRecipient'] = true;
+            $payment['invoice'] = $post->get('invoice');
+        }
+        else {
+            $payment['differentInvoiceRecipient'] = false;
+            unset($payment['invoice']);
+        }
+
+        // Store booking
+        $_SESSION['events']['booking'] = [
+            'event' => [
+                'id' => $event->getId(),
+                'title' => $event->getTitle(),
+                'persons' => $persons,
+                'price' => $event->getPrice(),
+                'total' => $total,
+            ],
+            'personal' => $post->get('owner'),
+            'payment' => $payment,
+        ];
+
+        // Get payment method
+        $methodClass = '\\Frootbox\\Ext\\Core\\Events\\Plugins\\Booking\\PaymentMethods\\' . $payment['type'] . '\\PaymentMethod';
+        $paymentMethod = $container->get($methodClass);
+
+        if (method_exists($paymentMethod, 'postPaymentSelectionAction')) {
+            $response = $paymentMethod->postPaymentSelectionAction();
+
+            if (!empty($response['redirect'])) {
+                die(json_encode([
+                    'redirect' => $response['redirect'],
+                ]));
+            }
+        }
+
+        die(json_encode([
+            'redirect' => $this->getActionUri('review'),
+        ]));
+    }
+
+    /**
+     *
+     */
+    public function ajaxSubmitBookingAction(
         \Frootbox\Http\Post $post,
         \Frootbox\Ext\Core\Events\Persistence\Repositories\Events $events,
         \Frootbox\Ext\Core\Events\Plugins\Booking\Persistence\Repositories\Bookings $bookings,
         \Frootbox\Db\Db $db,
+        \DI\Container $container,
+        \Frootbox\Mail\Transports\Interfaces\TransportInterface $mailTransport,
         \Frootbox\TranslatorFactory $translationFactory,
         \Frootbox\View\Engines\Interfaces\Engine $view,
         \Frootbox\Config\Config $config,
@@ -173,14 +276,11 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
     {
         // Validate required input
         $post->require([
-            'eventId',
-            'persons',
             'privacyPolicy',
-            'payment',
         ]);
 
         // Fetch event
-        $event = $events->fetchById($post->get('eventId'));
+        $event = $events->fetchById($_SESSION['events']['booking']['event']['id']);
 
         // Check if event has free seats
         if ($event->getFreeSeats() <= 0) {
@@ -188,30 +288,43 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         }
 
         // Check if requested seats are available
-        if ($event->getFreeSeats() < $post->get('persons')) {
+        if ($event->getFreeSeats() < $_SESSION['events']['booking']['event']['persons']) {
             throw new \Frootbox\Exceptions\RuntimeError('Too many seats requested.');
         }
 
         // Begin database transaction
         $db->transactionStart();
 
+        // Get payment method
+        $methodClass = '\\Frootbox\\Ext\\Core\\Events\\Plugins\\Booking\\PaymentMethods\\' . $_SESSION['events']['booking']['payment']['type'] . '\\PaymentMethod';
+        $paymentMethod = $container->get($methodClass);
+
         // Generate booking
         $booking = new \Frootbox\Ext\Core\Events\Plugins\Booking\Persistence\Booking([
             'pluginId' => $this->getId(),
             'parentId' => $event->getId(),
             'config' => [
-                'persons' => $post->get('persons'),
-                'owner' => $post->get('owner'),
-                'payment' => $post->get('payment'),
+                'persons' => $_SESSION['events']['booking']['event']['persons'],
+                'owner' => $_SESSION['events']['booking']['personal'],
+                'note' => $post->get('note'),
+                'payment' => [
+                    'state' => 'Created',
+                    'type' => $_SESSION['events']['booking']['payment']['type'],
+                ],
+                'invoice' => !empty($_SESSION['events']['booking']['payment']['invoice']) ? $_SESSION['events']['booking']['payment']['invoice'] : null,
             ],
         ]);
 
         // Create booking
         $booking = $bookings->insert($booking);
 
+        if (method_exists($paymentMethod, 'preCheckoutAction')) {
+            $response = $paymentMethod->preCheckoutAction($booking);
+        }
+
         // Update events booking state
         $bookedSeats = $event->getConfig('bookable.bookedSeats') ?? 0;
-        $bookedSeats += $post->get('persons');
+        $bookedSeats += $_SESSION['events']['booking']['event']['persons'];
 
         $event->addConfig([
             'bookable' => [
@@ -236,50 +349,24 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         $source = $builder->render($this->getConfig('mailTemplate'));
 
         // Init mailer
-        // TODO: Wrap this into frootbox class
+        $mail = new \Frootbox\Mail\Envelope;
+        $mail->setSubject('Buchung: ' . $event->getTitle());
+        $mail->setBodyHtml($source);
 
-        $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
+        $mail->clearTo();
+        $mail->addTo($this->getConfig('recipient'));
 
-        //Server settings
-        $mail->isSMTP();
-        $mail->Host = $config->get('mail.smtp.host');
-        $mail->SMTPAuth = true;
-        $mail->Username = $config->get('mail.smtp.username');
-        $mail->Password = $config->get('mail.smtp.password');
-        $mail->SMTPSecure = 'tls';
-        $mail->Port = 587;
-        $mail->CharSet = "utf-8";
-        $mail->Encoding = 'base64';
-        $mail->SMTPOptions = array (
-            'ssl' => array (
-                'verify_peer' => false,
-                'verify_peer_name' => false,
-                'allow_self_signed' => true,
-            ),
-        );
-
-        //Recipients
-        $mail->setFrom($config->get('mail.defaults.from.address'), $config->get('mail.defaults.from.name'));
-        $mail->addAddress($this->getConfig('recipient'));
-
-        // Content
-        $mail->isHTML(true);
-        $mail->Subject = 'Buchung: ' . $event->getTitle();
-        $mail->Body = $source;
-
-        $mail->send();
+        $mailTransport->send($mail);
 
         try {
-
             $payload->addData([
                 'bookingId' => $booking->getId()
             ]);
 
-            // Send mail to owner
-            $mail->clearAddresses();
-            $mail->addAddress($booking->getConfig('owner.email'));
+            $mail->clearTo();
+            $mail->addTo($booking->getConfig('owner.email'));
 
-            $mail->send();
+            $mailTransport->send($mail);
         }
         catch ( \PHPMailer\PHPMailer\Exception $e ) {
 
@@ -328,17 +415,40 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
      *
      */
     public function indexAction(
+        \Frootbox\Http\Post $post,
         \Frootbox\Ext\Core\Events\Persistence\Repositories\Events $eventsRepository,
     ): Response
     {
+
         $event = null;
 
         if ($this->hasAttribute('eventId')) {
             $event = $eventsRepository->fetchById($this->getAttribute('eventId'));
         }
+        elseif ($eventId = $post->get('eventId')) {
+            $event = $eventsRepository->fetchById($eventId);
+        }
 
         return new Response([
             'event' => $event,
+        ]);
+    }
+
+    /**
+     *
+     */
+    public function reviewAction(
+        \Frootbox\Ext\Core\Events\Persistence\Repositories\Events $eventRepository,
+    ): Response
+    {
+        // Fetch event
+        $event = $eventRepository->fetchById($_SESSION['events']['booking']['event']['id']);
+
+        // d($_SESSION['events']['booking']);
+
+        return new Response([
+            'event' => $event,
+            'booking' => $_SESSION['events']['booking'],
         ]);
     }
 }

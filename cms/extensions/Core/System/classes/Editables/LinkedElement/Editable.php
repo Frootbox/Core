@@ -41,8 +41,13 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
 
                 if (!empty($pageId = $text->getConfig('pageId'))) {
 
-                    $page = $pagesRepository->fetchById($pageId);
-                    $element->setAttribute($attribute, $page->getUri());
+                    try {
+                        $page = $pagesRepository->fetchById($pageId);
+                        $element->setAttribute($attribute, $page->getUri());
+                    }
+                    catch (\Exception $e) {
+                        $element->setAttribute($attribute, '#missing-page');
+                    }
                 }
                 elseif (!empty($url = $text->getConfig('link'))) {
 

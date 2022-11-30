@@ -287,7 +287,8 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
         \Frootbox\Persistence\Content\Repositories\Widgets $widgets,
         \Frootbox\Http\Get $get,
         \Frootbox\Http\Post $post,
-        \DI\Container $container
+        \DI\Container $container,
+        \Frootbox\Config\Config $configuration,
     ): Response
     {
         // Validate required input
@@ -296,13 +297,26 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
         // Fetch widget
         $widget = $widgets->fetchById($get->get('widgetId'));
 
-        // Update widget
-        $widget->setClassName($post->get('widgetClass'));
-        $widget->addConfig([
+        $config = [
             'width' => $post->get('width'),
             'layoutId' => $post->get('layoutId'),
             'margin' => $post->get('margin')
-        ]);
+        ];
+
+        if ($widget->getClassName() != $post->get('widgetClass')) {
+
+            preg_match('#^Frootbox\\\\Ext\\\\(.*?)\\\\(.*?)\\\\Widgets\\\\(.*?)\\\\Widget$#', $post->get('widgetClass'), $match);
+
+            $defaultConfig = $configuration->get('Ext.' . $match[1] . '.' . $match[2] . '.Widgets.' . $match[3] . '.defaultConfig');
+
+            if (!empty($defaultConfig)) {
+                $config = array_merge($config, $defaultConfig->getData());
+            }
+        }
+
+        // Update widget
+        $widget->setClassName($post->get('widgetClass'));
+        $widget->addConfig($config);
 
         $widget->save();
 

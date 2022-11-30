@@ -95,4 +95,12 @@ class User extends \Frootbox\Persistence\AbstractRow
             throw new \Frootbox\Exceptions\InputInvalid('TokenInvalid');
         }
     }
+
+    /**
+     *
+     */
+    public function verifyPassword(string $password): bool
+    {
+        return password_verify($password, $this->getPassword());
+    }
 }

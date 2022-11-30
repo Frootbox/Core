@@ -43,11 +43,11 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     {
         // Fetch booking
         $booking = $bookings->fetchById($get->get('bookingId'));
+
+        // Delete booking
         $booking->delete();
 
-
         // Todo: Implement a cancellation log
-
 
         // Fetch event
         $event = $events->fetchById($booking->getParentId());
@@ -64,6 +64,34 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         return self::getResponse('json', 200, [
             'success' => 'Die Buchung wurde storniert.'
         ]);
+    }
+
+    /**
+     *
+     */
+    public function ajaxBookingMoveAction(
+        \Frootbox\Http\Get $get,
+        \Frootbox\Http\Post $post,
+        \Frootbox\Ext\Core\Events\Persistence\Repositories\Events $eventRepository,
+        \Frootbox\Ext\Core\Events\Plugins\Booking\Persistence\Repositories\Bookings $bookingRepository,
+    ): \Frootbox\Admin\Controller\Response
+    {
+        // Fetch booking
+        $booking = $bookingRepository->fetchById($get->get('bookingId'));
+
+        // Obtain original event
+        $originalEvent = $booking->getEvent();
+
+        // Fetch new event
+        $targetEvent = $eventRepository->fetchById($post->get('eventId'));
+
+        // Update booking
+        $booking->setParentId($targetEvent->getId());
+        $booking->save();
+
+        // Update booked seats
+        $targetEvent->refreshBookedSeats();
+        $originalEvent->refreshBookedSeats();
     }
 
     /**
@@ -98,6 +126,7 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         \Frootbox\Http\Post $post,
         \Frootbox\Http\Get $get,
         \Frootbox\Ext\Core\Events\Persistence\Repositories\Events $events,
+        \Frootbox\Ext\Core\Events\Persistence\Repositories\Categories $categoriesRepository,
         \Frootbox\Admin\Viewhelper\GeneralPurpose $gp,
         \Frootbox\CloningMachine $cloningMachine
     ): \Frootbox\Admin\Controller\Response
@@ -141,6 +170,10 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
             $event->save();
 
             $cloningMachine->cloneContentsForElement($event, $cloneFrom->getUidBase());
+
+            foreach ($cloneFrom->getCategories() as $category) {
+                $category->connectItem($event);
+            }
         }
 
         return self::getResponse('json', 200, [
@@ -170,7 +203,8 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
 
         $event->delete();
 
-        return self::response('json', 200, [
+        return self::getResponse('json', 200, [
+            'success' => 'Die Veranstaltung wurde gelöscht.',
             'modalDismiss' => true,
             'replace' => [
                 'selector' => '#eventsReceiver',
@@ -178,6 +212,37 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
                     'plugin' => $this->plugin
                 ])
             ]
+        ]);
+    }
+
+    /**
+     *
+     */
+    public function ajaxDuplicateAction(
+        \Frootbox\Http\Get $get,
+        \Frootbox\Http\Post $post,
+        \Frootbox\Ext\Core\Events\Persistence\Repositories\Events $eventRepository,
+    ): \Frootbox\Admin\Controller\Response
+    {
+        // Fetch event
+        $event = $eventRepository->fetchById($get->get('eventId'));
+
+        $dateStart = new \DateTime($event->getDateStart());
+        $dateEnd = new \DateTime($event->getDateEnd());
+
+        for ($i = 1; $i <= $post->get('amount'); ++$i) {
+
+            $dateStart->modify('+' . $post->get('distance') . ' ' . $post->get('interval'));
+            $dateEnd->modify('+' . $post->get('distance') . ' ' . $post->get('interval'));
+
+            $newEvent = $event->duplicate();
+            $newEvent->setDateStart($dateStart->format('Y-m-d H:i:s'));
+            $newEvent->setDateEnd($dateEnd->format('Y-m-d H:i:s'));
+            $newEvent->save();
+        }
+
+        return self::getResponse('json', 200, [
+            'success' => 'Die Veranstaltung wurde ' . $post->get('amount') . ' mal dupliziert.',
         ]);
     }
 
@@ -307,15 +372,26 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
      */
     public function bookingAction (
         \Frootbox\Http\Get $get,
-        \Frootbox\Admin\View $view,
-        \Frootbox\Ext\Core\Events\Plugins\Booking\Persistence\Repositories\Bookings $bookings
-    ) {
+        \Frootbox\Ext\Core\Events\Persistence\Repositories\Events $eventRepository,
+        \Frootbox\Ext\Core\Events\Plugins\Booking\Persistence\Repositories\Bookings $bookingRepository,
+    ): \Frootbox\Admin\Controller\Response
+    {
         // Fetch booking
-        $booking = $bookings->fetchById($get->get('bookingId'));
-        $view->set('booking', $booking);
+        $booking = $bookingRepository->fetchById($get->get('bookingId'));
+
+        // Fetch events
+        $events = $eventRepository->fetch([
+            'where' => [
+                new \Frootbox\Db\Conditions\GreaterOrEqual('dateStart', date('Y-m-d H:i:s')),
+            ],
+            'order' => [ 'dateStart ASC' ],
+        ]);
 
 
-        return self::response();
+        return self::getResponse(body: [
+            'booking' => $booking,
+            'events' => $events,
+        ]);
     }
 
     /**
@@ -365,6 +441,22 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         return self::getResponse(body: [
             'event' => $event,
             'bookings' => $bookings,
+        ]);
+    }
+
+    /**
+     *
+     */
+    public function duplicateAction(
+        \Frootbox\Http\Get $get,
+        \Frootbox\Ext\Core\Events\Persistence\Repositories\Events $eventRepository,
+    ): \Frootbox\Admin\Controller\Response
+    {
+        // Fetch event
+        $event = $eventRepository->fetchById($get->get('eventId'));
+
+        return self::getResponse(body: [
+            'event' => $event,
         ]);
     }
 }

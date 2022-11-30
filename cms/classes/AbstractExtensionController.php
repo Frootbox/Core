@@ -10,7 +10,8 @@ abstract class AbstractExtensionController
     use \Frootbox\Persistence\Traits\Config;
 
     protected $config = [ ];
-    
+    protected string $type = 'Generic';
+
     /**
      * 
      */
@@ -33,6 +34,14 @@ abstract class AbstractExtensionController
     public function getBaseNamespace(): string
     {
         return substr(get_class($this), 0, -19);
+    }
+
+    /**
+     *
+     */
+    public function getType(): string
+    {
+        return $this->type;
     }
 
     /**

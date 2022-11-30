@@ -13,7 +13,7 @@ variables:
 {% set f = view.getViewhelper('Ext/Core/Forms/Form') %}
 {% set t = i.getTranslator() %}
 
-<script>
+<script nonce="{{ settings.nonce }}">
     $(function ( ) {
 
         /**

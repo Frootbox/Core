@@ -13,7 +13,7 @@
     <tbody>
 
         {% for contact in contacts %}
-            <tr id="row-{{ contact.getId() }}" data-title="Kontaktperson bearbeiten" class="{% if data.highlight == contact.getId() %}highlighted{% endif %}" data-modal="{{ data.plugin.getAdminUri('Contact', 'ajaxModalEdit', { contactId: contact.getId() }) }}">
+            <tr id="row-{{ contact.getId() }}" data-title="Kontaktperson bearbeiten" class="{% if data.highlight == contact.getId() %}highlighted{% endif %}" data-size="xl" data-modal="{{ data.plugin.getAdminUri('Contact', 'ajaxModalEdit', { contactId: contact.getId() }) }}">
                 <td>{{ contact.getFirstName() }}</td>
                 <td>{{ contact.getLastName() }}</td>
                 <td class="handle">

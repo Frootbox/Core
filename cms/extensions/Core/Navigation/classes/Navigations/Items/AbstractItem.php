@@ -49,13 +49,19 @@ abstract class AbstractItem extends \Frootbox\Persistence\AbstractRow
             return null;
         }
 
-        // return null;
+        $where = [
+            'navId' => $this->getNavId(),
+            'parentId' => $this->getId(),
+            'language' => $this->getLanguage(),
+        ];
+
+        if (empty($params['ignoreVisibility'])) {
+            $where[] = new \Frootbox\Db\Conditions\GreaterOrEqual('visibility',(IS_EDITOR ? 1 : 2));
+        }
+
+        // Fetch items
         $result = $this->getModel()->fetch([
-            'where' => [
-                'navId' => $this->getNavId(),
-                'parentId' => $this->getId(),
-                'language' => $this->getLanguage(),
-            ],
+            'where' => $where,
             'order' => [
                 'orderID DESC',
                 'id ASC',

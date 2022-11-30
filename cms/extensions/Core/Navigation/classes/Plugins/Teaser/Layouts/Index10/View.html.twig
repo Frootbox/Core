@@ -9,6 +9,7 @@ title: Dreiteilig
 {% set teasers = i.getTeasers() %}
 {% set pages = (teasers.getCount() / 3) | round(0, 'ceil') %}
 
+
 <div class="row">
     <div class="col-12 plugin Core Navigation Teaser Index10">
 
@@ -44,7 +45,6 @@ title: Dreiteilig
 
                             </div>
                             <div class="col-md-5">
-
 
                                 {% set teaser = teasers.current() %}
                                 {{ teasers.next() }}

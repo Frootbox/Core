@@ -34,8 +34,6 @@ class SitemapRoute extends \Frootbox\Routing\AbstractRoute
             ],
         ]);
 
-        d($result);
-
         $view->set('aliases', $result);
 
         if (substr($target, -4) == '.txt') {

@@ -2,7 +2,7 @@
 
 {% set partialId = 'partial' ~ random(100000, 999999) %}
 
-<script>
+<script nonce="{{ settings.nonce }}">
     $(function ( ) {
 
         $('#{{ partialId }}').keyup(function ( event ) {

@@ -101,6 +101,12 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
                     a.date DESC';
                     break;
 
+                case 'dateDesc':
+                    $sql .= '
+                        ORDER BY
+                    a.dateStart DESC';
+                    break;
+
                 case 'manualOrder':
                     $sql .= '
                         ORDER BY

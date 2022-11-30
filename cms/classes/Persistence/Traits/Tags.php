@@ -53,6 +53,43 @@ trait Tags
     /**
      *
      */
+    public function getTagsPublic(array $parameters = null): \Frootbox\Db\Result
+    {
+        // Obtain tags repository
+        $tagsRepository = $this->getDb()->getModel(\Frootbox\Persistence\Repositories\Tags::class);
+
+        $where = [
+            'itemId' => $this->getId(),
+            'itemClass' => get_class($this)
+        ];
+
+        if (!empty($parameters['ignore'])) {
+
+            foreach ($parameters['ignore'] as $ignoredTag) {
+
+                if (!empty($ignoredTag)) {
+                    $where[] = new \Frootbox\Db\Conditions\NotEqual('tag', $ignoredTag);
+                }
+            }
+        }
+
+        // Fetch tags
+        $tags = $tagsRepository->fetch([
+            'where' => $where,
+        ]);
+
+        foreach($tags as $index => $tag) {
+            if ($tag->getTag()[0] == '_') {
+                $tags->removeByIndex($index);
+            }
+        }
+
+        return $tags;
+    }
+
+    /**
+     *
+     */
     public function getTagsList(array $params = null): array
     {
         // Obtain tags repository
@@ -97,6 +134,7 @@ trait Tags
                 'tag' => $tag
             ]
         ]);
+
 
         return !empty($result);
     }

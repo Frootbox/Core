@@ -22,7 +22,7 @@
 
                 <form method="post" class="ajax" action="{{ plugin.getAdminUri('Address', 'ajaxUpdate', { addressId: address.getId() }) }}">
 
-                    <script>
+                    <script nonce="{{ settings.nonce }}">
                         $(function ( ) {
                             $('#title').focus();
                         });
@@ -147,9 +147,7 @@
 
                 <form method="post" class="ajax" action="{{ plugin.getAdminUri('Address', 'ajaxUpdateLocation', { addressId: address.getId() }) }}">
 
-
-
-                    <script>
+                    <script nonce="{{ settings.nonce }}">
                         $(function ( ) {
 
                             $('a.refresh-geolocation').click(function (event) {

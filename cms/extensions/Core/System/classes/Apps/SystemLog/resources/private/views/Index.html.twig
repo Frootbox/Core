@@ -3,7 +3,7 @@
 
 {{ front.addTab('System Log', app.getUri('index')) }}
 
-<script>
+<script nonce="{{ settings.nonce }}">
 	{% if get.get('query') %}
 		$(function ( ) {
 

@@ -1,0 +1,65 @@
+{# config
+
+title: mehrspaltig
+variables:
+    withContainer:
+        type: bool
+        label: mit Layout-Container
+    columns:
+        type: int
+        label: Anzahl Spalten
+        default: 2
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set a = view.getViewhelper('Assets', {   }) %}
+
+{% set files = i.getFiles() %}
+
+{% if variables.columns == 2 %}
+    {% set colClass = "col-md-6" %}
+{% elseif variables.columns == 3 %}
+    {% set colClass = "col-md-4" %}
+{% elseif variables.columns == 4 %}
+    {% set colClass = "col-md-3" %}
+{% else %}
+    {% set colClass = "col-md-12" %}
+{% endif %}
+
+{{ a.import('https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css') | raw }}
+{{ a.import('https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js') | raw }}
+
+<div class="plugin Core FileManager CopyrightFilesList Index02">
+
+    {% if variables.withContainer %}<div class="container">{% endif %}
+
+    <div class="row">
+        <div class="col-12">
+
+            <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+
+            <div data-editable data-uid="{{ plugin.getUid('text') }}"></div>
+
+            {% set columns = files.getColumns(variables.columns) %}
+
+            <div class="row">
+
+                {% for colum in columns %}
+                    <div class="{{ colClass }}">
+                        <ul class="file-list">
+                            {% for file in colum %}
+                                <li><a title="{{ file.getCopyright() }}" data-fancybox="gallery" href="{{ file.getUri({ width: 300 }) }}">{{ file.getCopyright() }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endfor %}
+
+            </div>
+
+        </div>
+    </div>
+
+    {% if variables.withContainer %}</div>{% endif %}
+
+</div>

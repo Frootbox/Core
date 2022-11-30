@@ -9,6 +9,7 @@ class Envelope
 {
     protected $subject = null;
     protected $to = [];
+    protected $bcc = [];
     protected $replyTo = null;
     protected $bodyHtml = null;
     protected $attachments = [];
@@ -32,6 +33,22 @@ class Envelope
     /**
      *
      */
+    public function addBcc(string $address, string $name = null): void
+    {
+        $this->bcc[] = new Recipient($address, $name);
+    }
+
+    /**
+     *
+     */
+    public function clearBcc(): void
+    {
+        $this->bcc = [];
+    }
+
+    /**
+     *
+     */
     public function clearTo(): void
     {
         $this->to = [];
@@ -43,6 +60,14 @@ class Envelope
     public function getAttachments(): array
     {
         return $this->attachments;
+    }
+
+    /**
+     *
+     */
+    public function getBcc(): array
+    {
+        return $this->bcc;
     }
 
     /**

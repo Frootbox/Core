@@ -34,6 +34,7 @@ class Controller extends \Frootbox\Admin\AbstractWidgetController
             'caption' => $post->get('caption'),
             'copyright' => $post->get('copyright'),
             'url' => $post->get('url'),
+            'urlTargetBlank' => !empty($post->get('urlTargetBlank')),
             'alt' => $post->get('alt'),
             'source' => $post->get('source'),
             'magnify' => $post->get('magnify'),

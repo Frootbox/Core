@@ -10,6 +10,25 @@ class Item extends \Frootbox\Ext\Core\Navigation\Navigations\Items\AbstractItem
     /**
      *
      */
+    public function getChildren(): \Frootbox\Db\Result
+    {
+        // Fetch pages
+        $pagesRepository = $this->getDb()->getRepository(\Frootbox\Persistence\Repositories\Pages::class);
+        $pages = $pagesRepository->fetch([
+            'where' => [
+                'parentId' => $this->getConfig('pageId'),
+            ],
+            'order' => [
+                'lft ASC',
+            ],
+        ]);
+
+        return $pages;
+    }
+
+    /**
+     *
+     */
     public function getHref(): string
     {
         if (empty($this->getConfig('pageId'))) {
@@ -128,8 +147,8 @@ class Item extends \Frootbox\Ext\Core\Navigation\Navigations\Items\AbstractItem
             return true;
         }
 
-        if ($this->config['pageId'] == $page->getParentId()) {
-            // return true;
+        if (!empty($parameters['inheritActiveFromeParent']) and $this->config['pageId'] == $page->getParentId()) {
+            return true;
         }
 
         // Check left and right

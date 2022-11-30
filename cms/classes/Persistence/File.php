@@ -157,6 +157,26 @@ class File extends AbstractRow
     /**
      *
      */
+    public function getNameClean(): string
+    {
+        $name = explode('.', $this->getPath());
+        $ext = strtolower(array_pop($name));
+
+        $name = $this->getName();
+        $name .= '.pdf';
+
+        if (substr($name, strlen($ext) * -1) == $ext) {
+            $name = substr($name, 0, (strlen($ext) + 1) * -1);
+        }
+
+        $name = $this->getStringUrlSanitized($name) . '.' . $ext;
+
+        return $name;
+    }
+
+    /**
+     *
+     */
     public function getSizeDisplay(): string
     {
         $size = $this->getSize();
@@ -206,11 +226,7 @@ class File extends AbstractRow
      */
     public function getUriDownload(array $params = null): string
     {
-        $name = explode('.', $this->getName());
-        $ext = strtolower(array_pop($name));
-        $name = implode('.', $name);
-        
-        $url = 'static/Ext/Core/FileManager/Download/serve/qs/f/' .$this->getId() . '/n/' . $this->getStringUrlSanitized($name) . '.' . $ext;
+        $url = 'static/Ext/Core/FileManager/Download/serve/qs/f/' . $this->getId() . '/n/' . $this->getNameClean();
 
         $url = (!empty($params['absolute']) ? SERVER_PATH_PROTOCOL : SERVER_PATH) . $url;
 
@@ -229,7 +245,6 @@ class File extends AbstractRow
             $options['path'] = $this->getPath();
         }
 
-                
         // Build hash
         $hash = md5($this->getDate() . json_encode($options));
         

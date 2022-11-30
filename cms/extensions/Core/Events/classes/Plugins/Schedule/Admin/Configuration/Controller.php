@@ -35,6 +35,100 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     /**
      *
      */
+    public function ajaxPricesSetAction(
+        \Frootbox\Http\Post $post,
+        \Frootbox\Ext\Core\Events\Persistence\Repositories\Events $eventRepository,
+    ): Response
+    {
+        // Fetch events
+        $events = $eventRepository->fetch([
+            'where' => [
+                'pluginId' => $this->plugin->getId(),
+            ],
+        ]);
+
+        foreach ($events as $event) {
+
+            $event->addConfig([
+                'bookable' => [
+                    'price' => $post->get('price'),
+                ],
+            ]);
+            $event->save();
+        }
+
+        return self::getResponse('json');
+    }
+
+    /**
+     *
+     */
+    public function ajaxTruncateBookingsAction(
+        \Frootbox\Ext\Core\Events\Plugins\Booking\Persistence\Repositories\Bookings $bookingRepository,
+        \Frootbox\Ext\Core\Events\Persistence\Repositories\Events $eventRepository,
+    ): Response
+    {
+        // Fetch events
+        $events = $eventRepository->fetch([
+            'where' => [
+                'pluginId' => $this->plugin->getId(),
+            ],
+        ]);
+
+        $count = 0;
+
+        foreach ($events as $event) {
+
+            // Fetch bookings
+            $bookings = $bookingRepository->fetch([
+                'where' => [
+                    'parentId' => $event->getId(),
+                ],
+            ]);
+
+            $count += $bookings->getTotal();
+
+            $bookings->map('delete');
+
+            // Update events bookings
+            $event->addConfig([
+                'bookable' => [
+                    'bookedSeats' => 0,
+                ],
+            ]);
+
+            $event->save();
+        }
+
+        return self::getResponse('json', 200, [
+            'success' => 'Es wurden ' . $count . ' Buchungen wurden gelöscht.',
+        ]);
+    }
+
+    /**
+     *
+     */
+    public function ajaxTruncateEventsAction(
+        \Frootbox\Ext\Core\Events\Persistence\Repositories\Events $eventRepository,
+    ): Response
+    {
+        // Fetch events
+        $events = $eventRepository->fetch([
+            'where' => [
+                'pluginId' => $this->plugin->getId(),
+            ],
+        ]);
+
+        $events->map('delete');
+
+        return self::getResponse('json', 200, [
+            'success' => 'Alle Veranstaltungen wurden gelöscht.',
+        ]);
+    }
+
+    /**
+     *
+     */
     public function ajaxUpdateAction(
         \Frootbox\Http\Post $post,
         \Frootbox\Ext\Core\Events\Persistence\Repositories\Events $eventsRepository

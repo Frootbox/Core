@@ -1,6 +1,6 @@
 
 
-<script>
+<script nonce="{{ settings.nonce }}">
     {% if get.get('highlight') %}
         $('tr[data-text="{{ get.get('highlight') }}"]').trigger('click');
     {% endif %}

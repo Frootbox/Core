@@ -51,7 +51,7 @@
 
                 {% if file %}
 
-                    <script>
+                    <script nonce="{{ settings.nonce }}">
                         $(function ( ) {
 
                             $('#image').click(function ( event ) {
@@ -117,7 +117,7 @@
                         {% endfor %}
                     </div>
 
-                    <script>
+                    <script nonce="{{ settings.nonce }}">
                         $(function ( ) {
 
                             $(window).off('resize');

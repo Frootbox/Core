@@ -32,8 +32,13 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
             'recipient' => $post->get('recipient'),
             'mailTemplate' => $post->get('mailTemplate'),
             'minPersons' => $post->get('minPersons'),
+            'fixPersons' => $post->get('fixPersons'),
             'closeEventAfterFirstBooking' => $post->get('closeEventAfterFirstBooking'),
+            'alwaysBookCompleteEvent' => $post->get('alwaysBookCompleteEvent'),
+            'hideTotalCosts' => !empty($post->get('hideTotalCosts')),
+            'hidePersons' => !empty($post->get('hidePersons')),
             'paymentmethods' => $post->get('paymentmethods'),
+            'buttonLabel' => $post->get('buttonLabel'),
         ]);
 
         $this->plugin->save();
@@ -59,6 +64,7 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
 
         // Gather mail templates
         $templates = $builder->setPlugin($this->plugin)->getTemplates('Mail');
+
         $view->set('mailTemplates', $templates);
 
         // Gather payment methods

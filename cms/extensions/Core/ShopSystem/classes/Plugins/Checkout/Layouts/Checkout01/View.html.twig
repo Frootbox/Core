@@ -18,7 +18,7 @@ variables:
 
 {{ v.asset('EXT:Core/ShopSystem/icons/css/all.css') | raw }}
 
-<script>
+<script nonce="{{ settings.nonce }}">
     var fbxShoppingUrisUpdateShipping = "{{ i.getUriAjax({ action: 'updateShippingMethod' }) | raw }}";
 </script>
 
@@ -33,7 +33,7 @@ variables:
 
             <div data-editable data-uid="{{ plugin.getUid('text-checkout') }}"></div>
 
-            <script>
+            <script nonce="{{ settings.nonce }}">
                 $(function ( ) {
 
                     $('#street').change(function ( event ) {
@@ -62,7 +62,7 @@ variables:
 
                         {% if addresses | length %}
 
-                            <script>
+                            <script nonce="{{ settings.nonce }}">
                                 var addresses = {{ addresses | json_encode | raw }};
 
                                 $(function ( ) {
@@ -177,7 +177,7 @@ variables:
 
                         <div data-editable data-uid="{{ plugin.getUid('text-shipping-top') }}"></div>
 
-                        <script>
+                        <script nonce="{{ settings.nonce }}">
                             $(function ( ) {
 
                                 $('#shipToAddress, #shipToBillingAddress').change(function ( ) {
@@ -279,7 +279,7 @@ variables:
 
                         {% if not config.get('shop.coupons.disabled') %}
 
-                            <script>
+                            <script nonce="{{ settings.nonce }}">
                                 $(function ( ) {
 
                                     /**
@@ -355,7 +355,7 @@ variables:
 
                             <h3>Zahlungsdaten</h3>
 
-                            <script>
+                            <script nonce="{{ settings.nonce }}">
                                 $(function( ) {
 
                                     $('input.paymentmethod').change(function ( ) {

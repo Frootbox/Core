@@ -43,7 +43,7 @@ class Articles extends \Frootbox\View\Viewhelper\AbstractViewhelper
                     new \Frootbox\Db\Conditions\GreaterOrEqual('visibility',(IS_LOGGED_IN ? 1 : 2)),
                 ],
                 'limit' => $params['limit'],
-                'order' => [ 'date DESC' ],
+                'order' => [ 'dateStart DESC' ],
             ]);
         }
 

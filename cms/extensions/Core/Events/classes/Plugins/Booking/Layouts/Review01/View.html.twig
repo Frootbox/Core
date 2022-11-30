@@ -1,0 +1,158 @@
+{# config
+
+title: Standard
+variables:
+    withContainer:
+        type: bool
+        label: mit Layout-Container
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set p = view.getViewhelper('Partials') %}
+{% set t = i.getTranslator() %}
+
+{% set bookableEvents = i.getEventsBookable() %}
+
+<div class="plugin Core Events Booking Review01">
+
+    {% if variables.withContainer %}<div class="container">{% endif %}
+
+    <div class="row">
+        <div class="col-12 ">
+
+            <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('review-title') }}">Buchung abschließen</h2>
+
+            <div data-editable data-uid="{{ plugin.getUid('review-text') }}"></div>
+
+            <form id="eventBookingForm" method="post" action="{{ plugin.getUriAjax('submitBooking') }}">
+
+                <div class="row">
+                    <div class="col-md-6">
+
+                        <h3>persönliche Daten</h3>
+
+                        <p>
+                            {{ booking.personal.company }}<br />
+                            {{ booking.personal.firstName }} {{ booking.personal.lastName }}<br />
+                            {{ booking.personal.street }} {{ booking.personal.streetNumber }}<br />
+                            {{ booking.personal.city }} {{ booking.personal.zipCode }}<br />
+                        </p>
+                        <p>
+                            {{ booking.personal.phone }}<br />
+                            {{ booking.personal.email }}
+                        </p>
+
+                        {% if booking.payment.invoice %}
+
+                            <h3>abweichender Rechnungsempfänger</h3>
+
+                            <p>
+                                {{ booking.payment.invoice.company }}<br />
+                                {{ booking.payment.invoice.firstName }} {{ booking.payment.invoice.lastName }}<br />
+                                {{ booking.payment.invoice.street }} {{ booking.payment.invoice.streetNumber }}<br />
+                                {{ booking.payment.invoice.city }} {{ booking.payment.invoice.zipCode }}<br />
+                            </p>
+                        {% endif %}
+
+                    </div>
+                    <div class="col-md-6">
+
+                        <h3>Zahlungsart</h3>
+
+                        <p>{{ t.translate("Payment" ~ booking.payment.type) }}</p>
+
+                        <h3>Bemerkung</h3>
+
+                        <textarea name="note" id="note" class="form-control"></textarea>
+                    </div>
+                </div>
+
+                <br />
+
+                <h3>Ihre Buchung</h3>
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th class="text-left">Veranstaltung</th>
+                            {% if not plugin.getConfig('hidePersons') %}
+                                <th class="text-left">Personen</th>
+                            {% endif %}
+                            <th class="text-left">Datum</th>
+                            {% if not plugin.getConfig('hideTotalCosts') %}
+                                <th class="text-right" width="170">Preis</th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{ event.getTitle() }}</td>
+                            {% if not plugin.getConfig('hidePersons') %}
+                                <td>{{ booking.event.persons }}</td>
+                            {% endif %}
+                            <td>{{ event.getDateStart() | date('d.m.Y H:i')}} Uhr</td>
+                            {% if not plugin.getConfig('hideTotalCosts') %}
+                                <td class="text-right">{{ event.getPrice() | number_format(2, ",", ".") }} EUR</td>
+                            {% endif %}
+                        </tr>
+                    </tbody>
+
+                    {% if not plugin.getConfig('hideTotalCosts') %}
+                        <tfoot>
+                            <tr>
+                                {% if not plugin.getConfig('hidePersons') %}
+                                    <td></td>
+                                {% endif %}
+                                <td colspan="2" class="text-right">Total</td>
+                                <td class="text-right">{{ booking.event.total | number_format(2, ",", ".") }} EUR</td>
+                            </tr>
+                        </tfoot>
+                    {% endif %}
+                </table>
+
+
+                <div class="form-group form-check">
+                    <input type="checkbox" class="form-check-input" id="privacyPolicy" name="privacyPolicy" required>
+                    <label class="form-check-label" for="privacyPolicy">{{ t.translate('AcceptPrivacyPolicy', [ i.getPrivacyPolicyLink() ]) | raw }}</label>
+                </div>
+
+                {#
+                <h3</h3>
+
+                <table class="table">
+                    <tr>
+                        <td>Veranstaltung</td>
+                        <td>{{ event.title }}</td>
+                    </tr>
+                    <tr>
+                        <td>Datum</td>
+                        <td>{{ event.getDateStart() | date('d.m.Y H:i')}} Uhr</td>
+                    </tr>
+                    <tr>
+                        <td>Preis</td>
+                        <td>{{ event.getConfig('bookable.price') | number_format(2, ",", ".") }} EUR pro Person</td>
+                    </tr>
+                </table>
+
+                {{ p.renderPartial('\\Frootbox\\Ext\\Core\\Events\\Plugins\\Booking\\Partials\\BookingSummary') | raw }}
+
+                #}
+
+
+
+                <div class="text-right">
+                    <br />
+                    <button type="submit" class="btn btn-primary">{{ plugin.getConfig('buttonLabel') | default('Buchung abschließen') }}</button>
+                </div>
+
+            </form>
+
+
+
+        </div>
+    </div>
+
+    {% if variables.withContainer %}</div>{% endif %}
+
+</div>

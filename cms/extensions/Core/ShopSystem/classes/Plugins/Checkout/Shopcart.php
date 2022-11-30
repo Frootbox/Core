@@ -80,16 +80,26 @@ class Shopcart
         // Initialize
         if (empty($_SESSION['cart']['products'][$key])) {
 
+            if (empty($options['forcePriceGross'])) {
+                $priceGross = $product->getPriceGross();
+                $price = $product->getPrice();
+            }
+            else {
+                $priceGross = $options['forcePriceGross'];
+                $price = round($priceGross / (1 + ($product->getTaxrate() / 100)), 2);
+            }
+
             $item = [
                 'key' => $key,
                 'productId' => $product->getId(),
                 'title' => $product->getTitle(),
                 'amount' => 0,
-                'price' => $product->getPrice(),
-                'priceGross' => $product->getPriceGross(),
+                'price' => $price,
+                'priceGross' => $priceGross,
                 'taxRate' => $product->getTaxrate(),
                 'uri' => $product->getUri(),
                 'shippingId' => $product->getShippingId(),
+                'type' => (empty($options['type']) ? 'Product' : $options['type']),
             ];
 
             if (!empty($options['customNote'])) {
@@ -202,7 +212,7 @@ class Shopcart
      */
     public function getItem(string $key): ShopcartItem
     {
-        return new ShopcartItem($this->items[$key]);
+        return new ShopcartItem($this->items[$key] ?? null);
     }
 
     /**
@@ -210,13 +220,17 @@ class Shopcart
      */
     public function getItemCount(): int
     {
-        $count = 0;
-
-        foreach ($this->items as $item) {
-            $count += $item['amount'] ?? 1;
+        if (empty($_SESSION['cart']['products'])) {
+            return 0;
         }
 
-        return $count;
+        $productCount = 0;
+
+        foreach ($_SESSION['cart']['products'] as $item) {
+            $productCount += $item['amount'];
+        }
+
+        return $productCount;
     }
 
     /**

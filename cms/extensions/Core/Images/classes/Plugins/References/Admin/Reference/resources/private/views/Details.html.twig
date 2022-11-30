@@ -53,19 +53,36 @@
                         {% endfor %}
                     {% endif %}
 
+
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="dateStart">Datum</label>
+                                <input type="date" class="form-control" id="dateStart" name="dateStart" placeholder="Datum" value="{{ reference.getDateStart() | date('Y-m-d') }}">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="dateStartTime">Zeit</label>
+                                <input type="time" class="form-control" id="dateStartTime" name="dateStartTime" placeholder="Uhrzeit" value="{{ reference.getDateStart() | date('H:i') }}">
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="form-group">
                         <label for="url">URL</label>
                         <input type="text" class="form-control" id="url" name="url" placeholder="URL" value="{{ reference.getConfig('url') }}">
                     </div>
 
-                    <div class="form-group">
-                        <label for="dateStart">Datum</label>
-                        <input type="date" class="form-control" id="dateStart" name="dateStart" placeholder="Datum" value="{% if reference.getDateStart() %}{{ reference.getDateStart() | date('Y-m-d') }}{% endif %}">
-                    </div>
 
                     {{ v.injectPartial('\\Frootbox\\Admin\\View\\Partials\\Input\\Tags', {
                         object: reference
                     }) | raw }}
+
+                    {% if reference.getConfig('noReferencesDetailPage') %}
+                        <div class="form-group form-check">
+                            <input {% if reference.getConfig('forceReferencesDetailPage') %}checked{% endif %} type="checkbox" class="form-check-input" id="forceReferencesDetailPage" name="forceReferencesDetailPage">
+                            <label class="form-check-label" for="forceReferencesDetailPage">Detailseite für diese Referenz dennoch anzeigen</label>
+                        </div>
+                    {% endif %}
 
                     <button type="submit" class="btn btn-primary">Speichern</button>
 

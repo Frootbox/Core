@@ -171,7 +171,7 @@ class HtmlParser
             'request' => REQUEST
         ];
 
-        $this->html = str_replace('</head>', '<script> var settings = ' . json_encode($variables) . ';</script>' . PHP_EOL . '</head>', $this->html);
+        $this->html = str_replace('</head>', '<script nonce="' . SCRIPT_NONCE . '"> var settings = ' . json_encode($variables) . ';</script>' . PHP_EOL . '</head>', $this->html);
 
         // Set base href
         $this->html = str_replace('</head>', '<base href="' . SERVER_PATH . '">' . PHP_EOL . '</head>', $this->html);
@@ -371,6 +371,7 @@ class HtmlParser
                 $extController = new $class;
 
                 $localPath = $extController->getAssetPath($match[3]);
+
             }
             elseif (substr($href, 0, 5) == 'FILE:') {
 
@@ -412,7 +413,6 @@ class HtmlParser
                     $localPath = realpath(dirname($cssFilePath) . '/' . preg_split('#[\#\?]#', $match[1])[0]);
                     $xpath = 'cache/public/' . $cacheRevision . '/assets/' . md5(dirname($localPath)) . '/' . basename($localPath);
                 }
-
 
                 $newPath = $configuration->get('filesRootFolder') . $xpath;
 
@@ -798,10 +798,10 @@ class HtmlParser
         }
 
         if (strpos($html, '</body>') !== false) {
-            $html = str_replace('</body>', '<script async src="' . $configuration->get('publicCacheDir') . $cachefilePath . '"></script>' . PHP_EOL . '</body>', $html);
+            $html = str_replace('</body>', '<script async src="' . SERVER_PATH_PROTOCOL . $configuration->get('publicCacheDir') . $cachefilePath . '"></script>' . PHP_EOL . '</body>', $html);
         }
         else {
-            $html = '<script async src="' . $configuration->get('publicCacheDir') . $cachefilePath . '"></script>' . PHP_EOL . $html;
+            $html = '<script async src="' . SERVER_PATH_PROTOCOL . $configuration->get('publicCacheDir') . $cachefilePath . '"></script>' . PHP_EOL . $html;
         }
 
         preg_match_all('#\"EXT:(.*?)/(.*?)/(.*?)\"#', $html, $matches);

@@ -5,7 +5,7 @@
 {% endif %}
 
     {% if data.categoryId %}
-        <script>
+        <script nonce="{{ settings.nonce }}">
             $(function ( ) {
                 $('tr[data-cat="{{ data.categoryId }}"]').trigger('click');
             });

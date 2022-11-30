@@ -154,6 +154,7 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         // Update article
         $article->setTitle($title);
         $article->setDateStart($post->get('dateStart') . ' ' . $post->get('timeStart'));
+        $article->setUserId(!empty($post->get('authorId')) ? $post->get('authorId') : null);
 
         $article->unsetConfig('titles');
         $article->unsetConfig('noIndividualDetailPage');
@@ -164,7 +165,6 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
             'source' => $post->get('source'),
             'dateDisplay' => $post->get('dateDisplay'),
         ]);
-
 
         $article->save();
 
@@ -181,6 +181,7 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         \Frootbox\Http\Get $get,
         \Frootbox\Ext\Core\News\Persistence\Repositories\Articles $articlesRepository,
         \Frootbox\Ext\Core\News\Persistence\Repositories\Categories $categoriesRepository,
+        \Frootbox\Ext\Core\News\Persistence\Repositories\Authors $authorRepository,
     ): Response
     {
         // Fetch article
@@ -198,6 +199,12 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
                     'dateStart DESC'
                 ]
             ]);
+
+            if (empty($article)) {
+                return self::getResponse('json', 200, [
+                    'error' => 'Keine weiteren Artikel verfügbar.',
+                ]);
+            }
         }
 
         // Fetch categories
@@ -210,10 +217,20 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
 
         $categories = $category ? $categoriesRepository->getTree($category->getRootId()) : null;
 
+        // Fetch authors
+        $authors = $authorRepository->fetch();
+
+        foreach ($authors as $index => $author) {
+
+            if (!$author->getConfig('isAuthor')) {
+                $authors->removeByIndex($index);
+            }
+        }
 
         return self::getResponse('html', 200, [
             'article' => $article,
             'categories' => $categories,
+            'authors' => $authors,
         ]);
     }
 
@@ -223,5 +240,20 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     public function indexAction(): Response
     {
         return self::getResponse();
+    }
+
+    /**
+     *
+     */
+    public function jumpToEditAction(
+        \Frootbox\Http\Get $get,
+        \Frootbox\Ext\Core\News\Persistence\Repositories\Articles $articlesRepository,
+    ): Response
+    {
+        // Fetch article
+        $article = $articlesRepository->fetchById($get->get('articleId'));
+
+        header('Location: ' . $article->getUriEdit());
+        exit;
     }
 }

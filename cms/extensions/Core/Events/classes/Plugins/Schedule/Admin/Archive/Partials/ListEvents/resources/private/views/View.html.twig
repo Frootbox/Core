@@ -22,7 +22,11 @@
 
 						{% if event.getConfig('bookable.seats') > 0 %}
 							<br />
-							<i class="fa fa-user"></i> {{ event.getConfig('bookable.bookedSeats') | default(0) }}/{{ event.getConfig('bookable.seats') }}
+							<i class="far fa-user"></i> {{ event.getConfig('bookable.bookedSeats') | default(0) }}/{{ event.getConfig('bookable.seats') }}
+
+							{% if event.getConfig('bookable.price') %}
+								<i class="far fa-euro-sign"></i> {{ event.getConfig('bookable.price') | number_format(2, ",", ".") }}
+							{% endif %}
 						{% endif %}
 
 						{% for tag in event.getTags() %}
@@ -46,7 +50,7 @@
 					</td>
 					<td class="text-right" nowrap>
 						<a class="ajax" href="{{ data.plugin.getAdminUri('Event', 'ajaxSwitchVisibility', { eventId: event.getId() }) }}"><i data-event="{{ event.getId() }}" class="fa fa-lightbulb visibility {{ event.getVisibilityString() }} icon"></i></a>
-						<a class="ajax" data-confirm="Soll diese Veranstaltung wirklich gelöscht werden?" href="{{ data.plugin.getAdminUri('Event', 'ajaxDelete', { eventId: event.getId() }) }}"><i class="fa fa-times icon"></i></a>
+						<a class="ajax" data-confirm="Soll diese Veranstaltung wirklich gelöscht werden?" href="{{ data.plugin.getAdminUri('Event', 'ajaxDelete', { eventId: event.getId() }) }}"><i class="far fa-trash icon"></i></a>
 					</td>
 				</tr>
 			{% endfor %}

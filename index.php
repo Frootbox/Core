@@ -47,6 +47,8 @@ try {
 
     $configuration = $container->get(\Frootbox\Config\Config::class);
 
+    define('PUBLIC_CACHE_DIR', str_replace(SERVER_PATH, '', SERVER_PATH_PROTOCOL) . $configuration->get('publicCacheDir'));
+
     if (!empty($domain = $configuration->get('general.host.domain'))) {
 
         if ($domain != $_SERVER['HTTP_HOST']) {
@@ -84,7 +86,11 @@ try {
     // Instantiate view
     $view = $container->get(\Frootbox\View\Engines\Interfaces\Engine::class);
 
+    define('SCRIPT_NONCE', base64_encode(random_bytes(20)));
+
+
     $view->set('settings', [
+        'nonce' =>  SCRIPT_NONCE,
         'serverpath' => SERVER_PATH,
         'serverpath_absolute' => SERVER_PATH_PROTOCOL,
         'basepath' => CORE_DIR
@@ -121,6 +127,8 @@ try {
     $configStatics = $container->get(\Frootbox\ConfigStatics::class);
 
     $session = $container->get(\Frootbox\Session::class);
+
+   // $_SESSION['SCRIPT_NONCE'] = SCRIPT_NONCE;
 
     define('SIGNING_TOKEN', $configStatics->getSigningToken());
     define('IS_LOGGED_IN', $session->isLoggedIn());
@@ -308,8 +316,7 @@ try {
             if (preg_match('#cache\/images#', $request)) {
 
                 $path = str_replace(dirname($_SERVER['SCRIPT_NAME']) . '/', '', $_SERVER['REQUEST_URI']) . '.xdata.json';
-
-                $json = file_get_contents($path);
+                $json = file_get_contents(__DIR__ . $path);
 
                 $request = json_decode($json, true);
 
@@ -454,9 +461,6 @@ try {
         exit;
     }
 
-
-
-
     $view->set('settings', array_merge($view->get('settings'), [
         'language' => GLOBAL_LANGUAGE,
         'isEditor' => IS_EDITOR,
@@ -510,6 +514,14 @@ try {
     // Replace translations
     $translationFactory = $container->get(\Frootbox\TranslatorFactory::class);
     $translator = $translationFactory->get($page->getLanguage());
+
+
+    // TODO move to re-usable twig extension later
+    $filter = new \Twig\TwigFilter('translate', function ($string) use ($translator) {
+        return $translator->translate($string);
+    });
+    $view->addFilter($filter);
+
 
     // Get sockets config from cache
     $key = md5($_SERVER['REQUEST_URI']);
@@ -827,7 +839,7 @@ try {
 
         }
 
-        $html = str_replace('</body>', '<script>' . $script . '</script></body>', $html);
+        $html = str_replace('</body>', '<script nonce="' . SCRIPT_NONCE . '">' . $script . '</script></body>', $html);
     }
 
     /*
@@ -852,6 +864,7 @@ try {
 
 
 
+    $_SESSION['SCRIPT_NONCE'] = SCRIPT_NONCE;
 
 
     if (!$page->isIndexable()) {
@@ -866,6 +879,11 @@ try {
     $html = str_replace('&#150;', '&ndash;', $html);
     $html = preg_replace('#</source>#', '<!-- removed closing source  tag -->', $html);
 
+    if (!defined('EDITING') or !EDITING) {
+        header("Content-Security-Policy: script-src 'self' 'unsafe-eval' www.google.com cookieconsent.herrundfraupixel.de 'nonce-" . SCRIPT_NONCE . "'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'");
+        header('Strict-Transport-Security: max-age=31536000');
+        header('X-Content-Type-Options: nosniff');
+    }
 
     echo $html;
 }

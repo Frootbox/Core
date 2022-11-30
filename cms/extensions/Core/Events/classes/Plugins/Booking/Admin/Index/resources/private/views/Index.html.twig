@@ -63,11 +63,33 @@
                                 <label for="minPersons">min. Personen</label>
                                 <input type="int" class="form-control" id="minPersons" name="minPersons" placeholder="min. Personen" value="{{ plugin.getConfig('minPersons') }}">
                             </div>
+                            <div class="form-group">
+                                <label for="fixPersons">fix Personen</label>
+                                <input type="int" class="form-control" id="fixPersons" name="fixPersons" placeholder="fix Personen" value="{{ plugin.getConfig('fixPersons') }}">
+                                <small id="emailHelp" class="form-text text-muted">Die Buchung erfolgt immer auf diese Personenzahl, wenn angegeben.</small>
+                            </div>
                             <div class="form-group form-check">
                                 <input type="checkbox" class="form-check-input" id="closeEventAfterFirstBooking" name="closeEventAfterFirstBooking" {% if plugin.getConfig('closeEventAfterFirstBooking') %}checked{% endif %}>
                                 <label class="form-check-label" for="closeEventAfterFirstBooking">Veranstaltung nach erster Buchung direkt schließen</label>
                             </div>
-
+                            <div class="form-group form-check">
+                                <input type="checkbox" class="form-check-input" id="alwaysBookCompleteEvent" name="alwaysBookCompleteEvent" {% if plugin.getConfig('alwaysBookCompleteEvent') %}checked{% endif %}>
+                                <label class="form-check-label" for="alwaysBookCompleteEvent">immer ganze Veranstaltung buchen</label>
+                            </div>
+                            <div class="form-group form-check">
+                                <input type="checkbox" class="form-check-input" id="hideTotalCosts" name="hideTotalCosts" {% if plugin.getConfig('hideTotalCosts') %}checked{% endif %}>
+                                <label class="form-check-label" for="hideTotalCosts">Gesamtpreis nicht anzeigen</label>
+                                <small id="emailHelp" class="form-text text-muted">Bei Kaufabschluss eventuell inkompatibel mit Button-Lösung!</small>
+                            </div>
+                            <div class="form-group form-check">
+                                <input type="checkbox" class="form-check-input" id="hidePersons" name="hidePersons" {% if plugin.getConfig('hidePersons') %}checked{% endif %}>
+                                <label class="form-check-label" for="hidePersons">Personenzahl nicht anzeigen</label>
+                            </div>
+                            <div class="form-group">
+                                <label for="buttonLabel">Button Beschriftung</label>
+                                <input type="text" class="form-control" id="buttonLabel" name="buttonLabel" placeholder="Button Beschriftung" value="{{ plugin.getConfig('buttonLabel') }}">
+                                <small id="emailHelp" class="form-text text-muted">Text auf dem Button zum Abschluss der Buchung. Leer lassen für Standard-Wert.</small>
+                            </div>
 
                         </div>
                     </div>

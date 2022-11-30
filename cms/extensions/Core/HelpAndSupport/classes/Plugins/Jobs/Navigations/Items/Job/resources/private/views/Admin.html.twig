@@ -1,0 +1,22 @@
+<script nonce="{{ settings.nonce }}">
+    $(function() {
+
+        $(document).on('change', '#jobId', function(event) {
+
+            let title = $('#jobId').find(":selected").text();
+
+            $('#title').val(title);
+
+        });
+    });
+</script>
+
+<div class="form-group">
+    <label for="jobId">Job</label>
+    <select required class="form-control" id="jobId" name="jobId">
+        <option value="">bitte wählen ...</option>
+        {% for job in item.getJobs() %}
+            <option {% if job.getId() == item.getConfig('jobId') %}selected{% endif %} value="{{ job.getId() }}">{{ job.getTitle() }}</option>
+        {% endfor %}
+    </select>
+</div>

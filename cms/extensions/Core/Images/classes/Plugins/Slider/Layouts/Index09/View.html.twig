@@ -30,7 +30,7 @@ variables:
     <param name="cloak" value="true" />
 {% endif %}
 
-<script>
+<script nonce="{{ settings.nonce }}">
     $(function ( ) {
 
         $(window).resize(function ( ) {

@@ -42,9 +42,13 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
             if ($file and ($element->getAttribute('data-physicalwidth') !== null or $element->getAttribute('data-physicalheight') !== null)) {
 
                 if (file_exists(FILES_DIR . $file->getPath())) {
+
                     $data = getimagesize(FILES_DIR . $file->getPath());
-                    $element->setAttribute('data-physicalwidth', $data[0]);
-                    $element->setAttribute('data-physicalheight', $data[1]);
+
+                    if (!empty($data)) {
+                        $element->setAttribute('data-physicalwidth', $data[0]);
+                        $element->setAttribute('data-physicalheight', $data[1]);
+                    }
                 }
             }
 

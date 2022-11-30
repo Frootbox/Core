@@ -18,11 +18,54 @@ class Event extends \Frootbox\Persistence\AbstractAsset implements \Frootbox\Per
     /**
      *
      */
+    public function delete()
+    {
+        // Clean up bookings
+        $bookingRepository = $this->getDb()->getRepository(\Frootbox\Ext\Core\Events\Plugins\Booking\Persistence\Repositories\Bookings::class);
+        $bookings = $bookingRepository->fetch([
+            'where' => [
+                'parentId' => $this->getId(),
+            ],
+        ]);
+
+        $bookings->map('delete');
+
+        return parent::delete();
+    }
+
+
+
+    /**
+     *
+     */
     public function getLanguageAliases(): array
     {
         $aliases = json_decode($this->data['aliases'], true);
 
         return $aliases['index'];
+    }
+
+    /**
+     *
+     */
+    public function getCategories(): \Frootbox\Db\Result
+    {
+        // Build sql
+        $sql = 'SELECT
+            c.*
+        FROM
+            categories c,
+            categories_2_items cx
+        WHERE
+            cx.categoryId = c.id AND   
+            cx.itemId = ' . $this->getId() . ' AND 
+            cx.itemClass = "Frootbox\\\\Ext\\\\Core\\\\Events\\\\Persistence\\\\Event" AND 
+            cx.categoryClass = "Frootbox\\\\Ext\\\\Core\\\\Events\\\\Persistence\\\\Category"';
+
+        $categoryRepository = $this->getDb()->getRepository(\Frootbox\Ext\Core\Events\Persistence\Repositories\Categories::class);
+        $result = $categoryRepository->fetchByQuery($sql);
+
+        return $result;
     }
 
     /**
@@ -236,6 +279,17 @@ class Event extends \Frootbox\Persistence\AbstractAsset implements \Frootbox\Per
      */
     public function isBookable(): bool
     {
+        if (empty($this->getConfig('bookable.seats'))) {
+            return false;
+        }
+
+        if (!empty($this->getConfig('bookable.bookedSeats')) and (int) $this->getConfig('bookable.bookedSeats') >= (int) $this->getConfig('bookable.seats')) {
+            return false;
+        }
+
+        return true;
+
+
         $seatsFree = $this->getConfig('bookable.seats');
 
         if (strlen($seatsFree) > 0 and (int) $seatsFree === 0) {
@@ -243,5 +297,31 @@ class Event extends \Frootbox\Persistence\AbstractAsset implements \Frootbox\Per
         }
 
         return true;
+    }
+
+    /**
+     *
+     */
+    public function refreshBookedSeats(): void
+    {
+        // Fetch bookings
+        $bookingRepository = $this->getDb()->getRepository(\Frootbox\Ext\Core\Events\Plugins\Booking\Persistence\Repositories\Bookings::class);
+        $bookings = $bookingRepository->fetch([
+            'where'=> [
+                'parentId' => $this->getId(),
+            ],
+        ]);
+
+        $persons = 0;
+
+        foreach ($bookings as $booking) {
+            $persons += $booking->getConfig('persons');
+        }
+
+        $this->addConfig([
+            'bookable' => [
+                'bookedSeats' => $persons,
+            ],
+        ]);
     }
 }

@@ -349,12 +349,20 @@ abstract class AbstractPlugin extends AbstractRow
     /**
      *
      */
-    public function getUriAjax($action, array $payload = null ): string
+    public function getUriAjax($action, array $payload = null, array $options = null ): string
     {
         $payload['pluginId'] = $this->getId();
         $payload['action'] = $action;
 
-        $url = SERVER_PATH . 'ajax/?' . http_build_query($payload) . '&' . SID;
+
+        $url = 'ajax/?' . http_build_query($payload) . '&' . SID;
+
+        if (!empty($options['absolute'])) {
+            $url = SERVER_PATH_PROTOCOL . $url;
+        }
+        else {
+            $url = SERVER_PATH . $url;
+        }
 
         return $url;
     }
@@ -362,10 +370,9 @@ abstract class AbstractPlugin extends AbstractRow
     /**
      *
      */
-    public function getAjaxUri($action, array $payload = null ): string
+    public function getAjaxUri($action, array $payload = null, array $options = null ): string
     {
-
-        return $this->getUriAjax($action, $payload);
+        return $this->getUriAjax($action, $payload, $options);
     }
 
     /**
@@ -537,6 +544,9 @@ abstract class AbstractPlugin extends AbstractRow
 
             $html = $view->render($layoutFile, $variables);
 
+
+            $paths = $this->getPath() . 'Layouts' . DIRECTORY_SEPARATOR . $layout . DIRECTORY_SEPARATOR . 'View.html.twig';
+
             // Auto inject layouts scss
             $standardsLayoutScss = null;
             if (file_exists($file = dirname($this->getBaseLayout($action)) . '/public/standards.less')) {
@@ -557,12 +567,20 @@ abstract class AbstractPlugin extends AbstractRow
                 $html = '<link type="text/css" rel="stylesheet/less" href="FILE:' . $standardsLayoutScss . '" />' . PHP_EOL . $html;
             }
 
-            $files = [
-                dirname($layoutFile) . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'init.js',
-                $this->getPath() . 'Layouts/' . $layout . '/public/init.js',
-            ];
-
             // Auto inject default javascript
+            $files = [];
+
+            // Check custom folder
+            $files[] = dirname($layoutFile) . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'init.js';
+
+            // Check base folder if layout is extended and original publics are requested
+            if (!empty($template->getConfig('injectPublics'))) {
+                $files[] = $this->getPath() . 'Layouts' . DIRECTORY_SEPARATOR . $template->getConfig('injectPublics') . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'init.js';
+            }
+
+            // Check actual layouts folder
+            $files[] = $this->getPath() . 'Layouts/' . $layout . '/public/init.js';
+
             foreach ($files as $file) {
 
                 if (file_exists($file)) {
@@ -586,6 +604,13 @@ abstract class AbstractPlugin extends AbstractRow
 
                 // Auto inject javascripts
                 $path = $config->get('pluginsRootFolder') . $match[1] . '/' . $match[2] . '/' . $match[3] . '/' . $matchx['layout'] . '/public/init.js';
+
+                if (file_exists($path)) {
+                    $html = '<script src="FILE:' . $path . '"></script>' . PHP_EOL . $html;
+                }
+
+                // Auto inject custom javascripts
+                $path = $config->get('pluginsRootFolder') . $match[1] . '/' . $match[2] . '/' . $match[3] . '/' . $matchx['layout'] . '/public/custom.js';
 
                 if (file_exists($path)) {
                     $html = '<script src="FILE:' . $path . '"></script>' . PHP_EOL . $html;

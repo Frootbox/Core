@@ -6,7 +6,7 @@
 
 {% set partialId = "FileUpload" ~ random(10000, 99999) %}
 
-<script>
+<script nonce="{{ settings.nonce }}">
 	$(function () {
 
 		$('#{{ partialId }}').fileupload({

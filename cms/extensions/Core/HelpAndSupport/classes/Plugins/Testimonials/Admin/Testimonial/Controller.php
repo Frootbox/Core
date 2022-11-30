@@ -29,7 +29,7 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         // Validate required fields
         $post->requireOne([ 'title', 'titles' ]);
 
-        // Insert multiple articles
+        // Insert multiple testimonial
         if (!empty($post->get('titles'))) {
             $titles = array_reverse(explode("\n", $post->get('titles')));
         }
@@ -42,12 +42,13 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
 
         foreach ($titles as $title) {
 
-            // Insert new property
+            // Insert new testimonial
             $entity = $entitiesRepository->insert(new \Frootbox\Ext\Core\HelpAndSupport\Plugins\Testimonials\Persistence\Testimonial([
                 'pageId' => $this->plugin->getPageId(),
                 'pluginId' => $this->plugin->getId(),
                 'title' => $title,
                 'dateStart' => $date->format('Y-m-d H:i:s'),
+                'visibility' => (DEVMODE ? 2 : 1),
                 'config' => [
                     'noTestimonialDetailPage' => $this->plugin->getConfig('noTestimonialDetailPage'),
                 ],

@@ -1,0 +1,54 @@
+{# config
+
+title: Standard
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set v = view.getViewhelper('View') %}
+
+{{ v.asset('EXT:Core/System/javascript/init-forms-ajax.js') | raw }}
+
+<div class="plugin Core ShopSystem CouponGenerator Index01">
+
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="inner-wrapper">
+
+                    <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+
+                    <div data-editable data-uid="{{ plugin.getUid('text-1') }}"></div>
+
+                    <div class="row justify-content-center">
+                        <div class="col-md-8">
+
+                            <form class="form-inline shopsystem-product-add-to-cart" action="{{ plugin.getAjaxUri('ajaxSubmitCoupon') }}" method="post">
+
+                                <label class="sr-only" for="value">Gutscheinwert</label>
+                                <div class="input-group mb-2 mr-sm-2">
+                                    <input type="number" class="form-control" id="value" name="value" placeholder="Gutscheinwert">
+                                    <div class="input-group-append">
+                                        <div class="input-group-text">EUR</div>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary mb-2">Gutschein in den Warenkorb legen</button>
+                            </form>
+
+                        </div>
+                        <div class="col-md-6">
+
+                            <div data-editable data-uid="{{ plugin.getUid('text-2') }}"></div>
+
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+

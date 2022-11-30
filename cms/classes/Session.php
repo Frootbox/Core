@@ -43,6 +43,15 @@ class Session {
 
         session_name($this->sessionName);
 
+        session_set_cookie_params([
+            'lifetime' => 3600 * 48,
+            'path' => SERVER_PATH,
+            'domain' => $_SERVER['SERVER_NAME'],
+            'secure' => IS_SSL,
+            'httponly' => true,
+            'samesite' => 'Strict'
+        ]);
+
         // Start session
         if ($config->get('session.disableCookies')) {
             session_start(['use_only_cookies' => 0, 'use_trans_sid' => 1]);
@@ -86,6 +95,14 @@ class Session {
         }
 
         return $this->user;
+    }
+
+    /**
+     *
+     */
+    public function getUserId(): ?int
+    {
+        return $this->userId;
     }
 
     /**

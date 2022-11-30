@@ -22,7 +22,11 @@ class Jobs extends \Frootbox\View\Viewhelper\AbstractViewhelper
     ): \Frootbox\Db\Result
     {
         // Fetch jobs
-        $result = $jobsRepository->fetch();
+        $result = $jobsRepository->fetch([
+            'where' => [
+                new \Frootbox\Db\Conditions\GreaterOrEqual('visibility',(IS_EDITOR ? 1 : 2)),
+            ],
+        ]);
 
         return $result;
     }

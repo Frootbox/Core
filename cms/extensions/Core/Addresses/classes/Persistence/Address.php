@@ -107,7 +107,7 @@ class Address extends \Frootbox\Persistence\AbstractRow
     }
 
     /**
-     * Generate articles alias
+     * Generate addresses alias
      *
      * @return \Frootbox\Persistence\Alias|null
      */

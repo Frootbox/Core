@@ -1,4 +1,4 @@
-<script>
+<script nonce="{{ settings.nonce }}">
     $(function ( ) {
 
         /**
@@ -16,7 +16,7 @@
 
             var container = $('[data-blocks][data-uid="' + uid + '"]');
 
-            fbxEditorOpenGenericModal('lg');
+            fbxEditorOpenGenericModal('xl');
 
             var data = {};
 
@@ -286,9 +286,21 @@
                 url: $(this).attr('href'),
                 success: function ( response ) {
 
-                    $('#fbxEditorGenericModal .modal-content').html(response.modal.html);
+                    if (typeof response.modal != "undefined" && typeof response.modal.html != "undefined") {
+                        $('#fbxEditorGenericModal .modal-content').html(response.modal.html);
+                    }
 
-                    $('[data-blocks][data-uid="' + response.blocks.uid + '"] .blocks-content').html(response.blocks.html);
+                    if (typeof response.blocks != "undefined" && typeof response.blocks.uid != "undefined") {
+                        $('[data-blocks][data-uid="' + response.blocks.uid + '"] .blocks-content').html(response.blocks.html);
+                    }
+
+                    if (typeof response.fadeOut != "undefined") {
+                        $(response.fadeOut).fadeOut();
+                    }
+
+                    if (typeof response.success != "undefined") {
+                        alert(response.success);
+                    }
                 }
             });
         });
@@ -316,9 +328,13 @@
                     if (typeof response.blocks != "undefined" && typeof response.blocks.html != "undefined") {
                         $('[data-blocks][data-uid="' + response.blocks.uid + '"] .blocks-content').html(response.blocks.html);
                     }
+
+                    if (typeof response.success != "undefined") {
+                        alert(response.success);
+                    }
                 },
-                error: function ( ) {
-                    alert("error");
+                error: function(xhr) {
+                    alert(xhr.responseText);
                 }
             });
         });

@@ -15,7 +15,6 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
         return __DIR__ . DIRECTORY_SEPARATOR;
     }
 
-
     /**
      *
      */
@@ -35,10 +34,18 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
             if ($match[1] == 'picture') {
 
                 $result = $files->fetch([
-                    'where' => ['uid' => $uid],
+                    'where' => [ 'uid' => $uid ],
                     'limit' => 1
                 ]);
 
+                if ($result->getCount() == 0 and $element->getAttribute('data-fallback-uid') !== null) {
+
+                    $result = $files->fetch([
+                        'where' => [ 'uid' => $element->getAttribute('data-fallback-uid') ],
+                        'limit' => 1
+                    ]);
+
+                }
 
                 if ($result->getCount() == 0) {
 
@@ -87,9 +94,15 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
                 <img data-image-edited="true" data-default="' . $default . '" class="' . $class . '" src="' . $file->getUriThumbnail($payload) . '" ' . ($payload['height'] ? 'height="' . $payload['height'] . '"' : '') . ' ' . ($payload['width'] ? 'width="' . $payload['width'] . '"' : '') . ' alt="' . $file->getAlt() . '" />
             ';
 
+                if (preg_match('#<img.*?usemap="\#([a-z0-1]+)".*?>#i', $innerHtml, $match)) {
+                    $html = str_replace('<img', '<img usemap="#' . $match[1]. '"', $html);
+                }
+
+
                 if (!empty($file->getConfig('link'))) {
                     $html = '<a href="' . $file->getConfig('link') . '">' . $html . '</a>';
                 }
+
 
                 $element->setInnerHtml($html);
             }

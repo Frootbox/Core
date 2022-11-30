@@ -19,7 +19,7 @@ variables:
 {% set i = view.getViewhelper('Delegator', { object: plugin }) %}
 {% set formRenderer = view.getViewhelper('Ext/Core/ContactForms/FormRenderer', {   }) %}
 
-<script>
+<script nonce="{{ settings.nonce }}">
     $(function ( ) {
 
         $(document).on('click', 'a[data-form]', function ( event ) {

@@ -1,0 +1,76 @@
+{# config
+
+title: Standard
+_variables:
+    showCountry:
+        type: bool
+        label: Land anzeigen
+        default: false
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set t = i.getTranslator() %}
+
+<div class="plugin Core HelpAndSupport Jobs Index06">
+
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+
+                <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+
+                <div data-editable data-uid="{{ plugin.getUid('teaser') }}"></div>
+
+                {% if jobs.getCount() == 0 %}
+                    <p>Es gibt derzeit keine offenen Stellenangebote.</p>
+                {% else %}
+
+                    {% for job in jobs %}
+
+                        {% set location = job.getLocation() %}
+
+                        <div class="row">
+                            <div class="col-md-12">
+
+                                <h3 data-editable data-uid="{{ job.getUid('title') }}">{{ job.getTitle }}</h3>
+
+                            </div>
+                        </div>
+                        <div class="row justify-content-between">
+                            <div class="col-md-8">
+                                <div data-editable data-uid="{{ job.getUid('teaser') }}"></div>
+                            </div>
+                            <div class="col-md-3">
+                                <p>
+                                    <b>
+                                        {% if job.getConfig('asSoonAsPossible') %}
+                                            {{ t.translate('asSoonAsPossible') }}
+                                        {% elseif job.getConfig('start') %}
+                                            {{ job.getConfig('start') }}
+                                        {% elseif job.getDateStart() %}
+                                            {{ job.getDateStart() }}
+                                        {% endif %}
+                                    </b>
+                                </p>
+
+                                {% if location %}
+                                    <p>{{ location.getTitle() }}</p>
+                                {% endif %}
+
+                                <p><a class="btn btn-primary" href="{{ job.getUri() }}">mehr Informationen</a></p>
+                            </div>
+                        </div>
+
+                        <hr />
+
+                    {% endfor %}
+
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+
+</div>
+

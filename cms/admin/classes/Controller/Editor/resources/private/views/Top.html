@@ -10,7 +10,7 @@
 
         {{ v.injectPartial('\\Frootbox\\Admin\\View\\Partials\\Head\\Partial')|raw }}
 
-        <script>
+        <script nonce="{{ settings.nonce }}">
 
             function startEditorNav ( ) {
 

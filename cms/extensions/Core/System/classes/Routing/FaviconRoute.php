@@ -12,7 +12,7 @@ class FaviconRoute extends \Frootbox\Routing\AbstractRoute
      */
     protected function getMatchingRegex(): string
     {
-        return '#^favicon.ico|apple-touch-icon.png|android-chrome-192x192.png|android-chrome-256x256.png|android-chrome-512x512.png|browserconfig.xml|favicon-16x16.png|favicon-32x32.png|mstile-150x150.png|safari-pinned-tab.svg|site.webmanifest$#i';
+        return '#^favicon.ico|apple-touch-icon.png|android-chrome-192x192.png|android-chrome-256x256.png|android-chrome-512x512.png|browserconfig.xml|favicon-16x16.png|favicon-32x32.png|mstile-150x150.png|safari-pinned-tab.svg|site\.webmanifest$#i';
     }
 
     /**

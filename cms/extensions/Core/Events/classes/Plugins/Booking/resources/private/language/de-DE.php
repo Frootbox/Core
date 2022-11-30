@@ -11,5 +11,8 @@ return [
     'LayoutAction.Index' => 'Buchungsseite',
     'LayoutAction.Completed' => 'Bestätigungsseite',
 
-    'PaymentInAdvance' => 'Vorkasse',
+    'PaymentCashOnPickup' => 'Bar bei Abholung',
+    'PaymentPaymentInAdvance' => 'Vorkasse',
+    'PaymentPaypal' => 'Paypal',
+    'PaymentVoucher' => 'Gutschein',
 ];

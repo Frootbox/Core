@@ -4,7 +4,7 @@
 <script src="{{ serverpath }}cms/admin/resources/public/libs/jquery/upload/js/jquery.iframe-transport.js"></script>
 <script src="{{ serverpath }}cms/admin/resources/public/libs/jquery/upload/js/jquery.fileupload.js"></script>
 
-<script>
+<script nonce="{{ settings.nonce }}">
     $(function () {
 
         $('#fileupload').fileupload({
@@ -118,6 +118,10 @@
         <div class="form-group">
             <label for="url">Verlinkung</label>
             <input type="text" class="form-control" id="url" name="url" placeholder="Verlinkung" value="{{ widget.getConfig('url') }}">
+        </div>
+        <div class="form-group form-check">
+            <input type="checkbox" class="form-check-input" id="urlTargetBlank" name="urlTargetBlank" {% if widget.getConfig('urlTargetBlank') %}checked{% endif %}>
+            <label class="form-check-label" for="urlTargetBlank">Link im neuen Fenster öffnen</label>
         </div>
         <div class="form-group">
             <label for="alt">ALT-Tag</label>

@@ -15,7 +15,7 @@
 <!DOCTYPE html>
 <html lang="{{ globalLanguage }}" xml:lang="{{ globalLanguage }}" xmlns="http://www.w3.org/1999/xhtml">
     <head>
-        <script>
+        <script nonce="{{ settings.nonce }}">
             (function(){"use strict";var c=[],f={},a,e,d,b;if(!window.jQuery){a=function(g){c.push(g)};f.ready=function(g){a(g)};e=window.jQuery=window.$=function(g){if(typeof g=="function"){a(g)}return f};window.checkJQ=function(){if(!d()){b=setTimeout(checkJQ,100)}};b=setTimeout(checkJQ,100);d=function(){if(window.jQuery!==e){clearTimeout(b);var g=c.shift();while(g){jQuery(g);g=c.shift()}b=f=a=e=d=window.checkJQ=null;return true}return false}}})();
         </script>
 
@@ -25,7 +25,9 @@
             {% elseif pagedata.title %}
                 {{ pagedata.title }}
             {% elseif page.getParentId() != "0" %}
-                {{ page.getTitle() }}
+                {{ page.getTitle() }} | {% endverbatim %}{{ title }}{% verbatim %}
+            {% else %}
+                {% endverbatim %}{{ title }}{% verbatim %}
             {% endif %}
         </title>
 
@@ -55,10 +57,10 @@
         <meta name="keywords" content="{{ alias.getConfig('seo.keywords') }}">
         <meta name="description" content="{{ alias.getConfig('seo.description') }}" />
 
-        {{ a.import('https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css') | raw }}
-        {{ a.import('https://code.jquery.com/jquery-3.4.0.min.js') | raw }}
-        {{ a.import('https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js') | raw }}
-        {{ a.import('https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js') | raw }}
+        {{ a.import('https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js') | raw }}
+        {{ a.import('https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css') | raw }}
+        {{ a.import('https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js') | raw }}
+        {{ a.import('https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js') | raw }}
 
         {{ gf.import('<link href="https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300,700|Open+Sans:400,400i,700&amp;display=swap" rel="stylesheet" />') | raw }}
 
@@ -95,7 +97,7 @@
                             <a class="logo" href="{{ v.link('') }}"><img src="EXT:{% endverbatim %}{{ vendorId }}/{{ extensionId }}{% verbatim %}/images/logo.svg" alt="Logo" /></a>
                         </div>
                         <div class="col-8 menu-col">
-                            <a class="toggle-offcanvas" href="#"><span class="icon-bars"></span></a>
+                            <a class="toggle-offcanvas" href="#">{{ icons.render('xmark') | raw }}</a>
                         </div>
                     </div>
                     <div class="row">
@@ -124,7 +126,7 @@
                         <a class="logo" href="{{ v.link('') }}"><img src="EXT:{% endverbatim %}{{ vendorId }}/{{ extensionId }}{% verbatim %}/images/logo.svg" alt="Logo" /></a>
                     </div>
                     <div class="col-8 menu-col">
-                        <a class="toggle-offcanvas" href="#"><span class="icon-bars"></span></a>
+                        <a class="toggle-offcanvas" href="#">{{ icons.render('bars') | raw }}</a>
                     </div>
                 </div>
             </div>
@@ -132,7 +134,7 @@
 
         {% block content %} <!-- HERE GOES THE CONTENT :D --> {% endblock %}
 
-        <footer>
+        <footer id="footer">
 
             {{ nav.getNavigation('FooterMeta', {
                 class: 'meta'

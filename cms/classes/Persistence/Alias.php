@@ -49,7 +49,6 @@ class Alias extends \Frootbox\Persistence\RowModels\ConfigurableRow
     ): array
     {
         $payload = new \Frootbox\Payload;
-
         $injectedGetData = [];
 
         try {

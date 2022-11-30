@@ -9,119 +9,161 @@
     <div class="modal-body">
 
         <div class="row">
-            <div class="col-6">
+            <div class="col-md-6">
+
+                <h4>Persönliche Details</h4>
+
+                <div class="row">
+                    <div class="col-6">
+
+                        <div class="form-group">
+                            <label for="gender">Anrede</label>
+                            <select class="form-control" id="gender" name="person[gender]">
+                                <option value="">bitte wählen ...</option>
+                                <option {% if contact.getGender() == 'Female' %}selected{% endif %} value="Female">Frau</option>
+                                <option {% if contact.getGender() == 'Male' %}selected{% endif %} value="Male">Herr</option>
+                                <option {% if contact.getGender() == 'Diverse' %}selected{% endif %} value="Diverse">Divers</option>
+                            </select>
+                        </div>
+
+                    </div>
+                    <div class="col-6">
+
+                        <div class="form-group">
+                            <label for="title">Titel</label>
+                            <input type="text" class="form-control" name="person[title]" id="title" placeholder="Title" value="{{ contact.getTitle() }}">
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-6">
+
+                        <div class="form-group">
+                            <label for="firstName">Vorname</label>
+                            <input type="text" class="form-control" name="person[firstName]" id="firstName" placeholder="Vorname" value="{{ contact.getFirstName() }}">
+                        </div>
+
+                    </div>
+                    <div class="col-6">
+
+                        <div class="form-group">
+                            <label for="lastName">Nachname</label>
+                            <input type="text" class="form-control" name="person[lastName]" id="lastName" placeholder="Nachname" value="{{ contact.getLastName() }}">
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="row">
+                    <div class="col-8">
+
+                        <div class="form-group">
+                            <label for="street">Straße</label>
+                            <input type="text" class="form-control" name="person[street]" id="street" placeholder="Straße" value="{{ contact.getStreet() }}">
+                        </div>
+
+                    </div>
+                    <div class="col-4">
+
+                        <div class="form-group">
+                            <label for="streetNumber">Nr.</label>
+                            <input type="text" class="form-control" name="person[streetNumber]" id="streetNumber" placeholder="Nr." value="{{ contact.getStreetNumber() }}">
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-4">
+
+                        <div class="form-group">
+                            <label for="zipcode">PLZ</label>
+                            <input type="text" class="form-control" name="person[zipcode]" id="zipcode" placeholder="PLZ" value="{{ contact.getZipCode() }}">
+                        </div>
+
+                    </div>
+                    <div class="col-8">
+
+                        <div class="form-group">
+                            <label for="city">Ort</label>
+                            <input type="text" class="form-control" name="person[city]" id="city" placeholder="Ort" value="{{ contact.getCity() }}">
+                        </div>
+
+                    </div>
+                </div>
+
+                <h4>Kontakt</h4>
 
                 <div class="form-group">
-                    <label for="gender">Anrede</label>
-                    <select class="form-control" id="gender" name="person[gender]">
-                        <option value="">bitte wählen ...</option>
-                        <option {% if contact.getGender() == 'Female' %}selected{% endif %} value="Female">Frau</option>
-                        <option {% if contact.getGender() == 'Male' %}selected{% endif %} value="Male">Herr</option>
-                        <option {% if contact.getGender() == 'Diverse' %}selected{% endif %} value="Diverse">Divers</option>
-                    </select>
+                    <label for="email">E-Mail</label>
+                    <input type="text" class="form-control" name="person[email]" id="email" placeholder="E-Mail" value="{{ contact.getEmail() }}" pattern="[^ @]*@[^ @]*">
+                </div>
+                <div class="form-group">
+                    <label for="phone">Telefon 1</label>
+                    <input type="text" class="form-control" name="person[phone]" id="phone" placeholder="Telefon" value="{{ contact.getPhone() }}">
+                </div>
+                <div class="form-group">
+                    <label for="phone2">Telefon 2</label>
+                    <input type="text" class="form-control" name="person[phone2]" id="phone2" placeholder="Telefon" value="{{ contact.getPhone2() }}">
+                </div>
+                <div class="form-group">
+                    <label for="fax">Fax</label>
+                    <input type="text" class="form-control" name="person[fax]" id="fax" placeholder="Fax" value="{{ contact.getFax() }}">
                 </div>
 
             </div>
-            <div class="col-6">
+            <div class="col-md-6">
+
+
+                <h4>Business</h4>
 
                 <div class="form-group">
-                    <label for="title">Titel</label>
-                    <input type="text" class="form-control" name="person[title]" id="title" placeholder="Title" value="{{ contact.getTitle() }}">
+                    <label for="company">Firma</label>
+                    <input type="text" class="form-control" name="person[company]" id="company" placeholder="Firma" value="{{ contact.getCompany() }}">
+                </div>
+                <div class="form-group">
+                    <label for="position">Position (allgemein)</label>
+                    <textarea class="form-control" name="person[position]" id="position" placeholder="Position (allgemein)">{{ contact.getPosition() }}</textarea>
                 </div>
 
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-6">
-
                 <div class="form-group">
-                    <label for="firstName">Vorname</label>
-                    <input type="text" class="form-control" name="person[firstName]" id="firstName" placeholder="Vorname" value="{{ contact.getFirstName() }}">
+                    <label for="categoryPosition">Position (Kategorie)</label>
+                    {% if connection %}
+                        <textarea class="form-control" name="connConfig[position]" id="categoryPosition" placeholder="Position (Kategorie)">{{ connection.getConfig('position') }}</textarea>
+                    {% else %}
+                        <div class="message warning">Die Kategorie-spezifische Position kann nur über die jeweilgie Kategorie bearbeitet werden.</div>
+                    {% endif %}
                 </div>
 
-            </div>
-            <div class="col-6">
+                <h4>Social-Media</h4>
 
                 <div class="form-group">
-                    <label for="lastName">Nachname</label>
-                    <input type="text" class="form-control" name="person[lastName]" id="lastName" placeholder="Nachname" value="{{ contact.getLastName() }}">
+                    <label for="facebook">Facebook</label>
+                    <input type="text" class="form-control" name="person[facebook]" id="facebook" placeholder="Facebook" value="{{ contact.getFacebook() }}">
                 </div>
-
-            </div>
-
-        </div>
-
-        <div class="form-group">
-            <label for="email">E-Mail</label>
-            <input type="text" class="form-control" name="person[email]" id="email" placeholder="E-Mail" value="{{ contact.getEmail() }}" pattern="[^ @]*@[^ @]*">
-        </div>
-        <div class="form-group">
-            <label for="phone">Telefon 1</label>
-            <input type="text" class="form-control" name="person[phone]" id="phone" placeholder="Telefon" value="{{ contact.getPhone() }}">
-        </div>
-        <div class="form-group">
-            <label for="phone2">Telefon 2</label>
-            <input type="text" class="form-control" name="person[phone2]" id="phone2" placeholder="Telefon" value="{{ contact.getPhone2() }}">
-        </div>
-        <div class="form-group">
-            <label for="fax">Fax</label>
-            <input type="text" class="form-control" name="person[fax]" id="fax" placeholder="Fax" value="{{ contact.getFax() }}">
-        </div>
-        <div class="form-group">
-            <label for="company">Firma</label>
-            <input type="text" class="form-control" name="person[company]" id="company" placeholder="Firma" value="{{ contact.getCompany() }}">
-        </div>
-        <div class="form-group">
-            <label for="position">Position (allgemein)</label>
-            <textarea class="form-control" name="person[position]" id="position" placeholder="Position (allgemein)">{{ contact.getPosition() }}</textarea>
-        </div>
-
-        <div class="form-group">
-            <label for="categoryPosition">Position (Kategorie)</label>
-            {% if connection %}
-                <textarea class="form-control" name="connConfig[position]" id="categoryPosition" placeholder="Position (Kategorie)">{{ connection.getConfig('position') }}</textarea>
-            {% else %}
-                <div class="message warning">Die Kategorie-spezifische Position kann nur über die jeweilgie Kategorie bearbeitet werden.</div>
-            {% endif %}
-        </div>
-
-        <div class="row">
-            <div class="col-8">
-
                 <div class="form-group">
-                    <label for="street">Straße</label>
-                    <input type="text" class="form-control" name="person[street]" id="street" placeholder="Straße" value="{{ contact.getStreet() }}">
+                    <label for="instagram">Instagram</label>
+                    <input type="text" class="form-control" name="person[instagram]" id="instagram" placeholder="Instagram" value="{{ contact.getInstagram() }}">
                 </div>
-
-            </div>
-            <div class="col-4">
-
                 <div class="form-group">
-                    <label for="streetNumber">Nr.</label>
-                    <input type="text" class="form-control" name="person[streetNumber]" id="streetNumber" placeholder="Nr." value="{{ contact.getStreetNumber() }}">
+                    <label for="twitter">Twitter</label>
+                    <input type="text" class="form-control" name="person[twitter]" id="twitter" placeholder="Twitter" value="{{ contact.getTwitter() }}">
+                </div>
+                <div class="form-group">
+                    <label for="youtube">Youtube</label>
+                    <input type="text" class="form-control" name="person[youtube]" id="youtube" placeholder="Youtube" value="{{ contact.getYoutube() }}">
+                </div>
+                <div class="form-group">
+                    <label for="twitch">Twitch</label>
+                    <input type="text" class="form-control" name="person[twitch]" id="twitch" placeholder="Twitch" value="{{ contact.getTwitch() }}">
                 </div>
 
             </div>
         </div>
 
-        <div class="row">
-            <div class="col-4">
-
-                <div class="form-group">
-                    <label for="zipcode">PLZ</label>
-                    <input type="text" class="form-control" name="person[zipcode]" id="zipcode" placeholder="PLZ" value="{{ contact.getZipCode() }}">
-                </div>
-
-            </div>
-            <div class="col-8">
-
-                <div class="form-group">
-                    <label for="city">Ort</label>
-                    <input type="text" class="form-control" name="person[city]" id="city" placeholder="Ort" value="{{ contact.getCity() }}">
-                </div>
-
-            </div>
-        </div>
 
 
     </div>

@@ -71,7 +71,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
         \Frootbox\Ext\Core\Images\Plugins\References\Persistence\Repositories\References $referencesRepository,
     ): void
     {
-        // Fetch events
+        // Fetch references
         $result = $referencesRepository->fetch([
             'where' => [
                 'pluginId' => $this->getId(),
@@ -100,6 +100,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
             tags t,
             assets a
         WHERE
+            SUBSTR(t.tag, 1, 1) != "_" AND
             t.itemClass = :className AND
             a.className = t.itemClass AND
             a.id = t.itemId AND
@@ -124,7 +125,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
         $sql .= ' GROUP BY
             t.tag
         ORDER BY        
-            t.tag DESC';
+            t.tag ASC';
 
         $result = $tagsRepository->fetchByQuery($sql, $payload);
 
@@ -190,11 +191,11 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
 
             switch ($this->getConfig('order')) {
                 case 'DateDesc':
-                    $order = [ 'date DESC' ];
+                    $order = [ 'dateStart DESC' ];
                     break;
 
                 case 'DateAsc':
-                    $order = [ 'date ASC' ];
+                    $order = [ 'dateStart ASC' ];
                     break;
 
                 case 'Manual':

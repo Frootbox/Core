@@ -1,0 +1,9 @@
+{% set i = view.getViewhelper('Delegator', { object: widget }) %}
+
+<blockquote>
+    <p>{{ widget.getConfig('quote') | nl2br }}</p>
+</blockquote>
+
+{% if widget.getConfig('author') %}
+    <p class="author">– {{ widget.getConfig('author') }}</p>
+{% endif %}

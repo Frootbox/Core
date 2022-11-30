@@ -27,8 +27,7 @@
 	}
 </style>
 
-<script>
-
+<script nonce="{{ settings.nonce }}">
 	function frootboxExtCoreFileManagerUploadFile ( fileInput, file ) {
 
 		var formData = new FormData();
@@ -132,10 +131,8 @@
 	<input max-size=32154 data-uid="{{ data.uid }}" data-upload="{{ serverpath }}static/Ext/Core/FileManager/Editor/upload?uid={{ data.uid }}&multiple={% if data.multiple %}1{% endif %}" {% if data.multiple %}multiple{% endif %} type="file" id="fileInput{{ random }}" class="form-control" />
 </div>
 
-<script>
+<script nonce="{{ settings.nonce }}">
 	$(function ( ) {
-
-
 		/**
 		 * Sort files
 		 */

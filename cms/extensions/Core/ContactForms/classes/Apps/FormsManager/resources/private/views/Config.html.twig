@@ -66,6 +66,10 @@
 
                             <h3>E-Mail an den Besucher</h3>
 
+                            <div class="form-group form-check">
+                                <input type="checkbox" class="form-check-input" id="autoReplyDeaktivated" name="autoReplyDeaktivated" {% if form.getConfig('autoReplyDeaktivated') %}checked{% endif %}>
+                                <label class="form-check-label" for="autoReplyDeaktivated">Rückantwort deaktivieren</label>
+                            </div>
                             <div class="form-group">
                                 <label for="replyTo">Antwort-Adresse (optional)</label>
                                 <input type="email" class="form-control" name="replyTo" id="replyTo" placeholder="Antwortadresse" value="{{ form.getConfig('replyTo') }}" aria-describedby="replyToHelp">

@@ -114,7 +114,7 @@
                         <input type="text" class="form-control" id="generalTermsLink" name="config[generalTermsLink]" placeholder="AGB-Seite" value="{{ plugin.getConfig('generalTermsLink') }}">
                     </div>
 
-                    <script>
+                    <script nonce="{{ settings.nonce }}">
                         $(function ( ) {
 
                             $("#generalTermsLink").on("drop", function( event ) {

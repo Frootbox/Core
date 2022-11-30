@@ -32,7 +32,6 @@ class StaticPagesRoute extends \Frootbox\Routing\AbstractRoute
             define('MULTI_LANGUAGE', !empty($configuration->get('i18n.multiAliasMode')));
         }
 
-
         // Convert request to page class
         $class = explode('?', substr($this->request->getRequestTarget(), 7))[0];
 

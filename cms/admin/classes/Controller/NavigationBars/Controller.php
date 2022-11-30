@@ -171,6 +171,10 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
 
         return self::getResponse('json', 200, [
             'modalDismiss' => true,
+            'replace' => [
+                'selector' => '.title[data-item="' . $item->getId() . '"]',
+                'html' => $item->getTitle(),
+            ],
         ]);
     }
 
@@ -257,7 +261,8 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
      */
     public function ajaxModalComposeItem(
         \Frootbox\Config\Config $config,
-        \Frootbox\Persistence\Repositories\Extensions $extensionsRepository
+        \Frootbox\Persistence\Repositories\Extensions $extensionsRepository,
+        \Frootbox\Persistence\Content\Repositories\ContentElements $contentElementsRepository,
     ): Response
     {
         // Fetch extensions
@@ -285,10 +290,51 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
                     continue;
                 }
 
+                $key = $extension->getVendorId() . '/' . $extension->getExtensionId();
                 $className = 'Frootbox\\Ext\\' . $extension->getVendorId() . '\\' . $extension->getExtensionId() . '\\Navigations\\Items\\' . $file . '\\Item';
-                $title = $file;
 
-                $languageFile = $dir->getPath() . $file . '/resources/private/language/de-DE.php';
+                $sections[$key][] = [
+                    'path' => $dir->getPath() . $file . '/',
+                    'className' => $className,
+                ];
+            }
+        }
+
+        // Fetch plugins
+        $plugins = $contentElementsRepository->fetch();
+
+        foreach ($plugins as $plugin) {
+
+            $path = $plugin->getPath() . 'Navigations/Items';
+
+            if (!file_exists($path)) {
+                continue;
+            }
+
+            $dir = new \Frootbox\Filesystem\Directory($path);
+
+            foreach($dir as $file) {
+
+                preg_match('#^Frootbox\\\\Ext\\\\(.*?)\\\\(.*?)\\\\Plugins\\\\(.*?)\\\\Plugin$#', get_class($plugin), $match);
+
+                $key = $match[1] . '/' . $match[2];
+                $className = 'Frootbox\\Ext\\' . $match[1] . '\\' . $match[2] . '\\Plugins\\' . $match[3] . '\\Navigations\\Items\\' . $file . '\\Item';
+
+                $sections[$key][] = [
+                    'className' => $className,
+                    'path' => $dir->getPath() . $file . '/',
+                ];
+            }
+        }
+
+        // Gather navigations data
+        foreach ($sections as $key => $section) {
+            foreach ($section as $index => $itemData) {
+
+                $da = explode('/', trim($itemData['path'], '/'));
+                $title = array_pop($da);
+
+                $languageFile = $itemData['path'] . 'resources/private/language/de-DE.php';
 
                 if (file_exists($languageFile)) {
 
@@ -299,12 +345,7 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
                     }
                 }
 
-                $key = $extension->getVendorId() . '/' . $extension->getExtensionId();
-
-                $sections[$key][] = [
-                    'title' => $title,
-                    'className' => $className,
-                ];
+                $sections[$key][$index]['title'] = $title;
             }
         }
 

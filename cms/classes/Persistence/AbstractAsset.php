@@ -140,4 +140,19 @@ abstract class AbstractAsset extends \Frootbox\Persistence\AbstractRow
 
         return $this->getConfig('titles')[$language] ?? null;
     }
+
+    /**
+     *
+     */
+    public function getUser(): ?\Frootbox\Persistence\User
+    {
+        if (empty($this->getUserId())) {
+            return null;
+        }
+
+        // Fetch user
+        $userRepository = $this->getDb()->getRepository(\Frootbox\Persistence\Repositories\Users::class);
+
+        return $userRepository->fetchById($this->getUserId());
+    }
 }

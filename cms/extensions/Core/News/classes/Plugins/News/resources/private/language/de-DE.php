@@ -8,6 +8,7 @@ return [
 
     'LayoutAction.Index' => 'News-Übersicht',
     'LayoutAction.ShowArticle' => 'Artikel-Ansicht',
+    'LayoutAction.ShowCategory' => 'Kategorie-Ansicht',
     'LayoutAction.Archive' => 'Archiv-Ansicht',
 
     'MoreArticles' => 'weitere Artikel',

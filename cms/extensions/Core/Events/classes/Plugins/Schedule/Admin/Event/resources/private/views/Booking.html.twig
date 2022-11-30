@@ -1,0 +1,93 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<h2>
+    Buchung #{{ booking.getId() }}
+</h2>
+
+<p><a class="ajax" href="{{ plugin.getAdminUri('Event', 'details', { eventId: booking.getParentId() }) }}"><i class="fa fa-chevron-circle-left"></i> zurück</a></p>
+
+<div class="row">
+    <div class="col-md-6">
+
+        <div class="card">
+            <div class="card-body">
+
+                <h3>Buchungsdetails</h3>
+
+                <table class="table">
+                    <tbody>
+                    <tr>
+                        <td width="25%">Event</td>
+                        <td>{{ booking.getEvent().getTitle() }}</td>
+                    </tr>
+                    <tr>
+                        <td>Datum</td>
+                        <td>{{ booking.getEvent().getDateStart() | date('d.m.Y H:i') }} Uhr</td>
+                    </tr>
+                    <tr>
+                        <td>Personen</td>
+                        <td><i class="fa fa-user"></i> {{ booking.getConfig('persons') }}</td>
+                    </tr>
+                    <tr>
+                        <td>Name</td>
+                        <td>{{ booking.getConfig('owner.firstName') }} {{ booking.getConfig('owner.lastName') }}</td>
+                    </tr>
+                    <tr>
+                        <td>Straße</td>
+                        <td>{{ booking.getConfig('owner.street') }} {{ booking.getConfig('owner.streetNumber') }}</td>
+                    </tr>
+                    <tr>
+                        <td>Ort</td>
+                        <td>{{ booking.getConfig('owner.zipCode') }} {{ booking.getConfig('owner.city') }}</td>
+                    </tr>
+                    <tr>
+                        <td>E-Mail</td>
+                        <td>{{ booking.getConfig('owner.email') }}</td>
+                    </tr>
+                    <tr>
+                        <td>Telefon</td>
+                        <td>{{ booking.getConfig('owner.phone') }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+
+
+            </div>
+        </div>
+
+    </div>
+    <div class="col-md-6">
+
+        <div class="card">
+            <div class="card-body">
+
+                <h3>Verschieben</h3>
+
+                <form class="ajax" method="post" action="{{ plugin.getAdminUri('Event', 'ajaxBookingMove', { bookingId: booking.getId() }) }}">
+
+                    <div class="form-group">
+                        <label for="eventId">Veranstaltung</label>
+                        <select class="form-control" id="eventId" name="eventId">
+                            <option value="">bitte wählen ...</option>
+
+                            {% for event in events %}
+                                {% if event.getId() != booking.getParentId() and event.getFreeSeats() >= booking.getConfig('persons') %}
+                                    <option value="{{ event.getId() }}">{{ event.getDateStart() | date('d.m.Y H:i') }} {{ event.getTitle() }} ({{ event.getFreeSeats() }} freie Plätze)</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Buchung verschieben</button>
+
+                </form>
+
+                <h3>Stornieren</h3>
+
+                <p><a href="{{ plugin.getAdminUri('Event', 'ajaxBookingCancel', { bookingId: booking.getId() }) }}" data-confirm="Soll diese Buchung wirklich storniert werden?" class="ajax btn btn-danger">Buchung stornieren</a></p>
+
+            </div>
+        </div>
+
+    </div>
+</div>

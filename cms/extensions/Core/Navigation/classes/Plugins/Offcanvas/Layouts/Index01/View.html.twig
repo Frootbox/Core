@@ -7,7 +7,7 @@ title: Standard
 {% set i = view.getViewhelper('Delegator', { object: plugin }) %}
 {% set v = view.getViewhelper('View') %}
 
-<script>
+<script nonce="{{ settings.nonce }}">
     $(function () {
 
         /**

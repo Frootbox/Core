@@ -1,0 +1,99 @@
+{# config
+
+title: Tabelle
+variables:
+    withContainer:
+        type: bool
+        label: mit Layout-Container
+    withAddress:
+        type: bool
+        label: mit Adresse
+    withThumbnail:
+        type: bool
+        label: mit Portrait
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+{% set icons = view.getViewhelper('Ext/HerrUndFrauPixelExt/Icons/Icons', { createDummyOnFail: true  }) %}
+
+<div class="plugin Core HelpAndSupport ContactPersons Index11">
+    {% if variables.withContainer %}<div class="container">{% endif %}
+
+        <div class="row">
+            <div class="col-12 ">
+                <div class="inner-wrapper">
+
+                    <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+
+                    <div class="top-teaser" data-editable data-uid="{{ plugin.getUid('teaser-text') }}"></div>
+
+                    <div class="row">
+                        {% for contact in plugin.getContacts() %}
+                            <div class="col-md-4">
+                                <div class="vcard">
+                                    <address class="adr">
+                                        <div class="fn">{{ contact.getName() }}</div>
+
+                                        {% if contact.getPosition() %}
+                                            <div class="role">{{ contact.getPosition() | nl2br }}</div>
+                                        {% endif %}
+                                    </address>
+
+                                    {% if contact.getPhone() %}
+                                        <a class="tel" href="tel:{{ contact.getPhone() }}">{{ contact.getPhone() }}</a>
+                                    {% endif %}
+
+                                    {% if contact.getEmail() %}
+                                        <a class="email" href="mailto:{{ contact.getEmail() }}">{{ contact.getEmail() }}</a>
+                                    {% endif %}
+                                </div>
+
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    {#
+                    <table class="table">
+                        <tbody>
+
+                                <tr>
+                                    {% if variables.withThumbnail %}
+                                        <td class="portrait">
+                                            <picture  data-editable data-uid="{{ contact.getUid('image')}}">
+                                                <img width="400" height="400" src="{{ i.getDummyImage({ width: 400, height: 400 }) }}" alt="" />
+                                            </picture>
+                                        </td>
+                                    {% endif %}
+
+                                    <td>{{ contact.getName() }}</td>
+                                    <td class="contacts">
+                                        {% if contact.getEmail() %}
+                                            <a href="mailto:{{ contact.getEmail() }}">{{ icons.render('envelope') | raw }}{{ contact.getEmail() }}</a>
+                                        {% endif %}
+
+                                        {% if contact.getPhone() %}
+                                            <a href="tel:{{ contact.getPhone() }}">{{ icons.render('phone') | raw }}{{ contact.getPhone() }}</a>
+                                        {% endif %}
+                                    </td>
+
+                                    {% if variables.withAddress %}
+                                        <td>
+                                            {{ contact.getStreet() }} {{ contact.getStreetNumber() }}<br />
+                                            {{ contact.getZipcode() }} {{ contact.getCity() }}
+                                        </td>
+                                    {% endif %}
+
+
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    #}
+
+                </div>
+            </div>
+        </div>
+
+        {% if variables.withContainer %}</div>{% endif %}
+</div>

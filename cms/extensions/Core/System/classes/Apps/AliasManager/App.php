@@ -97,6 +97,30 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
     /**
      *
      */
+    public function ajaxDetailsAction(
+        \Frootbox\Http\Get $get,
+        \Frootbox\Admin\View $view,
+
+        \Frootbox\Persistence\Repositories\Aliases $aliasRepository
+    ): Response
+    {
+        // Fetch alias
+        $alias = $aliasRepository->fetchById($get->get('aliasId'));
+
+        return self::getResponse('json', 200, [
+            'remove' => '.card[data-alias="' . $alias->getId() . '"]',
+            'append' => [
+                'selector' => '#aliasreceiver',
+                'html' => $this->render($view, [
+                    'alias' => $alias,
+                ]),
+            ],
+        ]);
+    }
+
+    /**
+     *
+     */
     public function ajaxDeleteAction(
         \Frootbox\Http\Get $get,
         \Frootbox\Persistence\Repositories\Aliases $aliasesRepository
@@ -108,7 +132,9 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
         $alias->delete();
 
         return self::getResponse('json', 200, [
-            'fadeOut' => '[data-alias="' . $alias->getId() . '"]'
+            'fadeOut' => [
+                '[data-alias="' . $alias->getId() . '"]',
+            ],
         ]);
     }
 

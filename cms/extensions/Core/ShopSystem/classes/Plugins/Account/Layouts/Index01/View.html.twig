@@ -6,7 +6,7 @@ title: Standard
 
 {% set i = view.getViewhelper('Delegator', { object: plugin }) %}
 
-<script>
+<script nonce="{{ settings.nonce }}">
     var fbxShopcartAccountRedirectAfterLogin = "{{ plugin.getActionUri('account') | raw }}";
 </script>
 

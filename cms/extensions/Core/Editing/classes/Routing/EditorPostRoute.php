@@ -19,10 +19,10 @@ class EditorPostRoute extends \Frootbox\Routing\AbstractRoute
      *
      */
     public function performRouting(
-        \Frootbox\Http\Response $response,
-        \Frootbox\Session $session,
         \DI\Container $container,
-        \Frootbox\View\Viewhelper\GeneralPurpose $gp
+        \Frootbox\Session $session,
+        \Frootbox\Http\Response $response,
+        \Frootbox\View\Viewhelper\GeneralPurpose $gp,
     ): void
     {
 
@@ -37,7 +37,6 @@ class EditorPostRoute extends \Frootbox\Routing\AbstractRoute
             $pHtml = $parser->getHtml();
 
             $html = str_replace('</body>', PHP_EOL . PHP_EOL . $pHtml . PHP_EOL . '</body>', $response->getBody());
-
 
             $response->setBody($html);
         }

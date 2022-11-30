@@ -1,0 +1,145 @@
+{# config
+
+title: Standard
+variables:
+    withContainer:
+        label: mit Layout-Container
+        type: bool
+        default: false
+    imageWidth:
+        label: Bild-Breite
+        type: int
+        default: 600
+    imageHeight:
+        label: Bild-Höhe
+        type: int
+        default: 300
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set icons = view.getViewhelper('Ext/HerrUndFrauPixelExt/Icons/Icons', { createDummyOnFail: true  }) %}
+
+{% set t = i.getTranslator() %}
+
+<div class="plugin Core Events Schedule ShowVenue01">
+
+    {% if variables.withContainer %}<div class="container">{% endif %}
+
+    <div class="row">
+        <div class="col-12">
+
+            <h2 class="first main-title" data-editable data-uid="{{ venue.getUid('title') }}">{{ venue.getTitle() }}</h2>
+
+
+            {% if venue.getLat() and venue.getLng() %}
+                <iframe width="100%" height="350"
+                        frameborder="0"
+                        scrolling="no"
+                        marginheight="0"
+                        marginwidth="0"
+                        src="https://maps.google.com/maps?q={{ venue.getLat() }},{{ venue.getLng() }}&hl=de&z=16&amp;output=embed"></iframe>
+            {% elseif venue.getStreet() and venue.getZipcode() %}
+                <iframe width="100%" height="350"
+                        frameborder="0"
+                        scrolling="no"
+                        marginheight="0"
+                        marginwidth="0"
+                        src="https://maps.google.com/maps?q={{ venue.getTitle() }} {{ venue.getStreet() }} {{ venue.getStreetNr() }}&hl=de&z=16&amp;output=embed"></iframe>
+            {% endif %}
+
+            <div class="row">
+
+                <div class="col-md-5">
+
+                    {#
+                    <picture data-editable data-uid="{{ event.getUid('image')}}">
+                        <img width="{{ variables.imageWidth }}" height="{{ variables.imageHeight }}" src="{{ i.getDummyImage({ width: variables.imageWidth, height: variables.imageHeight }) }}" alt="" />
+                    </picture>
+                    #}
+
+                    <div class="meta-wrapper">
+
+                        <div class="row">
+                            <div class="col-2">
+                                {{ icons.render('location-dot') | raw }}
+                            </div>
+                            <div class="col-10">
+                                <b>{{ venue.getTitle() }}</b>
+
+                                {% if venue.getStreet() or venue.getStreetNumber() %}
+                                    <br />{{ venue.getStreet() }} {{ venue.getStreetNumber() }}
+                                {% endif %}
+
+                                {% if enue.getZipcode() or venue.getCity() %}
+                                    <br />{{ venue.getZipcode() }} {{ venue.getCity() }}
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        {% if venue.getEmail() %}
+                            <div class="row">
+                                <div class="col-2">
+                                    {{ icons.render('envelope') | raw }}
+                                </div>
+                                <div class="col-10">
+                                    <a href="mailto:{{ venue.getEmail() }}">{{ venue.getEmail() }}</a>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        {% if venue.getPhone() %}
+                            <div class="row">
+                                <div class="col-2">
+                                    {{ icons.render('phone') | raw }}
+                                </div>
+                                <div class="col-10">
+                                    <a href="tel:{{ venue.getPhone() }}">{{ venue.getPhone() }}</a>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                    </div>
+
+                    {% if event.isBookable() and event.getFreeSeats() > 0 %}
+                        {% set bookingPlugin = plugin.getBookingPlugin() %}
+
+                        {% if bookingPlugin %}
+                            <p><a class="btn btn-primary btn-block" href="{{ bookingPlugin.getActionUri('index', { eventId: event.getId() }) }}">zur Buchung</a></p>
+                        {% endif %}
+                    {% endif %}
+
+                    <p><a href="{{ page.getUri() }}">{{ icons.add('click-back') | raw }}zurück</a></p>
+
+                </div>
+                <div class="col-md-7">
+
+                    <h2 class="first">Veranstaltungen</h2>
+
+                    <table class="table">
+                        <tbody>
+
+                            {% for event in venue.getEvents() %}
+                                <tr>
+                                    <td>{{ event.getDateStart() | date('d.m.Y') }}</td>
+                                    <td><a href="{{ event.getUri() }}">{{ event.getTitle() }}</a></td>
+                                </tr>
+                            {% endfor %}
+
+                        </tbody>
+                    </table>
+
+
+                </div>
+            </div>
+
+
+
+
+
+        </div>
+    </div>
+
+    {% if variables.withContainer %}</div>{% endif %}
+
+</div>

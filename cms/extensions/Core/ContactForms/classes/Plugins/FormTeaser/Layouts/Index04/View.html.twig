@@ -19,7 +19,7 @@ variables:
 {% set i = view.getViewhelper('Delegator', { object: plugin }) %}
 {% set formRenderer = view.getViewhelper('Ext/Core/ContactForms/FormRenderer', {   }) %}
 
-<script>
+<script nonce="{{ settings.nonce }}">
     $(function ( ) {
 
         $(document).on('click', 'a[data-form]', function ( event ) {
@@ -63,36 +63,44 @@ variables:
 
 <div class="plugin Core ContactForms FormTeaser Index04">
 
+    <div class="background" data-uid="{{ plugin.getUid('background-image') }}" data-type="Images/Background"></div>
+
+    <div class="xcontent">
+
         {% if variables.withLayoutContainer %}<div class="container">{% endif %}
 
-        <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle() }}</h2>
 
-        <div data-editable data-uid="{{ plugin.getUid('text') }}"></div>
+            <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle() }}</h2>
 
-        <div class="row">
-            <div class="col-md-6">
+            <div data-editable data-uid="{{ plugin.getUid('text') }}"></div>
 
-                <h3 class="first main-title" data-editable data-uid="{{ plugin.getUid('title-1') }}">Überschrift</h3>
-                <div data-editable data-uid="{{ plugin.getUid('text-1') }}"></div>
+            <div class="row">
+                <div class="col-md-6">
 
+                    <h3 class="first main-title" data-editable data-uid="{{ plugin.getUid('title-1') }}">Überschrift</h3>
+
+                    <div data-editable data-uid="{{ plugin.getUid('text-1') }}"></div>
+
+                </div>
+                <div class="col-md-6">
+
+                    <h3 class="first main-title" data-editable data-uid="{{ plugin.getUid('title-2') }}">Überschrift</h3>
+                    <div data-editable data-uid="{{ plugin.getUid('text-2') }}"></div>
+
+                    {{ formRenderer.render({
+                        formId: form.getId(),
+                        options: {
+                            editable: variables.fieldLabelsEditable,
+                        },
+                        payload: {
+                            Seite: page.getTitle()
+                        }
+                    }) | raw }}
+
+                </div>
             </div>
-            <div class="col-md-6">
-
-                <h3 class="first main-title" data-editable data-uid="{{ plugin.getUid('title-2') }}">Überschrift</h3>
-                <div data-editable data-uid="{{ plugin.getUid('text-2') }}"></div>
-
-                {{ formRenderer.render({
-                    formId: form.getId(),
-                    options: {
-                        editable: variables.fieldLabelsEditable,
-                    },
-                    payload: {
-                        Seite: page.getTitle()
-                    }
-                }) | raw }}
-
-            </div>
-        </div>
 
         {% if variables.withLayoutContainer %}</div>{% endif %}
+
+    </div>
 </div>

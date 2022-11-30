@@ -64,6 +64,8 @@ class Twig extends \Frootbox\GenericObject implements Interfaces\Engine {
         $this->twig->addFilter($filter);
 
 
+
+
         $filter = new \Twig\TwigFilter('md5', function ($string) {
 
             return md5($string);
@@ -80,6 +82,14 @@ class Twig extends \Frootbox\GenericObject implements Interfaces\Engine {
             'title' => $title,
             'uri' => $uri
         ];
+    }
+
+    /**
+     *
+     */
+    public function addFilter($filter): void
+    {
+        $this->twig->addFilter($filter);
     }
 
     /**
@@ -133,6 +143,7 @@ class Twig extends \Frootbox\GenericObject implements Interfaces\Engine {
     ): AbstractViewhelper
     {
         $viewhelper = str_replace('/', '\\', $viewhelper);
+
 
         if (substr($viewhelper, 0, 4) == 'Ext\\') {
             

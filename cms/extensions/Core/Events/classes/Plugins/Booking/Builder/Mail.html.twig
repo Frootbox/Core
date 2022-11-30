@@ -1,3 +1,4 @@
+
 <html>
     <head>
 
@@ -48,15 +49,32 @@
                     <td>{{ event.getTitle }}</td>
                 </tr>
                 <tr>
-                    <td>Datum</td>
-                    <td>{{ event.getDateStart.format('%d.%m.%Y') }}</td>
+                    <td>Buchungsnummer</td>
+                    <td>{{ random(100, 999) }}-{{ booking.getId() }}-{{ random(100, 999) }}</td>
                 </tr>
                 <tr>
-                    <td>Plätze</td>
-                    <td>{{ booking.getConfig('persons') }}</td>
+                    <td>Datum</td>
+                    <td>{{ event.getDateStart() | date('d.m.Y') }} {{ event.getDateStart() | date('H:i') }}–{{ event.getDateEnd() | date('H:i') }} Uhr</td>
                 </tr>
+
+                {% if not plugin.getConfig('alwaysBookCompleteEvent') %}
+                    <tr>
+                        <td>Plätze</td>
+                        <td>{{ booking.getConfig('persons') }}</td>
+                    </tr>
+                {% endif %}
+
             </tbody>
         </table>
+
+        {% if booking.getConfig('note') %}
+            <p>
+                <b>Bemerkung</b>
+            </p>
+
+            <p>{{ booking.getConfig('note') | nl2br }}</p>
+            <br />
+        {% endif %}
 
         <p>
             <b>Persönliche Daten</b>
@@ -71,14 +89,16 @@
                     </td>
                 </tr>
 
-                {% if booking.getConfig('owner.company') %}
-                    <tr>
-                        <td>Firma</td>
-                        <td>
-                            {{ booking.getConfig('owner.company') }}
-                        </td>
-                    </tr>
-                {% endif %}
+                {% block ownerCompany %}
+                    {% if booking.getConfig('owner.company') %}
+                        <tr>
+                            <td>Firma</td>
+                            <td>
+                                {{ booking.getConfig('owner.company') }}
+                            </td>
+                        </tr>
+                    {% endif %}
+                {% endblock %}
 
                 <tr>
                     <td>Straße</td>
@@ -108,22 +128,61 @@
         <table>
 
 
+        {% if booking.getConfig('invoice') %}
+            <p>
+                <b>Rechnungsempfänger</b>
+            </p>
+
+            <table class="datagrid">
+                <tbody>
+                    <tr>
+                        <td width="30%">Name</td>
+                        <td>
+                            {{ booking.getConfig('invoice.firstName') }} {{ booking.getConfig('invoice.lastName') }}
+                        </td>
+                    </tr>
+
+                    {% if booking.getConfig('invoice.company') %}
+                        <tr>
+                            <td>Firma</td>
+                            <td>
+                                {{ booking.getConfig('invoice.company') }}
+                            </td>
+                        </tr>
+                    {% endif %}
+
+                    <tr>
+                        <td>Straße</td>
+                        <td>
+                            {{ booking.getConfig('invoice.street') }} {{ booking.getConfig('invoice.streetNumber') }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Ort</td>
+                        <td>
+                            {{ booking.getConfig('invoice.zipCode') }} {{ booking.getConfig('invoice.city') }}
+                        </td>
+                    </tr>
+                </tbody>
+            <table>
+        {% endif %}
+
         {% if booking.getConfig('payment') %}
 
             <p>
                 <b>Zahlungsinformationen</b>
             </p>
 
-            {% if booking.getConfig('payment.type') == 'CashOnPickup' %}
-                <table class="datagrid">
-                    <tbody>
-                        <tr>
-                            <td width="30%" class="title">Zahlungsart</td>
-                            <td>Bar bei Abholung</td>
-                        </tr>
-                    </tbody>
-                </table>
-            {% elseif booking.getConfig('payment.type') == 'Voucher' %}
+            <table class="datagrid">
+                <tbody>
+                    <tr>
+                        <td width="30%" class="title">Zahlungsart</td>
+                        <td>{{ translator.translate("Payment" ~ booking.getConfig('payment.type')) }}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            {% if booking.getConfig('payment.type') == 'Voucher' %}
                     <table class="datagrid">
                         <tbody>
                         <tr>

@@ -321,7 +321,7 @@ class Page extends \Frootbox\AbstractStaticPage
         }
 
         // Prepare customers mail
-        if ($backmail !== null) {
+        if (empty($form->getConfig('autoReplyDeaktivated')) and $backmail !== null) {
 
             // Create new mail
             $mail = new \PHPMailer\PHPMailer\PHPMailer(true);

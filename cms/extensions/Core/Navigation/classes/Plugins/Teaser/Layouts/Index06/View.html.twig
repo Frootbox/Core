@@ -69,7 +69,7 @@ variables:
 </style>
 
 {% if variables.mobileHeight100 %}
-    <script>
+    <script nonce="{{ settings.nonce }}">
         $(function ( ) {
 
             var originalHeight = $('.plugin.Core.Navigation.Teaser.Index06 .height-mobile-100 .carousel-item').height();

@@ -1465,7 +1465,7 @@
 
   })();
 
-  SELF_CLOSING_NODE_NAMES = ['br', 'img', 'input'];
+  SELF_CLOSING_NODE_NAMES = ['br', 'img', 'input', 'hr'];
 
   _containedBy = function(nodeA, nodeB) {
     while (nodeA) {
@@ -9846,6 +9846,24 @@
 
   })(ContentTools.Tools.Heading);
 
+  ContentTools.Tools.Hr = (function(_super) {
+    __extends(Hr, _super);
+
+    function Hr() {
+      return Hr.__super__.constructor.apply(this, arguments);
+    }
+
+    ContentTools.ToolShelf.stow(Hr, 'hr');
+
+    Hr.label = 'Horizontal Ruler';
+
+    Hr.icon = 'subheading';
+
+    Hr.tagName = 'hr';
+
+    return Hr;
+
+  })(ContentTools.Tools.Heading);
 
   ContentTools.Tools.Blockquote = (function(_super) {
     __extends(Blockquote, _super);

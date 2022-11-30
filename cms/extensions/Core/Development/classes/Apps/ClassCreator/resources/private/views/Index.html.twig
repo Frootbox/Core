@@ -43,7 +43,7 @@
 							<option value="">bitte wählen ...</option>
 
 							{% for extension in extensions %}
-								<option value="{{ extension.getId() }}">{{ extension.getVendorId() }}/{{ extension.getExtensionId() }}</option>
+								<option {% if extension.getExtensionController().getType() == "Template" %}selected{% endif %} value="{{ extension.getId() }}">{{ extension.getVendorId() }}/{{ extension.getExtensionId() }}</option>
 							{% endfor %}
 
 						</select>
@@ -80,7 +80,7 @@
 							<option value="">bitte wählen ...</option>
 
 							{% for extension in extensions %}
-								<option value="{{ extension.getId() }}">{{ extension.getVendorId() }}/{{ extension.getExtensionId() }}</option>
+								<option {% if extension.getExtensionController().getType() == "Template" %}selected{% endif %} value="{{ extension.getId() }}">{{ extension.getVendorId() }}/{{ extension.getExtensionId() }}</option>
 							{% endfor %}
 
 						</select>
@@ -187,7 +187,7 @@
 									<option value="">bitte wählen ...</option>
 
 									{% for extension in extensions %}
-										<option value="{{ extension.getId() }}">{{ extension.getVendorId() }}/{{ extension.getExtensionId() }}</option>
+										<option {% if extension.getExtensionController().getType() == "Template" %}selected{% endif %} value="{{ extension.getId() }}">{{ extension.getVendorId() }}/{{ extension.getExtensionId() }}</option>
 									{% endfor %}
 
 								</select>
@@ -230,7 +230,7 @@
 									<option value="">bitte wählen ...</option>
 
 									{% for extension in extensions %}
-										<option value="{{ extension.getId() }}">{{ extension.getVendorId() }}/{{ extension.getExtensionId() }}</option>
+										<option {% if extension.getExtensionController().getType() == "Template" %}selected{% endif %} value="{{ extension.getId() }}">{{ extension.getVendorId() }}/{{ extension.getExtensionId() }}</option>
 									{% endfor %}
 
 								</select>
@@ -238,6 +238,10 @@
 							<div class="form-group">
 								<label for="title">Block Titel</label>
 								<input type="text" required class="form-control" id="title" name="title" placeholder="Block Titel">
+							</div>
+							<div class="form-group">
+								<label for="subtitle">Untertitel</label>
+								<input type="text" class="form-control" id="subtitle" name="subtitle" placeholder="Untertitel">
 							</div>
 							<div class="form-group">
 								<label for="blockId">Block ID</label>

@@ -29,6 +29,7 @@ class ShopcartItem
     protected $additionalText;
     protected $noExtraCharge = false;
     protected $hasSurcharge = false;
+    protected $type;
 
     /**
      *
@@ -51,6 +52,7 @@ class ShopcartItem
         $this->boundTo = $itemData['boundTo'] ?? null;
         $this->variantId = $itemData['variantId'] ?? null;
         $this->additionalText = $itemData['additionalText'] ?? null;
+        $this->type = $itemData['type'] ?? 'Product';
 
         if (!empty($itemData['hasOptions'])) {
             $this->hasOptions = true;
@@ -234,6 +236,14 @@ class ShopcartItem
     public function getTotal(): float
     {
         return (float) $this->getAmount() * $this->getPriceGross();
+    }
+
+    /**
+     *
+     */
+    public function getType(): string
+    {
+        return $this->type;
     }
 
     /**

@@ -28,6 +28,14 @@ variables:
         type: bool
         default: false
         label: andere Plugins verdrängen
+    textAlign:
+        type: list
+        default: center
+        label: Text-Ausrichtung
+        options:
+            center: zentriert
+            start: oben
+            end: unten
 
 /config #}
 
@@ -70,13 +78,16 @@ variables:
                         <div class="outer-wrapper" style="padding-top: {{ ((variables.image_ratio * 100) | round ) }}%;">
                             <div class="inner-wrapper">
                                 <div class="container h-100">
-                                    <div class="row h-100 align-items-center justify-content-center">
+                                    <div class="row h-100 align-items-{{ variables.textAlign }} justify-content-center">
+
 
                                         {% if not variables.noTeaserText %}
                                             <div class="col-12">
                                                 <div class="text-wrapper">
                                                     <div class="subtext" data-editable data-nowidgets data-uid="{{ teaser.getUid('teaser-subtext') }}"></div>
+
                                                     <h3 data-editable data-uid="{{ teaser.getUid('title') }}">{{ teaser.getTitle }}</h3>
+
                                                     <div data-nowidgets data-editable data-uid="{{ teaser.getUid('teaser-text') }}"></div>
 
                                                     {% if not teaser.isLinkDeactivated() %}

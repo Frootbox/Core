@@ -44,9 +44,5 @@ class EditorRoute extends \Frootbox\Routing\AbstractRoute
         $requestTarget = $request->getRequestTarget();
 
         $request->setRequestTarget(substr($requestTarget, 5));
-
-
-
-
     }
 }

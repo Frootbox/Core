@@ -17,6 +17,7 @@ variables:
     showFullEmail:
         label: E-Mail Adresse zeigen
         type: bool
+
 /config #}
 
 {% set i = view.getViewhelper('Delegator', { object: widget }) %}
@@ -46,13 +47,13 @@ variables:
 
     <div class="row">
         {% for contact in child.getContacts() %}
-            {{ sp.renderPartial('partials/Contact', { fromfile: __FILE__, colClass: colClass, contact: contact }) | raw }}
+            {{ sp.renderPartial('partials/Contact', { fromfile: __FILE__, colClass: colClass, contact: contact, i: i }) | raw }}
         {% endfor %}
     </div>
 {% endfor %}
 
 <div class="row">
     {% for contact in category.getContacts() %}
-        {{ sp.renderPartial('partials/Contact', { fromfile: __FILE__, colClass: colClass, contact: contact }) | raw }}
+        {{ sp.renderPartial('partials/Contact', { fromfile: __FILE__, colClass: colClass, contact: contact, i: i }) | raw }}
     {% endfor %}
 </div>

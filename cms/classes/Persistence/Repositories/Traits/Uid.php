@@ -47,7 +47,7 @@ trait Uid
             'uid' => $uid,
         ];
 
-        if (MULTI_LANGUAGE and empty($options['ignoreLanguage'])) {
+        if (MULTI_LANGUAGE and empty($options['ignoreLanguage']) and !empty($_SESSION['frontend']['language'])) {
             $where['language'] = $_SESSION['frontend']['language'];
         }
 

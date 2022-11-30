@@ -4,6 +4,18 @@
     'frame' : false,
 }) }}
 
+<script nonce="{{ settings.nonce }}">
+    $(function() {
+
+        $('#venueId').change(function() {
+
+            if ($('#title').val().length == 0) {
+                $('#title').val($(this).find('option:selected').html());
+            }
+        });
+    });
+</script>
+
 <form method="post" class="ajax" action="{{ plugin.getAdminUri('Event', 'ajaxCreate', { cloneFrom: clone.getId() }) }}">
 
     <div class="modal-body">

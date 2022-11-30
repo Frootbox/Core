@@ -26,6 +26,10 @@ variables:
     skipTeaserText:
         type: bool
         label: ohne Teaser-Text
+    withTagFilter:
+        type: bool
+        label: mit Tag-Filter
+
 
 /config #}
 
@@ -61,10 +65,25 @@ variables:
 
                 <div data-editable data-uid="{{ plugin.getUid('text') }}"></div>
 
+                {% if variables.withTagFilter %}
+                    {% set tags = plugin.getAvailableTags() %}
+
+                    {% if tags.getCount() %}
+                        <div class="filter-bar btn-group" role="group" aria-label="Basic example">
+                            {% for tag in tags %}
+                                <button type="button" data-tag="{{ tag.getTag() }}" class="tag btn btn-primary">{{ tag.getTag() }}</button>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endif %}
+
                 <div class="references row">
                     {% for reference in i.getReferences() %}
-                        <div class="{{ colClass }}">
+                        <div class="{{ colClass }} reference-wrapper {{ reference.getTags().implode(' ', 'tag') }}">
                             <div class="reference" {% if not variables.skipDetailsPage or reference.getUrlDomain() %}data-href{% endif %}>
+
+
+
                                 {% if not variables.noImage %}
 
                                     {% if variables.withMagnifier %}<a href="{{ f.getFileByUid(reference.getUid('image')).getUriThumbnail() }}" data-fancybox="references-{{ plugin.getId() }}">{% endif %}
@@ -77,14 +96,13 @@ variables:
 
                                 <div class="text-pillow">
 
-                                    <h3 data-editable data-uid="{{ reference.getUid('title') }}">{{ reference.getTitle }}</h3>
+                                    <h4 data-editable data-uid="{{ reference.getUid('title') }}">{{ reference.getTitle }}</h4>
 
                                     {% if not variables.skipTeaserText %}
                                         <div data-nowidgets data-editable data-uid="{{ reference.getUid('teaser') }}"></div>
                                     {% endif %}
 
-
-                                    {% if not variables.skipDetailsPage %}
+                                    {% if not variables.skipDetailsPage and reference.getUri() != "/" %}
                                         <p><a class="readmore" href="{{ reference.getUri() }}"><span>weiterlesen</span></a></p>
                                     {% elseif reference.getUrlDomain() %}
                                         <p><a class="readmore" href="{{ reference.getConfig('url') }}"><span>{{ reference.getUrlDomain() }}</span></a></p>

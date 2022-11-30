@@ -77,6 +77,18 @@ $(function ( ) {
                     initElements();
                 }
 
+                if (typeof response.remove !== 'undefined') {
+                    $(response.remove).remove();
+                }
+
+                if (typeof response.append !== 'undefined') {
+
+                    let html = $(response.append.selector).html();
+
+                    $(response.append.selector).html(html + response.append.html);
+                    initElements();
+                }
+
                 if (typeof response.replacements !== 'undefined') {
 
                     $.each(response.replacements, function ( key, value ) {
@@ -108,7 +120,15 @@ $(function ( ) {
                 }
 
                 if (typeof response.fadeOut !== 'undefined') {
-                    $(response.fadeOut).fadeOut();
+
+                    if (typeof response.fadeOut == 'object') {
+                        $.each(response.fadeOut, function(key, selector) {
+                            $(selector).fadeOut();
+                        });
+                    }
+                    else {
+                        $(response.fadeOut).fadeOut();
+                    }
                 }
 
                 if ($(this).attr('data-preservestate')) {
@@ -120,6 +140,10 @@ $(function ( ) {
 
                 if (typeof response.success != 'undefined') {
                     toastr.success(response.success);
+                }
+
+                if (typeof response.error != 'undefined') {
+                    toastr.error(response.error);
                 }
             },
             error : function ( xhr ) {

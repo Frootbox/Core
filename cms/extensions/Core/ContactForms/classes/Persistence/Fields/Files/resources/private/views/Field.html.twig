@@ -9,7 +9,7 @@
 {{ v.asset('EXT:Core/ContactForms/css/File.less') | raw }}
 {{ a.import('https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.2/min/dropzone.min.js') | raw }}
 
-<script>
+<script nonce="{{ settings.nonce }}">
     $(function ( ) {
 
         $("#fileupload_{{ field.getId() }}").dropzone({

@@ -8,6 +8,8 @@ namespace Frootbox\Admin\Controller\Plugin;
 
 use Frootbox\Admin\Controller\Response;
 use Frootbox\Config\Config;
+use Frootbox\Http\Interfaces\ResponseInterface;
+use Frootbox\View\ResponseRedirect;
 
 /**
  *
@@ -647,7 +649,7 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
         \DI\Container $container,
         \Frootbox\Http\Get $get,
         \Frootbox\Persistence\Content\Repositories\ContentElements $contentElementsRepository,
-    ):Response
+    ): Response
     {
         // Fetch plugin
         $plugin = $contentElementsRepository->fetchById($get->get('pluginId'));
@@ -668,6 +670,23 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
             'plugin' => $plugin,
             'pluginHtml' => $pluginHtml,
         ]);
+    }
+
+    /**
+     *
+     */
+    public function jumpToEditing(
+        \Frootbox\Http\Get $get,
+        \Frootbox\Persistence\Content\Repositories\ContentElements $contentElementsRepository,
+    ): ResponseInterface
+    {
+        // Fetch plugin
+        $plugin = $contentElementsRepository->fetchById($get->get('pluginId'));
+
+        $url = SERVER_PATH_PROTOCOL . 'cms/admin/Sitemap/index#plugin:' . $plugin->getPageId() . ':' . $plugin->getId() . ':Index:index';
+
+        header('Location: ' . $url);
+        exit;
     }
 
     /**

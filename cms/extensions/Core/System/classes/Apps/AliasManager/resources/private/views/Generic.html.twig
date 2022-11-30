@@ -7,27 +7,45 @@
     generische Aliase
 </h2>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Alias</th>
-            <th>Status</th>
-            <th>Ziel</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
+<div class="row">
+    <div class="col-md-7">
 
-    {% for alias in aliases %}
-        <tr data-alias="{{ alias.getId() }}" data-title="Alias bearbeiten" data-href="{{ app.getUri('details', { aliasId: alias.getId() }) }}">
-            <td>{{ alias.getAlias() }}</td>
-            <td>{{ alias.getStatus() }}</td>
-            <td>{{ alias.getConfig('target') }}</td>
-            <td class="text-right">
-                <a class="ajax" data-confirm="Soll dieser Alias wirklich gelöscht werden?" href="{{ app.getUri('ajaxDelete', { aliasId: alias.getId() }) }}"><i class="fa fa-times"></i></a>
-            </td>
-        </tr>
-    {% endfor %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Status</th>
+                    <th>Alias</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
 
-    </tbody>
-</table>
+                {% for alias in aliases %}
+                    {# <tr data-alias="{{ alias.getId() }}" data-title="Alias bearbeiten" data-href="{{ app.getUri('details', { aliasId: alias.getId() }) }}"> #}
+                    <tr class="ajax" data-alias="{{ alias.getId() }}" data-title="Alias bearbeiten" data-href="{{ app.getUri('ajaxDetails', { aliasId: alias.getId() }) }}">
+                        <td>
+                            <span class="badge {% if alias.getStatus() == 200 %}badge-success{% elseif alias.getStatus() == 301 %}badge-warning{% else %}badge-secondary{% endif %}">{{ alias.getStatus() }}</span>
+                        </td>
+                        <td>
+                            {{ alias.getAlias() }}
+
+                            {% if alias.getConfig('target') %}
+                                <br /><code>{{ alias.getConfig('target') }}</code>
+                            {% endif %}
+                        </td>
+                        <td class="text-right">
+                            <a class="ajax" data-confirm="Soll dieser Alias wirklich gelöscht werden?" href="{{ app.getUri('ajaxDelete', { aliasId: alias.getId() }) }}"><i class="far fa-trash"></i></a>
+                        </td>
+                    </tr>
+                {% endfor %}
+
+            </tbody>
+        </table>
+
+    </div>
+    <div class="col-md-4">
+        <div class="sticky-top">
+            <div id="aliasreceiver"></div>
+        </div>
+    </div>
+</div>

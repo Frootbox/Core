@@ -398,6 +398,40 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
             ];
         }
 
+        // Generate newly booked coupons
+        foreach ($shopcart->getItems() as $item) {
+
+            if ($item->getType() != 'GenericCoupon') {
+                continue;
+            }
+
+            // Generate coupon code
+            $couponCode = strtoupper(substr(md5(microtime(true)), 0, 7));
+
+            // Compose new coupon
+            $coupon = new \Frootbox\Ext\Core\ShopSystem\Persistence\Coupon([
+                'pageId' => $shopPlugin->getPageId(),
+                'pluginId' => $shopPlugin->getId(),
+                'title' => $shopcart->getPersonal('email'),
+                'uid' => $couponCode,
+                'config' => [
+                    'amount' => $item->getAmount(),
+                    'value' => $item->getPriceGross(),
+                    'taxrate' => $item->getTaxrate(),
+                ],
+            ]);
+
+            $xconfig = $item->getConfig();
+
+            $xconfig['couponCode'] = $couponCode;
+            $item->setConfig($xconfig);
+
+            $shopcart->setItem($item);
+
+            // Insert coupon
+            $couponsRepository->insert($coupon);
+        }
+
         // Compose booking
         $booking = new \Frootbox\Ext\Core\ShopSystem\Persistence\Booking([
             'pluginId' => $this->getId(),
@@ -500,6 +534,9 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
 
         $file = $this->getPath() . 'resources/private/builder/Mail.html.twig';
         $sourceSave = $view->render($file);
+
+
+        $file = $this->getPath() . 'resources/private/builder/ShopOwner.html.twig';
 
         $paymentInfo = $paymentMethod->renderSummary($view, $shopcart->getPaymentData());
         $view->set('paymentInfo', $paymentInfo);
@@ -809,6 +846,21 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
                 $itemData['priceGross'] += $surcharge;
                 $tax = $itemData['priceGross'] / (1 + $product->getTaxrate() / 100) * ($product->getTaxrate() / 100);
                 $itemData['price'] = round($itemData['priceGross'] - $tax, 2);
+            }
+
+            if (!empty($itemData['variantId']) and $itemData['variantId'] != 'default') {
+
+                // Fetch variant
+                $variant = $variantsRepository->fetchById($itemData['variantId']);
+
+
+                if (!empty($variant->getPrice())) {
+
+                    $product->getPriceForVariant($variant);
+
+                    $itemData['priceGross'] = $product->getPriceForVariant($variant);
+                    $itemData['price'] = $itemData['priceGross'] / (1 + ($itemData['taxRate'] / 100));
+                }
             }
         }
 

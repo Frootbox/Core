@@ -6,7 +6,7 @@
 <script src="{{ serverpath }}cms/admin/resources/public/libs/jquery/upload/js/jquery.iframe-transport.js"></script>
 <script src="{{ serverpath }}cms/admin/resources/public/libs/jquery/upload/js/jquery.fileupload.js"></script>
 
-<script>
+<script nonce="{{ settings.nonce }}">
 
     function refreshEditable ( rsp ) {
 
@@ -85,7 +85,7 @@
 
         </div>
 
-        <script>
+        <script nonce="{{ settings.nonce }}">
             $(function ( ) {
 
                 $('.show-upload-options').click(function ( event ) {

@@ -49,6 +49,8 @@ try {
 
     define('DEVMODE', !empty($config->get('devmode')));
 
+    define('SCRIPT_NONCE', !empty($_SESSION['SCRIPT_NONCE']) ? $_SESSION['SCRIPT_NONCE'] : base64_encode(random_bytes(20)));
+
     // Load extensions autoloader
     if (!file_exists($autoloadConfig = $config->get('filesRootFolder') . 'cache/system/autoload.php')) {
 
@@ -114,12 +116,13 @@ try {
         }
     }
 
-
-
-
     define('IS_WEBP', !empty($config->get('thumbnails.webp')));
 
-    define('GLOBAL_LANGUAGE', 'de-DE');
+    if (!empty($_GET['forceLanguage'])) {
+        $_SESSION['frontend']['language'] = $_GET['forceLanguage'];
+    }
+
+    define('GLOBAL_LANGUAGE', !empty($_GET['forceLanguage']) ? $_GET['forceLanguage'] : 'de-DE');
     define('DEFAULT_LANGUAGE', $config->get('i18n.defaults')[0] ?? $config->get('i18n.languages')[0] ?? 'de-DE');
     define('MULTI_LANGUAGE', !empty($config->get('i18n.multiAliasMode')));
 
@@ -154,6 +157,7 @@ try {
     $view->set('get', $container->get(\Frootbox\Http\Get::class));
 
     $view->set('settings', [
+        'nonce' => SCRIPT_NONCE,
         'serverpath' => SERVER_PATH,
         'serverpath_absolute' => SERVER_PATH_PROTOCOL,
         'basepath' => CORE_DIR,

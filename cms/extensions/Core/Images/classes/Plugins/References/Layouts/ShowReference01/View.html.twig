@@ -1,3 +1,13 @@
+{# config
+
+title: Kacheln
+variables:
+    withContainer:
+        type: bool
+        label: mit Layout-Container
+
+/config #}
+
 {% set b = view.getViewhelper('Breadcrumb', { singleton: true }) %}
 
 {{ b.addSection(reference.getTitle(), reference.getUri()) }}
@@ -11,17 +21,23 @@
 
 {{ view.addBreadcrumb(reference.getTitle(), reference.getUri()) }}
 
-<div class="row">
-    <div class="col-12 plugin Core Images References ShowReference01">
+<div class="plugin Core Images References ShowReference01">
 
-        {% if plugin.isFirst %}
-            <h1 data-editable data-uid="{{ reference.getUid('title') }}">{{ reference.getTitle }}</h1>
-        {% else %}
-            <h2 data-editable data-uid="{{ reference.getUid('title') }}">{{ reference.getTitle }}</h2>
-        {% endif %}
+    {% if variables.withContainer %}<div class="container">{% endif %}
 
-        <div class="teaser-text" data-editable data-uid="{{ reference.getUid('teaser') }}"></div>
+        <div class="row">
+            <div class="col-12 ">
 
-        <div data-editable data-uid="{{ reference.getUid('text') }}"></div>
-    </div>
+
+                <h2 class="first main-title" data-editable data-uid="{{ reference.getUid('title') }}">{{ reference.getTitle }}</h2>
+
+                <div class="teaser-text" data-editable data-uid="{{ reference.getUid('teaser') }}"></div>
+
+                <div data-editable data-uid="{{ reference.getUid('text') }}"></div>
+
+            </div>
+        </div>
+
+    {% if variables.withContainer %}</div>{% endif %}
+
 </div>

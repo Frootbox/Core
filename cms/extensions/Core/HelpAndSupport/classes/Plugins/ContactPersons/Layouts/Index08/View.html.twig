@@ -18,6 +18,9 @@ variables:
     skipContactData:
         type: bool
         label: Kontaktdaten verbergen
+    withRolloverEffect:
+        type: bool
+        label: mit Roll-Over Effekt
 /config #}
 
 {% set i = view.getViewhelper('Delegator', { object: plugin }) %}
@@ -32,6 +35,7 @@ variables:
 {% elseif variables.columns >= 4 %}
     {% set colClass = "col-md-3" %}
 {% endif %}
+
 
 <div class="plugin Core HelpAndSupport ContactPersons Index08">
 

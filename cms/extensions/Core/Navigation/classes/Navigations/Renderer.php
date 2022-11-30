@@ -87,7 +87,14 @@ class Renderer
             $html .= $icon;
         }
         else {
-            $html .= $icon . $item->getTitle();
+            $html .= $icon;
+
+            if (empty($this->parameters['wrapLinkText'])) {
+                $html .= $item->getTitle();
+            }
+            else {
+                $html .= '<span class="link-title">' . $item->getTitle() . '</span>';
+            }
         }
 
         $html .= '</span></a> ';
@@ -146,9 +153,11 @@ class Renderer
             return null;
         }
 
+        $navViewId = !empty($this->parameters['view']) ? $this->parameters['view'] : $this->navigation->getNavId();
+
         foreach ($folders->getData() as $path) {
 
-            $viewFile = $path . $this->navigation->getNavId() . DIRECTORY_SEPARATOR . 'View.html.twig';
+            $viewFile = $path . $navViewId . DIRECTORY_SEPARATOR . 'View.html.twig';
 
             if (file_exists($viewFile)) {
                 return $viewFile;

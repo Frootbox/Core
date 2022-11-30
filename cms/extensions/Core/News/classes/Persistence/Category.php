@@ -35,8 +35,7 @@ class Category extends \Frootbox\Persistence\Category
             categories_2_items x
         WHERE
             x.categoryId = ' . $this->getId() . ' AND
-            x.itemId = i.id AND
-            i.dateEnd >= "' . date('Y-m-d H:i:s') . '" ';
+            x.itemId = i.id';
 
         if (!empty($parameters['order'])) {
             $sql .= ' ORDER BY ' . $parameters['order'];

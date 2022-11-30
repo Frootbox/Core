@@ -35,6 +35,8 @@
                             <option value="">bitte wählen ...</option>
                             <option value="manualOrder" {% if plugin.getConfig('order') == 'manualOrder' %}selected{% endif %}>manuelle Sortierung</option>
                             <option value="newestFirst" {% if plugin.getConfig('order') == 'newestFirst' %}selected{% endif %}>Neueste zuerst</option>
+                            <option value="dateDesc" {% if plugin.getConfig('order') == 'dateDesc' %}selected{% endif %}>Datum absteigend</option>
+
                             <option value="random" {% if plugin.getConfig('order') == 'random' %}selected{% endif %}>zufällig</option>
                         </select>
 

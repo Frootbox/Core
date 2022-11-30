@@ -2,7 +2,7 @@
 {% set t = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\Translator') %}
 {{ t.setScope(data.plugin) }}
 
-<script>
+<script nonce="{{ settings.nonce }}">
     $(function ( ) {
 
         /**

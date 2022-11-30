@@ -17,7 +17,7 @@ variables:
 
 {{ v.asset('EXT:Core/ShopSystem/icons/css/all.css') | raw }}
 
-<script>
+<script nonce="{{ settings.nonce }}">
     gtag('event', 'begin_checkout', {
         "items": [
             {% for item in items %}

@@ -5,19 +5,17 @@
     Veranstaltung bearbeiten
 
     <span class="headoptions">
-        <a data-toggle="tooltip" data-modal data-title="gleiche Veranstaltung erstellen" href="{{ plugin.getAdminUri('Event', 'ajaxModalCompose', { cloneFrom: event.getId() }) }}"><i class="fa fa-plus-circle"></i></a>
-        <a data-toggle="tooltip" ata-title="Veranstaltung bearbeiten" target="edit-event-{{ event.getId() }}" href="{{ event.getUriEdit() }}"><i class="fa fa-pencil"></i></a>
+        <a data-toggle="tooltip" data-modal data-title="gleiche Veranstaltung erstellen" href="{{ plugin.getAdminUri('Event', 'ajaxModalCompose', { cloneFrom: event.getId() }) }}"><i class="fas fa-plus-circle"></i></a>
+        <a data-toggle="tooltip" ata-title="Veranstaltung bearbeiten" target="edit-event-{{ event.getId() }}" href="{{ event.getUriEdit() }}"><i class="far fa-pencil"></i></a>
 
-        <!--
         <span class="dropdown">
             <i class="far fa-bars dropdown-toggle" data-toggle="dropdown"></i>
 
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                <a class="dropdown-item" href="{{ v.getUri('Page', 'sort') }}">Seiten sortieren</a>
-                <a class="dropdown-item" href="{{ v.getUri('Sitemap', 'print') }}">druckbare Checkliste</a>
+                <a class="dropdown-item ajax" href="{{ plugin.getAdminUri('Event', 'duplicate', { eventId: event.getId() }) }}"><i class="far fa-copy"></i> mehrfach duplizieren</a>
             </div>
         </span>
-        -->
+
     </span>
 </h2>
 
@@ -159,7 +157,7 @@
     </div>
     <div class="tab-pane show" id="categories" role="tabpanel" aria-labelledby="categories-tab">
 
-        <script>
+        <script nonce="{{ settings.nonce }}">
             $(function ( ) {
 
                 $('input.category-switcher').on('change', function ( ) {
@@ -201,14 +199,34 @@
 
 {% if bookings.getCount > 0 %}
 
-    <h2>Buchungen</h2>
+    <h2>
+        Buchungen
+        <span class="headoptions">
+            <a data-toggle="tooltip" data-modal data-title="Buchung eintragen" href="{{ plugin.getAdminUri('Event', 'ajaxModalBookingCompose', { cloneFrom: event.getId() }) }}"><i class="fas fa-plus-circle"></i></a>
+        </span>
+    </h2>
 
     <table class="table">
+        <thead>
+            <tr>
+                <th>Nr.</th>
+                <th>Datum</th>
+                <th>Personen</th>
+                <th>Kunde</th>
+            </tr>
+        </thead>
         <tbody>
 
             {% for booking in bookings %}
                 <tr class="ajax" data-href="{{ plugin.getAdminUri('Event', 'booking', { bookingId: booking.getId() }) }}">
-                    <td>#{{ booking.getId() }}</td>
+                    <td nowrap>
+                        #{{ booking.getId() }}
+
+                        {% if booking.getConfig('payment.state') == "Payed" %}
+                            <span class="badge badge-success">bezahlt</span>
+                        {% endif %}
+
+                    </td>
                     <td>{{ booking.getDate() | date('d.m.Y H:i') }} Uhr</td>
                     <td><i class="fa fa-user"></i> {{ booking.getConfig('persons') }}</td>
                     <td>{{ booking.getConfig('owner.email') }}</td>

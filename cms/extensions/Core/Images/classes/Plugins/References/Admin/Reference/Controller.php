@@ -35,6 +35,7 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
             'pluginId' => $this->plugin->getId(),
             'title' => $post->get('title'),
             'visibility' => (DEVMODE ? 2 : 1),
+            'dateStart' => date('Y-m-d H:i:s'),
         ]));
 
         // Fix sorting
@@ -217,12 +218,13 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         $titles = !empty($post->get('titles')) ? array_filter($post->get('titles')) : [];
 
         $reference->setTitle($title);
-        $reference->setDateStart($post->get('dateStart'));
+        $reference->setDateStart($post->get('dateStart') . ' ' . $post->get('dateStartTime'));
 
         $reference->unsetConfig('titles');
         $reference->addConfig([
             'url' => $post->get('url'),
             'titles' => $titles,
+            'forceReferencesDetailPage' => $post->get('forceReferencesDetailPage'),
         ]);
         $reference->save();
 

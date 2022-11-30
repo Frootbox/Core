@@ -165,6 +165,12 @@ class Controller extends \Frootbox\Admin\Controller\AbstractControllerStatic
         $address->setZipcode($post->get('zipcode'));
         $address->setCountry($post->get('country'));
 
+        $address->setEmail($post->get('email'));
+        $address->setPhone($post->get('phone'));
+
+        $address->setLat($post->get('lat'));
+        $address->setLng($post->get('lng'));
+
         $address->save();
 
         return new Response('json', 200, [

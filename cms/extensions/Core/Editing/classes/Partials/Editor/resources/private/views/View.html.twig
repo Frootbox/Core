@@ -41,9 +41,7 @@
     }
 </style>
 
-
-
-<script>
+<script nonce="{{ settings.nonce }}">
 
     $(function ( ) {
 
@@ -75,6 +73,7 @@
             'ordered-list',
             'table',
             'blockquote',
+            'hr',
             'indent',
             'unindent',
             'line-break'
@@ -103,7 +102,7 @@
                 list: '{{ settings.serverpath }}cms/admin/Editor/Block/ajaxModalList?{{ SID }}'
             },
             texts : {
-                update : '{{ settings.serverpath }}cms/admin/Editor/Text/ajaxUpdate?{{ SID }}'
+                update : '{{ settings.serverpath }}cms/admin/Editor/Text/ajaxUpdate?forceLanguage={{ globalLanguage }}&{{ SID }}'
             },
             pictures : {
                 edit : '{{ settings.serverpath }}cms/admin/Editor/Picture/ajaxModalEdit?{{ SID }}',

@@ -71,8 +71,7 @@ variables:
 {% endif %}
 
 {% if variables.withContainer %}<div class="container">{% endif %}
-
-<script>
+<script nonce="{{ settings.nonce }}">
     gtag('event', 'view_item', {
         "items": [
             {
@@ -139,7 +138,7 @@ variables:
 
                     <br /><br />
 
-                            <script>
+                            <script nonce="{{ settings.nonce }}">
 
                                 var isEditing = {% if settings.isEditor %}true{% else %}false{% endif %};
 

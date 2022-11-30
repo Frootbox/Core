@@ -27,9 +27,9 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
         \Frootbox\Config\Config $config,
         \DI\Container $container,
         \Frootbox\CloningMachine $cloningMachine,
-        \Frootbox\View\Engines\Interfaces\Engine $view,
         \Frootbox\Persistence\Content\Repositories\Blocks $blocksRepository,
-        \Frootbox\Persistence\Repositories\Extensions $extensionsRepository
+        \Frootbox\Persistence\Repositories\Extensions $extensionsRepository,
+        \Frootbox\View\Engines\Interfaces\Engine $view,
     ): Response
     {
         // Validate required input
@@ -137,6 +137,7 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
         $blockHtml = '<style type="text/less">' . $scss . PHP_EOL . '</style>' . PHP_EOL . $blockHtml;
 
         $view->set('view', $view);
+        $view->set('page', $block->getPage());
 
         $parser = new \Frootbox\View\HtmlParser($blockHtml, $container);
         $html = $container->call([ $parser, 'parse']);
@@ -249,6 +250,7 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
 
         $list = [];
         $loop = 0;
+        $extLoop = 0;
 
         // Fetch extensions
         $result = $extensionsRepository->fetch([
@@ -259,13 +261,17 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
 
         foreach ($result as $extension) {
 
-            $dir = new \Frootbox\Filesystem\Directory($extension->getExtensionController()->getPath() . 'classes/Blocks/');
+            $extController = $extension->getExtensionController();
+
+            ++$extLoop;
+            $loopKey = $extController->getType() == 'Template' ? $extLoop + 200 : $extLoop + 100;
+
+            $dir = new \Frootbox\Filesystem\Directory($extController->getPath() . 'classes/Blocks/');
 
             $extList = [
                 'extension' => $extension->getVendorId() . '/' . $extension->getExtensionId(),
                 'blocks' => [],
             ];
-
 
             foreach ($dir as $file) {
 
@@ -308,11 +314,19 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
                 ];
             }
 
-            if (count($extList['blocks'])) {
-                ksort($extList['blocks']);
-                $list[] = $extList;
+            if (!empty($extList['blocks'])) {
+
+                foreach ($extList['blocks'] as $section => $blocks) {
+                    ksort($blocks);
+                    $extList['blocks'][$section] = $blocks;
+                }
+
+                $list[$loopKey] = $extList;
             }
         }
+
+        krsort($list);
+
 
         // Show blocks clipboard
         if (!empty($_SESSION['editmode']['editables']['block']['copy'])) {
@@ -377,8 +391,10 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
         \DI\Container $container,
         \Frootbox\Admin\View $view,
         \Frootbox\Config\Config $config,
+        \Frootbox\View\Engines\Interfaces\Engine $frontView,
         \Frootbox\Persistence\Content\Repositories\Blocks $blocksRepository,
         \Frootbox\Persistence\Repositories\Extensions $extensionsRepository,
+        \Frootbox\Persistence\Repositories\Pages $pageRepository,
     ): Response
     {
         // Fetch block
@@ -435,9 +451,15 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
             'blockController' => $adminController
         ]);
 
-
         // Render block content
         $blockHtml = '<div data-blocks data-uid="' . $block->getUidRaw() . '"></div>';
+
+        // TODO move to re-usable twig extension later
+        $filter = new \Twig\TwigFilter('translate', function ($string) {
+            return $string;
+        });
+        $frontView->addFilter($filter);
+
 
         define('EDITING', true);
 
@@ -457,6 +479,12 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
         }
 
         $view->set('view', $view);
+
+        // Fetch page
+        $page = $pageRepository->fetchById($block->getPageId());
+
+        $frontView->set('page', $page);
+
         $blockHtml = '<style type="text/less">' . $scss . PHP_EOL . '</style>' . PHP_EOL . $blockHtml;
 
         $parser = new \Frootbox\View\HtmlParser($blockHtml, $container);
@@ -578,6 +606,8 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
         \Frootbox\Http\Post $post,
         \DI\Container $container,
         \Frootbox\Persistence\Content\Repositories\Blocks $blocksRepository,
+        \Frootbox\Persistence\Repositories\Extensions $extensionsRepository,
+        \Frootbox\View\Engines\Interfaces\Engine $view,
     ): Response
     {
         // Fetch block
@@ -596,9 +626,29 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
 
         $block->save();
 
+
+
         $html = $container->call([ $block, 'renderHtml' ]);
 
         define('EDITING', true);
+
+        // Inject scss variables
+        $result = $extensionsRepository->fetch();
+        $scss = (string) null;
+
+        foreach ($result as $extension) {
+
+            $path = $extension->getExtensionController()->getPath();
+
+            $scssFile = $path . 'resources/public/css/styles-variables.less';
+
+            if (file_exists($scssFile)) {
+                $scss .= PHP_EOL . file_get_contents($scssFile);
+            }
+        }
+
+        $html = '<style type="text/less">' . $scss . PHP_EOL . '</style>' . PHP_EOL . $html;
+
 
         $parser = new \Frootbox\View\HtmlParser($html, $container);
         $html = $container->call([ $parser, 'parse']);

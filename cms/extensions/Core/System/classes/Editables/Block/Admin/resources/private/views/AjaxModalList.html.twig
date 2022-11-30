@@ -2,7 +2,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/TableDnD/0.9.1/jquery.tablednd.js" integrity="sha256-d3rtug+Hg1GZPB7Y/yTcRixO/wlI78+2m08tosoRn7A=" crossorigin="anonymous"></script>
 
-<script>
+<script nonce="{{ settings.nonce }}">
     $(function ( ) {
 
         $('#blockstable').tableDnD({
@@ -96,11 +96,18 @@
 
         {% for block in blocks %}
             <tr id="row-{{ block.getId() }}" data-block="{{ block.getId() }}">
-                <td>{{ block.getTitle() | default(block.getBlockId()) }}</td>
+                <td>
+                    {% if block.getTitle() and block.getBlockId() != block.getTitle() %}
+                        <b>{{ block.getTitle() }}</b><br />
+                        {{ block.getBlockId() }}
+                    {% else %}
+                        <b>{{ block.getBlockId() }}</b>
+                    {% endif %}
+                </td>
                 <td class="handle"><a href="#"><i class="fa fa-grip-lines"></i></a></td>
                 <td class="text-right">
                     <a class="block-switch" href="{{ controller.getActionUri('ajaxBlockSwitch', { blockId: block.getId() }) }}"><i class="fa fa-lightbulb xicon visibility {{ block.getVisibilityString() }}"></i></a>
-                    <a class="block-delete" href="{{ controller.getActionUri('ajaxBlockDelete', { blockId: block.getId() }) }}"><i class="fa fa-times xicon"></i></a>
+                    <a class="block-delete" href="{{ controller.getActionUri('ajaxBlockDelete', { blockId: block.getId() }) }}"><i class="far fa-trash xicon"></i></a>
                 </td>
             </tr>
         {% endfor %}

@@ -5,11 +5,14 @@
 
 namespace Frootbox\Ext\Core\News\Plugins\News;
 
+use Frootbox\Http\Interfaces\ResponseInterface;
+
 class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\Persistence\Interfaces\Cloneable
 {
     protected $publicActions = [
         'index',
         'showArticle',
+        'showCategory',
         'archive',
     ];
 
@@ -79,7 +82,19 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
     ): \Frootbox\Db\Result
     {
         if ($order === null) {
-            $order = 'dateStart DESC';
+
+            switch ($this->getConfig('sorting')) {
+
+                default:
+                case 'DateStartDesc':
+                    $order = 'dateStart DESC';
+                    break;
+
+                case 'DateStartAsc':
+                    $order = 'dateStart ASC';
+                    break;
+            }
+
         }
 
         $where = [
@@ -103,6 +118,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
             'limit' => $limit,
             'page' => $page,
         ]);
+
 
         return $result;
     }
@@ -203,7 +219,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
     /**
      *
      */
-    public function showArticleAction (
+    public function showArticleAction(
         \Frootbox\Ext\Core\News\Persistence\Repositories\Articles $articles,
         \Frootbox\View\Engines\Interfaces\Engine $view
     )
@@ -211,5 +227,20 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
         // Fetch article
         $article = $articles->fetchById($this->getAttribute('articleId'));
         $view->set('article', $article);
+    }
+
+    /**
+     *
+     */
+    public function showCategoryAction(
+        \Frootbox\Ext\Core\News\Persistence\Repositories\Categories $categoryRepository,
+    ): \Frootbox\View\Response
+    {
+        // Fetch category
+        $category = $categoryRepository->fetchById($this->getAttribute('categoryId'));
+
+        return new \Frootbox\View\Response([
+            'category' => $category,
+        ]);
     }
 }

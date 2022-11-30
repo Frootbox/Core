@@ -1,0 +1,163 @@
+<script nonce="{{ settings.nonce }}">
+    $(function() {
+
+        /**
+         * Show "headline edit" button
+         */
+        $(document).on('mouseenter', '.plugin[data-plugin]', function ( event ) {
+
+            if (isEditingFreeText) {
+                return;
+            }
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            if (!$('.frootbox-raise-tooltips').hasClass('active')) {
+                $('.popover').popover('hide');
+            }
+
+            var pluginId = $(this).attr('data-plugin');
+            var element = $(this);
+
+            $(this).attr('data-content', '<span class="options edit-mode">Plugin' +
+                '&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;' +
+                '<a target="_blank" class="plugin-edit" href="' + settings.serverpath + 'cms/admin/Plugin/jumpToEditing?pluginId=' + pluginId + '"><i class="far fa-pencil"><\/i><\/a>&nbsp;&nbsp;&nbsp;' +
+                '|&nbsp;&nbsp;&nbsp;' +
+                '<a class="popover-dismiss" href="#"><i class="far fa-times"><\/i><\/a>' +
+                '</span>'
+            );
+
+            $(this).popover({
+                placement: 'top',
+                html: true
+            });
+
+            $(this).popover('show');
+
+            return;
+
+            $('a.follow-parent-href').click(function ( event ) {
+
+                event.preventDefault();
+                event.stopImmediatePropagation();
+
+                isEditing = false;
+
+                element.parents('[data-href]').trigger('click');
+            });
+
+            $(document).on('click', 'a.headline-copy-url', function ( event ) {
+
+                event.preventDefault();
+                event.stopImmediatePropagation();
+
+
+                let str = settings.serverpath_protocol + settings.request;
+
+                if (typeof element.attr('id')!= "undefined") {
+                    str = str + '#' + element.attr('id');
+                }
+                else {
+                    str = str + '#' + element.attr('data-xid');
+                }
+
+                const el = document.createElement('textarea');
+                el.value = str;
+                document.body.appendChild(el);
+                el.select();
+                document.execCommand('copy');
+                document.body.removeChild(el);
+            });
+        });
+
+
+
+        /**
+         * Switch visibility of headline
+         */
+        $(document).on('click', 'a.headline-switch', function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            // Extract uid from href="#uid"
+            var uid = $(this).attr('href').substr(1);
+
+            var headline = $('[data-uid="' + uid + '"]');
+            var link = $(this);
+
+            $.ajax({
+                url: editorconfig.urls.headlines.switch,
+                data: {
+                    uid: uid
+                },
+                success: function ( response ) {
+
+                    if (response.headline.visible) {
+                        headline.removeClass('disabled-headline');
+                        link.removeClass('active');
+                    }
+                    else {
+                        headline.addClass('disabled-headline');
+                        link.addClass('active');
+                    }
+                }
+            });
+        });
+
+
+        /**
+         *
+         */
+        $(document).on('click', 'a.headline-edit', function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            $('.popover').popover('hide');
+
+            // Extract uid from href="#uid"
+            var uid = $(this).attr('href').substr(1);
+            var headline = $('[data-uid="' + uid + '"]');
+
+            fbxEditorOpenGenericModal();
+
+
+            if (headline[0].tagName == 'HEADER') {
+                headlineText = headline.find('h1, h2, h3, h4, h5, h6').first().text();
+            }
+            else {
+                headlineText = headline.find('.head').length > 0 ? headline.find('.head').text() : headline.text();
+            }
+
+            $.ajax({
+                url: "{{ settings.serverpath }}cms/admin/Editor/callEditable",
+                data: {
+                    method: 'ajaxModalEdit',
+                    editable: 'Frootbox/Ext/Core/System/Editables/Headline',
+                    headlineTag: headline.prop("tagName"),
+                    uid: uid,
+                    headline: headlineText,
+                    supertitle: headline.find('.supertitle').text(),
+                    subtitle: headline.find('.subtitle').text()
+                },
+                success: function ( html ) {
+
+                    $('#fbxEditorGenericModal .modal-content').html(html);
+
+                    $('#headline').focus();
+
+                    if ($('#fbxEditorGenericModal .modal-content #headline').val().length == 0) {
+                        $('#fbxEditorGenericModal .modal-content #headline').val(headline.text());
+                    }
+                }
+            });
+
+        });
+
+
+
+
+    });
+</script>

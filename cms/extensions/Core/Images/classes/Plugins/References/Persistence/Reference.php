@@ -66,7 +66,7 @@ class Reference extends \Frootbox\Persistence\AbstractAsset implements \Frootbox
      */
     protected function getNewAlias(): ?\Frootbox\Persistence\Alias
     {
-        if (!empty($this->getConfig('noReferencesDetailPage'))) {
+        if (!empty($this->getConfig('noReferencesDetailPage')) and empty($this->getConfig('forceReferencesDetailPage'))) {
             return null;
         }
 
@@ -87,7 +87,7 @@ class Reference extends \Frootbox\Persistence\AbstractAsset implements \Frootbox
      */
     public function getNewAliases(): array
     {
-        if (!empty($this->getConfig('noReferencesDetailPage'))) {
+        if (!empty($this->getConfig('noReferencesDetailPage')) and empty($this->getConfig('forceReferencesDetailPage'))) {
             return [];
         }
 
@@ -158,5 +158,25 @@ class Reference extends \Frootbox\Persistence\AbstractAsset implements \Frootbox
         $info = parse_url($this->getConfig('url'));
 
         return $info['host'] ?? null;
+    }
+
+    /**
+     *
+     */
+    public function getUri(array $options = null): string
+    {
+        if (!empty($this->getConfig('forceReferencesDetailPage'))) {
+            return parent::getUri($options);
+        }
+
+        if (!empty($this->getConfig('link'))) {
+            return $this->getConfig('link');
+        }
+
+        if (!empty($this->getConfig('noReferencesDetailPage'))) {
+            return '';
+        }
+
+        return parent::getUri($options);
     }
 }

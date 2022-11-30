@@ -10,7 +10,7 @@ return [
         'id' => 'Core',
         'name' => 'Frootbox'
     ],
-    'version' => '0.0.0',
+    'version' => '0.0.2',
     'requires' => [
         'Core/FileManager' => '0.0.1'
     ],

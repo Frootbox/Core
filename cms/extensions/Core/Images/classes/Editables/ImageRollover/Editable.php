@@ -117,6 +117,7 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
 
         if ($counter > 0) {
             $html = str_replace('</head>', '<script src="FILE:' . __DIR__ . '/resources/public/javascript/init.js' . '"></script>', $html);
+
         }
 
         return $html;

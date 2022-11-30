@@ -42,7 +42,7 @@
 <picture data-widget="{{ widget.getId }}">
 
     {% if widget.getConfig('url') %}
-        <a href="{{ widget.getConfig('url') }}">
+        <a {% if widget.getConfig('urlTargetBlank') %}target="_blank"{% endif %} href="{{ widget.getConfig('url') }}">
     {% elseif file and widget.getConfig('magnify') %}
         <a href="{{ file.getUriThumbnail() }}" data-fancybox="gallery">
     {% endif %}

@@ -9,7 +9,11 @@
 			<tr>
 				<th>Referenz</th>
 
-				{% if plugin.getOrdering() == "Manual" %}<th></th>{% endif %}
+				{% if plugin.getOrdering() == "Manual" %}
+					<th></th>
+				{% elseif plugin.getOrdering() == "DateDesc" %}
+					<th>Datum</th>
+				{% endif %}
 
 				<th></th>
 			</tr>
@@ -29,9 +33,13 @@
 
 					{% if plugin.getOrdering() == "Manual" %}
 						<td class="handle" style="cursor: pointer; vertical-align: middle;" width="40"><i class="fa fa-grip-lines"></i></td>
+					{% elseif plugin.getOrdering() == "DateDesc" %}
+						<td nowrap>
+							{{ reference.getDateStart() | date('d.m.Y H:i') }} Uhr
+						</td>
 					{% endif %}
 
-					<td class="text-right">
+					<td class="text-right" nowrap>
 						<a class="ajax" href="{{ v.getUri('Assets', 'ajaxSwitchVisibility', { assetId: reference.getId() } ) }}"><i data-asset="{{ reference.getId() }}" class="fa fa-lightbulb visibility {{ reference.getVisibilityString() }} icon"></i></a>
 						<a class="ajax" data-confirm="Soll diese Referenz wirklich gelöscht werden?" href="{{ data.plugin.getAdminUri('Reference', 'ajaxDelete', { referenceId: reference.getId() }) }}"><i class="fa fa-times icon"></i></a>
 					</td>

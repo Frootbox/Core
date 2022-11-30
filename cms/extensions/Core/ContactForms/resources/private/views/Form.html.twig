@@ -1,9 +1,9 @@
 {% set t = view.getViewhelper('Translator') %}
 
 {% if config.get('recaptcha.v3.key') %}
-    <script type="text/plain" onload="setRecaptcha();" data-consent="google-recaptcha" src="https://www.google.com/recaptcha/api.js?render={{ config.get('recaptcha.v3.key') }}"></script>
+    <script nonce="{{ settings.nonce }}" type="text/plain" onload="setRecaptcha();" data-consent="google-recaptcha" src="https://www.google.com/recaptcha/api.js?render={{ config.get('recaptcha.v3.key') }}"></script>
 
-    <script>
+    <script nonce="{{ settings.nonce }}">
         var forceReCaptcha = false;
         var recaptchaSiteKey = "{{ config.get('recaptcha.v3.key') }}";
 
@@ -15,7 +15,7 @@
     </script>
 {% endif %}
 
-<script>
+<script nonce="{{ settings.nonce }}">
     var _messageYourDataHasBeenSend = "{{ t.translate('YourDataHasBeenSend') }}";
     var _messageFormHasAlreadyBeenSent = "{{ t.translate('FormHasAlreadyBeenSent') }}";
     var _messageDataCouldNotBeSent = "{{ t.translate('DataCouldNotBeSent') }}";

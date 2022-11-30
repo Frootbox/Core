@@ -54,7 +54,7 @@
     }
 </style>
 
-<script>
+<script nonce="{{ settings.nonce }}">
     $(function  () {
         $("ol.example").sortable({
             onDrop: function ($item, container, _super, event) {

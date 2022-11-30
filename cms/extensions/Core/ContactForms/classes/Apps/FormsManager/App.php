@@ -187,6 +187,7 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
             'textAboveMail' => $post->get('textAboveMail'),
             'textBelowMail' => $post->get('textBelowMail'),
             'feedback' => $post->get('feedback'),
+            'autoReplyDeaktivated' => !empty($post->get('autoReplyDeaktivated')),
         ]);
 
         $form->save();
@@ -652,6 +653,9 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
         // Fetch field
         $field = $fieldsRepository->fetchById($get->get('fieldId'));
 
+        $group = $field->getGroup();
+        $form = $group->getForm();
+
         // Get options html
         $viewFile = $field->getPath() . 'resources/private/views/Admin.html.twig';
 
@@ -661,9 +665,9 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
             ]);
         }
 
-
         return new Response('html', 200, [
             'field' => $field,
+            'groups' => $form->getGroups(),
             'availableFields' => $this->getAvailableFields(),
             'optionsHtml' => $html ?? (string) null,
         ]);

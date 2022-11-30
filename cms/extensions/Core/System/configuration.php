@@ -22,6 +22,8 @@ return [
             6001 => \Frootbox\Ext\Core\System\Editables\SimpleElement::class,
             6002 => \Frootbox\Ext\Core\System\Editables\LinkedElement::class,
             6003 => \Frootbox\Ext\Core\System\Editables\Entity::class,
+            6004 => \Frootbox\Ext\Core\System\Editables\Plugin::class,
+
         ],
         'postroutes' => [
             \Frootbox\Ext\Core\System\Routing\EditingRoute::class,

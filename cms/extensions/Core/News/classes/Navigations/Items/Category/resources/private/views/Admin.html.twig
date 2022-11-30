@@ -1,5 +1,5 @@
 <div class="form-group">
-    <label for="categoryId">Seite</label>
+    <label for="categoryId">Kategorie</label>
     <select required class="form-control" id="categoryId" name="categoryId">
         <option value="">bitte wählen ...</option>
         {% for category in item.getCategories() %}
@@ -7,6 +7,7 @@
         {% endfor %}
     </select>
 </div>
+{#
 <div class="form-group">
     <label for="anchor">Anker</label>
     <input type="text" value="{{ item.getConfig('anchor') }}" id="anchor" name="anchor" placeholder="Anker" class="form-control" />
@@ -15,3 +16,4 @@
     <input type="checkbox" class="form-check-input" id="showChildren" name="showChildren" {% if item.getConfig('showChildren') %}checked{% endif %}>
     <label class="form-check-label" for="showChildren">Unterseiten auflisten</label>
 </div>
+#}

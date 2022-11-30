@@ -25,7 +25,7 @@
                         <label for="order">Sortierung</label>
                         <select class="form-control" name="order" id="order">
                             <option {% if plugin.getConfig('order') == "Manual" %}selected{% endif %} value="Manual">manuelle Sortierug</option>
-                            <option {% if plugin.getConfig('order') == "DateDesc" %}selected{% endif %} value="DateDesc">Neueste zuerst</option>
+                            <option {% if plugin.getConfig('order') == 'DateDesc' %}selected{% endif %} value="DateDesc">Datum absteigend</option>
                             <option {% if plugin.getConfig('order') == "DateAsc" %}selected{% endif %} value="DateAsc">Älteste zuerst</option>
                         </select>
                     </div>

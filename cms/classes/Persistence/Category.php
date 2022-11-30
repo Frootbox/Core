@@ -48,7 +48,7 @@ class Category extends \Frootbox\Persistence\RowModels\ConfigurableNestedSet
     {
         // Obtain connection model
         $connectionModel = ($this->connectionModel === null) ? \Frootbox\Persistence\Repositories\CategoriesConnections::class : $this->connectionModel;
-        $model = $this->db->getModel($connectionModel);
+        $model = $this->db->getRepository($connectionModel);
 
         // Check for existing connections
         $check = $model->fetch([
@@ -104,6 +104,10 @@ class Category extends \Frootbox\Persistence\RowModels\ConfigurableNestedSet
 
         $result->map('delete');
     }
+
+    /**
+     *
+     */
 
     /**
      *

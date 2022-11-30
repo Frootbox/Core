@@ -48,6 +48,7 @@ class View
         });
         $this->twig->addFilter($filter);
 
+
         $this->set('view', $this);
     }    
 

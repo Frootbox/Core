@@ -45,9 +45,7 @@ class Partials extends AbstractViewhelper
 
             return $html;
         }
-        elseif ($segment[0] == '/') {
-
-            preg_match('#^\/Frootbox\/Ext\/(.*?)\/(.*?)\/Plugins\/(.*?)\/(.*?)$#', $segment, $match);
+        elseif (preg_match('#^\/Frootbox\/Ext\/(.*?)\/(.*?)\/Plugins\/(.*?)\/(.*?)$#', $segment, $match)) {
 
             $class = '\\Frootbox\\Ext\\' . $match[1] . '\\' . $match[2] . '\\ExtensionController';
 
@@ -56,6 +54,17 @@ class Partials extends AbstractViewhelper
             $files[] = $config->get('partialsRootFolder') . $match[1] . '/' . $match[2] . '/' . $match[3] . '/' . $match[4] . '/View.html.twig';
             $files[] = $extController->getPath() . 'classes/Plugins/' . $match[3] . '/resources/private/partials/' . $match[4] . '/View.html.twig';
             $files[] = $extController->getPath() . 'classes/Plugins/' . $match[3] . '/' . $match[4] . '/resources/private/views/View.html.twig';
+        }
+        elseif (preg_match('#^\/Frootbox\/Ext\/(.*?)\/(.*?)\/(.*?)$#', $segment, $match)) {
+
+            $class = '\\Frootbox\\Ext\\' . $match[1] . '\\' . $match[2] . '\\ExtensionController';
+            $extController = new $class;
+
+            if (!empty($config->get('partialsRootFolder'))) {
+                $files[] = $config->get('partialsRootFolder') . $match[3] . '/View.html.twig';
+            }
+
+            $files[] = $extController->getPath() . 'resources/private/partials/' . $match[3] . '/View.html.twig';
         }
         else {
 
@@ -97,7 +106,13 @@ class Partials extends AbstractViewhelper
 
         $view->set('data', $parameters);
 
-        $html = $view->render($file);
+        foreach ($parameters as $key => $value) {
+            $view->set($key, $value);
+        }
+
+        $html = $view->render($file, [
+            'filePath' => dirname($file) . '/',
+        ]);
 
         if (file_exists($file)) {
 

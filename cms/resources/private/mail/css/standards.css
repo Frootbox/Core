@@ -1,0 +1,23 @@
+html {
+    min-height: 100%;
+    background: #f3f3f3;
+}
+
+table.body {
+    background: #f3f3f3;
+    height: 100%;
+    width: 100%;
+}
+
+table.container {
+    background: #fefefe;
+    width: 580px;
+    margin: 0 auto;
+    Margin: 0 auto;
+    text-align: inherit;
+}
+
+.footer p {
+    font-size: 12px;
+    color: #999;
+}

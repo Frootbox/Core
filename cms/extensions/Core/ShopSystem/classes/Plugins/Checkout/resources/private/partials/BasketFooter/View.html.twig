@@ -1,7 +1,7 @@
 {% set i = view.getViewhelper('Delegator', { object: plugin }) %}
 {% set icons = view.getViewhelper('Ext/HerrUndFrauPixelExt/Icons/Icons', { createDummyOnFail: true  }) %}
 
-<script>
+<script nonce="{{ settings.nonce }}">
     $(function ( ) {
 
         /**

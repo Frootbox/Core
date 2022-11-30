@@ -31,12 +31,16 @@ class Partial extends \Frootbox\Admin\View\Partials\AbstractPartial
         $plugin = $this->getData('plugin');
 
         switch ($plugin->getConfig('order')) {
-            case 'DateDesc':
+            case 'NewestFirst':
                 $order = [ 'date DESC' ];
                 break;
 
             case 'DateAsc':
                 $order = [ 'date ASC' ];
+                break;
+
+            case 'DateDesc':
+                $order = [ 'dateStart DESC' ];
                 break;
 
             case 'Manual':

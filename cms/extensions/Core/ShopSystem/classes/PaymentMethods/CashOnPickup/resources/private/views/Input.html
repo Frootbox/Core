@@ -1,6 +1,6 @@
 <p>Sie bezahlen bei Abholung in Bar oder mit EC Karte.</p>
 
-<script>
+<script nonce="{{ settings.nonce }}">
     $(function ( ) {
         $('#selfPickup').prop('checked', true);
         $('#selfPickup').trigger('change');

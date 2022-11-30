@@ -11,7 +11,7 @@ variables:
 
 {% set i = view.getViewhelper('Delegator', { object: plugin }) %}
 
-<script>
+<script nonce="{{ settings.nonce }}">
     $(function ( ) {
         localStorage.setItem('fbxShopCartItemCount', null);
         $('.fbxShopCartItemCounter').hide();

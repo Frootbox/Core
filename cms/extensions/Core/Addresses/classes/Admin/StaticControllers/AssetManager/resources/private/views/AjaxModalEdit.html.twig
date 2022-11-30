@@ -24,6 +24,8 @@
             </div>
         </div>
 
+        <hr />
+
         <div class="form-row">
             <div class="form-group col-4">
                 <label for="zipcode">PLZ</label>
@@ -34,12 +36,52 @@
                 <input type="text" class="form-control" name="city" id="city" placeholder="Ort" value="{{ address.getCity() }}">
             </div>
         </div>
-
         <div class="form-group">
             <label for="country">Land</label>
             <input type="text" class="form-control" name="country" id="country" placeholder="Land" value="{{ address.getCountry() }}">
         </div>
 
+        <hr />
+
+        <div class="form-group">
+            <label for="email">E-Mail</label>
+            <input type="email" class="form-control" name="email" id="email" placeholder="E-Mail" value="{{ address.getEmail() }}">
+        </div>
+        <div class="form-group">
+            <label for="phone">Telefon</label>
+            <input type="text" class="form-control" name="phone" id="phone" placeholder="Telefon" value="{{ address.getPhone() }}">
+        </div>
+
+        <hr />
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="lat">Breitengrad (Lat)</label>
+                    <input type="text" class="form-control" name="lat" id="lat" placeholder="Breitengrad" value="{{ address.getLat() }}">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="lng">Längengrad (Lng)</label>
+                    <input type="text" class="form-control" name="lng" id="lng" placeholder="Längengrad" value="{{ address.getLng() }}">
+                </div>
+            </div>
+        </div>
+
+        <script nonce="{{ settings.nonce }}">
+            $(function() {
+                $('#lat').change(function() {
+
+                    let match = $(this).val().match(/^(.*?)\,(.*?)$/);
+
+                    if (match) {
+                        $('#lat').val($.trim(match[1]));
+                        $('#lng').val($.trim(match[2]));
+                    }
+                });
+            });
+        </script>
 
     </div>
     <div class="modal-footer">

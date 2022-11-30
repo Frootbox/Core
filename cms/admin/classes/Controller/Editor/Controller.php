@@ -273,6 +273,7 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
             }
         }
 
+
         $source = $view->render($viewfile);
 
         return self::getResponse('plain', 200, $source);

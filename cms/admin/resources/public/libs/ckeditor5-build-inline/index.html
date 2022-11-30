@@ -105,7 +105,7 @@ For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
 
 <script src="ckeditor.js"></script>
 
-<script>
+<script nonce="{{ settings.nonce }}">
 	InlineEditor
 		.create( document.querySelector( '#editor' ), {
 			// toolbar: [ 'heading', '|', 'bold', 'italic', 'link' ]

@@ -65,11 +65,15 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
                 $alt = !empty($file->getConfig('caption')) ? strip_tags($file->getConfig('caption')) : $file->getName();
             }
 
-            $html = '<a href="' . $bigsrc . '" data-fancybox="gallery">
-                        <picture class="fluid">
+            $html = '<picture class="fluid">
                             <img width="' . $width . '" src="' . $src . '" alt="' . $alt . '" />
-                        </picture>
-                    </a>          
+                        </picture>';
+
+            if ($file->getConfig('magnifier')) {
+                $html = '<a href="' . $bigsrc . '" data-fancybox="gallery">' . $html . '</a>';
+            }
+
+            $html .= '        
                     <figcaption>
                         ' . ($file ? nl2br($file->getConfig('caption')) : null) . '
                         ' . (($file and $file->getCopyright()) ? '<span class="copyright">' . $file->getCopyright() . '</span>' : '') . '

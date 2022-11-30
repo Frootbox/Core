@@ -105,7 +105,7 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
             'maxage' => (3600 * 24 * 60)
         ]);
 
-        switch ( $get->get('action') ) {
+        switch($get->get('action')) {
 
             default:
             case 'redirect':

@@ -110,6 +110,10 @@ class Smtp extends AbstractTransport
             $this->mailer->addAddress($recipient->getAddress(), $recipient->getName());
         }
 
+        foreach ($envelope->getBcc() as $recipient) {
+            $this->mailer->addBcc($recipient->getAddress(), $recipient->getName());
+        }
+
         error_reporting($def);
 
         foreach ($envelope->getAttachments() as $attachment) {

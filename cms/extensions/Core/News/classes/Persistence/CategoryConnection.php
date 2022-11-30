@@ -72,8 +72,8 @@ class CategoryConnection extends \Frootbox\Persistence\CategoryConnection implem
             'virtualDirectory' => $virtualDirectory,
             'visibility' => 2,
             'payload' => $this->generateAliasPayload([
-                'action' => 'showProduct',
-                'showArticle' => $article->getId(),
+                'action' => 'showArticle',
+                'articleId' => $article->getId(),
                 'categoryId' => $category->getId(),
             ]),
         ]);

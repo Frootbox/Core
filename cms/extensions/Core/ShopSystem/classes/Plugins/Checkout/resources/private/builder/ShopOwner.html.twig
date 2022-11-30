@@ -1,0 +1,273 @@
+<html>
+    <head>
+
+        <style>
+            body {
+                font-family: Arial;
+                font-size: 14px;
+            }
+
+            td {
+                font-size: 14px;
+            }
+
+            td.text-right {
+                text-align: right;
+            }
+
+            table.items {
+                margin: 20px 0;
+            }
+
+            table.items thead th {
+                padding: 10px 0;
+            }
+
+            table.items td {
+                padding: 9px 0;
+                border-top: 1px solid #CCC;
+            }
+
+            a, a.email-link {
+                color: #000;
+            }
+
+            h4, th {
+                text-align: left;
+                font-size: 14px;
+                font-weight: bold;
+                text-transform: uppercase;
+            }
+
+        </style>
+
+
+    </head>
+    <body>
+
+        <table width="100%">
+            <tr>
+                <td align="center">
+
+                    <table width="600">
+                        <tr>
+                            <td>
+
+                                <img src="{{ serverpath }}static/Ext/Core/Images/Email/serve/qs/EXT/{{ baseVendor }}:{{ baseExtension }}:images/f/logo-email.png" alt="" />
+
+                                <br /><br /><br />
+
+                                {% if textAbove %}
+                                    <p>{{ textAbove | nl2br }}</p>
+                                {% else %}
+                                    <p>
+                                        <b>Hallo {{ shopcart.getPersonal('firstname') }} {{ shopcart.getPersonal('lastname') }},</b>
+                                    </p>
+                                    <p>
+                                        vielen Dank für Ihre Bestellung bei uns. Anbei finden Sie eine Übersicht über Ihre Bestellung.
+                                    </p>
+                                {% endif %}
+
+
+
+                                <br />
+
+                                <p>
+                                    Bestellnummer: {{ orderNumber }}<br />
+                                    Datum: {{ booking.getDate() | date('d.m.Y H:i') }} Uhr
+                                </p>
+
+                                <br />
+
+                                <table width="100%">
+                                    <tr>
+                                        <td width="50" valign="top">
+
+                                            <h4>persönliche Daten</h4>
+
+                                            <p>
+                                                {{ shopcart.getPersonal('firstname') }} {{ shopcart.getPersonal('lastname') }}<br />
+                                                {{ shopcart.getPersonal('street') }} {{ shopcart.getPersonal('streetNumber') }}<br />
+                                                {{ shopcart.getPersonal('postalCode') }} {{ shopcart.getPersonal('city') }}
+                                            </p>
+                                            <p>
+                                                <a class="email-link" href="mailto:{{ shopcart.getPersonal('email') }}">{{ shopcart.getPersonal('email') }}</a>
+                                            </p>
+
+                                            {% if shopcart.getPersonal('phone') %}
+                                                <p>Telefon <a class="email-link" href="tel:{{ shopcart.getPersonal('phone') }}">{{ shopcart.getPersonal('phone') }}</a></p>
+                                            {% endif %}
+
+                                            <br />
+
+                                            <h4>Rechnungsadresse</h4>
+
+                                            <p>
+                                                {{ shopcart.getPersonal('firstname') }} {{ shopcart.getPersonal('lastname') }}<br />
+                                                {{ shopcart.getPersonal('street') }} {{ shopcart.getPersonal('streetNumber') }}<br />
+                                                {{ shopcart.getPersonal('postalCode') }} {{ shopcart.getPersonal('city') }}
+                                            </p>
+
+                                        </td>
+                                        <td width="50" valign="top">
+
+                                            <h4>Lieferadresse</h4>
+
+                                            {% if shopcart.getShipping('type') == 'shipToBillingAddress' %}
+                                                <p>Rechnungsadresse ist Lieferadresse.</p>
+                                            {% elseif shopcart.getShipping('type') == 'selfPickup' %}
+                                                <p>Selbstabholung</p>
+                                            {% else %}
+                                                <p>
+                                                    {{ shopcart.getShipping('firstname') }} {{ shopcart.getShipping('lastname') }}<br />
+                                                    {% if shopcart.getShipping('addition') %}{{ shopcart.getShipping('addition') }}<br />{% endif %}
+                                                    {{ shopcart.getShipping('street') }} {{ shopcart.getShipping('streetNumber') }}<br />
+                                                    {{ shopcart.getShipping('postalCode') }} {{ shopcart.getShipping('city') }}
+                                                </p>
+                                            {% endif %}
+
+                                            {% if shopcart.getNewsletterConsent() %}
+
+                                                <br />
+
+                                                <h4>Newsletter</h4>
+
+                                                <p>Sie haben dem Erhalt des Newsletters zugestimmt. Vielen Dank!</p>
+
+                                            {% endif %}
+
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <br />
+
+                                <h4>Zahlungart</h4>
+
+                                <p>{{ shopcart.getPaymentMethod().getTitle() }}</p>
+
+                                {{ paymentInfo | raw }}
+
+                                <br />
+
+                                {% if booking.getConfig('note') %}
+
+                                    <h4>Bemerkung</h4>
+
+                                    <p>{{ booking.getConfig('note') | nl2br }}</p>
+
+                                    <br />
+                                {% endif %}
+
+                                {% if booking.getConfig('additionalinput') %}
+
+                                    <p><b>zusätzliche Angaben</b></p>
+                                    {% for index, input in booking.getConfig('additionalinput') %}
+                                        {{ index }}: {{ input }}<br />
+                                    {% endfor %}
+
+                                    <br />
+                                {% endif %}
+
+                                <h4>gekaufte Artikel</h4>
+
+                                <table width="100%" class="items" cellpadding="0" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th>Artikel</th>
+                                            <th class="text-right">Menge</th>
+                                            <th class="text-right">Einzelpreis</th>
+                                            <th class="text-right">Summe</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                    {% for item in shopcart.getItems() %}
+                                        <tr>
+                                            <td>
+                                                {{ item.getTitle() }}
+
+                                                {% if item.getConfig()['couponCode'] %}
+                                                    <br />gekaufter Coupon {{ item.getConfig()['couponCode'] }}
+                                                {% endif %}
+
+                                                {% for equipment in item.getEquipment() %}
+                                                    <br />+ {{ equipment.title }}
+                                                {% endfor %}
+
+                                                {% for option in item.getFieldOptions() %}
+                                                    <br />- {{ option.option }}{% if option.surcharge %} (+ {{ option.surcharge | number_format(2, ",", ".") }} &euro;){% endif %}
+                                                {% endfor %}
+
+                                                {% if item.getCustomNote() %}
+                                                    <br />{{ item.getCustomNote() | nl2br }}
+                                                {% endif %}
+
+                                                {% if item.getAdditionalText() %}
+                                                    <br />{{ item.getAdditionalText() | nl2br }}
+                                                {% endif %}
+                                            </td>
+                                            <td class="text-right">
+                                                {{ item.getAmount() }} x
+                                            </td>
+                                            <td class="text-right">
+                                                {{ item.getPriceGross() | number_format(2,',','.') }} EUR
+                                            </td>
+                                            <td class="text-right">
+                                                {{ item.getTotal() | number_format(2,',','.') }} EUR
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+
+                                    </tbody>
+                                    <tfoot>
+
+                                        {% for coupon in shopcart.getRedeemedCoupons() %}
+                                            <tr>
+                                                <td class="text-right" colspan="3">
+                                                    Coupon „{{ coupon.getCode() }}“ ({% if coupon.getConfig('valuePercent') %}{{ coupon.getConfig('valuePercent') }} %{% else %}{{ coupon.getValueLeft() | number_format(2,',','.') }} EUR{% endif %})
+
+                                                    <a class="coupon-dismiss" href="{{ data.plugin.getUriAjax('dismissCoupon', { couponCode: coupon.getCode() }) }}"><i class="fa fa-times"></i></a>
+                                                </td>
+                                                <td class="text-right">-{{ coupon.getRedeemedValue() | number_format(2,',','.') }} EUR</td>
+                                            </tr>
+                                        {% endfor %}
+
+                                        <tr>
+                                            <td class="text-right" colspan="3">Versand &amp; Bearbeitung</td>
+                                            <td class="text-right">{{ shopcart.getShippingCosts() | number_format(2,',','.') }} EUR</td>
+                                        </tr>
+
+                                        {% for section in shopcart.getTaxSections() %}
+
+                                            <tr>
+                                                <td class="text-right tax" colspan="3">inkl. {{ section.taxrate }} % MwSt. auf {{ section.total | number_format(2,',','.') }} EUR</td>
+                                                <td class="text-right tax">{{ section.tax | number_format(2,',','.') }} EUR</td>
+                                                {% if data.editable %}<td></td>{% endif %}
+                                            </tr>
+
+                                        {% endfor %}
+
+                                        <tr>
+                                            <td class="text-right" colspan="3"><b>Gesamtsumme</b></td>
+                                            <td class="text-right"><b>{{ shopcart.getTotal() | number_format(2,',','.') }} EUR</b></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+
+                                {% if textBelow %}
+                                    <p>{{ textBelow | raw | nl2br }}</p>
+                                {% else %}
+                                    <p>Wir bedanken uns für Ihren Einkauf und wünschen Ihnen viel Spass mit unseren Produkten!</p>
+                                {% endif %}
+
+                            </td>
+                        </tr>
+                    </table>
+
+                </td>
+            </tr>
+        </table>
+
+    </body>
+</html>

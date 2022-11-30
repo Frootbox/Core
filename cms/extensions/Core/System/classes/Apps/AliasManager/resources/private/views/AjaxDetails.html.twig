@@ -1,0 +1,57 @@
+<script nonce="{{ settings.nonce }}">
+    $(function() {
+
+        /**
+         *
+         */
+        $('a.close-panel').click(function(event) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            let aliasId = $(this).data('alias');
+
+            $('.card[data-alias="' + aliasId  + '"]').fadeOut();
+        });
+    });
+</script>
+
+<div class="card" data-alias="{{ alias.getId() }}">
+    <div class="card-body">
+
+        <p><b>{{ alias.getAlias() }}</b></p>
+
+        {% if alias.getConfig('target') %}
+            <p><br /><code>{{ alias.getConfig('target') }}</code></p>
+        {% endif %}
+
+        <form method="post" action="{{ app.getUri('ajaxUpdateSeo', { aliasId: alias.getId() }) }}" class="ajax">
+
+            <div class="form-group">
+                <label for="title">Titel</label>
+                <input type="text" class="form-control" id="title" name="title" aria-describedby="emailHelp" placeholder="Titel" value="{{ alias.getCOnfig('seo.title') }}">
+                <small id="emailHelp" class="form-text text-muted">Seitentitel/SERP Snippet Titel</small>
+            </div>
+            <div class="form-group">
+                <label for="description">Meta-Beschreibung</label>
+                <textarea rows="3" class="form-control" id="description" name="description" aria-describedby="descriptionHelp" placeholder="Meta-Beschreibung">{{ alias.getConfig('seo.description') }}</textarea>
+                <small id="descriptionHelp" class="form-text text-muted">SERP Snippet Text</small>
+            </div>
+            <div class="form-group">
+                <label for="keywords">Meta-Keywords</label>
+                <textarea rows="2" class="form-control" id="keywords" name="keywords" aria-describedby="keywordsHelp" placeholder="Meta-Keywords">{{ alias.getConfig('seo.keywords') }}</textarea>
+                <small id="keywordsHelp" class="form-text text-muted">nur für internen Gebrauch</small>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <button type="submit" class="btn btn-primary">Speichern</button>
+                </div>
+                <div class="col-md-6 text-right">
+                    <a data-alias="{{ alias.getId() }}" class="close-panel btn btn-primary" href="#"><i class="far fa-times"></i></a>
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>

@@ -1,12 +1,12 @@
-
 {% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set icons = view.getViewhelper('Ext/HerrUndFrauPixelExt/Icons/Icons', { createDummyOnFail: true  }) %}
 
 <div class="contacts">
     <div class="row">
         {% for contact in data.category.getContacts() %}
             <div class="{{ data.colClass }} contact">
 
-                <picture data-editable data-uid="{{ contact.getUid('image')}}">
+                <picture {% if not variables.withRolloverEffect %}data-editable{% else %}data-editable-rollover{% endif %} data-uid="{{ contact.getUid('image')}}">
                     <img width="600" height="400" src="{{ i.getDummyImage({ width: 600, height: 400 }) }}" alt="" />
                 </picture>
 
@@ -28,12 +28,12 @@
 
                 <p>
                     {% if contact.getPhone() %}
-                        <a href="tel:{{ contact.getPhone() }}"><i class="fa fa-fw fa-phone"></i>{{ contact.getPhone() }}</a><br />
+                        <a href="tel:{{ contact.getPhone() }}">{{ icons.render('phone', [ 'fa-fw' ]) | raw }}{{ contact.getPhone() }}</a><br />
                     {% endif %}
 
                     {% if contact.getEmail() %}
                         <a class="email" href="mailto:{{ contact.getEmail() }}">
-                            <i class="fa fa-fw fa-envelope"></i>{% if variables.showFullEmail %}{{ contact.getEmail() }}{% else %}E-Mail{% endif %}
+                            {{ icons.render('envelope', [ 'fa-fw' ]) | raw }}{% if variables.showFullEmail %}{{ contact.getEmail() }}{% else %}E-Mail{% endif %}
                         </a><br />
                     {% endif %}
 

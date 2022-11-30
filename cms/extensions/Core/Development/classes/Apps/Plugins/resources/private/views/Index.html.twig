@@ -1,0 +1,35 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ front.addTab('Plugins-Verwaltung', app.getUri('index')) }}
+
+<h2>
+	Plugins
+</h2>
+
+
+<div class="card">
+	<div class="card-body">
+
+		<table class="table">
+			<tbody>
+
+				{% for plugin in plugins %}
+					<tr>
+						<td>{{ plugin.getPage().getTitle() }}</td>
+						<td>{{ plugin.getTitle() }}</td>
+						<td>{{ plugin }}</td>
+						<td>
+							{% if plugin.getConfig('layout') %}
+								{% for action, layout in plugin.getConfig('layout') %}
+									{{ action }} => {{ layout }}<br />
+								{% endfor %}
+							{% endif %}
+						</td>
+					</tr>
+				{% endfor %}
+
+			</tbody>
+		</table>
+
+	</div>
+</div>

@@ -73,8 +73,11 @@ $(function ( ) {
 
                     $('#shopcartProductAddModal').modal('show');
                 }
-                else {
+                else if (typeof response.continue != "undefined") {
                     window.location.href = response.continue;
+                }
+                else if (typeof response.success != "undefined") {
+                    alert(response.success);
                 }
             },
             error: function ( response ) {
