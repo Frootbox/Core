@@ -69,7 +69,7 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
                             <img width="' . $width . '" src="' . $src . '" alt="' . $alt . '" />
                         </picture>';
 
-            if ($file->getConfig('magnifier')) {
+            if ($file and $file->getConfig('magnifier')) {
                 $html = '<a href="' . $bigsrc . '" data-fancybox="gallery">' . $html . '</a>';
             }
 

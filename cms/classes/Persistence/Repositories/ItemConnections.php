@@ -125,7 +125,7 @@ class ItemConnections extends \Frootbox\Db\Model
             x.baseCLass = :baseClass AND
             x.baseId = :baseId
         ORDER BY
-            x.orderId DESC';
+            x.orderId DESC, x.id ASC';
 
         $result = $repository->fetchByQuery($sql, [
             'itemClass' => $repository->getClass(),

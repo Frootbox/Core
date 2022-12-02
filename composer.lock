@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "078b9eecf012c1d00e1862d7faf03d78",
+    "content-hash": "f84cc22874b9235f8879e8065ac2c9e4",
     "packages": [
         {
             "name": "doctrine/annotations",
-            "version": "1.13.2",
+            "version": "1.13.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/annotations.git",
-                "reference": "5b668aef16090008790395c02c893b1ba13f7e08"
+                "reference": "648b0343343565c4a056bfc8392201385e8d89f0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/annotations/zipball/5b668aef16090008790395c02c893b1ba13f7e08",
-                "reference": "5b668aef16090008790395c02c893b1ba13f7e08",
+                "url": "https://api.github.com/repos/doctrine/annotations/zipball/648b0343343565c4a056bfc8392201385e8d89f0",
+                "reference": "648b0343343565c4a056bfc8392201385e8d89f0",
                 "shasum": ""
             },
             "require": {
@@ -29,9 +29,10 @@
             "require-dev": {
                 "doctrine/cache": "^1.11 || ^2.0",
                 "doctrine/coding-standard": "^6.0 || ^8.1",
-                "phpstan/phpstan": "^0.12.20",
+                "phpstan/phpstan": "^1.4.10 || ^1.8.0",
                 "phpunit/phpunit": "^7.5 || ^8.0 || ^9.1.5",
-                "symfony/cache": "^4.4 || ^5.2"
+                "symfony/cache": "^4.4 || ^5.2",
+                "vimeo/psalm": "^4.10"
             },
             "type": "library",
             "autoload": {
@@ -74,9 +75,9 @@
             ],
             "support": {
                 "issues": "https://github.com/doctrine/annotations/issues",
-                "source": "https://github.com/doctrine/annotations/tree/1.13.2"
+                "source": "https://github.com/doctrine/annotations/tree/1.13.3"
             },
-            "time": "2021-08-05T19:00:23+00:00"
+            "time": "2022-07-02T10:48:51+00:00"
         },
         {
             "name": "doctrine/lexer",
@@ -153,6 +154,52 @@
                 }
             ],
             "time": "2022-02-28T11:07:21+00:00"
+        },
+        {
+            "name": "frogbob/inky-php",
+            "version": "0.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/frogbob/inky-php.git",
+                "reference": "2178ab13f86473feb09b471b0a11bccfd2f10499"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/frogbob/inky-php/zipball/2178ab13f86473feb09b471b0a11bccfd2f10499",
+                "reference": "2178ab13f86473feb09b471b0a11bccfd2f10499",
+                "shasum": ""
+            },
+            "require": {
+                "paquettg/php-html-parser": "^2.1",
+                "php": ">=5.4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Frogbob\\InkyPHP\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Freerk van Zeijl",
+                    "email": "freerk.vanzeijl@ultrabold.com"
+                }
+            ],
+            "description": "PHP Implementation of ZURB's Foundation for Email parser - Based on thampe/inky",
+            "keywords": [
+                "inky",
+                "php",
+                "reponsive-emails"
+            ],
+            "support": {
+                "issues": "https://github.com/frogbob/inky-php/issues",
+                "source": "https://github.com/frogbob/inky-php/tree/master"
+            },
+            "time": "2019-11-08T23:26:55+00:00"
         },
         {
             "name": "frootbox/config",
@@ -239,12 +286,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Frootbox/Db.git",
-                "reference": "cd0f9bb1863d24c90713607a399f95f7218b50c8"
+                "reference": "c23a760bb7caa7a5c2ccc50adf6cc37e1ee4fb09"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Frootbox/Db/zipball/cd0f9bb1863d24c90713607a399f95f7218b50c8",
-                "reference": "cd0f9bb1863d24c90713607a399f95f7218b50c8",
+                "url": "https://api.github.com/repos/Frootbox/Db/zipball/c23a760bb7caa7a5c2ccc50adf6cc37e1ee4fb09",
+                "reference": "c23a760bb7caa7a5c2ccc50adf6cc37e1ee4fb09",
                 "shasum": ""
             },
             "default-branch": true,
@@ -269,9 +316,9 @@
                 "docs": "",
                 "email": "jan.habbo.bruening@gmail.com",
                 "issues": "https://github.com/Frootbox/Db/issues",
-                "source": "https://github.com/Frootbox/Db/tree/0.0.10"
+                "source": "https://github.com/Frootbox/Db/tree/0.1.1"
             },
-            "time": "2021-10-04T09:50:34+00:00"
+            "time": "2022-10-18T18:51:10+00:00"
         },
         {
             "name": "frootbox/debug",
@@ -356,12 +403,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Frootbox/Filesystem.git",
-                "reference": "845ad6de3c8856334d60ce760676e180ccdb74fc"
+                "reference": "867391d6ae3ece6e45660581d26d1fc27c4ba98b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Frootbox/Filesystem/zipball/845ad6de3c8856334d60ce760676e180ccdb74fc",
-                "reference": "845ad6de3c8856334d60ce760676e180ccdb74fc",
+                "url": "https://api.github.com/repos/Frootbox/Filesystem/zipball/867391d6ae3ece6e45660581d26d1fc27c4ba98b",
+                "reference": "867391d6ae3ece6e45660581d26d1fc27c4ba98b",
                 "shasum": ""
             },
             "require": {
@@ -389,9 +436,9 @@
                 "docs": "",
                 "email": "jan.habbo.bruening@gmail.com",
                 "issues": "https://github.com/Frootbox/Filesystem/issues",
-                "source": "https://github.com/Frootbox/Filesystem/tree/0.0.7"
+                "source": "https://github.com/Frootbox/Filesystem/tree/master"
             },
-            "time": "2021-10-04T09:58:15+00:00"
+            "time": "2021-10-04T14:56:17+00:00"
         },
         {
             "name": "frootbox/http",
@@ -399,12 +446,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Frootbox/Http.git",
-                "reference": "642db62503b350049a2f0ae98b415f5b24a1a8a0"
+                "reference": "b24d4173c9ed87dfd1b9c978c7ed4e5922d163a9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Frootbox/Http/zipball/642db62503b350049a2f0ae98b415f5b24a1a8a0",
-                "reference": "642db62503b350049a2f0ae98b415f5b24a1a8a0",
+                "url": "https://api.github.com/repos/Frootbox/Http/zipball/b24d4173c9ed87dfd1b9c978c7ed4e5922d163a9",
+                "reference": "b24d4173c9ed87dfd1b9c978c7ed4e5922d163a9",
                 "shasum": ""
             },
             "default-branch": true,
@@ -429,9 +476,9 @@
                 "docs": "",
                 "email": "jan.habbo.bruening@gmail.com",
                 "issues": "https://github.com/Frootbox/Http/issues",
-                "source": "https://github.com/Frootbox/Http/tree/0.0.5"
+                "source": "https://github.com/Frootbox/Http/tree/master"
             },
-            "time": "2021-10-04T10:02:28+00:00"
+            "time": "2022-10-30T19:21:56+00:00"
         },
         {
             "name": "frootbox/mail",
@@ -439,13 +486,16 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Frootbox/Mail.git",
-                "reference": "84c8dd9d0e2821cf191f62ffce24945c5323b3ad"
+                "reference": "588584127d0c8fa904734ae6e9cc4d57e31d7b5f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Frootbox/Mail/zipball/84c8dd9d0e2821cf191f62ffce24945c5323b3ad",
-                "reference": "84c8dd9d0e2821cf191f62ffce24945c5323b3ad",
+                "url": "https://api.github.com/repos/Frootbox/Mail/zipball/588584127d0c8fa904734ae6e9cc4d57e31d7b5f",
+                "reference": "588584127d0c8fa904734ae6e9cc4d57e31d7b5f",
                 "shasum": ""
+            },
+            "require": {
+                "phpmailer/phpmailer": "6.6.*"
             },
             "default-branch": true,
             "type": "library",
@@ -466,9 +516,9 @@
                 "docs": "",
                 "email": "jan.habbo.bruening@gmail.com",
                 "issues": "https://github.com/Frootbox/Mail/issues",
-                "source": "https://github.com/Frootbox/Mail/tree/v0.0.2"
+                "source": "https://github.com/Frootbox/Mail/tree/0.0.5"
             },
-            "time": "2019-07-01T06:58:42+00:00"
+            "time": "2022-09-27T13:22:33+00:00"
         },
         {
             "name": "frootbox/translation",
@@ -476,12 +526,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Frootbox/Translation.git",
-                "reference": "03dfeb979f7a9882f8cfef1293c74470d60c6ed8"
+                "reference": "795cdd5d622c24a7481f10c5227dc49b65922e15"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Frootbox/Translation/zipball/03dfeb979f7a9882f8cfef1293c74470d60c6ed8",
-                "reference": "03dfeb979f7a9882f8cfef1293c74470d60c6ed8",
+                "url": "https://api.github.com/repos/Frootbox/Translation/zipball/795cdd5d622c24a7481f10c5227dc49b65922e15",
+                "reference": "795cdd5d622c24a7481f10c5227dc49b65922e15",
                 "shasum": ""
             },
             "default-branch": true,
@@ -506,9 +556,9 @@
                 "docs": "",
                 "email": "jan.habbo.bruening@gmail.com",
                 "issues": "https://github.com/Frootbox/Translation/issues",
-                "source": "https://github.com/Frootbox/Translation/tree/0.0.7"
+                "source": "https://github.com/Frootbox/Translation/tree/master"
             },
-            "time": "2021-10-04T10:05:22+00:00"
+            "time": "2022-10-30T19:22:37+00:00"
         },
         {
             "name": "ifsnop/mysqldump-php",
@@ -677,6 +727,114 @@
                 "source": "https://github.com/opis/closure/tree/3.6.3"
             },
             "time": "2022-01-27T09:35:39+00:00"
+        },
+        {
+            "name": "paquettg/php-html-parser",
+            "version": "2.2.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/paquettg/php-html-parser.git",
+                "reference": "668c770fc5724ea3f15b8791435f054835be8d5e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/paquettg/php-html-parser/zipball/668c770fc5724ea3f15b8791435f054835be8d5e",
+                "reference": "668c770fc5724ea3f15b8791435f054835be8d5e",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "ext-mbstring": "*",
+                "ext-zlib": "*",
+                "paquettg/string-encode": "~1.0.0",
+                "php": ">=7.1"
+            },
+            "require-dev": {
+                "infection/infection": "^0.13.4",
+                "mockery/mockery": "^1.2",
+                "phan/phan": "^2.4",
+                "php-coveralls/php-coveralls": "^2.1",
+                "phpunit/phpunit": "^7.5.1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "PHPHtmlParser\\": "src/PHPHtmlParser"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Gilles Paquette",
+                    "email": "paquettg@gmail.com",
+                    "homepage": "http://gillespaquette.ca"
+                }
+            ],
+            "description": "An HTML DOM parser. It allows you to manipulate HTML. Find tags on an HTML page with selectors just like jQuery.",
+            "homepage": "https://github.com/paquettg/php-html-parser",
+            "keywords": [
+                "dom",
+                "html",
+                "parser"
+            ],
+            "support": {
+                "issues": "https://github.com/paquettg/php-html-parser/issues",
+                "source": "https://github.com/paquettg/php-html-parser/tree/2.2.1"
+            },
+            "time": "2020-01-20T12:59:15+00:00"
+        },
+        {
+            "name": "paquettg/string-encode",
+            "version": "1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/paquettg/string-encoder.git",
+                "reference": "a8708e9fac9d5ddfc8fc2aac6004e2cd05d80fee"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/paquettg/string-encoder/zipball/a8708e9fac9d5ddfc8fc2aac6004e2cd05d80fee",
+                "reference": "a8708e9fac9d5ddfc8fc2aac6004e2cd05d80fee",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.1"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^7.5.1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "stringEncode": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Gilles Paquette",
+                    "email": "paquettg@gmail.com",
+                    "homepage": "http://gillespaquette.ca"
+                }
+            ],
+            "description": "Facilitating the process of altering string encoding in PHP.",
+            "homepage": "https://github.com/paquettg/string-encoder",
+            "keywords": [
+                "charset",
+                "encoding",
+                "string"
+            ],
+            "support": {
+                "issues": "https://github.com/paquettg/string-encoder/issues",
+                "source": "https://github.com/paquettg/string-encoder/tree/1.0.1"
+            },
+            "time": "2018-12-21T02:25:09+00:00"
         },
         {
             "name": "php-di/invoker",
@@ -963,25 +1121,30 @@
         },
         {
             "name": "phpdocumentor/type-resolver",
-            "version": "1.6.1",
+            "version": "1.6.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpDocumentor/TypeResolver.git",
-                "reference": "77a32518733312af16a44300404e945338981de3"
+                "reference": "48f445a408c131e38cab1c235aa6d2bb7a0bb20d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpDocumentor/TypeResolver/zipball/77a32518733312af16a44300404e945338981de3",
-                "reference": "77a32518733312af16a44300404e945338981de3",
+                "url": "https://api.github.com/repos/phpDocumentor/TypeResolver/zipball/48f445a408c131e38cab1c235aa6d2bb7a0bb20d",
+                "reference": "48f445a408c131e38cab1c235aa6d2bb7a0bb20d",
                 "shasum": ""
             },
             "require": {
-                "php": "^7.2 || ^8.0",
+                "php": "^7.4 || ^8.0",
                 "phpdocumentor/reflection-common": "^2.0"
             },
             "require-dev": {
                 "ext-tokenizer": "*",
-                "psalm/phar": "^4.8"
+                "phpstan/extension-installer": "^1.1",
+                "phpstan/phpstan": "^1.8",
+                "phpstan/phpstan-phpunit": "^1.1",
+                "phpunit/phpunit": "^9.5",
+                "rector/rector": "^0.13.9",
+                "vimeo/psalm": "^4.25"
             },
             "type": "library",
             "extra": {
@@ -1007,22 +1170,22 @@
             "description": "A PSR-5 based resolver of Class names, Types and Structural Element Names",
             "support": {
                 "issues": "https://github.com/phpDocumentor/TypeResolver/issues",
-                "source": "https://github.com/phpDocumentor/TypeResolver/tree/1.6.1"
+                "source": "https://github.com/phpDocumentor/TypeResolver/tree/1.6.2"
             },
-            "time": "2022-03-15T21:29:03+00:00"
+            "time": "2022-10-14T12:47:21+00:00"
         },
         {
             "name": "phpmailer/phpmailer",
-            "version": "v6.5.4",
+            "version": "v6.6.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPMailer/PHPMailer.git",
-                "reference": "c0d9f7dd3c2aa247ca44791e9209233829d82285"
+                "reference": "8b6386d7417526d1ea4da9edb70b8352f7543627"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPMailer/PHPMailer/zipball/c0d9f7dd3c2aa247ca44791e9209233829d82285",
-                "reference": "c0d9f7dd3c2aa247ca44791e9209233829d82285",
+                "url": "https://api.github.com/repos/PHPMailer/PHPMailer/zipball/8b6386d7417526d1ea4da9edb70b8352f7543627",
+                "reference": "8b6386d7417526d1ea4da9edb70b8352f7543627",
                 "shasum": ""
             },
             "require": {
@@ -1034,8 +1197,8 @@
             "require-dev": {
                 "dealerdirect/phpcodesniffer-composer-installer": "^0.7.0",
                 "doctrine/annotations": "^1.2",
-                "php-parallel-lint/php-console-highlighter": "^0.5.0",
-                "php-parallel-lint/php-parallel-lint": "^1.3.1",
+                "php-parallel-lint/php-console-highlighter": "^1.0.0",
+                "php-parallel-lint/php-parallel-lint": "^1.3.2",
                 "phpcompatibility/php-compatibility": "^9.3.5",
                 "roave/security-advisories": "dev-latest",
                 "squizlabs/php_codesniffer": "^3.6.2",
@@ -1046,8 +1209,8 @@
                 "hayageek/oauth2-yahoo": "Needed for Yahoo XOAUTH2 authentication",
                 "league/oauth2-google": "Needed for Google XOAUTH2 authentication",
                 "psr/log": "For optional PSR-3 debug logging",
-                "stevenmaguire/oauth2-microsoft": "Needed for Microsoft XOAUTH2 authentication",
-                "symfony/polyfill-mbstring": "To support UTF-8 if the Mbstring PHP extension is not enabled (^1.2)"
+                "symfony/polyfill-mbstring": "To support UTF-8 if the Mbstring PHP extension is not enabled (^1.2)",
+                "thenetworg/oauth2-azure": "Needed for Microsoft XOAUTH2 authentication"
             },
             "type": "library",
             "autoload": {
@@ -1079,7 +1242,7 @@
             "description": "PHPMailer is a full-featured email creation and transfer class for PHP",
             "support": {
                 "issues": "https://github.com/PHPMailer/PHPMailer/issues",
-                "source": "https://github.com/PHPMailer/PHPMailer/tree/v6.5.4"
+                "source": "https://github.com/PHPMailer/PHPMailer/tree/v6.6.5"
             },
             "funding": [
                 {
@@ -1087,7 +1250,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2022-02-17T08:19:04+00:00"
+            "time": "2022-10-07T12:23:10+00:00"
         },
         {
             "name": "psr/cache",
@@ -1315,16 +1478,16 @@
         },
         {
             "name": "symfony/css-selector",
-            "version": "v6.0.3",
+            "version": "v6.0.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/css-selector.git",
-                "reference": "1955d595c12c111629cc814d3f2a2ff13580508a"
+                "reference": "ab2746acddc4f03a7234c8441822ac5d5c63efe9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/css-selector/zipball/1955d595c12c111629cc814d3f2a2ff13580508a",
-                "reference": "1955d595c12c111629cc814d3f2a2ff13580508a",
+                "url": "https://api.github.com/repos/symfony/css-selector/zipball/ab2746acddc4f03a7234c8441822ac5d5c63efe9",
+                "reference": "ab2746acddc4f03a7234c8441822ac5d5c63efe9",
                 "shasum": ""
             },
             "require": {
@@ -1360,7 +1523,7 @@
             "description": "Converts CSS selectors to XPath expressions",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/css-selector/tree/v6.0.3"
+                "source": "https://github.com/symfony/css-selector/tree/v6.0.11"
             },
             "funding": [
                 {
@@ -1376,20 +1539,20 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-01-02T09:55:41+00:00"
+            "time": "2022-06-27T17:10:44+00:00"
         },
         {
             "name": "symfony/dom-crawler",
-            "version": "v6.0.9",
+            "version": "v6.0.15",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/dom-crawler.git",
-                "reference": "6571e5166f1af8e42e8a4ba4a4ecd83890521469"
+                "reference": "b659bb16afdeb784699ee08736b22bc6cc352536"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/dom-crawler/zipball/6571e5166f1af8e42e8a4ba4a4ecd83890521469",
-                "reference": "6571e5166f1af8e42e8a4ba4a4ecd83890521469",
+                "url": "https://api.github.com/repos/symfony/dom-crawler/zipball/b659bb16afdeb784699ee08736b22bc6cc352536",
+                "reference": "b659bb16afdeb784699ee08736b22bc6cc352536",
                 "shasum": ""
             },
             "require": {
@@ -1433,7 +1596,7 @@
             "description": "Eases DOM navigation for HTML and XML documents",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/dom-crawler/tree/v6.0.9"
+                "source": "https://github.com/symfony/dom-crawler/tree/v6.0.15"
             },
             "funding": [
                 {
@@ -1449,7 +1612,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-05-04T14:46:38+00:00"
+            "time": "2022-10-28T16:22:58+00:00"
         },
         {
             "name": "symfony/polyfill-ctype",
@@ -1689,16 +1852,16 @@
         },
         {
             "name": "tijsverkoyen/css-to-inline-styles",
-            "version": "2.2.4",
+            "version": "2.2.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tijsverkoyen/CssToInlineStyles.git",
-                "reference": "da444caae6aca7a19c0c140f68c6182e337d5b1c"
+                "reference": "4348a3a06651827a27d989ad1d13efec6bb49b19"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tijsverkoyen/CssToInlineStyles/zipball/da444caae6aca7a19c0c140f68c6182e337d5b1c",
-                "reference": "da444caae6aca7a19c0c140f68c6182e337d5b1c",
+                "url": "https://api.github.com/repos/tijsverkoyen/CssToInlineStyles/zipball/4348a3a06651827a27d989ad1d13efec6bb49b19",
+                "reference": "4348a3a06651827a27d989ad1d13efec6bb49b19",
                 "shasum": ""
             },
             "require": {
@@ -1736,22 +1899,22 @@
             "homepage": "https://github.com/tijsverkoyen/CssToInlineStyles",
             "support": {
                 "issues": "https://github.com/tijsverkoyen/CssToInlineStyles/issues",
-                "source": "https://github.com/tijsverkoyen/CssToInlineStyles/tree/2.2.4"
+                "source": "https://github.com/tijsverkoyen/CssToInlineStyles/tree/2.2.5"
             },
-            "time": "2021-12-08T09:12:39+00:00"
+            "time": "2022-09-12T13:28:28+00:00"
         },
         {
             "name": "twig/twig",
-            "version": "v3.4.1",
+            "version": "v3.4.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/twigphp/Twig.git",
-                "reference": "e939eae92386b69b49cfa4599dd9bead6bf4a342"
+                "reference": "c38fd6b0b7f370c198db91ffd02e23b517426b58"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/twigphp/Twig/zipball/e939eae92386b69b49cfa4599dd9bead6bf4a342",
-                "reference": "e939eae92386b69b49cfa4599dd9bead6bf4a342",
+                "url": "https://api.github.com/repos/twigphp/Twig/zipball/c38fd6b0b7f370c198db91ffd02e23b517426b58",
+                "reference": "c38fd6b0b7f370c198db91ffd02e23b517426b58",
                 "shasum": ""
             },
             "require": {
@@ -1802,7 +1965,7 @@
             ],
             "support": {
                 "issues": "https://github.com/twigphp/Twig/issues",
-                "source": "https://github.com/twigphp/Twig/tree/v3.4.1"
+                "source": "https://github.com/twigphp/Twig/tree/v3.4.3"
             },
             "funding": [
                 {
@@ -1814,7 +1977,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-05-17T05:48:52+00:00"
+            "time": "2022-09-28T08:42:51+00:00"
         },
         {
             "name": "wa72/htmlpagedom",
