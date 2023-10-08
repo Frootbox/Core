@@ -1,0 +1,31 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<div class="modal-header">
+    <h5 class="modal-title">Produkt-Teaser bearbeiten</h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+
+<div class="modal-body">
+
+
+    <form class="block-controller-action" method="post" action="{{ controller.getActionUri('ajaxModalEdit', { blockId: block.getId(), blockAction: 'ajaxUpdate' }) }}">
+
+        {% for tag in tags %}
+            <div class="form-group form-check">
+                <input type="checkbox" {% if tag.getTag() in block.getConfig('tags') %}checked{% endif %} class="form-check-input" id="tag_{{ tag.getId() }}" name="tags[]" value="{{ tag.getTag() }}">
+                <label class="form-check-label" for="tag_{{ tag.getId() }}">{{ tag.getTag() }}</label>
+            </div>
+        {% endfor %}
+
+        <div class="form-group">
+            <label for="limit">Anzahl</label>
+            <input type="number" class="form-control" id="limit" name="limit" value="{{ block.getLimit() }}">
+        </div>
+
+        <button type="submit" class="btn btn-primary">Speichern</button>
+
+    </form>
+
+</div>

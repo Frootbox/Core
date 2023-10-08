@@ -153,6 +153,10 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
                 $selector = '#adminReceiver';
                 break;
 
+            case 'Editor':
+                $selector = '#editorReceiver';
+                break;
+
             default:
                 $selector = '#userReceiver';
                 break;

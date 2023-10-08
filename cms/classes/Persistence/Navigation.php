@@ -13,7 +13,9 @@ class Navigation extends AbstractRow
     use Traits\Visibility;
 
     /**
-     *
+     * @param array|null $params
+     * @return \Frootbox\Db\Result
+     * @throws \Frootbox\Exceptions\RuntimeError
      */
     public function getItems(array $params = null): \Frootbox\Db\Result
     {

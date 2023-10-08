@@ -144,4 +144,13 @@ class Response {
         
         return $this->type;
     }
+
+    /**
+     * @param array $bodyData
+     * @return void
+     */
+    public function setBodyData(array $bodyData): void
+    {
+        $this->body = $bodyData;
+    }
 }

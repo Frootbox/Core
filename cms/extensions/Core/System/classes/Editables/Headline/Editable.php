@@ -47,7 +47,7 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
                 'where' => $where,
             ]);
 
-            if (MULTI_LANGUAGE and !$text and !preg_match('#^([a-z\-]{1,})\:([0-9]{1,})\:title$#i', $uid) and $element->getAttribute('data-nolanguagefallback') === null) {
+            if (MULTI_LANGUAGE and !$text and (!preg_match('#^([a-z\-]{1,})\:([0-9]{1,})\:title$#i', $uid) or $element->text() == 'Überschrift') and $element->getAttribute('data-nolanguagefallback') === null) {
 
                 if (GLOBAL_LANGUAGE == DEFAULT_LANGUAGE) {
 
@@ -89,9 +89,18 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
                 $classes .= ' disabled-headline';
             }
 
-            $template = '<header class="' . $classes . '" data-uid="' . $uid . '">';
+            $addedHtml = (string) null;
 
-            if ($text and !empty($text->getConfig('supertitle')) and empty($element->getAttribute('data-skipsupertitle'))) {
+            if ($element->getAttribute('data-skipsupertitle') !== null) {
+                $addedHtml = ' data-skipsupertitle ';
+            }
+
+            $template = '<header ' . $addedHtml . ' class="' . $classes . '" data-uid="' . $uid . '">';
+
+            if (!empty($element->getAttribute('data-supertitle'))) {
+                $template .= '<p class="supertitle">' . $element->getAttribute('data-supertitle') . '</p>';
+            }
+            elseif ($text and !empty($text->getConfig('supertitle')) and empty($element->getAttribute('data-skipsupertitle'))) {
                 $template .= '<p class="supertitle">' . $text->getConfig('supertitle') . '</p>';
             }
 
@@ -118,10 +127,23 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
                 $subtitle = $match[1];
             }
 
-            $template .= '<' . $tagName . ' data-editable data-uid="' . $uid . '" style="' . $styles . '">' . $headlineText . '</' . $tagName . '>';
+            $id = (string) null;
+
+            if ($text and !empty($text->getConfig('elementId'))) {
+                $id = ' id="' . $text->getConfig('elementId') . '" ';
+            }
+
+            if ($element->getAttribute('id')) {
+                $id = ' id="' . $element->getAttribute('id') . '" ';
+            }
 
 
-            if ($text and !empty($text->getConfig('subtitle')) and empty($element->getAttribute('data-skipsubline'))) {
+            $template .= '<' . $tagName . ' ' . $id . ' data-editable data-uid="' . $uid . '" style="' . $styles . '">' . $headlineText . '</' . $tagName . '>';
+
+            if (!empty($element->getAttribute('data-subtitle'))) {
+                $template .= '<p class="subtitle">' . $element->getAttribute('data-subtitle') . '</p>';
+            }
+            elseif ($text and !empty($text->getConfig('subtitle')) and empty($element->getAttribute('data-skipsubline'))) {
                 $template .= '<p class="subtitle">' . nl2br($text->getConfig('subtitle')) . '</p>';
             }
             elseif ($subtitle) {

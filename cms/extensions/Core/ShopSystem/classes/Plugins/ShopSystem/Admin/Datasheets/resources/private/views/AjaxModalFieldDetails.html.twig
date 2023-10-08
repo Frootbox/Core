@@ -16,13 +16,20 @@
             <label for="type">Typ</label>
             <select class="form-control" name="type" id="type" size="1">
                 <optgroup label="Text">
-                    <option value="Text">Text</option>
+                    <option {% if field.getType() == "Text" %}selected{% endif %} value="Text">Text</option>
+                    <option {% if field.getType() == "TextArea" %}selected{% endif %} value="TextArea">Textfeld</option>
                 </optgroup>
                 <optgroup label="Gewicht">
                     <option {% if field.getType() == "Gram" %}selected{% endif %} value="Gram">Gramm</option>
                 </optgroup>
                 <optgroup label="Energie">
                     <option {% if field.getType() == "Kilojoule" %}selected{% endif %} value="Kilojoule">Kilojoule</option>
+                </optgroup>
+                <optgroup label="Fläche">
+                    <option {% if field.getType() == "SquareMeter" %}selected{% endif %} value="SquareMeter">Quadratmeter</option>
+                </optgroup>
+                <optgroup label="Länge">
+                    <option {% if field.getType() == "Meter" %}selected{% endif %} value="Meter">Meter</option>
                 </optgroup>
                 <optgroup label="Optional">
                     <option {% if field.getType() == "OptionalList" %}selected{% endif %} value="OptionalList">Liste</option>

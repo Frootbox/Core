@@ -22,7 +22,7 @@ class Pages
             pages p2
         WHERE
             p1.title LIKE "%' . $keyword . '%" AND
-            p2.id = p1.parentId
+            p2.id = p1.parentId                
         ORDER BY
             p1.lft ASC';
 

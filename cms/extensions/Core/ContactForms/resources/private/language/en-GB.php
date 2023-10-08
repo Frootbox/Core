@@ -4,7 +4,7 @@
  */
 
 return [
-    '.AcceptPrivacyPolicy' => 'Ich habe die [Datenschutzerklärung] gelesen und akzeptiere diese.',
+    '.AcceptPrivacyPolicy' => 'I have read the [privacy policy] and accept it.',
     '.Exceptions.InputMissing.AcceptPrivacyPolicy' => 'Sie müssen die Datenschutzerklärung lesen und akzeptieren.',
     '.PleaseSelect' => 'please select ...',
     '.PlaceFilesToUploadHere' => 'Drop files here for upload.',

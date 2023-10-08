@@ -16,7 +16,7 @@
                 <tr class="ajax {% if datasheet.getId == data.highlight %}highlighted{% endif %}" data-href="{{ data.plugin.getAdminUri('Datasheets', 'details', { datasheetId: datasheet.getId() }) }}">
                     <td>{{ datasheet.getTitle() }}</td>
                     <td class="text-right">
-                        <a class="ajax" data-confirm="Soll dieses Datenblatt wirklich gelöscht werden?" href="{{ data.plugin.getAdminUri('Datasheets', 'ajaxDelete', { datasheetId: datasheet.getId() }) }}"><i class="fa fa-times"></i></a>
+                        <a class="ajax" data-confirm="Soll dieses Datenblatt wirklich gelöscht werden?" href="{{ data.plugin.getAdminUri('Datasheets', 'ajaxDelete', { datasheetId: datasheet.getId() }) }}"><i class="far fa-trash"></i></a>
                     </td>
                 </tr>
             {% endfor %}

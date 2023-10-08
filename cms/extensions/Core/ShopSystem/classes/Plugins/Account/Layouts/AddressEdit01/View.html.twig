@@ -9,22 +9,12 @@ title: Standard
 {% set p = view.getViewhelper('Partials', { plugin: plugin }) %}
 {% set a = view.getViewhelper('Assets', {   }) %}
 
-{{ v.asset('EXT:Core/ShopSystem/icons/css/all.css') | raw }}
-
 <div class="plugin Core ShopSystem Account Account01">
     <div class="container">
 
         <div class="row">
             <div class="col-12">
                 <div class="inner-wrapper">
-
-                    {% if plugin.isFirst %}
-                        <h1 data-editable data-uid="{{ plugin.getUid('title-address-edit') }}">Adresse bearbeiten</h1>
-                    {% else %}
-                        <h2 data-editable data-uid="{{ plugin.getUid('title-address-edit') }}">Adresse bearbeiten</h2>
-                    {% endif %}
-
-                    <br /><br />
 
                     <div class="row">
                         <div class="col-md-4">
@@ -33,6 +23,8 @@ title: Standard
 
                         </div>
                         <div class="col-md-8">
+
+                            <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title-address-edit') }}">Adresse bearbeiten</h2>
 
                             <form id="updateForm" method="post" action="{{ plugin.getUriAjax('addressUpdate', { addressId: address.getId() }) }}">
 

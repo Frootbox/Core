@@ -12,6 +12,18 @@ class Question extends \Frootbox\Persistence\AbstractAsset
     protected $model = Repositories\Questions::class;
 
     /**
+     * @return string|null
+     */
+    public function getLink(): ?string
+    {
+        if (empty($this->getConfig('link'))) {
+            return null;
+        }
+
+        return $this->getConfig('link');
+    }
+
+    /**
      * Generate questions alias
      *
      * @return \Frootbox\Persistence\Alias|null
@@ -27,6 +39,7 @@ class Question extends \Frootbox\Persistence\AbstractAsset
             'virtualDirectory' => [
                 $this->getTitle()
             ],
+            'uid' => $this->getUid('alias'),
             'payload' => $this->generateAliasPayload([
                 'action' => 'showQuestion',
                 'questionId' => $this->getId()

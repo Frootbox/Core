@@ -16,8 +16,6 @@ class Page extends \Frootbox\AbstractStaticPage
         \Frootbox\View\Viewhelper\Delegator $delegator
     )
     {
-
-
         // $shopcart = new \Frootbox\Ext\Core\ShopSystem\Plugins\Checkout\Shopcart();
 
         $_SESSION['cart']['paymentmethod']['data']['transaction']['token'] = $get->get('token');

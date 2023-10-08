@@ -1,0 +1,27 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{% if shippingcosts.getCount() == 0 %}
+    <div class="message warning">Es wurden noch keine Varianten erstellt.</div>
+{% else %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Versandkostenart</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+
+            {% for shippingcost in shippingcosts %}
+                <tr class="{% if shippingcost.getId == data.highlight %}highlighted{% endif %}" data-title="Versandkosten bearbeiten" data-modal="{{ data.plugin.getAdminUri('Shipping', 'ajaxModalEdit', { shippingId: shippingcost.getId() }) }}">
+                    <td><i class="far fa-truck preicon"></i>{{ shippingcost.getTitle() }}</td>
+                    <td class="text-right">
+                        <a class="ajax" data-toggle="tooltip" data-modal data-title="Diese Versandkostenart auf alle Produkte übertragen." data-confirm="Soll diese Versandkostenart wirklich auf alle Produkte übertragen werden?" href="{{ plugin.getAdminUri('Shipping', 'ajaxCopyToAll', { shippingId: get.get('shippingId') }) }}"><i class="far fa-copy icon"></i></a>
+                        <a class="ajax" data-toggle="tooltip" data-modal data-title="Versandkosten entfernen" data-confirm="Soll diese Versandkostenart wirklich gelöscht werden?" href="{{ data.plugin.getAdminUri('Shipping', 'ajaxDelete', { shippingId: shippingcost.getId() }) }}"><i class="far fa-trash icon"></i></a>
+                    </td>
+                </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+{% endif %}

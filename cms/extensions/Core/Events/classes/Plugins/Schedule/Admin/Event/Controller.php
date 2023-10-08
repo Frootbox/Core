@@ -92,6 +92,10 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         // Update booked seats
         $targetEvent->refreshBookedSeats();
         $originalEvent->refreshBookedSeats();
+
+        return self::getResponse('json', 200, [
+            'success' => 'Die Buchung wurde verschoben.'
+        ]);
     }
 
     /**
@@ -119,8 +123,84 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         return self::getResponse('json');
     }
 
+    public function ajaxCloneMultiAction(
+        \Frootbox\Http\Post $post,
+        \Frootbox\CloningMachine $cloningMachine,
+        \Frootbox\Ext\Core\Events\Persistence\Repositories\Events $eventRepository,
+        \Frootbox\Admin\Viewhelper\GeneralPurpose $gp,
+    ): \Frootbox\Admin\Controller\Response
+    {
+        // Get target date
+        $targetDay = new \DateTime($post->get('cloneToDay'));
+
+        foreach ($post->get('events') as $eventId) {
+
+            // Fetch source event
+            $cloneFrom = $eventRepository->fetchById($eventId);
+
+            $dateStart = new \DateTime($cloneFrom->getDateStart());
+            $dateEnd = new \DateTime($cloneFrom->getDateEndt());
+
+
+            // Build up new event
+            $event = new \Frootbox\Ext\Core\Events\Persistence\Event([
+                'title' => $cloneFrom->getTitle(),
+                'pluginId' => $this->plugin->getId(),
+                'pageId' => $this->plugin->getPage()->getId(),
+                'parentId' => $cloneFrom->getParentId(),
+                'visibility' => (DEVMODE ? 2 : 1),
+                'dateStart' => $targetDay->format('Y-m-d') . ' ' . $dateStart->format('H:i:s'),
+                'dateEnd' => $targetDay->format('Y-m-d') . ' ' . $dateEnd->format('H:i:s'),
+            ]);
+
+            // Persist event
+            $event = $eventRepository->insert($event);
+
+            $event->addConfig([
+                'bookable' => [
+                    'seats' => $cloneFrom->getConfig('bookable.seats'),
+                    'price' => $cloneFrom->getConfig('bookable.price'),
+                ]
+            ]);
+
+            $tags = [];
+            foreach ($cloneFrom->getTags() as $tag) {
+                $tags[] = $tag->getTag();
+            }
+
+            $event->setTags($tags);
+
+            $event->save();
+
+            // Clone content
+            $cloningMachine->cloneContentsForElement($event, $cloneFrom->getUidBase());
+
+            foreach ($cloneFrom->getCategories() as $category) {
+                $category->connectItem($event);
+            }
+        }
+
+        return self::getResponse('json', 200, [
+            'modalDismiss' => true,
+            'replace' => [
+                'selector' => '#eventsReceiver',
+                'html' => $gp->injectPartial(\Frootbox\Ext\Core\Events\Plugins\Schedule\Admin\Archive\Partials\ListEvents\Partial::class, [
+                    'plugin' => $this->plugin,
+                ])
+            ]
+        ]);
+    }
+
     /**
-     *
+     * @param \Frootbox\Http\Post $post
+     * @param \Frootbox\Http\Get $get
+     * @param \Frootbox\Ext\Core\Events\Persistence\Repositories\Events $events
+     * @param \Frootbox\Ext\Core\Events\Persistence\Repositories\Categories $categoriesRepository
+     * @param \Frootbox\Admin\Viewhelper\GeneralPurpose $gp
+     * @param \Frootbox\CloningMachine $cloningMachine
+     * @return \Frootbox\Admin\Controller\Response
+     * @throws \Frootbox\Exceptions\InputMissing
+     * @throws \Frootbox\Exceptions\RuntimeError
      */
     public function ajaxCreateAction(
         \Frootbox\Http\Post $post,
@@ -153,7 +233,7 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
             }
         }
 
-        // Create event
+        // Persist event
         $event = $events->insert($event);
 
         // Clone data if needed
@@ -167,8 +247,17 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
                     'price' => $cloneFrom->getConfig('bookable.price'),
                 ]
             ]);
+
+            $tags = [];
+            foreach ($cloneFrom->getTags() as $tag) {
+                $tags[] = $tag->getTag();
+            }
+
+            $event->setTags($tags);
+
             $event->save();
 
+            // Clone content
             $cloningMachine->cloneContentsForElement($event, $cloneFrom->getUidBase());
 
             foreach ($cloneFrom->getCategories() as $category) {
@@ -313,25 +402,36 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     }
 
     /**
-     *
+     * @param \Frootbox\Http\Get $get
+     * @return \Frootbox\Admin\Controller\Response
+     */
+    public function ajaxModalCloneAction(
+        \Frootbox\Http\Get $get,
+        \Frootbox\Ext\Core\Events\Persistence\Repositories\Events $eventRepository,
+    ): \Frootbox\Admin\Controller\Response
+    {
+        $events = [];
+
+        foreach ($get->get('events') as $eventId => $state) {
+
+            $events[] = $eventRepository->fetchById($eventId);
+        }
+
+        return new \Frootbox\Admin\Controller\Response('plain', 200, [
+            'events' => $events,
+        ]);
+    }
+
+    /**
+     * @param \Frootbox\Http\Get $get
+     * @param \Frootbox\Ext\Core\Events\Persistence\Repositories\Events $events
+     * @return \Frootbox\Admin\Controller\Response
      */
     public function ajaxModalComposeAction (
-        \Frootbox\Admin\View $view,
         \Frootbox\Http\Get $get,
-        // \Frootbox\Ext\Core\Events\Persistence\Repositories\Venues $venues,
         \Frootbox\Ext\Core\Events\Persistence\Repositories\Events $events,
-    )
+    ): \Frootbox\Admin\Controller\Response
     {
-        /*
-        // Fetch available venues
-        $result = $venues->fetch([
-            'where' => [ 'pluginId' => $this->plugin->getId() ]
-        ]);
-
-        $view->set('venues', $result);
-        */
-
-
         // Fetch event to be cloned
         if (!empty($get->get('cloneFrom'))) {
             $clone = $events->fetchById($get->get('cloneFrom'));
@@ -339,6 +439,21 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
 
         return new \Frootbox\Admin\Controller\Response('plain', 200, [
             'clone' => $clone ?? null,
+        ]);
+    }
+
+    /**
+     * @param \Frootbox\Http\Post $post
+     * @return \Frootbox\Admin\Controller\Response
+     */
+    public function ajaxMultiActionAction(
+        \Frootbox\Http\Post $post,
+    ): \Frootbox\Admin\Controller\Response
+    {
+        return new \Frootbox\Admin\Controller\Response('json', 200, [
+            'success' => null,
+            'modalTitle' => 'Veranstaltungen klonen',
+            'triggerModal' => $this->plugin->getAdminUri('Event', 'ajaxModalClone', [ 'events' => $post->get('event') ]),
         ]);
     }
 

@@ -15,6 +15,10 @@ trait Visibility
         return 'visibility-' . $this->getVisibility();
     }
 
+    /**
+     * @return void
+     * @throws \Frootbox\Exceptions\NotFound
+     */
     public function validateVisibility(): void
     {
         $visibility = $this->getVisibility();

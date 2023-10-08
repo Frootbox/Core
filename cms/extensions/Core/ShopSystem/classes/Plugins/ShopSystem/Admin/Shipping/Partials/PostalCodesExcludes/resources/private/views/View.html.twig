@@ -1,0 +1,64 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{% set excludes = plugin.getConfig('postalExcludes') %}
+{% set loops = excludes | length %}
+
+{% for i in 0..loops %}
+
+    <div class="row">
+        <div class="col-md-2">
+            <div class="form-group">
+                <label for="from{{ i }}">PLZ von</label>
+                <input type="text" class="form-control" id="from{{ i }}" name="excludes[{{ i }}][from]" value="{{ excludes[i]["from"] }}">
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                <label for="to{{ i }}">PLZ bis</label>
+                <input type="text" class="form-control" id="to{{ i }}" name="excludes[{{ i }}][to]" value="{{ excludes[i]["to"] }}">
+            </div>
+        </div>
+        <div class="col-md-8">
+
+            <div class="row">
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label for="day{{ i }}1">Mo.</label>
+                        <input type="checkbox" class="form-control" id="day{{ i }}1" name="excludes[{{ i }}][days][1]" {% if excludes[i]["days"][1] %}checked{% endif %}>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Di.</label>
+                        <input type="checkbox" class="form-control" id="exampleCheck1" name="excludes[{{ i }}][days][2]" {% if excludes[i]["days"][2] %}checked{% endif %}>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Mi.</label>
+                        <input type="checkbox" class="form-control" id="exampleCheck1" name="excludes[{{ i }}][days][3]" {% if excludes[i]["days"][3] %}checked{% endif %}>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Do.</label>
+                        <input type="checkbox" class="form-control" id="exampleCheck1" name="excludes[{{ i }}][days][4]" {% if excludes[i]["days"][4] %}checked{% endif %}>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Fr.</label>
+                        <input type="checkbox" class="form-control" id="exampleCheck1" name="excludes[{{ i }}][days][5]" {% if excludes[i]["days"][5] %}checked{% endif %}>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Sa.</label>
+                        <input type="checkbox" class="form-control" id="exampleCheck1" name="excludes[{{ i }}][days][6]" {% if excludes[i]["days"][6] %}checked{% endif %}>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+{% endfor %}

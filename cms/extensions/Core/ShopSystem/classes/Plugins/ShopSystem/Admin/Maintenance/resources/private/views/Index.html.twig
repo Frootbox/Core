@@ -1,0 +1,378 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+{% set i = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\Delegator', { object: controller }) %}
+
+<h2>
+    Konfiguration
+</h2>
+
+<p><a class="ajax" href="{{ plugin.getAdminUri('Index', 'index') }}"><i class="fa fa-chevron-circle-left"></i> zurück</a></p>
+
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+    <li class="nav-item">
+        <a class="nav-link active" id="general-tab" data-toggle="tab" href="#general" role="tab" aria-controls="general" aria-selected="true">allgemein</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link " id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Zahlungsarten</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="checkout-tab" data-toggle="tab" href="#checkout" role="tab" aria-controls="checkout" aria-selected="false">Bestellablauf</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="mwst-tab" data-toggle="tab" href="#mwst" role="tab" aria-controls="mwst" aria-selected="false">Mehrwertsteuer</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="ui-tab" data-toggle="tab" href="#ui" role="tab" aria-controls="ui" aria-selected="false">Backend-UI</a>
+    </li>
+
+    {% if user.getType() == "SuperAdmin" %}
+        <li class="nav-item">
+            <a class="nav-link" id="maintenance-tab" data-toggle="tab" href="#maintenance" role="tab" aria-controls="maintenance" aria-selected="false">Wartung</a>
+        </li>
+    {% endif %}
+
+</ul>
+
+<div class="tab-content" id="myTabContent">
+    <div class="tab-pane fade show active" id="general" role="tabpanel" aria-labelledby="general-tab">
+
+        <div class="card">
+            <div class="card-body">
+
+                <h3>Allgemein</h3>
+
+                <form method="post" action="{{ plugin.getAdminUri('Configurations', 'ajaxUpdateGeneral') }}" class="ajax">
+
+                    <div class="form-group">
+                        <label for="orderNumberTemplate">Bestellnummern-Vorlage</label>
+                        <input type="text" class="form-control" id="orderNumberTemplate" name="config[orderNumberTemplate]" placeholder="Bestellnummern-Vorlage" value="{{ plugin.getConfig('orderNumberTemplate') }}">
+                    </div>
+                    <div class="form-group form-check">
+                        <input type="checkbox" class="form-check-input" {% if plugin.getConfig('ignoreEquipmentsVisibility') %}checked{% endif %} id="ignoreEquipmentsVisibility" name="config[ignoreEquipmentsVisibility]">
+                        <label class="form-check-label" for="ignoreEquipmentsVisibility">Sichtbarkeit beim Zubehör ignorieren</label>
+                    </div>
+
+                    {% if v.isExtensionInstalled('Core', 'ContactForms') %}
+                        <div class="form-group">
+                            <label for="formId">Anfrageformular</label>
+                            <select class="form-control" id="formId" name="config[formId]">
+                                <option value="">kein Anfrageformular</option>
+                                {% for form in i.getForms() %}
+                                    <option {% if plugin.getConfig('formId') == form.getId %}selected{% endif %} value="{{ form.getId }}">{{ form.getTitle() }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    {% else %}
+                        <div class="message warning">Zur Verbindung eines Anfrageformulars müssen Sie die Erweiterung <b>Core/ContactForms</b> installieren.</div>
+                    {% endif %}
+
+                    <div class="form-group">
+                        <label for="currencySign">Währungszeichen</label>
+                        <input type="text" class="form-control" id="currencySign" name="config[currencySign]" value="{{ plugin.getCurrencySign() }}">
+                    </div>
+                    <div class="form-group form-check">
+                        <input type="checkbox" class="form-check-input" {% if plugin.getConfig('noProductsDetailPages') %}checked{% endif %} id="noProductsDetailPages" name="config[noProductsDetailPages]">
+                        <label class="form-check-label" for="noProductsDetailPages">keine Detailseiten für Produkte</label>
+                    </div>
+                    <div class="form-group form-check">
+                        <input type="checkbox" class="form-check-input" {% if plugin.getConfig('noCategoriesDetailPages') %}checked{% endif %} id="noCategoriesDetailPages" name="config[noCategoriesDetailPages]">
+                        <label class="form-check-label" for="noCategoriesDetailPages">keine Detailseiten für Kategorien</label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Speichern</button>
+
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+    <div class="tab-pane fade show" id="home" role="tabpanel" aria-labelledby="home-tab">
+
+        <div class="card">
+            <div class="card-body">
+
+                <h3>
+                    Zahlungsarten
+                    <span class="headoptions">
+                        <a data-toggle="tooltip" data-modal data-title="Zahlungsart hinzufügen" href="{{ plugin.getAdminUri('Configurations', 'ajaxModalPaymentMethodCompose') }}"><i class="fa fa-plus-circle"></i></a>
+                    </span>
+                </h3>
+
+
+                <form method="post" action="{{ plugin.getAdminUri('Configurations', 'ajaxUpdatePaymentMethods') }}" class="ajax">
+
+                    {% for paymentMethod in paymentMethods %}
+                        <div class="form-group form-check">
+                            <input {% if paymentMethod.class in plugin.getConfig('paymentmethods') %}checked{% endif %} type="checkbox" class="form-check-input" name="paymentmethods[{{ paymentMethod.class }}]" id="method_{{ paymentMethod.id }}">
+                            <label class="form-check-label" for="method_{{ paymentMethod.id }}">{{ paymentMethod.title }}</label>
+                        </div>
+                    {% endfor %}
+
+                    <button type="submit" class="btn btn-primary">Speichern</button>
+
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+    <div class="tab-pane fade" id="checkout" role="tabpanel" aria-labelledby="checkout-tab">
+
+        <div class="card">
+            <div class="card-body">
+
+                <form method="post" class="ajax" action="{{ plugin.getAdminUri('Configurations', 'ajaxUpdateCheckout') }}">
+
+                    <h3>Warenkorb</h3>
+
+                    <div class="form-group">
+                        <label for="newsletterConnector">Newsletter</label>
+                        <select class="form-control" id="newsletterConnector" name="config[newsletterConnector]">
+                            <option value="">keine Newsletter-Verbindung</option>
+                            {% for connector in newsletterConnectors %}
+                            <option {% if plugin.getConfig('newsletterConnector') %}selected{% endif %} value="{{ connector.class }}">{{ connector.title }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="generalTermsLink">AGB-Seite</label>
+                        <input type="text" class="form-control" id="generalTermsLink" name="config[generalTermsLink]" placeholder="AGB-Seite" value="{{ plugin.getConfig('generalTermsLink') }}">
+                    </div>
+
+                    <script nonce="{{ settings.nonce }}">
+                        $(function ( ) {
+
+                            $("#generalTermsLink").on("drop", function( event ) {
+
+                                window.setTimeout(function ( ) {
+
+                                    console.log($("#generalTermsLink").val());
+                                    var found = $("#generalTermsLink").val().match(/ajaxPanelContent\?pageId=([0-9]{1,})$/i);
+
+                                    $('#generalTermsLink').val('fbx://page:' + found[1]);
+                                }, 300);
+                            });
+                        });
+                    </script>
+
+                    <div class="form-group form-check">
+                        <input {% if plugin.getConfig('skipSelfpickup') %}checked{% endif %} type="checkbox" class="form-check-input" id="skipSelfpickup" name="config[skipSelfpickup]">
+                        <label class="form-check-label" for="skipSelfpickup">keine Selbstabholung</label>
+                    </div>
+
+                    <h3>E-Mail</h3>
+
+                    <div class="form-group">
+                        <label for="recipients">Empfänger</label>
+                        <input data-role="tagsinput" type="text" class="form-control" name="config[recipients]" id="recipients" placeholder="Empfänger" value="{{ plugin.getConfig('recipients') }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="subject">Betreff</label>
+                        <input type="text" class="form-control" name="config[subject]" id="subject" placeholder="Betreff" value="{{ plugin.getConfig('subject') }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="textAbove">Text über Produktauflistung</label>
+                        <textarea rows="10" class="form-control" name="config[textAbove]" id="textAbove" placeholder="Text über Produktauflistung">{{ plugin.getConfig('textAbove') }}</textarea>
+                        <small id="emailHelp" class="form-text text-muted"><a data-modal href="{{ plugin.getAdminUri('Configurations', 'ajaxModalHelpMailPlaceholder') }}">mögliche Platzhalter</a></small>
+                    </div>
+                    <div class="form-group">
+                        <label for="textBelow">Text unter Produktauflistung</label>
+                        <textarea rows="10" class="form-control" name="config[textBelow]" id="textBelow" placeholder="Text unter Produktauflistung">{{ plugin.getConfig('textBelow') }}</textarea>
+                    </div>
+
+                    <h3>Kontaktfelder</h3>
+
+                    <div class="row">
+                        <div class="col-md-6">
+
+                            <div class="form-group form-check">
+                                <input type="checkbox" class="form-check-input" id="fieldCompany" name="config[fields][Company]" {% if plugin.getConfig('fields.Company') %}checked{% endif %}>
+                                <label class="form-check-label" for="fieldCompany">Firmenname</label>
+                            </div>
+
+                        </div>
+                        <div class="col-md-6">
+
+                            <div class="form-group form-check">
+                                <input type="checkbox" class="form-check-input" id="fieldCompanyMandatory" name="config[fieldsMandatory][Company]" {% if plugin.getConfig('fieldsMandatory.Company') %}checked{% endif %}>
+                                <label class="form-check-label" for="fieldCompanyMandatory">Pflichtfeld</label>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <div class="row">
+                        <div class="col-md-6">
+
+                            <div class="form-group form-check">
+                                <input type="checkbox" class="form-check-input" id="fieldVAT" name="config[fields][VAT]" {% if plugin.getConfig('fields.VAT') %}checked{% endif %}>
+                                <label class="form-check-label" for="fieldVAT">USt. IdNr.</label>
+                            </div>
+
+                        </div>
+                        <div class="col-md-6">
+
+                            <div class="form-group form-check">
+                                <input type="checkbox" class="form-check-input" id="fieldVATMandatory" name="config[fieldsMandatory][VAT]" {% if plugin.getConfig('fieldsMandatory.VAT') %}checked{% endif %}>
+                                <label class="form-check-label" for="fieldVATMandatory">Pflichtfeld</label>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <h3>Rechnung</h3>
+
+                    <div class="form-group form-check">
+                        <input type="checkbox" class="form-check-input" id="invoiceCreateOnCheckout" name="config[invoice][createOnCheckout]" {% if plugin.getConfig('invoice.createOnCheckout') %}checked{% endif %}>
+                        <label class="form-check-label" for="invoiceCreateOnCheckout">Rechnung erstellen</label>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="currentInvoiceNumber">aktuelle Rechnungsnummer</label>
+                                <input type="number" class="form-control" name="config[invoice][currentNumber]" id="currentInvoiceNumber" placeholder="aktuelle Rechnungsnummer" value="{{ plugin.getConfig('invoice.currentNumber') }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="invoiceNumberTemplate">Vorlage für Rechnungsnummer</label>
+                                <input type="text" class="form-control" name="config[invoice][numberTemplate]" id="invoiceNumberTemplate" placeholder="Vorlage für Rechnungsnummer" value="{{ plugin.getConfig('invoice.numberTemplate') }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    {{ v.injectPartial('Frootbox/Ext/Core/FileManager/Admin/Partials/FileManager', {
+                        uid: plugin.getUid('invoice-footer'),
+                        multiple: false,
+                        label: "Hintergrund"
+                    }) | raw }}
+
+
+                    <div class="form-group">
+                        <label for="invoiceAddressLine">Adresszeile für Brieffenster</label>
+                        <input type="text" class="form-control" name="config[invoice][addressLine]" id="invoiceAddressLine" placeholder="Adresszeile für Brieffenster" value="{{ plugin.getConfig('invoice.addressLine') }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="invoiceTextBelowInvoiceNumber">Text unter Rechnungsnummer</label>
+                        <textarea class="form-control" name="config[invoice][textBelowInvoiceNumber]" id="invoiceTextBelowInvoiceNumber" placeholder="Text unter Rechnungsnummer">{{ plugin.getConfig('invoice.textBelowInvoiceNumber') }}</textarea>
+                    </div>
+
+                    <h3>Auftragsbestätigung</h3>
+
+                    <div class="form-group form-check">
+                        <input type="checkbox" class="form-check-input" id="confirmationOfOrderCreateOnCheckout" name="config[confirmationOfOrder][createOnCheckout]" {% if plugin.getConfig('confirmationOfOrder.createOnCheckout') %}checked{% endif %}>
+                        <label class="form-check-label" for="confirmationOfOrderCreateOnCheckout">Auftragsbestätigung erstellen</label>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="currentOrderNumber">aktuelle Auftragsnummer</label>
+                                <input type="number" class="form-control" name="config[confirmationOfOrder][currentNumber]" id="currentOrderNumber" placeholder="aktuelle Auftragsnummer" value="{{ plugin.getConfig('confirmationOfOrder.currentNumber') }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="confirmationOfOrderNumberTemplate">Vorlage für Auftragsnummer</label>
+                                <input type="text" class="form-control" name="config[confirmationOfOrder][numberTemplate]" id="confirmationOfOrderNumberTemplate" placeholder="Vorlage für Auftragsnummer" value="{{ plugin.getConfig('confirmationOfOrder.numberTemplate') }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    {{ v.injectPartial('Frootbox/Ext/Core/FileManager/Admin/Partials/FileManager', {
+                        uid: plugin.getUid('confirmationOfOrder-background'),
+                        multiple: false,
+                        label: "Hintergrund"
+                    }) | raw }}
+
+
+                    <div class="form-group">
+                        <label for="confirmationOfOrderAddressLine">Adresszeile für Brieffenster</label>
+                        <input type="text" class="form-control" name="config[confirmationOfOrder][addressLine]" id="confirmationOfOrderAddressLine" placeholder="Adresszeile für Brieffenster" value="{{ plugin.getConfig('confirmationOfOrder.addressLine') }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmationOfOrderTextBelowInvoiceNumber">Text unter Auftragsnummer</label>
+                        <textarea class="form-control" name="config[confirmationOfOrder][textBelowInvoiceNumber]" id="confirmationOfOrderTextBelowOrderNumber" placeholder="Text unter Auftragsnummer">{{ plugin.getConfig('confirmationOfOrder.textBelowOrderNumber') }}</textarea>
+                    </div>
+
+
+                    <button type="submit" class="btn btn-primary">Speichern</button>
+
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+    <div class="tab-pane fade" id="mwst" role="tabpanel" aria-labelledby="mwst-tab">
+
+        <div class="card">
+            <div class="card-body">
+
+                <form method="post" class="ajax" action="{{ plugin.getAdminUri('Configurations', 'ajaxUpdateVat') }}">
+
+                    <h3>Mehrwertsteuer Änderung</h3>
+
+                    <div class="form-group">
+                        <label for="sourceVat">aktuelle Mehrwertsteuer</label>
+                        <input type="text" class="form-control" name="sourceVat" id="sourceVat" placeholder="aktuelle Mehrwertsteuer" value="">
+                    </div>
+                    <div class="form-group">
+                        <label for="targetVat">neue Mehrwertsteuer</label>
+                        <input type="text" class="form-control" name="targetVat" id="targetVat" placeholder="neue Mehrwertsteuer" value="">
+                    </div>
+                    <div class="form-group form-check">
+                        <input type="checkbox" class="form-check-input" id="keepGrossPrice" name="keepGrossPrice">
+                        <label class="form-check-label" for="keepGrossPrice">Brutto-Preis bleibt gleich</label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Änderung übernehmen</button>
+
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+    <div class="tab-pane fade" id="ui" role="tabpanel" aria-labelledby="ui-tab">
+
+        <div class="card">
+            <div class="card-body">
+
+                <form method="post" class="ajax" action="{{ plugin.getAdminUri('Configurations', 'ajaxUpdateUi') }}">
+
+                    <h3>Produktlisten</h3>
+
+                    <div class="form-group">
+                        <label for="productListSorting">Standard-Sortierung</label>
+                        <select class="form-control" id="productListSorting" name="productListSorting">
+                            <option value="TitleAsc">Titel, aufsteigend</option>
+                            <option value="DateDesc">Datum, absteigend</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Speichern</button>
+
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+    <div class="tab-pane fade" id="maintenance" role="tabpanel" aria-labelledby="maintenance-tab">
+
+        <div class="card">
+            <div class="card-body">
+
+                <h3>Wartung</h3>
+
+                <p><a class="btn btn-primary ajax" data-confirm="Sollen wirklich ALLE Bestellungen gelöscht werden?" href="{{ plugin.getAdminUri('Maintenance', 'ajaxOrdersClear') }}">Alle Bestellungen löschen</a></p>
+
+            </div>
+        </div>
+
+    </div>
+</div>

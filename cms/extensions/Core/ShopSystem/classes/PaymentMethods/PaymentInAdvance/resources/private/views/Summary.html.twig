@@ -1,4 +1,3 @@
-
 {% if translator.hasKey('Core.ShopSystem.PaymentMethods.PaymentInAdvance.Summary') %}
     <p>{{ translator.translate('Core.ShopSystem.PaymentMethods.PaymentInAdvance.Summary', [ (shopcart.getTotal()|number_format(2, ',', '.')), orderNumber ]) | raw }}</p>
 {% else %}

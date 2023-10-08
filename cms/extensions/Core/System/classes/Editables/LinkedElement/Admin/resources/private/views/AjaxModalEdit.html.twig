@@ -58,18 +58,39 @@
             <label for="url">URL</label>
             <input type="text" class="form-control" id="url" name="url" placeholder="URL" value="{{ text.getConfig('link') }}">
         </div>
-        <div class="form-group">
-            <label for="email">E-Mail</label>
-            <input type="email" class="form-control" id="email" name="email" placeholder="E-Mail" value="{{ text.getConfig('email') }}">
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="email">E-Mail</label>
+                    <input type="email" class="form-control" id="email" name="email" placeholder="E-Mail" value="{{ text.getConfig('email') }}">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="emailSubject">Betreff</label>
+                    <input type="text" class="form-control" id="emailSubject" name="emailSubject" placeholder="Betreff" value="{{ text.getConfig('emailSubject') }}">
+                </div>
+            </div>
         </div>
+
         <div class="form-group">
             <label for="phone">Telefon</label>
             <input type="text" class="form-control" id="phone" name="phone" placeholder="Telefon" value="{{ text.getConfig('phone') }}">
         </div>
         <div class="form-group">
             <label for="fileId">Datei-ID</label>
-            <input type="text" class="form-control" id="fileId" name="fileId" placeholder="Datei-ID" value="{{ text.getConfig('filelink') }}">
+            <input type="number" class="form-control" id="fileId" name="fileId" placeholder="Datei-ID" value="{{ text.getConfig('filelink') }}">
         </div>
+
+        {{ v.injectPartial('Frootbox/Ext/Core/FileManager/Editor/Partials/FileManager', {
+            uid: get.get('uid')
+        }) | raw }}
+
+        {{ v.injectPartial('Frootbox/Ext/Core/FileManager/Editor/Partials/FileUpload', {
+            multiple: false,
+            uid: get.get('uid'),
+        }) | raw }}
 
         <div class="form-group">
             <label for="pageId">CMS-Seite</label>
@@ -77,7 +98,12 @@
                 <option value="">keine Seite gewählt</option>
 
                 {% for child in pages %}
-                    <option {% if text.getConfig('pageId') == child.getId() %}selected{% endif %} value="{{ child.getId() }}">{{ child.getTitle() }}</option>
+                    <option {% if text.getConfig('pageId') == child.getId() %}selected{% endif %} value="{{ child.getId() }}">
+                        {% if child.getLevel() > 1 %}
+                            {% for i in 1..(child.getLevel() - 1) %}--{% endfor %}
+                        {% endif %}
+                        {{ child.getTitle() }}
+                    </option>
                 {% endfor %}
 
             </select>

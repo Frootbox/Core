@@ -5,11 +5,15 @@ $(function ( ) {
     }
 
     if (localStorage.getItem('fbxShopCartItemCount') > 0) {
+
         $('.fbxShopCartItemCounter').show();
         $('.fbxShopCartItemCounter').html(localStorage.getItem('fbxShopCartItemCount'));
+
+        $('.fbxShopCartVisibleOnItemCount').show();
     }
     else {
         $('.fbxShopCartItemCounter').hide();
+        $('.fbxShopCartVisibleOnItemCount').hide();
     }
 
 
@@ -50,9 +54,19 @@ $(function ( ) {
     /**
      * Add product to cart via form submit
      */
+    $(document).on('click', 'form.shopsystem-product-add-to-cart button', function ( event ) {
+        $(this).attr('data-clicked', '1');
+    });
+
     $(document).on('submit', 'form.shopsystem-product-add-to-cart', function ( event ) {
 
         event.preventDefault();
+
+        let button = $(this).find('[data-clicked="1"]');
+
+        if (button.length > 0) {
+            $(this).append('<input class="auto-append" type="hidden" name="' + button.attr('name') + '" value="' + button.attr('value') + '" />');
+        }
 
         $.ajax({
             url: $(this).attr('action'),

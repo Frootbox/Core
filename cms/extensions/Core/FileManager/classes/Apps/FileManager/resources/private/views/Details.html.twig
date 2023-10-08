@@ -2,6 +2,10 @@
 
 {{ front.addTab('Dateiverwaltung', app.getUri('index')) }}
 
+{% if folder %}
+    {{ front.addTab(folder.getTitle(), app.getUri('index', { folderId: folder.getId() })) }}
+{% endif %}
+
 <h2>
     {{ file.getName() }}
     <span class="headoptions">

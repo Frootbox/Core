@@ -14,6 +14,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
     protected $publicActions = [
         'index',
         'completed',
+        'review',
     ];
 
     /**
@@ -36,7 +37,8 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
             b.id,
             b.config,
             e.dateStart as eventDateStart,
-            e.dateEnd as eventDateEnd
+            e.dateEnd as eventDateEnd,
+            e.parentId
         FROM 
             assets b,
             assets e

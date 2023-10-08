@@ -51,6 +51,7 @@
             var fileId = $(this).attr('href').substr(1);
 
             var img = $('picture[data-fileid="' + fileId + '"] img');
+            var wrapper = $('picture[data-fileid="' + fileId + '"]');
 
             $('.popover').popover('hide');
 
@@ -61,7 +62,8 @@
                 data: {
                     method: 'ajaxModalEdit',
                     editable: 'Frootbox/Ext/Core/Images/Editables/PhysicalImage',
-                    fileId: fileId
+                    fileId: fileId,
+                    isLinkable: (typeof wrapper.data('linkable') != "undefined" ? 1 : 0),
                 },
                 success: function ( html ) {
 

@@ -4,12 +4,61 @@
 
 <h2>
 	Formular-Verwaltung
-	<span class="headoptions">
-		<a data-toggle="tooltip" data-modal data-title="neues Formular hinzufügen" href="{{ app.getUri('ajaxModalCompose') }}"><i class="fa fa-plus-circle"></i></a>
-	</span>
 </h2>
 
-<div id="formsReceiver">
-	{{ v.injectPartial('\\Frootbox\\Ext\\Core\\ContactForms\\Apps\\FormsManager\\Partials\\ListForms') | raw }}
+<div class="row">
+	<div class="col-md-4">
+
+		<h4>Kategorien</h4>
+
+		<script nonce="{{ settings.nonce }}">
+			$(function ( ) {
+
+				$(document).on('click', '#categoriesTreeReceiver tr[data-cat]', function ( event ) {
+
+					event.preventDefault();
+					event.stopImmediatePropagation();
+
+					$('#categoriesTreeReceiver tr[data-cat]').removeClass('highlighted');
+					$(this).addClass('highlighted');
+
+					var categoryId = $(this).attr('data-cat');
+
+					$.ajax({
+						url: "{{ app.getUri('ajaxPanelForms') | raw }}",
+						data: {
+							categoryId: categoryId
+						},
+						success: function ( html ) {
+
+							$('#formsReceiver').html(html);
+
+							// initElements();
+						}
+					});
+				});
+
+			//	$('#categoriesTreeReceiver tr[data-cat]').first().trigger('click');
+			});
+		</script>
+
+		{{ v.injectPartial('\\Frootbox\\Admin\\Controller\\Assets\\Categories\\Partials\\CategoriesManager', {
+			uid: app.getUid('categories'),
+			plugin: plugin,
+			className : 'Frootbox\\Ext\\Core\\ContactForms\\Persistence\\Category'
+		}) | raw }}
+
+	</div>
+	<div class="col-md-8">
+
+		<div id="formsReceiver">
+			{{ v.injectPartial('\\Frootbox\\Ext\\Core\\ContactForms\\Apps\\FormsManager\\Partials\\ListForms', {
+				app: app,
+			}) | raw }}
+		</div>
+
+	</div>
 </div>
+
+
 

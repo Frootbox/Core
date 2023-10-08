@@ -12,7 +12,7 @@ namespace Frootbox\Admin\View\Partials;
 abstract class AbstractPartial extends \Frootbox\GenericObject implements PartialInterface
 {
     protected $path;
-    protected $data;
+    protected array $data = [];
 
     /**
      *
@@ -92,7 +92,8 @@ abstract class AbstractPartial extends \Frootbox\GenericObject implements Partia
     }
 
     /**
-     *
+     * @param array $data
+     * @return PartialInterface
      */
     public function setData(array $data): PartialInterface
     {
@@ -101,10 +102,9 @@ abstract class AbstractPartial extends \Frootbox\GenericObject implements Partia
         return $this;
     }
 
-
-    
     /**
-     * 
+     * @param string $attribute
+     * @return bool
      */
     public function hasData(string $attribute): bool
     {

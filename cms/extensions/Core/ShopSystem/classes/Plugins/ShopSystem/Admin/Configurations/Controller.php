@@ -88,7 +88,13 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     {
         // Set new config
         $this->plugin->unsetConfig('skipSelfpickup');
+        $this->plugin->unsetConfig('fields');
+        $this->plugin->unsetConfig('fieldsMandatory');
+        $this->plugin->unsetConfig('invoice');
+        $this->plugin->unsetConfig('confirmationOfOrder');
+
         $this->plugin->addConfig($post->get('config'));
+
         $this->plugin->save();
 
         return self::getResponse('json');
@@ -98,11 +104,66 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
      *
      */
     public function ajaxUpdateGeneralAction(
-        \Frootbox\Http\Post $post
+        \Frootbox\Http\Post $post,
+        \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Products $productRepository,
+        \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Categories $categoryRepository,
     ): Response
     {
+        $this->plugin->unsetConfig('ignoreEquipmentsVisibility');
+        $this->plugin->unsetConfig('noProductsDetailPages');
+        $this->plugin->unsetConfig('noCategoriesDetailPages');
+
         // Set new config
         $this->plugin->addConfig($post->get('config'));
+        $this->plugin->save();
+
+        // Update products
+        $products = $productRepository->fetch([
+            'where' => [
+                'pluginId' => $this->plugin->getId(),
+            ],
+        ]);
+
+        foreach ($products as $product) {
+
+            $product->addConfig([
+                'noProductsDetailPages' => !empty($this->plugin->getConfig('noProductsDetailPages')),
+            ]);
+
+            $product->save();
+        }
+
+        // Update categories
+        $categories = $categoryRepository->fetch([
+            'where' => [
+                'pluginId' => $this->plugin->getId(),
+            ],
+        ]);
+
+        foreach ($categories as $category) {
+
+            $category->addConfig([
+                'noCategoriesDetailPages' => !empty($this->plugin->getConfig('noCategoriesDetailPages')),
+            ]);
+
+            $category->save();
+        }
+
+        return self::getResponse('json');
+    }
+
+    /**
+     *
+     */
+    public function ajaxUpdateUiAction(
+        \Frootbox\Http\Post $post,
+    ): Response
+    {
+        $this->plugin->addConfig([
+            'ui' => [
+                'productListSorting' => $post->get('productListSorting'),
+            ],
+        ]);
         $this->plugin->save();
 
         return self::getResponse('json');

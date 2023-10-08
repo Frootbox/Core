@@ -44,8 +44,8 @@
                 grecaptcha.ready(function() {
                     grecaptcha.execute(recaptchaSiteKey, { action: 'submit' }).then(function(token) {
 
-                        form.append('<input type="hidden" id="recaptchaToken" name="token" />');
-                        $('#recaptchaToken').val(token);
+                        form.append('<input type="hidden" class="recaptchaToken" name="token" />');
+                        form.find('.recaptchaToken').val(token);
 
                         _contactFormSubmitForm(form);
                     });
@@ -65,6 +65,11 @@
             method: 'post',
             dataType: 'json',
             success: function ( response ) {
+
+                if (typeof response.callback != "undefined") {
+                    window[response.callback]();
+                    return;
+                }
 
                 if (typeof response.redirect != "undefined") {
                     window.location.href = response.redirect;
@@ -101,7 +106,9 @@
     }
 </script>
 
-<form method="post" class="contactform ajax form" id="form{{ form.getId() }}" action="{{ form.getAction({ pluginId: plugin.getId() }) }}">
+<form method="post" class="{{ addedClassName }} contactform ajax form" id="form{{ form.getId() }}" action="{{ form.getAction({ pluginId: plugin.getId() }) }}">
+
+    <input type="hidden" name="_xparams[redirect]" value="{{ redirect }}" />
 
     {% if config.get('recaptcha.v3.key') %}
         <div style="border: 3px solid red; padding: 20px; margin-bottom: 40px;" class="cookie-consent-message">
@@ -116,32 +123,34 @@
     {% set requiredFields = false %}
 
     {% for group in form.getGroups() %}
-        <div class="row {% if group.getConfig('alignItemsEnd') %}align-items-end{% endif %}">
+        <div class="group-wrapper {{ group.getConfig('className') }}">
+            <div class="row {% if group.getConfig('alignItemsEnd') %}align-items-end{% endif %}">
 
-            {% if group.getTitle() %}
-                <div class="col-md-12">
-                    <h3>{{ group.getTitle() }}</h3>
-                </div>
-            {% endif %}
-
-            {% for column in group.getColumns() %}
-                <div class="col-md-{{ column.columns }}">
-
-                    <div class="group-details">
-
-
-                        {% for field in column.fields %}
-                            {{ renderer.renderField(field) | raw }}
-
-                            {% if field.isRequired() %}
-                                {% set requiredFields = true %}
-                            {% endif %}
-
-                        {% endfor %}
+                {% if group.getTitle() %}
+                    <div class="col-md-12">
+                        <h3 class="title">{{ group.getTitle() }}</h3>
                     </div>
+                {% endif %}
 
-                </div>
-            {% endfor %}
+                {% for column in group.getColumns() %}
+                    <div class="col-md-{{ column.columns }}">
+
+                        <div class="group-details">
+
+
+                            {% for field in column.fields %}
+                                {{ renderer.renderField(field) | raw }}
+
+                                {% if field.isRequired() %}
+                                    {% set requiredFields = true %}
+                                {% endif %}
+
+                            {% endfor %}
+                        </div>
+
+                    </div>
+                {% endfor %}
+            </div>
         </div>
     {% endfor %}
 

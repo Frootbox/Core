@@ -48,6 +48,7 @@ class Teaser extends \Frootbox\Persistence\AbstractAsset implements \Frootbox\Pe
             'virtualDirectory' => [
                 $this->getTitle()
             ],
+            'uid' => $this->getUid('alias'),
             'payload' => $this->generateAliasPayload([
                 'action' => 'showTeaser',
                 'teaserId' => $this->getId()
@@ -96,6 +97,7 @@ class Teaser extends \Frootbox\Persistence\AbstractAsset implements \Frootbox\Pe
                     'virtualDirectory' => [
                         $title,
                     ],
+                    'uid' => $this->getUid('alias'),
                     'payload' => $this->generateAliasPayload([
                         'action' => 'showTeaser',
                         'teaserId' => $this->getId()
@@ -114,6 +116,7 @@ class Teaser extends \Frootbox\Persistence\AbstractAsset implements \Frootbox\Pe
                     'virtualDirectory' => [
                         $this->getTitle()
                     ],
+                    'uid' => $this->getUid('alias'),
                     'payload' => $this->generateAliasPayload([
                         'action' => 'showTeaser',
                         'teaserId' => $this->getId()
@@ -145,7 +148,14 @@ class Teaser extends \Frootbox\Persistence\AbstractAsset implements \Frootbox\Pe
         }
 
         if (!empty($this->config['redirect']['email'])) {
-            return 'mailto:' . $this->config['redirect']['email'];
+
+            $url = 'mailto:' . $this->config['redirect']['email'];
+
+            if (!empty($this->config['redirect']['emailSubject'])) {
+                $url .= '?subject=' . $this->config['redirect']['emailSubject'];
+            }
+
+            return $url;
         }
 
         if (!empty($this->config['redirect']['article']['id'])) {
@@ -168,7 +178,8 @@ class Teaser extends \Frootbox\Persistence\AbstractAsset implements \Frootbox\Pe
             return $base . $this->config['redirect']['intern'];
         }
 
-        if (!empty($this->getAlias())) {
+        if (!empty($this->getAlias(options: [ 'skipForceLanguage' => true ]))) {
+
             return parent::getUri($options);
         }
 

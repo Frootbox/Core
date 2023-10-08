@@ -1,0 +1,504 @@
+{# config
+
+title: Standard
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set sp = view.getViewhelper('StaticPages') %}
+{% set b = view.getViewhelper('Breadcrumb', { singleton: true }) %}
+{% set a = view.getViewhelper('Assets', {   }) %}
+{% set partials = view.getViewhelper('Partials', { plugin: plugin }) %}
+{% set p = view.getViewhelper('Plugins') %}
+
+
+{% set basketPlugin = p.getByClass('Frootbox\\Ext\\Core\\ShopSystem\\Plugins\\Checkout\\Plugin') %}
+
+{{ b.addSection(product.getTitle(), product.getUri()) }}
+
+{{ view.set({ pagedata: { canonical: product.getUri({ absolute: true }) } }) }}
+
+{{ view.set({ pagedata: { title: product.getTitle() } }) }}
+
+{{ view.set({ pagedata: { ogTitle: product.getTitle() } }) }}
+{{ view.set({ pagedata: { ogDescription: text.getTextByUid(product.getUid('teaser')).getText() } }) }}
+
+{% set locationCategories = { b: 'Bronze', s: 'Silver', g: 'Gold' } %}
+{% set locationCategory = locationCategories[(product.getTitle() | first | lower)] %}
+
+{% set shopcart = i.getShopcart() %}
+
+{% set item = shopcart.getItemByProductId(product.getId()) %}
+
+<script nonce="{{ settings.nonce }}">
+
+    const productTitle = "{{ product.getTitle() }}";
+    var category;
+
+    switch (productTitle.charAt(0).toLowerCase()) {
+        case 'b':
+            category = 'Bronze';
+            break;
+
+        case 's':
+            category = 'Silver';
+            break;
+
+        case 'g':
+            category = 'Gold';
+            break;
+    }
+
+    var urlToProduct = "{{ sp.getUri('Holl/BreitbandEvents/Product', 'jumpToName', {}, {}) }}";
+
+    var booked = [
+        '{{ product.getTitle() }}',
+    ];
+
+
+    $(function() {
+
+        if (category == 'Gold') {
+            $('.no-gold').remove();
+        }
+
+        booked.forEach(function(x) {
+
+            $('tspan').each(function() {
+
+                if ($(this).data('class')) {
+                    className = $(this).data('class');
+                }
+                else {
+                    className = $(this).text().toLowerCase();
+                }
+
+                if (className == x.toLowerCase()) {
+                    $('rect.' + className).addClass('marked');
+                }
+                else {
+                    $('rect.' + className).addClass('booked');
+                }
+            });
+        });
+    });
+</script>
+
+{% set databsheet = product.getDatasheet() %}
+
+<div class="plugin Core ShopSystem ShopSystem ShowProduct01">
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+
+                <div class="sticky-top">
+
+
+
+                    {% if product.getTitle() in [ 'B24', 'S25', 'B23', 'B22', 'S24', 'B21' ] %}
+                        {{ partials.renderPartial('FloorPlanPromenade', { skipTitles: true }) | raw }}
+                    {% else %}
+                        {{ partials.renderPartial('FloorPlanSonnendeck', { skipTitles: true }) | raw }}
+                    {% endif %}
+
+                </div>
+
+            </div>
+            <div class="col-md-6">
+
+                <header class="h2 first main-title">
+                    <h2>
+                        {{ product.getTitle }}
+                    </h2>
+                    <p class="subtitle">
+                        {{ databsheet.getTitle() }}<br />
+                        <span style="display: block; margin: 5px 0 0 0; font-weight: normal;">{{ product.getPrice() | number_format(2, ',', '.') }} {{ currencySign }} <span style="color: #CCC; font-size: 14px;">zzgl. 19 % USt.</span></span>
+                    </p>
+                </header>
+
+                <p></p>
+
+                <div data-nowidgets data-editable data-uid="{{ databsheet.getUid('teaser') }}"></div>
+
+
+                <h2>Fläche buchen</h2>
+
+
+
+
+                    <script nonce="{{ settings.nonce }}">
+                        $(function() {
+
+                            /**
+                             *
+                             */
+                            $('#coExhibitor').change(function(event) {
+
+                                $('.co-exhibitor').addClass('d-none');
+                                $('.co-exhibitor').find('textarea').prop('disabled', true);
+                                $('.co-exhibitor').find('textarea').prop('required', false);
+
+                                let num = parseInt($(this).val());
+
+                                if ($(this).val().length > 0) {
+
+                                    for (i = 1; i <= num; ++i) {
+                                        $('.co-exhibitor[data-num="' + i + '"]').removeClass('d-none');
+                                        $('.co-exhibitor[data-num="' + i + '"]').find('textarea, input').prop('disabled', false);
+                                        $('.co-exhibitor[data-num="' + i + '"]').find('textarea, input').prop('required', true);
+                                    }
+                                }
+                            });
+
+                            /**
+                             *
+                             */
+                            $('#additionalStandAttendants').change(function(event) {
+
+                                var attendantCount = 2;
+
+                                if (category == 'Gold') {
+                                    attendantCount = 4;
+                                }
+
+                                attendantCount += parseInt($(this).val());
+
+                                $('.stand-attendant').addClass('d-none');
+
+                                for (let i = 1; i <= attendantCount; ++i) {
+                                    $('.stand-attendant[data-attendants="' + i + '"]').removeClass('d-none');
+                                }
+                            });
+
+                            $('#additionalStandAttendants').trigger('change');
+                        });
+                    </script>
+
+                    <form method="post" class="shopsystem-product-add-to-cart" action="{{ sp.getUri('Core/ShopSystem/Basket', 'addProduct', { clearAll: true, productId: product.getId(), followup: 'redirect' }, { redirect: basketPlugin.getActionUri('index') }) }}">
+
+                        <h4>Aussteller</h4>
+
+                        <div class="form-group">
+                            <label for="company">Firma *</label>
+                            <input type="text" class="form-control" id="company" name="personal[company]" required value="{{ shopcart.getPersonal('company') }}">
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group col-6">
+                                <label for="billing_gender">Anrede *</label>
+                                <select required class="form-control" id="billing_gender" name="personal[gender]">
+                                    <option value="">bitte wählen ...</option>
+                                    <option {% if shopcart.getPersonal('gender') == 'Female' %}selected{% endif %} value="Female">Frau</option>
+                                    <option {% if shopcart.getPersonal('gender') == 'Male' %}selected{% endif %} value="Male">Herr</option>
+                                    <option {% if shopcart.getPersonal('gender') == 'Diverse' %}selected{% endif %} value="Diverse">Divers</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-6">
+                                <label for="billing_title">Titel</label>
+                                <input type="text" class="form-control" id="billing_title" name="personal[title]" placeholder="Titel" value="{{ shopcart.getPersonal('title') }}">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-6 col-md-6">
+                                <label for="billing_firstname">Vorname *</label>
+                                <input required type="text" class="form-control" id="billing_firstname" name="personal[firstname]" placeholder="Vorname" value="{{ shopcart.getPersonal('firstname') }}">
+                            </div>
+                            <div class="form-group col-6 col-md-6">
+                                <label for="billing_lastname">Nachname *</label>
+                                <input required type="text" class="form-control" id="billing_lastname" name="personal[lastname]" placeholder="Nachname" value="{{ shopcart.getPersonal('lastname') }}">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="billing_vat">{{ 'Core.ShopSystem.Plugins.Checkout.Field.VAT' | translate }}</label>
+                            <input type="text" class="form-control" id="billing_vat" name="personal[vat]" placeholder="VAT" value="{{ shopcart.getPersonal('vat') }}">
+                        </div>
+
+
+                        <div class="form-group">
+                            <label for="billing_addition">Adresszusatz</label>
+                            <input type="text" class="form-control" id="billing_addition" name="personal[addition]" placeholder="Adresszusatz" value="{{ shopcart.getPersonal('addition') }}">
+                        </div>
+
+                        <script nonce="{{ settings.nonce }}">
+                            $(function() {
+
+                                $('#billing_street').change(function() {
+
+                                    if ($('#billing_streetNumber').val().length == 0 && $('#billing_street').val().match(/(.*?) ([0-9]+)$/)) {
+
+                                        let match = $('#billing_street').val().match(/^(.*?) ([0-9]+)$/);
+
+                                        $('#billing_street').val(match[1]);
+                                        $('#billing_streetNumber').val(match[2]);
+                                    }
+                                });
+                            });
+                        </script>
+
+                        <div class="form-row">
+                            <div class="form-group col-8">
+                                <label for="billing_street">Straße *</label>
+                                <input required type="text" class="form-control" id="billing_street" name="personal[street]" placeholder="Straße" value="{{ shopcart.getPersonal('street') }}">
+                            </div>
+                            <div class="form-group col-4">
+                                <label for="billing_streetNumber">Nr.*</label>
+                                <input required type="text" class="form-control" id="billing_streetNumber" name="personal[streetNumber]" placeholder="Nr." value="{{ shopcart.getPersonal('streetNumber') }}">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-4">
+                                <label for="billing_postalCode">PLZ *</label>
+                                <input required type="text" class="form-control" id="billing_postalCode" name="personal[postalCode]" placeholder="PLZ" value="{{ shopcart.getPersonal('postalCode') }}">
+                            </div>
+                            <div class="form-group col-8">
+                                <label for="billing_city">Ort *</label>
+                                <input required type="text" class="form-control" id="billing_city" name="personal[city]" placeholder="Ort" value="{{ shopcart.getPersonal('city') }}">
+                            </div>
+                        </div>
+
+                        {% if i.getCountries() %}
+                            <div class="form-group">
+                                <label for="billing_country">Land *</label>
+                                <select required class="form-control" id="billing_country" name="personal[country]">
+                                    <option value="">bitte wählen ...</option>
+                                    {% for isocode in i.getCountries() %}
+                                        <option {% if shopcart.getPersonal('country') == isocode %}selected{% endif %} value="{{ isocode }}">{{ ('Core.ShopSystem.Plugins.Checkout.Country.' ~ isocode) | translate }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        {% endif %}
+
+                        <div class="form-group">
+                            <label for="billing_email">E-Mail *</label>
+                            <input required type="email" class="form-control" id="billing_email" name="personal[email]" placeholder="E-Mail" value="{{ shopcart.getPersonal('email') | default(user.getEmail()) }}">
+                        </div>
+                        <div class="form-group">
+                            <label for="billing_phone">Telefon</label>
+                            <input type="text" class="form-control" id="billing_phone" name="personal[phone]" placeholder="Telefon" value="{{ shopcart.getPersonal('phone') }}">
+                        </div>
+
+                        <p>Daten der ausstellenden Firma. Ein abweichender Rechnungsempfänger kann später angegeben werden.</p>
+
+                        <h4>Ausstattung</h4>
+
+                        <div class="form-group">
+                            <label for="numberOfBarTables">Anzahl Stehtische</label>
+                            <select class="form-control" id="numberOfBarTables" name="xdata[numberOfBarTables]">
+                                <option value="">keine</option>
+                                <option>1</option>
+                                {% if locationCategory == "Silver" or locationCategory == "Gold" %}
+                                    <option>2</option>
+                                {% endif %}
+
+                                {% if locationCategory == "Gold" %}
+                                    <option>3</option>
+                                {% endif %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="numberOfBarStools">Anzahl Barhocker</label>
+                            <select class="form-control" id="numberOfBarStools" name="xdata[numberOfBarStools]">
+                                <option value="">keine</option>
+                                <option>1</option>
+                                <option>2</option>
+                                <option>3</option>
+
+                                {% if locationCategory == "Silver" or locationCategory == "Gold" %}
+                                    <option>4</option>
+                                {% endif %}
+
+                                {% if locationCategory == "Gold" %}
+                                    <option>5</option>
+                                    <option>6</option>
+                                {% endif %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="numberOfConferenceTables">Anzahl Konferenztische</label>
+                            <select class="form-control" id="numberOfConferenceTables" name="xdata[numberOfConferenceTables]">
+                                <option value="">keine</option>
+                                <option>1</option>
+
+                                {% if locationCategory == "Silver" or locationCategory == "Gold" %}
+                                    <option>2</option>
+                                {% endif %}
+
+                                {% if locationCategory == "Gold" %}
+                                    <option>3</option>
+                                {% endif %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="numberOfChairs">Anzahl Stühle</label>
+                            <select class="form-control" id="numberOfChairs" name="xdata[numberOfChairs]">
+                                <option value="">keine</option>
+                                <option>1</option>
+                                <option>2</option>
+                                <option>3</option>
+
+                                {% if locationCategory == "Silver" or locationCategory == "Gold" %}
+                                    <option>4</option>
+                                {% endif %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="additionalTechnicalEquipment">Weitere Technik</label>
+                            <textarea class="form-control" id="additionalTechnicalEquipment" name="xdata[additionalTechnicalEquipment]" rows="3">{{ item.getXData().additionalTechnicalEquipment }}</textarea>
+                            <small id="emailHelp" class="form-text text-muted">Kosten für weitere Technik werden nach Aufwand berechnet.</small>
+                        </div>
+
+                        <h4>Standbetreuer</h4>
+
+                        <div class="d-none form-group stand-attendant" data-attendants="1">
+                            <label for="standAttendant1">Name Betreuer 1</label>
+                            <input type="text" class="form-control" id="standAttendant1" name="xdata[standAttendant1]" value="{{ item.getXData().standAttendant1 }}">
+                        </div>
+                        <div class="d-none form-group stand-attendant" data-attendants="2">
+                            <label for="standAttendant2">Name Betreuer 2</label>
+                            <input type="text" class="form-control" id="standAttendant2" name="xdata[standAttendant2]" value="{{ item.getXData().standAttendant2 }}">
+                        </div>
+                        <div class="d-none form-group stand-attendant" data-attendants="3">
+                            <label for="standAttendant3">Name Betreuer 3</label>
+                            <input type="text" class="form-control" id="standAttendant3" name="xdata[standAttendant3]" value="{{ item.getXData().standAttendant3 }}">
+                        </div>
+                        <div class="d-none form-group stand-attendant" data-attendants="4">
+                            <label for="standAttendant4">Name Betreuer 4</label>
+                            <input type="text" class="form-control" id="standAttendant4" name="xdata[standAttendant4]" value="{{ item.getXData().standAttendant4 }}">
+                        </div>
+                        <div class="d-none form-group stand-attendant" data-attendants="5">
+                            <label for="standAttendant5">Name Betreuer 5</label>
+                            <input type="text" class="form-control" id="standAttendant5" name="xdata[standAttendant5]" value="{{ item.getXData().standAttendant5 }}">
+                        </div>
+                        <div class="d-none form-group stand-attendant" data-attendants="6">
+                            <label for="standAttendant6">Name Betreuer 6</label>
+                            <input type="text" class="form-control" id="standAttendant6" name="xdata[standAttendant6]" value="{{ item.getXData().standAttendant6 }}">
+                        </div>
+                        <div class="d-none form-group stand-attendant" data-attendants="7">
+                            <label for="standAttendant7">Name Betreuer 7</label>
+                            <input type="text" class="form-control" id="standAttendant7" name="xdata[standAttendant7]" value="{{ item.getXData().standAttendant7 }}">
+                        </div>
+                        <div class="d-none form-group stand-attendant" data-attendants="8">
+                            <label for="standAttendant8">Name Betreuer 8</label>
+                            <input type="text" class="form-control" id="standAttendant8" name="xdata[standAttendant8]" value="{{ item.getXData().standAttendant8 }}">
+                        </div>
+                        <div class="d-none form-group stand-attendant" data-attendants="9">
+                            <label for="standAttendant9">Name Betreuer 9</label>
+                            <input type="text" class="form-control" id="standAttendant9" name="xdata[standAttendant9]" value="{{ item.getXData().standAttendant9 }}">
+                        </div>
+                        <div class="d-none form-group stand-attendant" data-attendants="10">
+                            <label for="standAttendant10">Name Betreuer 10</label>
+                            <input type="text" class="form-control" id="standAttendant10" name="xdata[standAttendant10]" value="{{ item.getXData().standAttendant10 }}">
+                        </div>
+
+
+                        <div class="form-group">
+                            <label for="additionalStandAttendants">Zusätzliche Standbetreuer</label>
+                            <select class="form-control" id="additionalStandAttendants" name="xdata[additionalStandAttendants]">
+                                <option value="0">keine</option>
+                                <option>1</option>
+                                <option>2</option>
+                                <option>3</option>
+                                <option>4</option>
+                                <option>5</option>
+                                <option>6</option>
+                                <option class="no-gold">7</option>
+                                <option class="no-gold">8</option>
+                            </select>
+                            <small id="emailHelp" class="form-text text-muted">Zusätzliche Standbetreuer werden mit 35,00 € zzgl. 19 % USt. pro Person berechnet.</small>
+                        </div>
+
+                        {% if locationCategory == "Gold" %}
+
+                            <h4>Mitaussteller</h4>
+
+                            <p>Preis pro Mitaussteller: 400,00 € zzgl. 19 % USt. (inkl. 1 Standbetreuer, es gibt keine zusätzlichen Freikarten für Gäste)</p>
+
+                            <div class="form-group">
+                                <label for="coExhibitor">Mitaussteller</label>
+                                <select class="form-control" id="coExhibitor" name="xdata[coExhibitor]">
+                                    <option value="">keine Mitaussteller</option>
+                                    <option>1</option>
+                                    <option>2</option>
+                                </select>
+                            </div>
+
+                            <div class="d-none co-exhibitor" data-num="1">
+
+                                <h5>Mitausteller 1</h5>
+
+                                <div class="form-group">
+                                    <label for="nameOfCoExhibitor1Company">Firmenname *</label>
+                                    <textarea disabled class="form-control" id="nameOfCoExhibitor1Company" name="xdata[nameOfCoExhibitor1Company]" rows="3"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="nameOfCoExhibitor1StandAttendant">Name des Standbetreuers *</label>
+                                    <input disabled class="form-control" id="nameOfCoExhibitor1StandAttendant" name="xdata[nameOfCoExhibitor1StandAttendant]" />
+                                </div>
+                            </div>
+
+                            <div class="d-none co-exhibitor" data-num="2">
+
+                                <h5>Mitausteller 2</h5>
+
+                                <div class="form-group">
+                                    <label for="nameOfCoExhibitor2Company">Firmenname *</label>
+                                    <textarea disabled class="form-control" id="nameOfCoExhibitor2Company" name="xdata[nameOfCoExhibitor2Company]" rows="3"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="nameOfCoExhibitor2StandAttendant">Name des Standbetreuers *</label>
+                                    <input disabled class="form-control" id="nameOfCoExhibitor2StandAttendant" name="xdata[nameOfCoExhibitor2StandAttendant]" />
+                                </div>
+                            </div>
+
+                        {% endif %}
+
+
+
+                        <h4>Abendveranstaltung</h4>
+
+                        <p>Von 18:00–22:00 Uhr, inkl. Dinner, Getränkeauswahl, Showprogramm</p>
+
+                        <div class="form-group">
+                            <label for="eveningEvent">Anzahl Personen</label>
+                            <select class="form-control" id="eveningEvent" name="xdata[eveningEvent]">
+                                <option value="0">keine</option>
+                                <option>1</option>
+                                <option>2</option>
+                                <option>3</option>
+                                <option>4</option>
+                                <option>5</option>
+                            </select>
+                            <small id="emailHelp" class="form-text text-muted">Preis: 145,00 € zzgl. 19 % USt. pro Person.</small>
+                        </div>
+
+                        <h4>Speaker-Slot</h4>
+
+                        <div class="form-group form-check">
+                            <input type="checkbox" class="form-check-input" id="speakerSlot" name="xdata[speakerSlot]">
+                            <label class="form-check-label" for="speakerSlot">Buchung eines SPEAKER-Slots</label>
+                            <small id="emailHelp" class="form-text text-muted">30 min., 750,00 € zzgl. 19 % USt.</small>
+                        </div>
+
+                        {#
+                        <h4>Stellfläche Messemobil</h4>
+
+                        <div class="form-group form-check">
+                            <input type="checkbox" class="form-check-input" id="spaceForExhibitionVehicle" name="xdata[spaceForExhibitionVehicle]">
+                            <label class="form-check-label" for="spaceForExhibitionVehicle">Stellfläche Messemobil auf der Außenfläche zum Preis von 300,00 € netto inkl. Stromanschluss von 9–17 Uhr</label>
+                        </div>
+                        #}
+
+                        <br />
+
+                        <button type="submit" class="btn btn-primary">zur Buchung</button>
+
+                    </form>
+
+
+            </div>
+        </div>
+    </div>
+
+</div>

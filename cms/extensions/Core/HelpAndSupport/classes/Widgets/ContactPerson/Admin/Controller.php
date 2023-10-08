@@ -59,10 +59,9 @@ class Controller extends \Frootbox\Admin\AbstractWidgetController {
        \Frootbox\Admin\View $view
     )
     {
-
         // Fetch contact groups
         $result = $contacts->fetch([
-
+            'order' => [ 'lastName ASC', 'firstName ASC' ],
         ]);
 
         $view->set('contacts', $result);

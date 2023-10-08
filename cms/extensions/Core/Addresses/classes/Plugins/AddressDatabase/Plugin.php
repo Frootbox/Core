@@ -20,23 +20,46 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
     /**
      *
      */
-    public function getAddresses(
-        \Frootbox\Session $session,
-        \Frootbox\Ext\Core\Addresses\Persistence\Repositories\Addresses $addressesRepository,
-    ): ?\Frootbox\Db\Result
+    public function getAddresses(array $parameters = []): ?\Frootbox\Db\Result
     {
-        $minVisibility = $session->isLoggedIn() ? 1 : 2;
+        $limit = $parameters['limit'] ?? 1024;
 
         // Fetch addresses
+        $addressesRepository = $this->getDb()->getRepository(\Frootbox\Ext\Core\Addresses\Persistence\Repositories\Addresses::class);
         $result = $addressesRepository->fetch([
             'where' => [
                 'pluginId' => $this->getId(),
-                new \Frootbox\Db\Conditions\GreaterOrEqual('visibility', $minVisibility),
+                new \Frootbox\Db\Conditions\GreaterOrEqual('visibility',(IS_EDITOR ? 1 : 2)),
             ],
-          //  'order' => [ 'title ASC' ],
+            'limit' => $limit,
+            // 'order' => [ 'title ASC' ],
         ]);
 
         return $result;
+    }
+
+    /**
+     * @param array $parameters
+     * @return array
+     */
+    public function getAddressesByLetter(array $parameters = []): array
+    {
+        $addresses = $this->getAddresses($parameters);
+
+        $list = [];
+
+        foreach ($addresses as $address) {
+
+            $key = mb_strtolower(mb_substr($address->getTitle(), 0, 1));
+
+            if (!isset($list[$key])) {
+                $list[$key] = [];
+            }
+
+            $list[$key][] = $address;
+        }
+
+        return $list;
     }
 
     /**
@@ -48,13 +71,13 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
     }
 
     /**
-     *
+     * @return array
+     * @throws \Frootbox\Exceptions\RuntimeError
      */
-    public function getTags(
-        \Frootbox\Persistence\Repositories\Tags $tagsRepository
-    )
+    public function getTags(): array
     {
         // Fetch tags
+        $tagsRepository = $this->getDb()->getRepository(\Frootbox\Persistence\Repositories\Tags::class);
         $result = $tagsRepository->fetch([
             'where' => [
                 'itemClass' => \Frootbox\Ext\Core\Addresses\Persistence\Address::class,
@@ -142,7 +165,8 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
     }
 
     /**
-     *
+     * @param \Frootbox\Ext\Core\Addresses\Persistence\Repositories\Addresses $addressesRepository
+     * @return Response
      */
     public function showAddressAction(
         \Frootbox\Ext\Core\Addresses\Persistence\Repositories\Addresses $addressesRepository
@@ -150,6 +174,10 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
     {
         // Fetch address
         $address = $addressesRepository->fetchById($this->getAttribute('addressId'));
+
+        if (!$address->isVisible()) {
+            return new \Frootbox\View\ResponseRedirect($this->getActionUri('index'));
+        }
 
         return new Response([
             'address' => $address,

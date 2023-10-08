@@ -6,106 +6,15 @@
         <div class="xmessage">Sie haben aktuell keine Artikel im Warenkorb.</div>
     {% else %}
 
-        <script nonce="{{ settings.nonce }}">
-            $(function ( ) {
-
-                /**
-                 *
-                 */
-                $(document).on('change', 'select.set-amount', function ( event ) {
-
-                    $.ajax({
-                        headers: {
-                            Accept: "application/json; charset=utf-8",
-                        },
-                        url: $(this).attr('data-update'),
-                        data: {
-                            amount: $(this).val()
-                        },
-                        success: function ( response ) {
-
-                            $('#itemsTableReceiver').html(response.html);
-
-                            localStorage.setItem('fbxShopCartItemCount', response.shopcart.items);
-                            $('.fbxShopCartItemCounter').show();
-                            $('.fbxShopCartItemCounter').html(response.shopcart.items);
-                        }
-                    });
-                });
-
-
-                /**
-                 *
-                 */
-                $(document).on('click', 'a.drop-item', function ( event ) {
-
-                    event.preventDefault();
-                    event.stopImmediatePropagation();
-
-                    if (!confirm('Soll dieses Produkt aus dem Warenkorb entfernt werden?')) {
-                        return;
-                    }
-
-                    $.ajax({
-                        url: $(this).attr('href'),
-                        type: 'GET',
-                        dataType: 'JSON',
-                        success: function ( response ) {
-
-                            $('#itemsTableReceiver').html(response.html);
-
-                            localStorage.setItem('fbxShopCartItemCount', response.shopcart.items);
-                            $('.fbxShopCartItemCounter').show();
-                            $('.fbxShopCartItemCounter').html(response.shopcart.items);
-                        }
-                    });
-                });
-
-                /**
-                 *
-                 */
-                $(document).on('click', 'a.open-options', function ( event ) {
-
-                    event.preventDefault();
-                    event.stopImmediatePropagation();
-
-                    $.ajax({
-                        url: $(this).attr('href'),
-                        type: 'GET',
-                        success: function ( html ) {
-
-                            $('.generic-shopcart-modal').remove();
-
-                            $('body').append('<div ' + 'class="generic-shopcart-modal">' + html + '</' + 'div>');
-
-                        }
-                    });
-
-                });
-
-                /**
-                 *
-                 */
-                $(document).on('click', 'a.generic-modal-close', function ( event ) {
-
-                    event.preventDefault();
-                    event.stopImmediatePropagation();
-
-                    $('.generic-shopcart-modal').remove();
-                });
-            });
-        </script>
-
         <h3>Artikel im Warenkorb</h3>
 
         <div class="table-responsive-sm">
-
 
             <table class="table checkout-items-table">
                 <thead>
                     <tr>
                         <th class="d-none d-md-table-cell">Artikel</th>
-                        <th class="text-right">Anzahl</th>
+                        <th width="200" class="text-right">Anzahl</th>
                         <th class="text-right">Preis</th>
                         <th class="text-right">Gesamt</th>
                         {% if data.editable %}<th width="75"></th>{% endif %}
@@ -114,6 +23,9 @@
                 <tbody>
 
                     {% for item in items %}
+
+                        {% set product = item.getProduct() %}
+
                         <tr data-item="{{ item.getKey() }}" class="d-md-none">
                             <td colspan="3">
                                 {% if item.getUri() and not plugin.getConfig('skipLinkage') %}
@@ -128,17 +40,18 @@
                                     {% endif %}
 
                                     {% for option in item.getFieldOptions() %}
-                                        <br />{{ option.group }}: {{ option.option }}{% if option.surcharge %} (+ {{ option.surcharge | number_format(2, ',', '.') }} &euro;){% endif %}
+                                        <br />{{ option.group }}: {{ option.option }}{% if option.surcharge %} (+ {{ option.surcharge | number_format(2, ',', '.') }} {{ currencySign }}){% endif %}
                                     {% endfor %}
                                 {% endif %}
 
                                 {% for equipment in item.getEquipment() %}
-                                    <br />+ {{ equipment.title }} ({% if equipment.priceGross == 0 %}inkl.{% else %}{{ equipment.priceGross | number_format(2, ",", ".") }} EUR{% endif %})
+                                    <br />+ {{ equipment.title }} ({% if equipment.priceGross == 0 %}inkl.{% else %}{{ equipment.priceGross | number_format(2, ",", ".") }} {{ currencySign }}{% endif %})
                                 {% endfor %}
 
                                 {% if item.getCustomNote() %}
                                     <div class="customnote">{{ item.getCustomNote() | nl2br }}</div>
                                 {% endif %}
+
                             </td>
                             <td class="d-none d-md-table-cell"></td>
                         </tr>
@@ -156,12 +69,12 @@
                                     {% endif %}
 
                                     {% for option in item.getFieldOptions() %}
-                                        <br />{{ option.group }}: {{ option.option }}{% if option.surcharge %} (+ {{ option.surcharge | number_format(2, ',', '.') }} &euro;){% endif %}
+                                        <br />{{ option.group }}: {{ option.option }}{% if option.surcharge %} (+ {{ option.surcharge | number_format(2, ',', '.') }} {{ currencySign }}){% endif %}
                                     {% endfor %}
                                 {% endif %}
 
                                 {% for equipment in item.getEquipment() %}
-                                    <br />+ {{ equipment.title }} ({% if equipment.priceGross == 0 %}inkl.{% else %}{{ equipment.priceGross | number_format(2, ",", ".") }} EUR{% endif %})
+                                    <br />+ {{ equipment.title }} ({% if equipment.priceGross == 0 %}inkl.{% else %}{{ equipment.priceGross | number_format(2, ",", ".") }} {{ currencySign }}{% endif %})
                                 {% endfor %}
 
                                 {% if item.getCustomNote() %}
@@ -174,9 +87,16 @@
                             </td>
                             <td class="text-right">
 
-                                {% if data.editable and not item.isBound() %}
+                                {% if (product and product.getConfig('freeChoiceOfAmount') and product.getPackagingUnit()) and not (item.isBound() or item.isAmountFixed()) %}
+                                    <div class="input-group mb-3">
+                                        <input data-update="{{ data.plugin.getUriAjax('UpdateItemAmount', { key: item.getKey() } ) }}" type="tel" class="set-amount form-control" placeholder="Menge wählen ..." aria-label="Menge wählen" name="items[{{ item.getKey() }}][amount]" value="{{ item.getAmount() }}">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text" id="basic-addon2">{{ ("Core.ShopSystem.Plugins.ShopSystem.UnitShort" ~ product.getPackagingUnit()) | translate }}</span>
+                                        </div>
+                                    </div>
+                                {% elseif data.editable and not item.isBound() and not item.isAmountFixed() %}
                                     <select size="1" name="items[{{ item.getKey() }}][amount]" class="set-amount" data-key="{{ item.getKey() }}" data-update="{{ data.plugin.getUriAjax('UpdateItemAmount', { key: item.getKey() } ) }}">
-                                        {% for i in 1..20 %}
+                                        {% for i in 1..item.getAmountMax() %}
                                             <option {% if item.getAmount() == i %}selected{% endif %} value="{{ i }}">{{ i }} x</option>
                                         {% endfor %}
                                     </select>
@@ -186,17 +106,35 @@
 
                             </td>
                             <td class="text-right" nowrap>
-                                {% if item.getPriceGross() > 0 %}
-                                    {{ item.getPriceGross() | number_format(2, ",", ".") }} EUR
+
+                                {% if not plugin.getConfig('showNetPrices') %}
+                                    {% if item.getPriceGrossFinal() > 0 %}
+                                        {{ item.getPriceGrossFinal() | number_format(2, ",", ".") }} {{ currencySign }}
+                                    {% else %}
+                                        kostenlos
+                                    {% endif %}
                                 {% else %}
-                                    kostenlos
+                                    {% if item.getPrice() > 0 %}
+                                        {{ item.getPrice() | number_format(2, ",", ".") }} {{ currencySign }}
+                                    {% else %}
+                                        kostenlos
+                                    {% endif %}
                                 {% endif %}
                             </td>
                             <td class="text-right" nowrap>
-                                {% if item.getTotal() > 0 %}
-                                    {{ item.getTotal() | number_format(2, ",", ".") }} EUR
+
+                                {% if not plugin.getConfig('showNetPrices') %}
+                                    {% if item.getTotal() > 0 %}
+                                        {{ item.getTotal() | number_format(2, ",", ".") }} {{ currencySign }}
+                                    {% else %}
+                                        kostenlos
+                                    {% endif %}
                                 {% else %}
-                                    kostenlos
+                                    {% if item.getTotalNet() > 0 %}
+                                        {{ item.getTotalNet() | number_format(2, ",", ".") }} {{ currencySign }}
+                                    {% else %}
+                                        kostenlos
+                                    {% endif %}
                                 {% endif %}
                             </td>
 
@@ -215,52 +153,71 @@
                 </tbody>
                 <tfoot>
 
+                    {% if plugin.getConfig('showNetPrices') %}
+                        <tr>
+                            <td class="text-right" colspan="3">Netto</td>
+                            <td class="text-right">{{ data.shopcart.getTotalNetItems() | number_format(2,',','.') }} {{ currencySign }}</td>
+                            {% if data.editable %}<td></td>{% endif %}
+                        </tr>
+                    {% endif %}
+
+
                     {% for coupon in data.shopcart.getRedeemedCoupons() %}
                         <tr>
                             <td class="text-right" colspan="3">
-                                Coupon „{{ coupon.getCode() }}“ ({% if coupon.getConfig('valuePercent') %}{{ coupon.getConfig('valuePercent') }} %{% else %}{{ coupon.getValueLeft() | number_format(2,',','.') }} EUR{% endif %})
+                                Coupon „{{ coupon.getCode() }}“ ({% if coupon.getConfig('valuePercent') %}{{ coupon.getConfig('valuePercent') }} %{% else %}{{ coupon.getValueLeft() | number_format(2,',','.') }} {{ currencySign }}{% endif %})
 
                                 <a class="coupon-dismiss" href="{{ data.plugin.getUriAjax('dismissCoupon', { couponCode: coupon.getCode() }) }}"><i class="fa fa-times"></i></a>
                             </td>
-                            <td class="text-right">-{{ coupon.getRedeemedValue() | number_format(2,',','.') }} EUR</td>
+                            <td class="text-right">-{{ coupon.getRedeemedValue() | number_format(2,',','.') }} {{ currencySign }}</td>
                         </tr>
                     {% endfor %}
 
-                    <tr>
-                        <td class="d-none d-md-table-cell"></td>
-                        <td class="text-right" colspan="2">
-                            {% if data.shopcart.getShippingCosts() is same as (null) %}
-                                zzgl. Versand
-                            {% elseif data.shopcart.getShippingCosts() == 0 %}
-                                Versand kostenlos
-                            {% else %}
-                                Versand
-                            {% endif %}
-                        </td>
-                        <td class="text-right">
-                            {% if data.shopcart.getShippingCosts() is same as (null) or data.shopcart.getShippingCosts() == 0 %}
+                    {% if not plugin.getConfig('skipShipping') %}
+                        <tr>
+                            <td class="d-none d-md-table-cell"></td>
+                            <td class="text-right" colspan="2">
+                                {% if data.shopcart.getShippingCosts() is same as (null) %}
+                                    zzgl. Versand
+                                {% elseif data.shopcart.getShippingCosts() == 0 %}
+                                    Versand kostenlos
+                                {% else %}
+                                    Versand
+                                {% endif %}
+                            </td>
+                            <td class="text-right">
+                                {% if data.shopcart.getShippingCosts() is same as (null) or data.shopcart.getShippingCosts() == 0 %}
 
-                            {% else %}
-                                {{ data.shopcart.getShippingCosts() | number_format(2,',','.') }} EUR
-                            {% endif %}
-                        </td>
-                        {% if data.editable %}<td></td>{% endif %}
-                    </tr>
+                                {% else %}
+                                    {{ data.shopcart.getShippingCosts() | number_format(2,',','.') }} {{ currencySign }}
+                                {% endif %}
+                            </td>
+                            {% if data.editable %}<td></td>{% endif %}
+                        </tr>
+                    {% endif %}
 
                     {% if data.shopcart.getTaxSections() %}
                         {% for section in data.shopcart.getTaxSections() %}
                             <tr>
                                 <td class="d-none d-md-table-cell"></td>
-                                <td class="text-right tax" colspan="2">inkl. {{ section.taxrate }} % MwSt. auf {{ section.total | number_format(2,',','.') }} EUR</td>
-                                <td class="text-right tax">{{ section.tax | number_format(2,',','.') }} EUR</td>
+                                <td class="text-right tax" colspan="2">
+                                    {% if plugin.getConfig('showNetPrices') %}
+                                        zzgl. {{ section.taxrate }} % USt. auf {{ section.net | number_format(2,',','.') }} {{ currencySign }}
+                                    {% else %}
+                                        inkl. {{ section.taxrate }} % MwSt. auf {{ section.total | number_format(2,',','.') }} {{ currencySign }}
+                                    {% endif %}
+                                </td>
+                                <td class="text-right tax">{{ section.tax | number_format(2,',','.') }} {{ currencySign }}</td>
                                 {% if data.editable %}<td></td>{% endif %}
                             </tr>
                         {% endfor %}
                     {% else %}
                         <tr>
                             <td class="d-none d-md-table-cell"></td>
-                            <td class="text-right tax" colspan="2">inkl. 0 % MwSt. auf {{ section.total | number_format(2,',','.') }} EUR</td>
-                            <td class="text-right tax">0,00 EUR</td>
+                            <td class="text-right tax" colspan="2">
+                                zzgl 0 % MwSt. auf {{ section.total | number_format(2,',','.') }} {{ currencySign }}
+                            </td>
+                            <td class="text-right tax">0,00 {{ currencySign }}</td>
                             {% if data.editable %}<td></td>{% endif %}
                         </tr>
                     {% endif %}
@@ -268,7 +225,7 @@
                     <tr>
                         <td class="d-none d-md-table-cell"></td>
                         <td class="total" colspan="2">Summe</td>
-                        <td class="total" nowrap>{{ data.shopcart.getTotal() | number_format(2,',','.') }} EUR</td>
+                        <td class="total" nowrap>{{ data.shopcart.getTotal() | number_format(2,',','.') }} {{ currencySign }}</td>
                         {% if data.editable %}<td></td>{% endif %}
                     </tr>
                 </tfoot>

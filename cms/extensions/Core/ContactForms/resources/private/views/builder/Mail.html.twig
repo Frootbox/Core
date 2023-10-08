@@ -47,7 +47,17 @@
                         {% if key != "token" %}
                             <tr>
                                 <td>{{ key }}</td>
-                                <td>{{ value }}</td>
+                                <td>
+                                    {% if value is iterable %}
+                                        {% if value.url %}
+                                            <a href="{{ value.url }}">{{ value.title }}</a>
+                                        {% else %}
+                                            {{ value.title }}
+                                        {% endif %}
+                                    {% else %}
+                                        {{ value }}
+                                    {% endif %}
+                                </td>
                             </tr>
                         {% endif %}
 

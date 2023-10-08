@@ -85,7 +85,6 @@ class StaticPagesRoute extends \Frootbox\Routing\AbstractRoute
             $response = new \Frootbox\View\Response;
         }
 
-        
         if ($response instanceof \Frootbox\View\ResponseRedirect) {
 
             if (strpos($_SERVER['HTTP_ACCEPT'], 'text/html') !== false) {

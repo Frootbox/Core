@@ -48,11 +48,24 @@ class Job extends \Frootbox\Persistence\AbstractAsset implements \Frootbox\Persi
             return null;
         }
 
+        $title = trim($this->getTitle() . ' ' . $this->getSubtitle());
+
+        if (!empty($this->getConfig('urlSuffixSubtitle'))) {
+
+            $textRepository = $this->getDb()->getRepository(\Frootbox\Persistence\Content\Repositories\Texts::class);
+            $text = $textRepository->fetchByUid($this->getUid('title'));
+
+            if (!empty($text) and !empty($text->getConfig('subtitle'))) {
+                $title .= ' ' . $text->getConfig('subtitle');
+            }
+        }
+
         return new \Frootbox\Persistence\Alias([
             'pageId' => $this->getPageId(),
             'virtualDirectory' => [
-                $this->getTitle()
+                $title,
             ],
+            'uid' => $this->getUid('alias'),
             'payload' => $this->generateAliasPayload([
                 'action' => 'showJob',
                 'jobId' => $this->getId()
@@ -93,6 +106,7 @@ class Job extends \Frootbox\Persistence\AbstractAsset implements \Frootbox\Persi
                     'language' => $language,
                     'pageId' => $this->getPageId(),
                     'virtualDirectory' => $vd,
+                    'uid' => $this->getUid('alias'),
                     'payload' => $this->generateAliasPayload([
                         'action' => 'showJob',
                         'jobId' => $this->getId(),
@@ -112,6 +126,7 @@ class Job extends \Frootbox\Persistence\AbstractAsset implements \Frootbox\Persi
                         'virtualDirectory' => [
                             $this->getTitle()
                         ],
+                        'uid' => $this->getUid('alias'),
                         'payload' => $this->generateAliasPayload([
                             'action' => 'showJob',
                             'jobId' => $this->getId()
@@ -120,6 +135,38 @@ class Job extends \Frootbox\Persistence\AbstractAsset implements \Frootbox\Persi
                 ],
             ];
         }
+    }
+
+    /**
+     * @return array
+     */
+    public function getSearchableTags(): array
+    {
+        $tags = [];
+
+        foreach ($this->getTags() as $tag) {
+            $tags[] = 'tag-' . $tag->getTag();
+        }
+
+        $tags[] = $this->getType();
+
+        return $tags;
+    }
+
+    /**
+     *
+     */
+    public function getType(): ?string
+    {
+        if (!empty($this->getConfig('type'))) {
+            return $this->getConfig('type');
+        }
+
+        if (!empty($this->getConfig('typeId'))) {
+            return $this->getConfig('typeId');
+        }
+
+        return null;
     }
 
     /**

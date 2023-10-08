@@ -1,6 +1,7 @@
+
 <nav class="shopcart-account-menu">
-    <a href="{{ plugin.getActionUri('orders') }}">Bestellungen</a>
-    <a href="{{ plugin.getActionUri('addresses') }}">Adressbuch</a>
+    <a class="{% if pluginAction == "orders" or pluginAction == "order" %}active{% endif %}" href="{{ plugin.getActionUri('orders') }}">Bestellungen</a>
+    <a class="{% if pluginAction == "addresses" or pluginAction == "addressEdit" %}active{% endif %}" href="{{ plugin.getActionUri('addresses') }}">Adressbuch</a>
     <a href="{{ settings.serverpath }}static/Ext/Core/System/Auth/logout?redirect={{ data.plugin.getActionUri('index') | url_encode | raw }}">Abmelden</a>
 </nav>
 

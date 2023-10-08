@@ -11,7 +11,7 @@ return [
         'id' => 'Core',
         'name' => 'Frootbox',
     ],
-    'version' => '1.2.6',
+    'version' => '1.4.0',
     'requires' => [
 
     ],

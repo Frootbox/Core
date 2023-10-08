@@ -31,6 +31,24 @@ class Renderer
     }
 
     /**
+     * @param Items\AbstractItem $item
+     * @return \Frootbox\Db\Result
+     */
+    public function getChildrenForItem(\Frootbox\Ext\Core\Navigation\Navigations\Items\AbstractItem $item): ?\Frootbox\Db\Result
+    {
+        if ($item->hasAutoItems()) {
+
+            $items = $this->container->call([$item, 'getAutoItems']);
+
+            return $items;
+        }
+        else {
+            return $item->getItems();
+        }
+    }
+
+
+    /**
      *
      */
     protected function generateDefaultHtml(): string
@@ -63,7 +81,9 @@ class Renderer
      */
     protected function getItemHtml(\Frootbox\Ext\Core\Navigation\Navigations\Items\AbstractItem $item): string
     {
-        $html = '<a data-loop="' . ++$this->loop . '" class="' . implode(' ', $item->getClasses()) . ' ' . ($item->isActive($this->parameters) ? 'active' : '') . '" href="' . $item->getHref() . '"><span>';
+        $itemIsActive = $item->isActive($this->parameters);
+
+        $html = '<a data-item="' . $item->getId() . '" data-parent="' . $item->getParentId() . '" data-loop="' . ++$this->loop . '" class="' . implode(' ', $item->getClasses()) . ' ' . ($itemIsActive ? 'active' : '') . '" href="' . $item->getHref() . '"><span>';
 
         if (!empty($item->getConfig('icon'))) {
 
@@ -109,10 +129,14 @@ class Renderer
 
                 $html = str_replace('class="', 'class="has-children ', $html);
 
+                $html .= '<div data-item="' . $item->getId() . '" class="children-wrapper ' . ($itemIsActive ? 'active' : '') . '">';
+
                 foreach ($children as $item) {
                     $item->addClass('child');
                     $html .= $this->getItemHtml($item);
                 }
+
+                $html .= '</div>';
             }
         }
 
@@ -153,7 +177,11 @@ class Renderer
             return null;
         }
 
-        $navViewId = !empty($this->parameters['view']) ? $this->parameters['view'] : $this->navigation->getNavId();
+        $navViewId = isset($this->parameters['view']) ? $this->parameters['view'] : $this->navigation->getNavId();
+
+        if ($navViewId === false) {
+            return null;
+        }
 
         foreach ($folders->getData() as $path) {
 
@@ -181,9 +209,23 @@ class Renderer
 
         $view->set('parameters', $this->parameters);
         $view->set('navigation', $this->navigation);
+        $view->set('renderer', $this);
 
         $html = $view->render($viewFile);
 
+        // Auto inject css file
+        $stylesheetFile = dirname($viewFile) . '/public/standards.less';
+
+        if (file_exists($stylesheetFile)) {
+            $html = '<link type="text/css" rel="stylesheet/less" href="FILE:' . $stylesheetFile . '" />' . PHP_EOL . $html;
+        }
+
+        // Auto inject javascript file
+        $scriptFile = dirname($viewFile) . '/public/init.js';
+
+        if (file_exists($scriptFile)) {
+            $html = '<script src="FILE:' . $scriptFile . '"></script>' . PHP_EOL . $html;
+        }
 
         return $html;
     }

@@ -10,8 +10,7 @@ variables:
 /config #}
 
 {% set i = view.getViewhelper('Delegator', { object: plugin }) %}
-
-{{ i.injectScss({ path: 'Index01/public/standards.less'}) | raw }}
+{% set icons = view.getViewhelper('Ext/HerrUndFrauPixelExt/Icons/Icons', { createDummyOnFail: true  }) %}
 
 <div class="plugin Core News News Index01">
 
@@ -28,17 +27,20 @@ variables:
 
                 {% set articles = i.getArticles() %}
 
-                {% for article in articles %}
+                <div class="teasers">
+                    {% for article in articles %}
+                        <div class="teaser">
+                            <h3 data-editable data-uid="{{ article.getUid('title') }}">{{ article.getTitle }}</h3>
 
-                    <h3 data-editable data-uid="{{ article.getUid('title') }}">{{ article.getTitle }}</h3>
+                            <div data-nowidgets data-editable data-uid="{{ article.getUid('teaser') }}"></div>
 
-                    <div data-nowidgets data-editable data-uid="{{ article.getUid('teaser') }}"></div>
+                            {% if article.showReadMore() %}
+                                <p class="read-more"><a href="{{ article.getUri() }}">{{ icons.render('square-chevron-right') | raw }}weiterlesen</a></p>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
 
-                    {% if article.showReadMore() %}
-                        <p><a class="read-more" href="{{ article.getUri() }}">weiterlesen</a></p>
-                    {% endif %}
-
-                {% endfor %}
             </div>
 
         </div>

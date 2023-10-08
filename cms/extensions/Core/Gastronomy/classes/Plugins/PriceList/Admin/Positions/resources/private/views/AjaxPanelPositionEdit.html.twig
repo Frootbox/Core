@@ -34,6 +34,22 @@
                 <input type="text" class="form-control" name="number" id="number" placeholder="Nummer" value="{{ listEntry.getNumber() }}">
             </div>
 
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="dateStart">Sichtbar ab</label>
+                        <input type="date" class="form-control" name="dateStart" id="dateStart" placeholder="Sichtbar ab" value="{% if listEntry.getDateStart() %}{{ listEntry.getDateStart() | date('Y-m-d') }}{% endif %}">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="dateEnd">Sichtbar bis</label>
+                        <input type="date" class="form-control" name="dateEnd" id="dateEnd" placeholder="Sichtbar bis" value="{% if listEntry.getDateEnd() %}{{ listEntry.getDateEnd() | date('Y-m-d') }}{% endif %}">
+                    </div>
+                </div>
+            </div>
+
+
             <button type="submit" class="btn btn-primary">Speichern</button>
 
         </form>

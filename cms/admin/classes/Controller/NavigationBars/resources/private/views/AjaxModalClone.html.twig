@@ -1,0 +1,30 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    'frame' : false,
+}) }}
+
+<form method="post" class="ajax" action="{{ v.getUri('NavigationBars', 'ajaxClone', { navigationId: navigation.getId(), language: language }) }}">
+
+    <div class="modal-body">
+
+        <div class="form-group">
+            <label for="targetLanguage">Zielsprache</label>
+            <select class="form-control" id="targetLanguage" name="targetLanguage">
+                <option value="">bitte wählen ...</option>
+
+                {% for targetLanguage in config.get('i18n.languages') %}
+                    {% if language != targetLanguage %}
+                        <option value="{{ targetLanguage }}">{{ targetLanguage }}</option>
+                    {% endif %}
+                {% endfor %}
+
+            </select>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Speichern</button>
+    </div>
+
+</form>

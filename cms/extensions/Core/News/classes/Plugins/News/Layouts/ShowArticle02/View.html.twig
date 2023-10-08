@@ -1,0 +1,87 @@
+{# config
+
+title: Standard
+variables:
+    skipTeaser:
+        type: bool
+        label: ohne Teaser
+    withContainer:
+        label: mit Layout-Container
+        type: bool
+        default: false
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set b = view.getViewhelper('Breadcrumb', { singleton: true }) %}
+{% set text = view.getViewhelper('Text') %}
+{% set t = i.getTranslator() %}
+{% set h = view.getViewhelper('Hreflang', { singleton: true }) %}
+
+{% set icons = view.getViewhelper('Ext/HerrUndFrauPixelExt/Icons/Icons', { createDummyOnFail: true  }) %}
+
+{{ view.set('hideGlobalBlocks', true) }}
+
+{{ b.addSection(article.getTitle(globalLanguage), article.getUri()) }}
+
+{{ view.set({ pagedata: { title: article.getTitle(globalLanguage) } }) }}
+
+{% set image = article.getFileByUid('image') %}
+
+{% if  image %}
+    {{ view.set({ pagedata: { ogImage: image } }) }}
+{% endif %}
+
+{{ view.set({ pagedata: { ogTitle: article.getTitle(globalLanguage) } }) }}
+{{ view.set({ pagedata: { ogDescription: text.getTextByUid(article.getUid('teaser')).getText() } }) }}
+
+{% set a = view.getViewhelper('Ext/Core/System/Assets', {   }) %}
+
+{{ a.import('https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css') | raw }}
+{{ a.import('https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js') | raw }}
+
+{% for language, xalias in article.getLanguageAliases() %}
+    {{ h.addItem(language, xalias) }}
+{% endfor %}
+
+<param name="cloak" value="1" />
+
+<div class="plugin Core News News ShowArticle02">
+
+    {% if variables.withContainer %}<div class="container">{% endif %}
+
+    <div class="row">
+        <div class="col-12">
+
+            <div class="inner-wrapper">
+
+                <h2 class="first main-title" data-editable data-uid="{{ article.getUid('title') }}">{{ article.getTitle }}</h2>
+
+                {% if not variables.skipTeaser %}
+                    <div class="content-teaser">
+                        <div data-nowidgets data-editable data-uid="{{ article.getUid('teaser') }}"></div>
+                    </div>
+
+                    <hr />
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+
+    {% if variables.withContainer %}</div>{% endif %}
+
+    <div class="blocks" data-blocks data-label="Blöcke des Artikels" data-uid="{{ article.getUid('block-content') }}"></div>
+
+    {% if variables.withContainer %}<div class="container">{% endif %}
+        <div class="row">
+            <div class="col-12">
+
+                <div data-editable data-uid="{{ article.getUid('text') }}"></div>
+
+            </div>
+
+        </div>
+    {% if variables.withContainer %}</div>{% endif %}
+
+</div>

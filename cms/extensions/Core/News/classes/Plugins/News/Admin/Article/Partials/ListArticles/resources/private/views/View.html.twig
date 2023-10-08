@@ -26,10 +26,10 @@
 							<span class="badge badge-info">{{ tag.getTag() }}</span>
 						{% endfor %}
 					</td>
-					<td>{{ article.getDateStart() | date("d.m.Y H:i") }} Uhr</td>
-					<td class="text-right">
+					<td nowrap>{{ article.getDateStart() | date("d.m.Y H:i") }} Uhr</td>
+					<td class="text-right" nowrap>
 						<a class="ajax" href="{{ v.getUri('Assets', 'ajaxSwitchVisibility', { assetId: article.getId() } ) }}"><i data-asset="{{ article.getId() }}" class="fa fa-lightbulb visibility {{ article.getVisibilityString() }} icon"></i></a>
-						<a class="ajax" data-confirm="Soll dieser Newsartikel wirklich gelöscht werden?" href="{{ data.plugin.getAdminUri('Article', 'ajaxDelete', { articleId: article.getId() }) }}"><i class="icon fa fa-times"></i></a>
+						<a class="ajax" data-confirm="Soll dieser Newsartikel wirklich gelöscht werden?" href="{{ data.plugin.getAdminUri('Article', 'ajaxDelete', { articleId: article.getId() }) }}"><i class="icon far fa-trash"></i></a>
 					</td>
 				</tr>
 

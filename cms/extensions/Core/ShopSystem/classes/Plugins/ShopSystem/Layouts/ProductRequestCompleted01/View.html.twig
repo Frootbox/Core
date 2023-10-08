@@ -1,0 +1,28 @@
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set t = i.getTranslator() %}
+{% set b = view.getViewhelper('Breadcrumb', { singleton: true }) %}
+
+{% set formRenderer = view.getViewhelper('Ext/Core/ContactForms/FormRenderer', {  }) %}
+
+{{ b.addSection(product.getTitle(), product.getUri()) }}
+{{ b.addSection('Produkt-Anfrage') }}
+
+{{ view.set({ pagedata: { robots: "noindex" } }) }}
+
+<div class="wave white plugin Core ShopSystem ShopSystem ProductRequestCompleted01">
+
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+
+                <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('request-completed-title') }}">Anfrage gesendet</h2>
+
+                <div data-editable data-nowidgets data-uid="{{ plugin.getUid('request-completed-text') }}">
+                    <p>Vielen Dank für Ihr Interesse, die Anfrage wurde gesendet.</p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>

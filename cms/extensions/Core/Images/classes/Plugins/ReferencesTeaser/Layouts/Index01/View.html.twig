@@ -14,6 +14,10 @@ variables:
         type: int
         label: Bildhöhe
         default: 300
+    withContainer:
+        type: bool
+        label: mit Layout-Container
+
 /config #}
 
 {% set i = view.getViewhelper('Delegator', { object: plugin }) %}
@@ -31,37 +35,44 @@ variables:
 {% set references = i.getReferences() %}
 
 {% if references.getCount() > 0 %}
-    <div class="row">
-        <div class="col-12 plugin Core Images ReferencesTeaser Index01">
 
-            <h2 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+    <div class="plugin Core Images ReferencesTeaser Index01">
+    {% if variables.withContainer %}<div class="container">{% endif %}
 
-            <div data-editable data-uid="{{ plugin.getUid('teaser') }}"></div>
+        <div class="row">
+            <div class="col-12">
 
-            <div class="references row justify-content-center">
-                {% for reference in references %}
-                    <div class="{{ colClass }}">
-                        <div class="reference" data-href>
-                            {% if not variables.noImage %}
-                                <picture class="fluid" data-editable {% if variables.noImageDummy %}data-skipempty="1"{% endif %} data-uid="{{ reference.getUid('image') }}">
-                                    <img width="{{ variables.image_width }}" height="{{ variables.image_height }}" src="{{ i.getDummyImage({ width: variables.image_width, height: variables.image_height | default(300) }) }}" alt="" />
-                                </picture>
-                            {% endif %}
+                <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
 
-                            <div class="text-pillow">
-                                <h3 data-editable data-uid="{{ reference.getUid('title') }}">{{ reference.getTitle }}</h3>
+                <div data-editable data-uid="{{ plugin.getUid('teaser') }}"></div>
+
+                <div class="references row justify-content-center">
+                    {% for reference in references %}
+                        <div class="{{ colClass }}">
+                            <div class="reference" data-href>
+                                {% if not variables.noImage %}
+                                    <picture class="fluid" data-editable {% if variables.noImageDummy %}data-skipempty="1"{% endif %} data-uid="{{ reference.getUid('image') }}">
+                                        <img width="{{ variables.image_width }}" height="{{ variables.image_height }}" src="{{ i.getDummyImage({ width: variables.image_width, height: variables.image_height | default(300) }) }}" alt="" />
+                                    </picture>
+                                {% endif %}
+
+                                <div class="text-pillow">
+                                    <h3 data-editable data-uid="{{ reference.getUid('title') }}">{{ reference.getTitle }}</h3>
 
 
-                                <div data-nowidgets data-editable data-uid="{{ reference.getUid('teaser') }}"></div>
+                                    <div data-nowidgets data-editable data-uid="{{ reference.getUid('teaser') }}"></div>
 
-                                <p><a class="readmore" href="{{ reference.getUri() }}"><span>weiterlesen</span></a></p>
+                                    <p><a class="readmore" href="{{ reference.getUri() }}"><span>weiterlesen</span></a></p>
+                                </div>
+
                             </div>
-
                         </div>
-                    </div>
-                {% endfor %}
-            </div>
+                    {% endfor %}
+                </div>
 
+            </div>
         </div>
+
+    {% if variables.withContainer %}</div>{% endif %}
     </div>
 {% endif %}

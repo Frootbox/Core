@@ -24,7 +24,7 @@ class Partial extends \Frootbox\Admin\View\Partials\AbstractPartial
      *
      */
     public function onBeforeRendering(
-        \Frootbox\Ext\Core\Images\Plugins\References\Persistence\Repositories\References $referencesRepository
+        \Frootbox\Ext\Core\Images\Plugins\References\Persistence\Repositories\References $referenceRepository,
     ): Response
     {
         // Obtain plugin
@@ -49,13 +49,34 @@ class Partial extends \Frootbox\Admin\View\Partials\AbstractPartial
                 break;
         }
 
-        // Fetch references
-        $references = $referencesRepository->fetch([
-            'where' => [
-                'pluginId' => $plugin->getId(),
-            ],
-            'order' => $order,
-        ]);
+        if ($this->hasData('keyword')) {
+
+            // Build sql
+            $sql = 'SELECT 
+                *
+            FROM
+                assets 
+            WHERE
+                className = :className AND
+                title LIKE :keyword
+            ';
+
+            // Fetch references
+            $references = $referenceRepository->fetchByQuery($sql, [
+                'className' => \Frootbox\Ext\Core\Images\Plugins\References\Persistence\Reference::class,
+                'keyword' => '%' . $this->getData('keyword') . '%',
+            ]);
+        }
+        else {
+
+            // Fetch references
+            $references = $referenceRepository->fetch([
+                'where' => [
+                    'pluginId' => $plugin->getId(),
+                ],
+                'order' => $order,
+            ]);
+        }
 
         return new Response('html', 200, [
             'references' => $references,

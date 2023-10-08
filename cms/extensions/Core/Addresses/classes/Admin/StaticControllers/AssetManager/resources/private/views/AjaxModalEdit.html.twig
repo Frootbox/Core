@@ -4,6 +4,29 @@
     frame: false,
 }) }}
 
+<script nonce="{{ settings.nonce }}">
+    $(function ( ) {
+
+        $('a.refresh-geolocation').click(function (event) {
+
+            $.ajax({
+                url: "https://maps.googleapis.com/maps/api/geocode/json",
+                data: {
+                    address: $('#zipcode').val() + " " + $('#city').val() + ", " + $('#street').val() + " " + $('#streetNumber').val(),
+                    key: "{{ plugin.getConfig('googleMapsApiKey') | default(configuration.get('addresses.google.geolocation.apiKey')) | raw }}"
+                },
+                success: function (response) {
+
+                    console.log(response);
+
+                    $('#lat').val(response.results[0].geometry.location.lat);
+                    $('#lng').val(response.results[0].geometry.location.lng);
+                }
+            });
+        });
+    });
+</script>
+
 <form method="post" class="ajax" action="{{ v.getStaticUri('Core/Addresses/AssetManager', 'ajaxUpdate', { addressId: address.getId() }) }}">
 
     <div class="modal-body">
@@ -59,6 +82,7 @@
                 <div class="form-group">
                     <label for="lat">Breitengrad (Lat)</label>
                     <input type="text" class="form-control" name="lat" id="lat" placeholder="Breitengrad" value="{{ address.getLat() }}">
+                    <small id="emailHelp" class="form-text text-muted refresh-geolocation"><a class="refresh-geolocation" href="#">aktualisieren</a></small>
                 </div>
             </div>
             <div class="col-md-6">

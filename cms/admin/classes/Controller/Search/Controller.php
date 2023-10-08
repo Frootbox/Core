@@ -60,7 +60,8 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
     ): Response
     {
         $searchAdapters = [
-            GlobalAdapters\Pages::class
+            GlobalAdapters\Homepage::class,
+            GlobalAdapters\Pages::class,
         ];
 
         $sql = [ ];
@@ -72,7 +73,7 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
             $sql[] = $adapter->getSql($get->get('q'));
         }
 
-        $query = implode(' UNION ', $sql);
+        $query = '(' . implode(' ) UNION ( ', $sql) . ')';
 
         $stmt = $db->query($query);
         $stmt->execute();

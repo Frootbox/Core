@@ -1,0 +1,67 @@
+.plugin.Core.ContactForms.FormTeaser.Index05 {
+
+  div[data-editable]:not(:empty) {
+    margin-bottom: 50px;
+  }
+
+  .form-group.form-check {
+    input[type="checkbox"] {
+      margin-top: 8px;
+    }
+  }
+
+  .form-group {
+    input {
+      padding-left: 0;
+      border-width: 0 0 1px 0;
+      border-radius: 0;
+      background: none;
+
+      &:focus, &:active {
+        outline: none;
+        box-shadow: none;
+        border-color: inherit;
+      }
+    }
+
+    textarea {
+      border-radius: 0;
+      background: none;
+      
+      &:focus, &:active {
+        outline: none;
+        box-shadow: none;
+        border-color: inherit;
+      }
+    }
+  }
+
+  .form-group.field-input {
+    position: relative;
+    margin-top: 30px;
+
+    label {
+      position: absolute;
+      top: -40px;
+      pointer-events: none;
+      transform-origin: 0 0; //scale keeps to the right
+      transform: scale(1) translateY(100%);
+      transition: transform 0.2s linear;
+
+      &.animate-label {
+        top: -17px;
+        transform: scale(0.6) translateY(0%);
+        transition: transform 0.2s linear;
+      }
+    }
+  }
+
+  .form-panel {
+    display: none;
+
+    &.active {
+      display: block;
+    }
+  }
+}
+

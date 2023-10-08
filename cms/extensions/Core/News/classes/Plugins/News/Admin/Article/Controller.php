@@ -80,12 +80,18 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
 
         foreach ($titles as $title) {
 
+            $dateStart = $date->format('Y-m-d H:i:s');
+
+            if (preg_match('#^([0-9]{1,})\.([0-9]{1,})\.([0-9]{4})$#', $title, $match)) {
+                $dateStart = $match[3] . '-' . $match[2] . '-' . $match[1] . ' 00:00:00';
+            }
+
             // Insert new article
             $article = $articles->insert(new \Frootbox\Ext\Core\News\Persistence\Article([
                 'pageId' => $this->plugin->getPageId(),
                 'pluginId' => $this->plugin->getId(),
                 'title' => $title,
-                'dateStart' => $date->format('Y-m-d H:i:s'),
+                'dateStart' => $dateStart,
                 'visibility' => (DEVMODE ? 2 : 1),
             ]));
 

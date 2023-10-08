@@ -10,7 +10,7 @@ use Frootbox\Admin\Controller\Response;
 class Controller extends \Frootbox\Admin\AbstractPluginController
 {
     /**
-     *
+     * @return string
      */
     public function getPath(): string
     {
@@ -52,17 +52,20 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     }
 
     /**
-     *
+     * @param \Frootbox\Http\Post $post
+     * @param \Frootbox\Ext\Core\Images\Plugins\References\Persistence\Repositories\References $referencesRepository
+     * @return Response
      */
     public function ajaxUpdateAction(
         \Frootbox\Http\Post $post,
-        \Frootbox\Ext\Core\Images\Plugins\References\Persistence\Repositories\References $referencesRepository
+        \Frootbox\Ext\Core\Images\Plugins\References\Persistence\Repositories\References $referencesRepository,
     ): Response
     {
         // Update config
         $this->plugin->addConfig([
             'order' => $post->get('order'),
-            'noReferencesDetailPage' => $post->get('noReferencesDetailPage'),
+            'noReferencesDetailPage' => !empty($post->get('noReferencesDetailPage')),
+            'dedicatedLocationPerReference' => !empty($post->get('dedicatedLocationPerReference')),
             'formId' => $post->get('formId'),
         ]);
 
@@ -78,7 +81,8 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         foreach ($result as $entity) {
 
             $entity->addConfig([
-                'noReferencesDetailPage' => $post->get('noReferencesDetailPage'),
+                'noReferencesDetailPage' => !empty($post->get('noReferencesDetailPage')),
+                'dedicatedLocationPerReference' => !empty($post->get('dedicatedLocationPerReference')),
             ]);
 
             $entity->save();

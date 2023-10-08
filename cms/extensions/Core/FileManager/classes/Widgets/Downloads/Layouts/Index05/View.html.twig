@@ -1,0 +1,21 @@
+{# config
+
+title: nur Liste
+variables:
+    withHeadline:
+        label: mit Headline
+        type: bool
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: widget }) %}
+
+{% if variables.withHeadline %}
+    <h4 data-editable data-uid="{{ widget.getUid('title') }}">Download</h4>
+{% endif %}
+
+<ul>
+    {% for file in i.getFiles() %}
+        <li><a href="{{ file.getUriDownload() }}">{{ file.getTitle }}</a></li>
+    {% endfor %}
+</ul>

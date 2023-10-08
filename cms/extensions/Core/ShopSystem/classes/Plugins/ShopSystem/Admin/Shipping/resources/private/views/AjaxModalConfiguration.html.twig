@@ -1,0 +1,34 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    'frame' : false,
+}) }}
+
+
+<form method="post" class="ajax" action="{{ plugin.getAdminUri('Shipping', 'ajaxUpdateConfiguration') }}">
+
+    <div class="modal-body">
+
+        <div class="form-group">
+            <label for="regularShippingDays">reguläre Liefertage</label>
+            <select class="form-control" id="regularShippingDays" multiple="true" size="7" name="shipping[regularShippingDays][]">
+                <option {% if 1 in plugin.getConfig('shipping.regularShippingDays') %}selected{% endif %} value="1">Montag</option>
+                <option {% if 2 in plugin.getConfig('shipping.regularShippingDays') %}selected{% endif %} value="2">Dienstag</option>
+                <option {% if 3 in plugin.getConfig('shipping.regularShippingDays') %}selected{% endif %} value="3">Mittwoch</option>
+                <option {% if 4 in plugin.getConfig('shipping.regularShippingDays') %}selected{% endif %} value="4">Donnerstag</option>
+                <option {% if 5 in plugin.getConfig('shipping.regularShippingDays') %}selected{% endif %} value="5">Freitag</option>
+                <option {% if 6 in plugin.getConfig('shipping.regularShippingDays') %}selected{% endif %} value="6">Samstag</option>
+                <option {% if 7 in plugin.getConfig('shipping.regularShippingDays') %}selected{% endif %} value="7">Sonntag</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="skipNextWorkdays">Werktage Vorlauf für Lieferung</label>
+            <input type="text" class="form-control" id="skipNextWorkdays" name="shipping[skipNextWorkdays]" placeholder="Werktage Vorlauf für Lieferung" value="{{ plugin.getConfig('shipping.skipNextWorkdays') }}">
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Speichern</button>
+    </div>
+
+</form>

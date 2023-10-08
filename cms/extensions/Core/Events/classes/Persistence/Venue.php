@@ -8,6 +8,7 @@ namespace Frootbox\Ext\Core\Events\Persistence;
 class Venue extends \Frootbox\Persistence\AbstractLocation implements \Frootbox\Persistence\Interfaces\MultipleAliases
 {
     use \Frootbox\Persistence\Traits\Alias;
+    use \Frootbox\Persistence\Traits\Uid;
 
     protected $model = Repositories\Venues::class;
 
@@ -24,11 +25,63 @@ class Venue extends \Frootbox\Persistence\AbstractLocation implements \Frootbox\
                 'veranstaltungsorte',
                 $this->getTitle()
             ],
+            'uid' => $this->getUid('alias'),
             'payload' => $this->generateAliasPayload([
                 'action' => 'showVenue',
                 'venueId' => $this->getId()
             ])
         ]);
+    }
+
+    /**
+     * @return \Frootbox\Db\Result
+     * @throws \Frootbox\Exceptions\RuntimeError
+     */
+    public function getBookings(): \Frootbox\Db\Result
+    {
+        // Generate sql
+        $sql = 'SELECT
+            b.id,
+            b.config,
+            e.dateStart as eventDateStart,
+            e.dateEnd as eventDateEnd
+        FROM 
+            assets b,
+            assets e
+        WHERE
+            (                
+                b.className = "Frootbox\\\\Ext\\\\Core\\\\Events\\\\Plugins\\\\Booking\\\\Persistence\\\\Booking"
+            ) AND
+            (
+                e.parentId = ' . $this->getId() . ' AND
+                e.id = b.parentId
+            )
+        ORDER BY
+            e.dateStart ASC';
+
+        // Fetch bookings
+        $bookingRepository = $this->getDb()->getRepository(\Frootbox\Ext\Core\Events\Plugins\Booking\Persistence\Repositories\Bookings::class);
+        $result = $bookingRepository->fetchByQuery($sql);
+
+        return $result;
+    }
+
+    public function getBookingsByDay(): array
+    {
+        $List = [];
+
+        foreach ($this->getBookings() as $booking) {
+
+            $day = explode(' ', $booking->getEventDateStart())[0];
+
+            if (!isset($list[$day])) {
+                $list[$day] = [];
+            }
+
+            $list[$day][] = $booking;
+        }
+
+        return $list;
     }
 
     /**
@@ -78,7 +131,7 @@ class Venue extends \Frootbox\Persistence\AbstractLocation implements \Frootbox\
      */
     public function getNewAliases(): array
     {
-
+        throw new \Exception("MULTI LANGUE MODE NOT SUPPORTED YET.");
     }
 
     /**

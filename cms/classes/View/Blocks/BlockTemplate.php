@@ -11,7 +11,8 @@ namespace Frootbox\View\Blocks;
  */
 class BlockTemplate
 {
-    protected $path;
+    protected string $path;
+    protected ?string $overrideThumbnail = null;
 
     use \Frootbox\Traits\ViewConfigParser;
     use \Frootbox\Persistence\Traits\Config;
@@ -27,6 +28,25 @@ class BlockTemplate
     }
 
     /**
+     * @param string $path
+     * @return void
+     */
+    public function captureThumbnail(string $path): void
+    {
+        $files = [
+            $path . 'thumbnail.jpg',
+            $path . 'thumbnail.png',
+        ];
+
+        foreach ($files as $file) {
+            if (file_exists($file)) {
+                $this->overrideThumbnail = $file;
+                break;
+            }
+        }
+    }
+
+    /**
      *
      */
     public function getId(): string
@@ -35,20 +55,33 @@ class BlockTemplate
     }
 
     /**
-     *
+     * @return string|null
+     */
+    public function getOverrideThumbnail(): ?string
+    {
+        return $this->overrideThumbnail;
+    }
+
+    /**
+     * @return string
      */
     public function getThumbnailSrc(): string
     {
-        $paths = [];
-        $paths[] = $this->path . '/thumbnail.svg';
-        $paths[] = $this->path . '/thumbnail.png';
-        $paths[] = $this->path . '/thumbnail.jpg';
-        $paths[] = CORE_DIR . 'cms/admin/resources/public/images/no-thumbnail.png';
+        if (!empty($this->overrideThumbnail)) {
+            $path = $this->overrideThumbnail;
+        }
+        else {
+            $paths = [];
+            $paths[] = $this->path . '/thumbnail.svg';
+            $paths[] = $this->path . '/thumbnail.png';
+            $paths[] = $this->path . '/thumbnail.jpg';
+            $paths[] = CORE_DIR . 'cms/admin/resources/public/images/no-thumbnail.png';
 
-        foreach ($paths as $path) {
+            foreach ($paths as $path) {
 
-            if (file_exists($path)) {
-                break;
+                if (file_exists($path)) {
+                    break;
+                }
             }
         }
 

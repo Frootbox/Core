@@ -1,0 +1,42 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ front.addTab('App Verwaltung', app.getUri('index')) }}
+
+
+<h2>
+	App Verwaltung
+</h2>
+
+<form method="post" action="{{ app.getUri('ajaxUpdate') }}" class="ajax">
+
+	<table class="table">
+		<thead>
+			<tr>
+				<th>App</th>
+				<th>Zugriff</th>
+			</tr>
+		</thead>
+		<tbody>
+
+			{% for app in apps %}
+				<tr>
+					<td>{{ app.getTitle() }}</td>
+					<td>
+
+						<select class="form-control" name="access[{{ app.getId() }}]">
+							<option value="">bitte wählen</option>
+							<option {% if app.getAccess() == "SuperAdmin" %}selected{% endif %} value="SuperAdmin">Super-Admin</option>
+							<option {% if app.getAccess() == "Admin" %}selected{% endif %} value="Admin">Admin</option>
+							<option {% if app.getAccess() == "Editor" %}selected{% endif %} value="Editor">Redakteur</option>
+						</select>
+
+					</td>
+				</tr>
+			{% endfor %}
+
+
+		</tbody>
+	</table>
+
+	<button type="submit" class="mt-3 btn btn-primary">Speichern</button>
+</form>

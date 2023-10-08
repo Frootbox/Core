@@ -91,6 +91,7 @@ class Article extends \Frootbox\Persistence\AbstractAsset implements \Frootbox\P
             'virtualDirectory' => [
                 $this->getTitle()
             ],
+            'uid' => $this->getUid('alias'),
             'payload' => $this->generateAliasPayload([
                 'action' => 'showArticle',
                 'articleId' => $this->getId()
@@ -123,6 +124,7 @@ class Article extends \Frootbox\Persistence\AbstractAsset implements \Frootbox\P
                     'virtualDirectory' => [
                         $title,
                     ],
+                    'uid' => $this->getUid('alias'),
                     'payload' => $this->generateAliasPayload([
                         'action' => 'showArticle',
                         'articleId' => $this->getId()

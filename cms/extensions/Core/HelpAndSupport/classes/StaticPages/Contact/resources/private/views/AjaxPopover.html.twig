@@ -1,0 +1,32 @@
+{% set i = view.getViewhelper('Delegator', { object: page }) %}
+
+
+<div class="row">
+    <div class="col-md-4">
+        <picture  data-editable data-uid="{{ contact.getUid('image')}}">
+            <img class="round" width="420" height="500" src="{{ i.getDummyImage({ width: 420, height: 500 }) }}" alt="" />
+        </picture>
+    </div>
+    <div class="col-md-8">
+
+        <p>
+            <b>{{ contact.getName() }}</b>
+        </p>
+        <p>
+            {{ contact.getPosition() }}
+        </p>
+        <p class="contact-links">
+            {% if contact.getEmail() %}
+                <a href="mailto:{{ contact.getEmail() }}">{{ contact.getEmail() }}</a><br />
+            {% endif %}
+
+            {% if contact.getPhone() %}
+                <a href="tel:{{ contact.getPhone() }}">{{ contact.getPhone() }}</a><br />
+            {% endif %}
+        </p>
+
+        <br />
+
+        <a class="contact-popover-wrapper-close" href="#">schließen</a>
+    </div>
+</div>

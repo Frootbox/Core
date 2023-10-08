@@ -6,14 +6,9 @@ variables:
         type: int
         label: Spalten
         default: 3
-    image_width:
-        type: int
-        label: Bildbreite
-        default: 500
-    image_height:
-        type: int
-        label: Bildhöhe
-        default: 250
+    skipHeadline:
+        type: bool
+        label: ohne Überschrift
     withLayoutContainer:
         type: bool
         label: mit Layout-Container
@@ -40,10 +35,8 @@ variables:
         <div class="row">
             <div class="col-12">
 
-                {% if plugin.isFirst %}
-                    <h1 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h1>
-                {% else %}
-                    <h2 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+                {% if not variables.skipHeadline %}
+                    <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
                 {% endif %}
 
                 <div data-editable data-uid="{{ plugin.getUid('teaser') }}"></div>
@@ -65,12 +58,20 @@ variables:
                                 <span class="country-name">{{ address.getCountry() }}</span>
                             </p>
 
+                            {% if address.getPhone() %}
+                                <p>
+                                    <a href="tel:{{ address.getPhone() }}">Telefon <span class="tel">{{ address.getPhone() }}</span></a>
+                                </p>
+                            {% endif %}
+
                             <p>
-                                <a href="tel:{{ address.getPhone() }}">Telefon <span class="tel">{{ address.getPhone() }}</span></a>
-                            </p>
-                            <p>
+                                {% if address.getEmail() %}
                                 <a href="mailto:{{ address.getEmail() }}">{{ address.getEmail() }}</a><br />
-                                <a href="{{ address.getUrlExtern() }}">{{ address.getUrlDisplay() }}</a><br />
+                                {% endif %}
+
+                                {% if address.getUrlExtern() %}
+                                    <a href="{{ address.getUrlExtern() }}">{{ address.getUrlDisplay() }}</a><br />
+                                {% endif %}
                             </p>
 
                             <div data-nowidgets data-editable data-uid="{{ address.getUid('teaser') }}"></div>

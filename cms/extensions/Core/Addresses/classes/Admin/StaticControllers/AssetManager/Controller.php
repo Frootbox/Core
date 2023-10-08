@@ -6,6 +6,7 @@
 namespace Frootbox\Ext\Core\Addresses\Admin\StaticControllers\AssetManager;
 
 use Frootbox\Admin\Controller\Response;
+use Frootbox\Config\Config;
 
 class Controller extends \Frootbox\Admin\Controller\AbstractControllerStatic
 {
@@ -27,7 +28,7 @@ class Controller extends \Frootbox\Admin\Controller\AbstractControllerStatic
         \Frootbox\Admin\Viewhelper\GeneralPurpose $gp,
         \Frootbox\Persistence\Content\Repositories\ContentElements $contentElements,
         \Frootbox\Ext\Core\Addresses\Persistence\Repositories\Addresses $addressesRepository
-    )
+    ): Response
     {
         $post->require([ 'title' ]);
 
@@ -40,15 +41,17 @@ class Controller extends \Frootbox\Admin\Controller\AbstractControllerStatic
         // Fetch plugin
         $plugin = $contentElements->fetchById($get->get('pluginId'));
 
-        // Create address
+        // Compose address
         $address = new $rowClass([
             'pluginId' => $plugin->getId(),
             'pageId' => $plugin->getPageId(),
             'title' => $post->get('title'),
             'visibility' => (DEVMODE ? 2 : 1),
+            'className' => $rowClass,
         ]);
 
-        $address = $addressesRepository->insert($address);
+        // Persist new address
+        $address = $addressesRepository->persist($address);
 
         return new Response('json', 200, [
             'modalDismiss' => true,
@@ -75,6 +78,8 @@ class Controller extends \Frootbox\Admin\Controller\AbstractControllerStatic
     {
         // Fetch address
         $address = $addressesRepository->fetchById($get->get('addressId'));
+
+        // Delete address
         $address->delete();
 
         // Fetch plugin
@@ -85,7 +90,8 @@ class Controller extends \Frootbox\Admin\Controller\AbstractControllerStatic
             'replace' => [
                 'selector' => '#addressesReceiver',
                 'html' => $gp->injectPartial(\Frootbox\Ext\Core\Addresses\Admin\Partials\AddressList\Partial::class, [
-                    'plugin' => $plugin
+                    'plugin' => $plugin,
+                    'repository' => $get->get('repository'),
                 ])
             ]
         ]);
@@ -109,6 +115,7 @@ class Controller extends \Frootbox\Admin\Controller\AbstractControllerStatic
      */
     public function ajaxModalEdit(
         \Frootbox\Http\Get $get,
+        \Frootbox\Config\Config $configuration,
         \Frootbox\Ext\Core\Addresses\Persistence\Repositories\Addresses $addressesRepository
     ): Response
     {
@@ -117,6 +124,7 @@ class Controller extends \Frootbox\Admin\Controller\AbstractControllerStatic
 
         return new Response('html', 200, [
             'address' => $address,
+            'configuration' => $configuration,
         ]);
     }
 
@@ -145,12 +153,15 @@ class Controller extends \Frootbox\Admin\Controller\AbstractControllerStatic
     }
 
     /**
-     *
+     * @param \Frootbox\Http\Get $get
+     * @param \Frootbox\Http\Post $post
+     * @param \Frootbox\Ext\Core\Addresses\Persistence\Repositories\Addresses $addressesRepository
+     * @return Response
      */
     public function ajaxUpdate(
         \Frootbox\Http\Get $get,
         \Frootbox\Http\Post $post,
-        \Frootbox\Ext\Core\Addresses\Persistence\Repositories\Addresses $addressesRepository
+        \Frootbox\Ext\Core\Addresses\Persistence\Repositories\Addresses $addressesRepository,
     ): Response
     {
         // Fetch address

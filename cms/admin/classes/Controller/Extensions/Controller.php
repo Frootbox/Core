@@ -115,7 +115,6 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
         // Obtain extension configuration
         $extConf = require_once $post->get('extension') . DIRECTORY_SEPARATOR . 'configuration.php';
 
-
         // Gather extensions
         $dependencyTree = [];
 
@@ -180,6 +179,7 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
             }
 
             if ($extConfigPath === null) {
+                d($cExtPath);
                 d("Config missing");
             }
 
@@ -284,7 +284,7 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
      */
     public function ajaxModalCompose(
         \Frootbox\Config\Config $config,
-        \Frootbox\Persistence\Repositories\Extensions $extensionsRepository
+        \Frootbox\Persistence\Repositories\Extensions $extensionsRepository,
     ): Response
     {
         // Gather extension paths
@@ -429,6 +429,7 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
         \Frootbox\Config\Config $config,
         \Frootbox\Persistence\Repositories\Extensions $extensions,
         \Frootbox\Admin\Viewhelper\GeneralPurpose $gp,
+        \Frootbox\Db\Db $db,
     ): Response
     {
         // Fetch matching extensions
@@ -439,6 +440,7 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
             ],
         ]);
 
+        $db->transactionStart();
 
         // None found: Insert extension!
         if ($result->getCount() == 0) {
@@ -456,7 +458,6 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
         else {
             $extension = $result->current();
         }
-
 
         // Switch state!
         if (!$extension->getIsactive()) {
@@ -517,6 +518,8 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
         if ($extension->getIsactive()) {
             $container->call([ $extension, 'init' ]);
         }
+
+        $db->transactionCommit();
 
         return self::getResponse('json', 200, [
             'replacements' => [

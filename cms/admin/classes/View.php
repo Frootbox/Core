@@ -50,7 +50,15 @@ class View
 
 
         $this->set('view', $this);
-    }    
+    }
+
+    /**
+     *
+     */
+    public function addFilter($filter): void
+    {
+        $this->twig->addFilter($filter);
+    }
 
     /**
      *

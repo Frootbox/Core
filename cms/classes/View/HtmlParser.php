@@ -58,7 +58,6 @@ class HtmlParser
 
             if (empty($text)) {
 
-
                 if (MULTI_LANGUAGE and GLOBAL_LANGUAGE != DEFAULT_LANGUAGE and $element->getAttribute('data-nolanguagefallback') === null) {
 
                     $text = $texts->fetchOne([
@@ -98,7 +97,11 @@ class HtmlParser
 
             $textSource = $text->getText();
 
-            if (defined('EDITING') and !empty($textSource)) {
+            if (!defined('EDITING') or !EDITING) {
+                $textSource = preg_replace('#\s*\x{00AD}*[_]{3,}\s*<\/p>#s', '<hr /></p>', $textSource);
+            }
+
+            if (defined('EDITING') and EDITING and !empty($textSource)) {
                 $textSource .= '<p></p>';
             }
 
@@ -123,22 +126,16 @@ class HtmlParser
 
             try {
                 $widget = $widgets->fetchById($matches[1][$index]);
-            }
-            catch ( \Frootbox\Exceptions\NotFound $e ) {
-
-                $widget = null;
-                $widgetHtml = '<figure data-ce-moveable class="widget widget-justify col-12" data-id="' . $matches[1][$index] . '">Widget #' . $matches[1][$index] . ' nicht gefunden.</figure>';
-            }
-
-            try {
 
                 $widgetHtml = $this->container->call([ $widget, 'renderHtml' ], [
                     'action' => 'Index'
                 ]);
             }
-            catch ( \Exception $e ) {
-                $widget = null;
-                $widgetHtml = '<figure data-ce-moveable class="widget widget-justify col-12" data-id="' . $matches[1][$index] . '">' . $e->getMessage() . '</figure>';
+            catch ( \Frootbox\Exceptions\NotFound $e ) {
+
+                if (defined('EDITING')) {
+                    $widgetHtml = '<figure data-ce-moveable class="widget widget-justify col-12" data-id="' . $matches[1][$index] . '">Widget #' . $matches[1][$index] . ' nicht gefunden.</figure>';
+                }
             }
 
             $this->html = str_replace($tagline, $widgetHtml, $this->html);
@@ -168,10 +165,11 @@ class HtmlParser
         $variables = [
             'serverpath' => SERVER_PATH,
             'serverpath_protocol' => SERVER_PATH_PROTOCOL,
-            'request' => REQUEST
+            'request' => REQUEST,
         ];
 
         $this->html = str_replace('</head>', '<script nonce="' . SCRIPT_NONCE . '"> var settings = ' . json_encode($variables) . ';</script>' . PHP_EOL . '</head>', $this->html);
+
 
         // Set base href
         $this->html = str_replace('</head>', '<base href="' . SERVER_PATH . '">' . PHP_EOL . '</head>', $this->html);
@@ -299,41 +297,7 @@ class HtmlParser
     {
         $translator = $translationFactory->get(GLOBAL_LANGUAGE);
 
-/*
-        foreach (debug_backtrace() as $trace) {
-
-            unset($trace['args']);
-            unset($trace['object']);
-
-            p($trace);
-        }
-
-        echo "<hr />";
-*/
-
-        /*
-        // Replace picture tags
-        $crawler = \Wa72\HtmlPageDom\HtmlPageCrawler::create($this->html);
-        $crawler->filter('img[src=""]')->each(function ( $element ) use ($payload) {
-
-            $width = $element->getAttribute('width');
-            $height = $element->getAttribute('height');
-
-            $data = $payload->clear()->addData([
-                'width' => $width,
-                'height' => $height
-            ])->export();
-
-            $element->setAttribute('src', SERVER_PATH . 'static/Ext/Core/Images/Dummy/render/?' . http_build_query($data));
-        });
-
-
-        $this->html = $crawler->saveHTML();
-        */
-
         $html = $this->html;
-
-
 
         $configuration = $config;
 
@@ -449,7 +413,7 @@ class HtmlParser
         }
 
         if (strpos($html, '</head>') !== false) {
-            $html = str_replace('</head>', '<link media="all" data-nocache="1" rel="stylesheet" type="text/css" href="' . $configuration->get('publicCacheDir') . $cachefilePath . '" />' . PHP_EOL . '', $html);
+            $html = str_replace('</head>', '<link media="all" data-nocache="1" rel="stylesheet" type="text/css" href="' . $configuration->get('publicCacheDir') . $cachefilePath . '" />' . PHP_EOL . '</head>', $html);
         }
         else {
             $html = '<link media="all" data-nocache="1" rel="stylesheet" type="text/css" href="' . $configuration->get('publicCacheDir') . $cachefilePath . '" />' . PHP_EOL . $html;
@@ -459,12 +423,11 @@ class HtmlParser
         $scss = (string) null;
 
         $crawler = \Wa72\HtmlPageDom\HtmlPageCrawler::create($html);
-        $crawler->filter('link[rel="stylesheet/less"]')->each(function ( $element ) use (&$scss, $configuration, $cacheRevision) {
+        $crawler->filter('link[rel="stylesheet/less"]')->each(function($element) use (&$scss, &$html, $configuration, $cacheRevision) {
 
             $href = $element->getAttribute('href');
 
             $publicDir = dirname($href);
-
 
             if (substr($href, 0, 4) == 'EXT:') {
 
@@ -566,13 +529,18 @@ class HtmlParser
                 return str_replace($match[1], $newpath, $match[0]);
             }, $css);
 
-
             $scss .= $css . PHP_EOL . PHP_EOL;
+
+            $tag = (string) $element;
+
+            $html = str_replace($tag, '', $html);
 
             $element->remove();
         });
 
-        $html = $crawler->saveHTML();
+        // $html = $crawler->saveHTML();
+
+
 
         if (preg_match_all('#<style type="text/less">(.*?)</style>#is', $html, $matches)) {
 
@@ -674,7 +642,7 @@ class HtmlParser
         $scripts = [ ];
         $scriptChecker = [];
 
-        $crawler->filter('script[src^="EXT:"], script[src^="FILE:"]')->each(function ( $element ) use ($minifier, &$scripts, &$scriptChecker) {
+        $crawler->filter('script[src^="EXT:"], script[src^="FILE:"]')->each(function($element) use (&$html, $minifier, &$scripts, &$scriptChecker) {
 
             $src = $element->getAttribute('src');
 
@@ -715,11 +683,13 @@ class HtmlParser
                 $scripts[] = $localPath;
             }
 
+            $tag = (string) $element;
+
+            $html = str_replace($tag, '', $html);
             $element->remove();
         });
 
-        $html = $crawler->saveHTML();
-
+        // $html = $crawler->saveHTML();
         preg_match_all('#<translate key="(.*?)"></translate>#', $html, $matches);
 
         foreach ($matches[0] as $index => $tagline) {
@@ -740,10 +710,10 @@ class HtmlParser
         }
 
         if (strpos($html, '</body>') !== false) {
-            $html = str_replace('</body>', '<script async src="' . $configuration->get('publicCacheDir') . $cacheFilePath . '"></script>' . PHP_EOL . '</body>', $html);
+            $html = str_replace('</body>', '<script nonce="' . SCRIPT_NONCE . '" async src="' . $configuration->get('publicCacheDir') . $cacheFilePath . '"></script>' . PHP_EOL . '</body>', $html);
         }
         else {
-            $html = '<script async src="' . $configuration->get('publicCacheDir') . $cacheFilePath . '"></script>' . PHP_EOL . $html;
+            $html = '<script nonce="' . SCRIPT_NONCE . '" async src="' . $configuration->get('publicCacheDir') . $cacheFilePath . '"></script>' . PHP_EOL . $html;
         }
 
         foreach ($scripts as $script) {
@@ -754,7 +724,12 @@ class HtmlParser
             $file->setSource(file_get_contents($script));
             $file->write();
 
-            $html = str_replace('</body>', '<script async data-untouched="1" src="' . $configuration->get('publicCacheDir') . $cacheFilePath . '"></script>' . PHP_EOL . '</body>', $html);
+            if (strpos($html, '</body>') !== false) {
+                $html = str_replace('</body>', '<script async data-untouched="1" src="' . $configuration->get('publicCacheDir') . $cacheFilePath . '"></script>' . PHP_EOL . '</body>', $html);
+            }
+            else {
+                $html = '<script async data-untouched="1" src="' . $configuration->get('publicCacheDir') . $cacheFilePath . '"></script>' . PHP_EOL . $html;
+            }
         }
 
 
@@ -798,10 +773,10 @@ class HtmlParser
         }
 
         if (strpos($html, '</body>') !== false) {
-            $html = str_replace('</body>', '<script async src="' . SERVER_PATH_PROTOCOL . $configuration->get('publicCacheDir') . $cachefilePath . '"></script>' . PHP_EOL . '</body>', $html);
+            $html = str_replace('</body>', '<script nonce="' . SCRIPT_NONCE . '" async src="' . SERVER_PATH_PROTOCOL . $configuration->get('publicCacheDir') . $cachefilePath . '"></script>' . PHP_EOL . '</body>', $html);
         }
         else {
-            $html = '<script async src="' . SERVER_PATH_PROTOCOL . $configuration->get('publicCacheDir') . $cachefilePath . '"></script>' . PHP_EOL . $html;
+            $html = '<script nonce="' . SCRIPT_NONCE . '" async src="' . SERVER_PATH_PROTOCOL . $configuration->get('publicCacheDir') . $cachefilePath . '"></script>' . PHP_EOL . $html;
         }
 
         preg_match_all('#\"EXT:(.*?)/(.*?)/(.*?)\"#', $html, $matches);

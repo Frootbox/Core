@@ -12,33 +12,69 @@
     <div class="card">
         <div class="card-body">
 
-            <div class="form-group form-check">
-                <input type="checkbox" class="form-check-input" id="noJobsDetailPage" name="noJobsDetailPage" {% if plugin.getConfig('noJobsDetailPage') %}checked{% endif %}>
-                <label class="form-check-label" for="noJobsDetailPage">Keine Detailseiten für Job-Angebote</label>
-            </div>
-            <div class="form-group">
-                <label for="customButtonEmail">E-Mail Link auf Info-Button</label>
-                <input type="text" class="form-control" name="config[customButtonEmail]" id="customButtonEmail" placeholder="Empfänger" value="{{ plugin.getConfig('customButtonEmail') }}">
-            </div>
-            <div class="form-group">
-                <label for="customEmailSubject">E-Mail Betreff</label>
-                <input type="text" class="form-control" name="config[customEmailSubject]" id="customEmailSubject" placeholder="E-Mail Betreff" value="{{ plugin.getConfig('customEmailSubject') }}">
-                <small id="emailHelp" class="form-text text-muted">mögl. Variablen: [title]</small>
+            <div class="row">
+                <div class="col-md-6">
+
+                    <h3>Allgemein</h3>
+
+                    <div class="form-group form-check">
+                        <input type="checkbox" class="form-check-input" id="ignoreForeignTitles" name="ignoreForeignTitles" {% if plugin.getConfig('ignoreForeignTitles') %}checked{% endif %}>
+                        <label class="form-check-label" for="ignoreForeignTitles">Bei Mehrsprachigkeit Jobs ohne passende Sprache ignorieren</label>
+                    </div>
+
+                    <h3>URLs</h3>
+
+                    <div class="form-group form-check">
+                        <input type="checkbox" class="form-check-input" id="noJobsDetailPage" name="noJobsDetailPage" {% if plugin.getConfig('noJobsDetailPage') %}checked{% endif %}>
+                        <label class="form-check-label" for="noJobsDetailPage">Keine Detailseiten für Job-Angebote</label>
+                    </div>
+                    <div class="form-group form-check">
+                        <input type="checkbox" class="form-check-input" id="urlSuffixSubtitle" name="urlSuffixSubtitle" {% if plugin.getConfig('urlSuffixSubtitle') %}checked{% endif %}>
+                        <label class="form-check-label" for="urlSuffixSubtitle">Untertitel in URL aufnehmen</label>
+                    </div>
+
+                </div>
+                <div class="col-md-6">
+
+                    <h3>Bewerbung</h3>
+
+                    <div class="form-group">
+                        <label for="customButtonEmail">E-Mail Link auf Info-Button</label>
+                        <input type="text" class="form-control" name="config[customButtonEmail]" id="customButtonEmail" placeholder="Empfänger" value="{{ plugin.getConfig('customButtonEmail') }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="customEmailSubject">E-Mail Betreff</label>
+                        <input type="text" class="form-control" name="config[customEmailSubject]" id="customEmailSubject" placeholder="E-Mail Betreff" value="{{ plugin.getConfig('customEmailSubject') }}">
+                        <small id="emailHelp" class="form-text text-muted">mögl. Variablen: [title]</small>
+                    </div>
+
+                    {% if v.isExtensionInstalled('Core', 'ContactForms') %}
+                        <div class="form-group">
+                            <label for="formId">Bewerbungsformular</label>
+                            <select class="form-control" id="formId" name="config[formId]">
+                                <option value="">kein Bewerbungsformular</option>
+                                {% for form in i.getForms() %}
+                                    <option {% if plugin.getConfig('formId') == form.getId %}selected{% endif %} value="{{ form.getId }}">{{ form.getTitle() }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="alternateFormId">Warteliste</label>
+                            <select class="form-control" id="alternateFormId" name="config[alternateFormId]">
+                                <option value="">kein Formular</option>
+                                {% for form in i.getForms() %}
+                                    <option {% if plugin.getConfig('alternateFormId') == form.getId %}selected{% endif %} value="{{ form.getId }}">{{ form.getTitle() }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    {% else %}
+                        <div class="message warning">Zur Verbindung eines Bewerbungsformulares müssen Sie die Erweiterung <b>Core/ContactForms</b> installieren.</div>
+                    {% endif %}
+
+                </div>
+
             </div>
 
-            {% if v.isExtensionInstalled('Core', 'ContactForms') %}
-                <div class="form-group">
-                    <label for="formId">Bewerbungsformular</label>
-                    <select class="form-control" id="formId" name="config[formId]">
-                        <option value="">kein Bewerbungsformular</option>
-                        {% for form in i.getForms() %}
-                            <option {% if plugin.getConfig('formId') == form.getId %}selected{% endif %} value="{{ form.getId }}">{{ form.getTitle() }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-            {% else %}
-                <div class="message warning">Zur Verbindung eines Bewerbungsformulares müssen Sie die Erweiterung <b>Core/ContactForms</b> installieren.</div>
-            {% endif %}
 
             <button type="submit" class="btn btn-primary">Speichern</button>
 

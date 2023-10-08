@@ -69,7 +69,19 @@ abstract class AbstractField extends \Frootbox\Persistence\AbstractAsset
      */
     public function getValue(): string
     {
-        return (string) $this->value;
+        if (!empty($this->value)) {
+            return (string) $this->value;
+        }
+
+        if (!empty($this->getConfig('presetValue'))) {
+            return (string) $this->getConfig('presetValue');
+        }
+
+        if (!empty($this->getConfig('presetValueFromGet')) and !empty($_GET['fields'][$this->getId()])) {
+            return $_GET['fields'][$this->getId()];
+        }
+
+        return "";
     }
 
     /**

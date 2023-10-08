@@ -86,16 +86,6 @@ try {
     // Instantiate view
     $view = $container->get(\Frootbox\View\Engines\Interfaces\Engine::class);
 
-    define('SCRIPT_NONCE', base64_encode(random_bytes(20)));
-
-
-    $view->set('settings', [
-        'nonce' =>  SCRIPT_NONCE,
-        'serverpath' => SERVER_PATH,
-        'serverpath_absolute' => SERVER_PATH_PROTOCOL,
-        'basepath' => CORE_DIR
-    ]);
-
 
     // Load extensions autoloader
     if (!file_exists($autoloadConfig = $configuration->get('filesRootFolder') . 'cache/system/autoload.php')) {
@@ -128,7 +118,19 @@ try {
 
     $session = $container->get(\Frootbox\Session::class);
 
-   // $_SESSION['SCRIPT_NONCE'] = SCRIPT_NONCE;
+    if (((!empty($_SERVER['HTTP_ACCEPT']) and strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false) or (!empty($_SERVER['REQUEST_URI']) and (strpos($_SERVER['REQUEST_URI'], '/ajax/') !== false or strpos($_SERVER['REQUEST_URI'], '/static/') !== false))) and !empty($_SESSION['SCRIPT_NONCE'])) {
+        define('SCRIPT_NONCE', $_SESSION['SCRIPT_NONCE']);
+    }
+    else {
+        define('SCRIPT_NONCE', base64_encode(random_bytes(20)));
+    }
+
+    $view->set('settings', [
+        'nonce' =>  SCRIPT_NONCE,
+        'serverpath' => SERVER_PATH,
+        'serverpath_absolute' => SERVER_PATH_PROTOCOL,
+        'basepath' => CORE_DIR
+    ]);
 
     define('SIGNING_TOKEN', $configStatics->getSigningToken());
     define('IS_LOGGED_IN', $session->isLoggedIn());
@@ -165,6 +167,7 @@ try {
     $requestX = $request;
     $request = $request->getRequestTarget();
 
+    define('REQUEST_URI', $request);
 
     if (preg_match('/[A-Z]/', $request)){
 
@@ -198,6 +201,7 @@ try {
         $container->call([ $widget, $action . 'Action' ]);
     }
 
+
     /**
      * Perform ajax action
      */
@@ -206,6 +210,16 @@ try {
         define('GLOBAL_LANGUAGE', (!empty($_SESSION['frontend']['language']) ? $_SESSION['frontend']['language'] : 'de-DE'));
         define('DEFAULT_LANGUAGE', 'de-DE');
         define('MULTI_LANGUAGE', !empty($configuration->get('i18n.multiAliasMode')));
+
+        // Replace translations
+        $translationFactory = $container->get(\Frootbox\TranslatorFactory::class);
+        $translator = $translationFactory->get(GLOBAL_LANGUAGE);
+
+        // TODO move to re-usable twig extension later
+        $filter = new \Twig\TwigFilter('translate', function ($string) use ($translator) {
+            return $translator->translate($string);
+        });
+        $view->addFilter($filter);
 
         // Fetch plugin
         $plugins = $container->get(\Frootbox\Persistence\Content\Repositories\ContentElements::class);
@@ -220,7 +234,6 @@ try {
         // Call ajax method on plugin
         $response = $container->call([ $plugin, $action . 'Action' ]);
 
-
         // Convert empty responses to default response class to retain backward compatibility
         if (empty($response)) {
             $response = new \Frootbox\View\Response;
@@ -228,6 +241,18 @@ try {
 
         if (($response instanceof \Frootbox\View\ResponseJson or $response instanceof \Frootbox\View\ResponseRedirect) and strpos($_SERVER['HTTP_ACCEPT'], 'text/html') !== false) {
             $response = \Frootbox\View\Response::createFromJsonResponse($response);
+        }
+
+        if ($response instanceof \Frootbox\View\ResponseJson) {
+            $data = $response->getData();
+
+            if (!empty($data['html'])) {
+
+                $parser = new \Frootbox\View\HtmlParser($data['html'], $container);
+                $data['html'] = $container->call([ $parser, 'parse' ]);
+
+                $response->setData($data);
+            }
         }
 
         if ($response instanceof \Frootbox\View\ResponseRedirect) {
@@ -245,6 +270,29 @@ try {
             $html = $container->call([ $plugin, 'renderHtml'], [
                 'action' => $action
             ]);
+
+            // Inject scss variables
+            $extensionRepository = $container->get(\Frootbox\Persistence\Repositories\Extensions::class);
+            $result = $extensionRepository->fetch([
+                'where' => [
+                    'isactive' => 1,
+                ],
+            ]);
+
+            $scss = (string) null;
+
+            foreach ($result as $extension) {
+
+                $path = $extension->getExtensionController()->getPath();
+
+                $scssFile = $path . 'resources/public/css/styles-variables.less';
+
+                if (file_exists($scssFile)) {
+                    $scss .= PHP_EOL . file_get_contents($scssFile);
+                }
+            }
+
+            $html = '<style type="text/less">' . $scss . PHP_EOL . '</style>' . PHP_EOL . $html;
 
             // Parse html
             $parser = new \Frootbox\View\HtmlParser($html, $container);
@@ -348,6 +396,7 @@ try {
                 ]
             ];
 
+
             if (!empty($configuration->get('failroutes'))) {
                 array_push($routes, ...$configuration->get('failroutes')->getData());
             }
@@ -431,8 +480,31 @@ try {
 
     $_SESSION['frontend']['language'] = GLOBAL_LANGUAGE;
 
+
+    // Replace translations
+    $translationFactory = $container->get(\Frootbox\TranslatorFactory::class);
+
+    if (!empty($_GET['forceLanguage'])) {
+        $translator = $translationFactory->get($_GET['forceLanguage']);
+    }
+    elseif (!empty($alias)) {
+        $translator = $translationFactory->get($alias->getLanguage());
+    }
+    else {
+        $translator = $translationFactory->get($language);
+    }
+
+
+    // TODO move to re-usable twig extension later
+    $filter = new \Twig\TwigFilter('translate', function ($string) use ($translator) {
+
+        return $translator->translate($string);
+    });
+    $view->addFilter($filter);
+
+
     // Perform security check
-    if ($page->getVisibility() == 'Moderated' and !IS_EDITOR) {
+    if ($page->getVisibility() == 'Locked' or ($page->getVisibility() == 'Moderated' and !IS_EDITOR)) {
         header('HTTP/1.1 401 Unauthorized', true);
         header("X-Robots-Tag: noindex, nofollow", true);
 
@@ -461,10 +533,13 @@ try {
         exit;
     }
 
+
+
     $view->set('settings', array_merge($view->get('settings'), [
         'language' => GLOBAL_LANGUAGE,
         'isEditor' => IS_EDITOR,
         'isLoggedIn' => IS_LOGGED_IN,
+        'pageId' => $page->getId(),
     ]));
 
     $view->addGlobal('globalLanguage', GLOBAL_LANGUAGE);
@@ -511,16 +586,6 @@ try {
         $view->addPath($configuration->get('pageRootFolder'));
     }
 
-    // Replace translations
-    $translationFactory = $container->get(\Frootbox\TranslatorFactory::class);
-    $translator = $translationFactory->get($page->getLanguage());
-
-
-    // TODO move to re-usable twig extension later
-    $filter = new \Twig\TwigFilter('translate', function ($string) use ($translator) {
-        return $translator->translate($string);
-    });
-    $view->addFilter($filter);
 
 
     // Get sockets config from cache
@@ -576,7 +641,6 @@ try {
     $htmlSnippets = [ ];
 
     $layout = $configuration->get('layoutRootFolder') . $page->getLayout();
-
 
     if (!empty($matches)) {
         foreach ($matches[0] as $index => $tagline) {
@@ -880,7 +944,11 @@ try {
     $html = preg_replace('#</source>#', '<!-- removed closing source  tag -->', $html);
 
     if (!defined('EDITING') or !EDITING) {
-        header("Content-Security-Policy: script-src 'self' 'unsafe-eval' www.google.com cookieconsent.herrundfraupixel.de 'nonce-" . SCRIPT_NONCE . "'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'");
+
+        $scriptSrc = !empty($configuration->get('contentSecurityPolicy.domains')) ? implode(' ', $configuration->get('contentSecurityPolicy.domains')->getData()) : '';
+
+        header("Content-Security-Policy: script-src * 'self' 'unsafe-inline' 'unsafe-eval' " . $scriptSrc . " www.google.com cookieconsent.herrundfraupixel.de 'nonce-" . SCRIPT_NONCE . "'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'");
+        // header("Content-Security-Policy: script-src * 'self' 'unsafe-inline' 'unsafe-eval' " . $scriptSrc . " www.google.com cookieconsent.herrundfraupixel.de 'nonce-" . SCRIPT_NONCE . "'; base-uri 'self'; form-action 'self'; object-src 'none'");
         header('Strict-Transport-Security: max-age=31536000');
         header('X-Content-Type-Options: nosniff');
     }
@@ -888,6 +956,7 @@ try {
     echo $html;
 }
 catch (\Frootbox\Exceptions\NotFound $exception) {
+
 
     if (!isset($requestX)) {
         die($exception->getMessage());
@@ -940,7 +1009,7 @@ catch (\Frootbox\Exceptions\NotFound $exception) {
 
     if (!$page) {
         if (!empty($_SESSION['user']['id'])) {
-            throw new \Frootbox\Exceptions\ResourceMissing('Page', [ $request ]);
+          //  throw new \Frootbox\Exceptions\ResourceMissing('Page', [ $request ]);
         }
 
         http_response_code(404);
@@ -1028,6 +1097,7 @@ catch ( \Exception $exception ) {
     echo '<html><head>
         <style>
             body { padding: 40px 0 0 0; background: #FFF; text-align: center; font-family: Arial; color: #CCC; }
+            body { padding: 40px 0 0 0; background: #FFF; text-align: left; font-family: Arial; color: #000; }
         </style>
     </head>
     <body>';

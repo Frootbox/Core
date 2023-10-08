@@ -1,0 +1,105 @@
+{# config
+
+title: Standard
+variables:
+    pluginWidth:
+        type: int
+        default: 12
+        label: Breite des Plugins (1-12)
+    fieldLabelsEditable:
+        type: bool
+        default: false
+        label: Label der Felder bearbeitbar
+    withLayoutContainer:
+        type: bool
+        label: mit Layout-Container
+    skipHeadline:
+        type: bool
+        label: ohne Überschrift
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set formRenderer = view.getViewhelper('Ext/Core/ContactForms/FormRenderer', {   }) %}
+
+<script nonce="{{ settings.nonce }}">
+    $(function ( ) {
+
+        $(document).on('click', 'a[data-form]', function ( event ) {
+
+            event.preventDefault();
+
+            $('a[data-form]').removeClass('active');
+            $(this).addClass('active');
+
+            let url = window.location.href.split('#')[0];
+            url = url + '#' + $(this).data('form');
+
+            window.location.href = url;
+        });
+
+        /**
+         * Animate labels
+         */
+        $('.form-group input').focus(function(){
+            me = $(this) ;
+            $("label[for='" + me.attr('id')+"']").addClass("animate-label");
+        });
+
+        $('.form-group input').blur(function(){
+            me = $(this) ;
+            if ( me.val() == ""){
+                $("label[for='"+me.attr('id')+"']").removeClass("animate-label");
+            }
+        });
+
+        /**
+         * Init form view
+         */
+        let hash = window.location.hash;
+
+        if (hash.length > 0) {
+            $('a[data-form="' + hash.split('#')[1] + '"]').trigger('click');
+        }
+    });
+</script>
+
+<div class="plugin Core ContactForms FormTeaser Index05">
+
+    <div class="background" data-uid="{{ plugin.getUid('background-image') }}" data-type="Images/Background"></div>
+
+    <div class="xcontent">
+
+        {% if variables.withLayoutContainer %}<div class="container">{% endif %}
+
+            <div class="row">
+                <div class="col-md-6">
+
+                    {% if not variables.skipHeadline %}
+                        <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle() }}</h2>
+                    {% endif %}
+
+                    <div data-editable data-uid="{{ plugin.getUid('text') }}"></div>
+
+                </div>
+                <div class="col-md-6">
+
+                    <div data-editable data-uid="{{ plugin.getUid('text-2') }}"></div>
+
+                    {{ formRenderer.render({
+                        formId: form.getId(),
+                        options: {
+                            editable: variables.fieldLabelsEditable,
+                        },
+                        payload: {
+                            Seite: page.getTitle()
+                        }
+                    }) | raw }}
+
+                </div>
+            </div>
+
+        {% if variables.withLayoutContainer %}</div>{% endif %}
+
+    </div>
+</div>

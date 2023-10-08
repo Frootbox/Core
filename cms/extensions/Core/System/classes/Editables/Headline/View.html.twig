@@ -27,7 +27,7 @@
                 '|&nbsp;&nbsp;&nbsp;' +
                 '<a class="headline-switch ' + ($(this).hasClass('disabled-headline') ? 'active' : '') + '" href="#' + uid + '"><i class="far fa-eye-slash"><\/i><\/a>&nbsp;&nbsp;&nbsp;' +
                 '|&nbsp;&nbsp;&nbsp;' +
-                '<a class="headline-copy-url" href="#' + uid + '"><i class="far fa-copy"><\/i><\/a>&nbsp;&nbsp;&nbsp;' +
+                '<a class="headline-copy-url" href="#' + uid + '"><i class="far fa-hashtag"><\/i><\/a>&nbsp;&nbsp;&nbsp;' +
                 '|&nbsp;&nbsp;&nbsp;' +
                 '<a class="popover-dismiss" href="#"><i class="far fa-times"><\/i><\/a>' +
                 (($(this).parents('[data-href]').length > 0) ? '&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;<a class="follow-parent-href" href="#"><i class="far fa-link"><\/i><\/a>' : '') +
@@ -51,31 +51,41 @@
                 element.parents('[data-href]').trigger('click');
             });
 
-            $(document).on('click', 'a.headline-copy-url', function ( event ) {
+            /**
+             * Copy headlines url with hastag to clipboard
+             */
+            $(document).on('click', 'a.headline-copy-url', function (event) {
 
                 event.preventDefault();
                 event.stopImmediatePropagation();
 
+                var uid = $(this).attr('href').substr(1);
+                var headline = $('[data-uid="' + uid + '"]').find('h1, h2, h3, h4, h5, h6');
 
                 let str = settings.serverpath_protocol + settings.request;
 
-                if (typeof element.attr('id')!= "undefined") {
-                    str = str + '#' + element.attr('id');
+                if (typeof headline.attr('id')!= "undefined") {
+                    str = str + '#' + headline.attr('id');
                 }
                 else {
-                    str = str + '#' + element.attr('data-xid');
+                    str = str + '#' + headline.attr('data-xid');
                 }
 
-                const el = document.createElement('textarea');
-                el.value = str;
-                document.body.appendChild(el);
-                el.select();
-                document.execCommand('copy');
-                document.body.removeChild(el);
+                str = str.replace(settings.serverpath_protocol + 'edit/', '');
+                str = str.replace(settings.serverpath_protocol, '');
+
+                if (!navigator.clipboard) {
+                    alert("Browser nicht kompatibel.");
+                    return;
+                }
+
+                navigator.clipboard.writeText(str).then(function() {
+                    console.log('Async: Copying to clipboard was successful!');
+                }, function(err) {
+                    console.error('Async: Could not copy text: ', err);
+                });
             });
         });
-
-
 
         /**
          * Switch visibility of headline
@@ -127,13 +137,14 @@
 
             fbxEditorOpenGenericModal();
 
-
             if (headline[0].tagName == 'HEADER') {
                 headlineText = headline.find('h1, h2, h3, h4, h5, h6').first().text();
             }
             else {
                 headlineText = headline.find('.head').length > 0 ? headline.find('.head').text() : headline.text();
             }
+
+            console.log(typeof headline.data('skipsupertitle'));
 
             $.ajax({
                 url: "{{ settings.serverpath }}cms/admin/Editor/callEditable",
@@ -144,6 +155,7 @@
                     uid: uid,
                     headline: headlineText,
                     supertitle: headline.find('.supertitle').text(),
+                    skipSuperTitle: (typeof headline.data('skipsupertitle') != "undefined" ? 1 : 0),
                     subtitle: headline.find('.subtitle').text()
                 },
                 success: function ( html ) {

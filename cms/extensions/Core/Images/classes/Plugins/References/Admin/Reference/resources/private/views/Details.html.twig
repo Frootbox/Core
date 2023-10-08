@@ -18,12 +18,15 @@
     </span>
 </h2>
 
-<p><a class="ajax" href="{{ plugin.getAdminUri('Index', 'index') }}"><i class="fa fa-chevron-circle-left"></i> zurück</a></p>
+<p><a class="ajax" href="{{ plugin.getAdminUri('Index', 'index', { keyword: get.get('keyword') }) }}"><i class="fa fa-chevron-circle-left"></i> zurück</a></p>
 
 
 <ul class="nav nav-tabs" id="myTab" role="tablist">
     <li class="nav-item">
         <a class="nav-link active" id="info-tab" data-toggle="tab" href="#info" role="tab" aria-controls="info" aria-selected="true">Info</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="location-tab" data-toggle="tab" href="#location" role="tab" aria-controls="location">Standort</a>
     </li>
     <li class="nav-item">
         <a class="nav-link" id="imageMap-tab" data-toggle="tab" href="#imageMap" role="tab" aria-controls="imageMap">Image-Map</a>
@@ -84,9 +87,30 @@
                         </div>
                     {% endif %}
 
+                    {% if v.isExtensionInstalled('Core', 'Addresses') %}
+                        {{ v.injectPartial('\\Frootbox\\Ext\\Core\\Addresses\\Admin\\Partials\\Input\\Select', {
+                            className: 'Frootbox\\Ext\\Core\\Images\\Plugins\\References\\Persistence\\Location',
+                            pluginId: get.get('pluginId'),
+                            locationId: reference.getLocationId(),
+                            title: 'Ort',
+                            fieldName: 'locationId',
+                        }) | raw }}
+                    {% endif %}
+
                     <button type="submit" class="btn btn-primary">Speichern</button>
 
                 </form>
+
+            </div>
+        </div>
+
+    </div>
+    <div class="tab-pane fade show" id="location" role="tabpanel" aria-labelledby="location-tab">
+
+        <div class="card">
+            <div class="card-body">
+
+
 
             </div>
         </div>

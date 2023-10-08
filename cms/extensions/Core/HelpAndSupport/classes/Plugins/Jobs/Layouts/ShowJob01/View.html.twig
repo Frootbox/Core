@@ -13,6 +13,15 @@ variables:
         type: int
         label: vordefinierte globale Textblöcke
         default: 0
+    withTextAboveColumns:
+        type: bool
+        label: mit Text über den Spalten
+    skipSocialSharing:
+        type: bool
+        label: kein Social-Sharing
+    skipMapLocation:
+        type: bool
+        label: ohne Standort-Karte
 
 /config #}
 
@@ -54,24 +63,27 @@ variables:
             </div>
 
 
-            {% set articleUrl = job.getUri({ absolute: true }) %}
+            {% if not variables.skipSocialSharing %}
+                {% set articleUrl = job.getUri({ absolute: true }) %}
 
-            <nav class="social-sharing">
+                <nav class="social-sharing">
 
-                <a data-toggle="tooltip" data-placement="bottom" title="Jobangebot teilen auf Facebook" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u={{ articleUrl | url_encode }}">{{ icons.render('facebook') | raw }}</a>
-                <a data-toggle="tooltip" data-placement="bottom" title="Jobangebot teilen auf Twitter" target="_blank" href="https://twitter.com/home?status={{ articleUrl | url_encode }}">{{ icons.render('twitter') | raw }}</a>
-                <a data-toggle="tooltip" data-placement="bottom" title="Jobangebot teilen auf Xing" target="_blank" href="https://www.xing.com/spi/shares/new?url={{ articleUrl | url_encode }}">{{ icons.render('xing') | raw }}</a>
-                <a data-toggle="tooltip" data-placement="bottom" title="Jobangebot teilen auf LinkedIn" target="_blank" href="https://www.linkedin.com/share?id={{ articleUrl | url_encode }}">{{ icons.render('linkedin') | raw }}</a>
+                    <a data-toggle="tooltip" data-placement="bottom" title="Jobangebot teilen auf Facebook" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u={{ articleUrl | url_encode }}">{{ icons.render('facebook') | raw }}</a>
+                    <a data-toggle="tooltip" data-placement="bottom" title="Jobangebot teilen auf Twitter" target="_blank" href="https://twitter.com/home?status={{ articleUrl | url_encode }}">{{ icons.render('twitter') | raw }}</a>
+                    <a data-toggle="tooltip" data-placement="bottom" title="Jobangebot teilen auf Xing" target="_blank" href="https://www.xing.com/spi/shares/new?url={{ articleUrl | url_encode }}">{{ icons.render('xing') | raw }}</a>
+                    <a data-toggle="tooltip" data-placement="bottom" title="Jobangebot teilen auf LinkedIn" target="_blank" href="https://www.linkedin.com/share?id={{ articleUrl | url_encode }}">{{ icons.render('linkedin') | raw }}</a>
 
-                {% if image %}
-                    <a data-toggle="tooltip" data-placement="bottom" title="Jobangebot teilen auf Pinterest" target="_blank" href="https://pinterest.com/pin/create/button/?media={{ image.getUriThumbnail() | url_encode }}&amp;url={{ articleUrl | url_encode }}&amp;media=">{{ icons.render('pinterest') | raw }}</a>
-                {% endif %}
+                    {% if image %}
+                        <a data-toggle="tooltip" data-placement="bottom" title="Jobangebot teilen auf Pinterest" target="_blank" href="https://pinterest.com/pin/create/button/?media={{ image.getUriThumbnail() | url_encode }}&amp;url={{ articleUrl | url_encode }}&amp;media=">{{ icons.render('pinterest') | raw }}</a>
+                    {% endif %}
 
-                <a data-toggle="tooltip" data-placement="bottom" title="Jobangebot empfehlen per E-Mail" href="mailto:?subject=Empfehlung&amp;body={{ articleUrl | url_encode }}">{{ icons.render('envelope') | raw }}</a>
+                    <a data-toggle="tooltip" data-placement="bottom" title="Jobangebot empfehlen per E-Mail" href="mailto:?subject=Empfehlung&amp;body={{ articleUrl | url_encode }}">{{ icons.render('envelope') | raw }}</a>
 
-            </nav>
+                </nav>
+            {% endif %}
 
-            {% if location %}
+
+            {% if location and not variables.skipMapLocation %}
 
                 <h3>Standort: {{ location.getCity() }}</h3>
 
@@ -80,8 +92,14 @@ variables:
                 <br /><br />
             {% endif %}
 
-            <div class="row">
-                <div class="col-md-7">
+
+            {% if variables.withTextAboveColumns %}
+                <div data-editable data-uid="{{ job.getUid('text-above-columns') }}"></div>
+            {% endif %}
+
+
+            <div class="row justify-content-between">
+                <div class="col-md-6">
 
                     {% if variables.predefinedTextblocks >= 1 %}
                         <h3 data-editable data-uid="{{ plugin.getUid('title-tasks') }}">Ihre Aufgaben</h3>

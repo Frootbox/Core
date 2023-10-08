@@ -18,6 +18,10 @@ variables:
         type: bool
         label: ohne Überschrift
         default: false
+    withContainer:
+        type: bool
+        label: mit Layout-Container
+
 /config #}
 
 {% set i = view.getViewhelper('Delegator', { object: plugin }) %}
@@ -36,51 +40,55 @@ variables:
 
 
 
-<div class="row">
-    <div class="col-12 plugin Core Navigation Teaser Index09 {% if variables.skipHeadline %}skipped-headline{% endif %} {% if variables.img_width != variables.img_height %}rect{% endif %}">
+{% if variables.withContainer %}<div class="container">{% endif %}
 
-        {% if not variables.skipHeadline %}
-            {% if plugin.isFirst %}
-                <h1 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h1>
-            {% else %}
-                <h2 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+    <div class="row">
+        <div class="col-12 plugin Core Navigation Teaser Index09 {% if variables.skipHeadline %}skipped-headline{% endif %} {% if variables.img_width != variables.img_height %}rect{% endif %}">
+
+            {% if not variables.skipHeadline %}
+                {% if plugin.isFirst %}
+                    <h1 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h1>
+                {% else %}
+                    <h2 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+                {% endif %}
             {% endif %}
-        {% endif %}
 
-        <div data-editable data-uid="{{ plugin.getUid('text') }}"></div>
+            <div data-editable data-uid="{{ plugin.getUid('text') }}"></div>
 
-        <div class="row justify-content-md-center teasers">
+            <div class="row justify-content-md-center teasers">
 
-            {% for teaser in teasers %}
+                {% for teaser in teasers %}
 
-                <div class="{{ colClass }} teaser" data-href id="teaser-{{ teaser.getId() }}">
-                    <div class="row">
-                        <div class="col-4">
+                    <div class="{{ colClass }} teaser" data-href id="teaser-{{ teaser.getId() }}">
+                        <div class="row">
+                            <div class="col-4">
 
-                            <picture class="fluid round" data-editable data-uid="{{ teaser.getUid('image')}}">
-                                <img width="{{ variables.img_width }}" height="{{ variables.img_height }}" src="{{ i.getDummyImage({ width: variables.img_width, height: variables.img_height }) }}" alt="" />
-                            </picture>
+                                <picture class="fluid round" data-editable data-uid="{{ teaser.getUid('image')}}">
+                                    <img width="{{ variables.img_width }}" height="{{ variables.img_height }}" src="{{ i.getDummyImage({ width: variables.img_width, height: variables.img_height }) }}" alt="" />
+                                </picture>
 
-                        </div>
-                        <div class="col-8">
+                            </div>
+                            <div class="col-8">
 
-                            <h4>{{ teaser.getTitle }}</h4>
+                                <h4>{{ teaser.getTitle }}</h4>
 
-                            <div data-editable data-uid="{{ teaser.getUid('teaser-text') }}"></div>
+                                <div data-editable data-uid="{{ teaser.getUid('teaser-text') }}"></div>
 
-                            {% if not teaser.isLinkDeactivated() %}
-                                <p><a href="{{ teaser.getUri() }}">mehr erfahren</a></p>
-                            {% endif %}
+                                {% if not teaser.isLinkDeactivated() %}
+                                    <p><a href="{{ teaser.getUri() }}">mehr erfahren</a></p>
+                                {% endif %}
 
+                            </div>
                         </div>
                     </div>
-                </div>
 
-            {% endfor %}
+                {% endfor %}
+
+            </div>
+
+            <div data-editable data-uid="{{ plugin.getUid('text-below') }}"></div>
 
         </div>
-
-        <div data-editable data-uid="{{ plugin.getUid('text-below') }}"></div>
-
     </div>
-</div>
+
+{% if variables.withContainer %}</div>{% endif %}

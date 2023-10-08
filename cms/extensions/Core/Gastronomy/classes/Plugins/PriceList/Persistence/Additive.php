@@ -16,4 +16,19 @@ class Additive extends \Frootbox\Persistence\AbstractAsset
     {
         return null;
     }
+
+    /**
+     *
+     */
+    public function getSymbol(): ?string
+    {
+        if (empty($this->getConfig('symbol'))) {
+            $this->addConfig([
+                'symbol' => $this->getOrderId(),
+            ]);
+            $this->save();
+        }
+
+        return $this->getConfig('symbol');
+    }
 }

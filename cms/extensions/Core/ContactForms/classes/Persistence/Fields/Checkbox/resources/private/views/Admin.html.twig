@@ -1,5 +1,20 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
 <div class="form-group">
     <label for="checkboxText">Text zur Checkbox</label>
     <textarea rows="15" class="form-control" id="checkboxText" name="checkboxText" aria-describedby="fieldHelp">{{ field.getConfig('checkboxText') }}</textarea>
     <small id="fieldHelp" class="form-text text-muted">Falls angegeben wird der Text an Stelle des Titels an der Checkbox angezeigt.</small>
 </div>
+
+{{ v.injectPartial('Frootbox/Ext/Core/FileManager/Editor/Partials/FileUpload', {
+    label: 'automatischer Anhang',
+    multiple: true,
+    uid: field.getUid('autoAttachments'),
+    helpText: 'Diese Dateien werden der autoamtischen Rückanwort an den Besucher als Anhang beigefügt.'
+}) | raw }}
+
+
+{{ v.injectPartial('Frootbox/Ext/Core/FileManager/Editor/Partials/FileManager', {
+    uid: field.getUid('autoAttachments')
+}) | raw }}
+

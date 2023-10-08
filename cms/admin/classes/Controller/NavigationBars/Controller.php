@@ -15,13 +15,55 @@ use Frootbox\Db\Db;
  */
 class Controller extends \Frootbox\Admin\Controller\AbstractController
 {
+    public function ajaxClone(
+        \Frootbox\Http\Get $get,
+        \Frootbox\Http\Post $post,
+        \Frootbox\Admin\Viewhelper\GeneralPurpose $gp,
+        \Frootbox\Persistence\Repositories\Navigations $navigationRepository,
+        \Frootbox\Persistence\Repositories\NavigationsItems $navigationItemRepository,
+    ): Response
+    {
+        // Fetch navigation
+        $navigation = $navigationRepository->fetchById($get->get('navigationId'));
+
+        // Clear navigation items
+        $items = $navigationItemRepository->fetch([
+            'where' => [
+                'navId' => $navigation->getId(),
+                'language' => $post->get('targetLanguage'),
+            ],
+        ]);
+
+        $items->map('delete');
+
+        // Clone items
+        foreach ($navigation->getItems() as $item1) {
+
+            $nItem = $item1->duplicate();
+            $nItem->setLanguage($post->get('targetLanguage'));
+            $nItem->save();
+
+            foreach ($item1->getItemsDefault() as $item2) {
+
+                $nItem2 = $item2->duplicate();
+                $nItem2->setLanguage($post->get('targetLanguage'));
+                $nItem2->setParentId($nItem->getId());
+                $nItem2->save();
+            }
+        }
+
+        return self::getResponse('json', 200, [
+            'success' => 'Die Daten wurden gespeichert.',
+        ]);
+    }
+
     /**
      *
      */
     public function ajaxCreate(
         \Frootbox\Http\Post $post,
         \Frootbox\Admin\Viewhelper\GeneralPurpose $gp,
-        \Frootbox\Persistence\Repositories\Navigations $navigationsRepository
+        \Frootbox\Persistence\Repositories\Navigations $navigationsRepository,
     ): Response
     {
         // Insert new navigation
@@ -114,6 +156,7 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
                     'selector' => '#navItemsReceiver',
                     'html' => $gp->injectPartial(\Frootbox\Admin\Controller\NavigationBars\Partials\ListNavigationItems\Partial::class, [
                         'navigation' => $navigation,
+                        'language' => $item->getLanguage(),
                     ]),
                 ],
             ],
@@ -226,7 +269,7 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
     public function ajaxUpdate(
         \Frootbox\Http\Get $get,
         \Frootbox\Http\Post $post,
-        \Frootbox\Persistence\Repositories\Navigations $navigationsRepository
+        \Frootbox\Persistence\Repositories\Navigations $navigationsRepository,
     ): Response
     {
         // Fetch navigation
@@ -243,7 +286,29 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
     }
 
     /**
-     *
+     * @param \Frootbox\Config\Config $config
+     * @return Response
+     */
+    public function ajaxModalClone(
+        \Frootbox\Http\Get $get,
+        \Frootbox\Config\Config $config,
+        \Frootbox\Persistence\Repositories\Navigations $navigationRepository,
+    ): Response
+    {
+        // Fetch navigation
+        $navigation = $navigationRepository->fetchById($get->get('navigationId'));
+
+        return self::getResponse('html', 200, [
+            'config' => $config,
+            'language' => $get->get('language') ?? DEFAULT_LANGUAGE,
+            'navigation' => $navigation,
+        ]);
+    }
+
+    /**
+     * @param \Frootbox\Config\Config $config
+     * @param \Frootbox\Persistence\Repositories\Extensions $extensionsRepository
+     * @return Response
      */
     public function ajaxModalCompose(
         \Frootbox\Config\Config $config,
@@ -404,7 +469,7 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
      */
     public function details(
         \Frootbox\Http\Get $get,
-        \Frootbox\Persistence\Repositories\Navigations $navigationsRepository
+        \Frootbox\Persistence\Repositories\Navigations $navigationsRepository,
     ): Response
     {
         // Fetch navigation

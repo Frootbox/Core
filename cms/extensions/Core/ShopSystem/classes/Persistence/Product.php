@@ -30,7 +30,6 @@ class Product extends \Frootbox\Persistence\AbstractConfigurableRow implements \
 
         $result->map('delete');
 
-
         // Cleanup category connections
         $model = $this->db->getModel(\Frootbox\Persistence\Repositories\CategoriesConnections::class);
         $result = $model->fetch([
@@ -140,6 +139,33 @@ class Product extends \Frootbox\Persistence\AbstractConfigurableRow implements \
         }
 
         return $alias;
+    }
+
+    /**
+     * @return \Frootbox\Db\Result
+     */
+    public function getCategories(): \Frootbox\Db\Result
+    {
+        // Build sql
+        $sql = 'SELECT
+            c.*
+        FROM
+            categories c,
+            categories_2_items x
+        WHERE
+            x.categoryId = c.id AND
+            x.categoryClass = :categoryClass AND
+            x.itemClass = :itemClass AND
+            x.itemId = '  .$this->getId();
+
+        // Fetch categories
+        $categoryRepository = $this->getDb()->getRepository(\Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Categories::class);
+        $categories = $categoryRepository->fetchByQuery($sql, [
+            ':categoryClass' => \Frootbox\Ext\Core\ShopSystem\Persistence\Category::class,
+            ':itemClass' => \Frootbox\Ext\Core\ShopSystem\Persistence\Product::class,
+        ]);
+
+        return $categories;
     }
 
     /**
@@ -259,7 +285,8 @@ class Product extends \Frootbox\Persistence\AbstractConfigurableRow implements \
     }
 
     /**
-     *
+     * @param string $name
+     * @return DatasheetField|null
      */
     public function getFieldByName(string $name): ?\Frootbox\Ext\Core\ShopSystem\Persistence\DatasheetField
     {
@@ -269,7 +296,8 @@ class Product extends \Frootbox\Persistence\AbstractConfigurableRow implements \
         $sql = 'SELECT
             a.id as fieldId,
             a.*,
-            d.valueText as valueText
+            d.valueText as valueText,
+            d.valueInt as valueInt
         FROM
             assets a        
         LEFT JOIN
@@ -278,12 +306,13 @@ class Product extends \Frootbox\Persistence\AbstractConfigurableRow implements \
             d.productId = ' . $this->getId() . ' AND
             d.fieldId = a.id
         WHERE
-            a.className = "Frootbox\\\\Ext\\\\Core\\\\ShopSystem\\\\Persistence\\\\DatasheetField" AND
+            a.className = :className AND
             a.parentId = ' . $this->getDatasheetId() . ' AND
             a.title = :name
         LIMIT 1';
 
         $result = $model->fetchByQuery($sql, [
+            ':className' => \Frootbox\Ext\Core\ShopSystem\Persistence\DatasheetField::class,
             ':name' => $name
         ]);
 
@@ -374,15 +403,16 @@ class Product extends \Frootbox\Persistence\AbstractConfigurableRow implements \
         return $list;
     }
 
-
     /**
-     *
+     * @return \Frootbox\Db\Result
      */
     public function getFiles(): \Frootbox\Db\Result
     {
         // Fetch files
         $filesRepository = $this->db->getRepository(\Frootbox\Persistence\Repositories\Files::class);
-        $result = $filesRepository->fetchResultByUid($this->getUid('files'));
+        $result = $filesRepository->fetchResultByUid($this->getUid('files'), [
+            'order' => 'orderId DESC',
+        ]);
 
         return $result;
     }
@@ -394,7 +424,9 @@ class Product extends \Frootbox\Persistence\AbstractConfigurableRow implements \
     {
         // Fetch files
         $filesRepository = $this->db->getRepository(\Frootbox\Persistence\Repositories\Files::class);
-        $result = $filesRepository->fetchResultByUid($this->getUid('images'));
+        $result = $filesRepository->fetchResultByUid($this->getUid('images'), [
+            'order' => 'orderId DESC',
+        ]);
 
         return $result;
     }
@@ -428,11 +460,16 @@ class Product extends \Frootbox\Persistence\AbstractConfigurableRow implements \
      */
     protected function getNewAlias(): ?\Frootbox\Persistence\Alias
     {
+        if (!empty($this->getConfig('noProductsDetailPages'))) {
+            return null;
+        }
+
         return new \Frootbox\Persistence\Alias([
             'pageId' => $this->getPageId(),
             'virtualDirectory' => [
                 $this->getTitle()
             ],
+            'uid' => $this->getUid('alias'),
             'payload' => $this->generateAliasPayload([
                 'action' => 'showProduct',
                 'productId' => $this->getId()
@@ -445,6 +482,10 @@ class Product extends \Frootbox\Persistence\AbstractConfigurableRow implements \
      */
     public function getNewAliases(): array
     {
+        if (!empty($this->getConfig('noProductsDetailPages'))) {
+            return [];
+        }
+
         if (!empty($this->getConfig('titles'))) {
 
             $list = [ 'index' => [] ];
@@ -461,6 +502,7 @@ class Product extends \Frootbox\Persistence\AbstractConfigurableRow implements \
                     'virtualDirectory' => [
                         $title,
                     ],
+                    'uid' => $this->getUid('alias'),
                     'payload' => $this->generateAliasPayload([
                         'action' => 'showProduct',
                         'productId' => $this->getId()
@@ -479,6 +521,7 @@ class Product extends \Frootbox\Persistence\AbstractConfigurableRow implements \
                     'virtualDirectory' => [
                         $this->getTitle()
                     ],
+                    'uid' => $this->getUid('alias'),
                     'payload' => $this->generateAliasPayload([
                         'action' => 'showProduct',
                         'productId' => $this->getId()
@@ -561,7 +604,17 @@ class Product extends \Frootbox\Persistence\AbstractConfigurableRow implements \
         foreach ($list as $index => $equipment) {
 
             try {
+
+                // Fetch product
                 $product = $repository->fetchById($equipment['productId']);
+
+                if ($product->getVisibility() < 2) {
+
+                    unset($list[$index]);
+
+                    continue;
+                }
+
                 $list[$index]['product'] = $product;
             }
             catch ( \Exception $e ) {
@@ -570,6 +623,21 @@ class Product extends \Frootbox\Persistence\AbstractConfigurableRow implements \
         }
 
         return $list;
+    }
+
+    /**
+     *
+     */
+    public function getShippingCosts(): ?\Frootbox\Ext\Core\ShopSystem\Persistence\ShippingCosts
+    {
+        if (empty($this->getShippingId())) {
+            return null;
+        }
+
+        $repository = $this->getDb()->getRepository(\Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\ShippingCosts::class);
+        $shippingCosts = $repository->fetchById($this->getShippingId());
+
+        return $shippingCosts;
     }
 
     /**

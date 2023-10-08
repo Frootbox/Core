@@ -123,9 +123,12 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
 
             foreach ($dir as $file) {
 
+                $class = $controller->getBaseNamespace() . 'ShippingCosts\\' . $file . '\\ShippingCosts';
+                $shippingCosts = new $class;
+
                 $shippingcosts[] = [
                     'class' => $controller->getBaseNamespace() . 'ShippingCosts\\' . $file . '\\ShippingCosts',
-                    'title' => $file
+                    'title' => $shippingCosts->getTitle(),
                 ];
             }
         }
@@ -138,20 +141,185 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     /**
      *
      */
+    public function ajaxModalConfigurationAction(
+
+    ): Response
+    {
+        return self::getResponse('plain', 200, [
+
+        ]);
+    }
+
+    /**
+     *
+     */
     public function ajaxModalEditAction (
         \Frootbox\Http\Get $get,
+        \Frootbox\Admin\View $view,
         \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\ShippingCosts $shippingCostsRepository,
-        \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Products $productsRepository
     ): Response
     {
         // Fetch shopping costs
         $shippingCosts = $shippingCostsRepository->fetchById($get->get('shippingId'));
 
+        if (!empty($shippingCosts->getPath())) {
 
+            $viewFilePath = $shippingCosts->getPath() . 'resources/private/views/Admin.html.twig';
 
+            if (file_exists($viewFilePath)) {
+                $adminHtml = $view->render($viewFilePath, null, [
+                    'shippingCosts' => $shippingCosts,
+                ]);
+            }
+        }
 
         return self::getResponse('plain', 200, [
+            'shippingCosts' => $shippingCosts,
+            'adminHtml' => $adminHtml ?? null,
+        ]);
+    }
 
+    /**
+     *
+     */
+    public function ajaxToggleDayAction(
+        \Frootbox\Http\Get $get,
+        \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\ShippingDay $shippingDayRepository,
+    ): Response
+    {
+        // Validate date
+        $date = new \DateTime($get->get('date'));
+
+        if ($date < new \DateTime()) {
+            throw new \Exception('Es können keine vergangenen Daten bearbeitet werden.');
+        }
+
+        $check = $shippingDayRepository->fetchOne([
+            'where' => [
+                'dateStart' => $get->get('date') . ' 00:00:00',
+            ],
+        ]);
+
+        if (!empty($check)) {
+
+            // Free date
+            $check->delete();
+
+            return self::getResponse('json', 200, [
+                'success' => 'Die Daten wurden gespeichert.',
+                'removeClass' => [
+                    'selector' => 'a[data-date="' . $get->get('date') . '"]',
+                    'className' => 'blocked',
+                ],
+                'addClass' => [
+                    'selector' => 'a[data-date="' . $get->get('date') . '"]',
+                    'className' => 'active',
+                ],
+            ]);
+        }
+        else {
+
+            // Block date
+            $shippingDay = new \Frootbox\Ext\Core\ShopSystem\Persistence\ShippingDay([
+                'dateStart' => $get->get('date'),
+            ]);
+
+            $shippingDayRepository->insert($shippingDay);
+
+            return self::getResponse('json', 200, [
+                'success' => 'Die Daten wurden gespeichert.',
+                'addClass' => [
+                    'selector' => 'a[data-date="' . $get->get('date') . '"]',
+                    'className' => 'blocked',
+                ],
+            ]);
+        }
+    }
+
+    /**
+     *
+     */
+    public function ajaxUpdateAction(
+        \Frootbox\Http\Get $get,
+        \Frootbox\Http\Post $post,
+        \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\ShippingCosts $shippingCostsRepository,
+    ): Response
+    {
+        // Fetch shopping costs
+        $shippingCosts = $shippingCostsRepository->fetchById($get->get('shippingCostsId'));
+
+        // Update shipping costs
+        $shippingCosts->setTitle($post->get('title'));
+        $shippingCosts->save();
+
+        $shippingCosts->updateFromPost($post);
+
+        return self::getResponse('json', 200, [
+            'modalDismiss' => true,
+        ]);
+    }
+
+    /**
+     *
+     */
+    public function ajaxUpdateConfigurationAction(
+        \Frootbox\Http\Post $post,
+    ): Response
+    {
+        $this->plugin->unsetConfig('shipping');
+        $this->plugin->addConfig([
+            'shipping' => $post->get('shipping'),
+        ]);
+        $this->plugin->save();
+
+        return self::getResponse('json', 200, [
+            'modalDismiss' => true,
+        ]);
+    }
+
+    public function ajaxUpdateExcludesAction(
+        \Frootbox\Http\Post $post,
+        \Frootbox\Admin\Viewhelper\GeneralPurpose $gp
+    ): Response
+    {
+        $excludes = $post->get('excludes') ?? [];
+
+        foreach ($excludes as $index => $data) {
+            if (empty($data['from']) or empty($data['to'])) {
+                unset($excludes[$index]);
+            }
+        }
+
+        $excludes = array_values($excludes);
+
+        $this->plugin->unsetConfig('postalExcludes');
+        $this->plugin->addConfig([
+            'postalExcludes' => $excludes,
+        ]);
+        $this->plugin->save();
+
+        return self::getResponse('json', 200, [
+            'success' => 'Die Daten wurden gespeichert.',
+            'replace' => [
+                'selector' => '#excludes-receiver',
+                'html' => $gp->injectPartial(\Frootbox\Ext\Core\ShopSystem\Plugins\ShopSystem\Admin\Shipping\Partials\PostalCodesExcludes\Partial::class, [
+                    'plugin' => $this->plugin
+                ])
+            ]
+        ]);
+    }
+
+    /**
+     *
+     */
+    public function daysAction(
+        \Frootbox\Http\Get $get,
+    ): Response
+    {
+        $date = $get->get('date') ? $get->get('date') : date('Y-m-d');
+
+        return self::getResponse(body: [
+            'date' => $date,
         ]);
     }
 

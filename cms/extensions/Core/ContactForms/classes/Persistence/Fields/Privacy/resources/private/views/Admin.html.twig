@@ -1,0 +1,38 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<script>
+    $(function() {
+
+        $('#linkedFile').change(function() {
+
+            if ($(this).is(':checked')) {
+                $('.file-upload-wrapper').show();
+            }
+            else {
+                $('.file-upload-wrapper').hide();
+            }
+
+        });
+
+        $('#linkedFile').trigger('change');
+    });
+</script>
+
+<div class="form-group form-check">
+    <input type="checkbox" class="form-check-input" id="linkedFile" name="linkedFile" {% if field.getConfig('linkedFile') %}checked{% endif %} aria-describedby="linkedFileHelp">
+    <label class="form-check-label" for="linkedFile">Datei als Datenschutzerklärung</label>
+    <small id="linkedFileHelp" class="form-text text-muted">Datei kann hier hochfgeladen werden</small>
+</div>
+
+<div class="file-upload-wrapper">
+    {{ v.injectPartial('\\Frootbox\\Ext\\Core\\FileManager\\Admin\\Partials\\FileManager', {
+        uid: field.getUid('file'),
+        multiple: false
+    }) | raw }}
+</div>
+
+<div class="form-group">
+    <label for="privacyText">Einverständnis-Text (optional)</label>
+    <textarea class="form-control" id="privacyText" name="privacyText" rows="8" aria-describedby="privacy-text-help">{{ field.getConfig('privacyText') }}</textarea>
+    <small id="privacy-text-help" class="form-text text-muted">Verlinkung der Datenschutzerklärung mit <code>[Text]</code>.</small>
+</div>

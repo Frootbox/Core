@@ -23,7 +23,7 @@ class Partial extends \Frootbox\Admin\View\Partials\AbstractPartial
      */
     public function onBeforeRendering(
         \Frootbox\Admin\View $view,
-        \Frootbox\Persistence\Repositories\Pages $pagesRepository
+        \Frootbox\Persistence\Repositories\Pages $pagesRepository,
     ): void
     {
         // Fetch root page
@@ -34,7 +34,7 @@ class Partial extends \Frootbox\Admin\View\Partials\AbstractPartial
             ],
             'limit' => 1
         ]);
-        
+
         if ($result->getCount() == 0) {
             
             $rootPage = $pagesRepository->insertRoot(new \Frootbox\Persistence\Page([
@@ -46,7 +46,6 @@ class Partial extends \Frootbox\Admin\View\Partials\AbstractPartial
             
             $rootPage = $result->current();
         }
-
 
         // Generate sitemap tree
         $tree = $pagesRepository->getTree($rootPage->getId());

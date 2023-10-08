@@ -21,7 +21,8 @@
                 </td>
                 <td class="text-right">
                     <a class="ajax" data-toggle="tooltip" title="Ansprechperson aktivieren/deaktivieren" href="{{ data.plugin.getAdminUri('Contact', 'ajaxSwitchVisible', { contactId: contact.getId() }) }}"><i data-contact="{{ contact.getId() }}" class="fa fa-lightbulb icon visibility visibility-{{ contact.getVisibility() }}"></i></a>
-                    <a class="ajax" data-confirm="Soll dieser Ansprechpartner wirklich gelöscht werden?" href="{{ data.plugin.getAdminUri('Contact', 'ajaxDelete', { contactId: contact.getId() }) }}"><i class="fa fa-times icon"></i></a>
+                    <a data-toggle="tooltip" data-title="Mitarbeiter im Frontend bearbeiten" target="edit-contact-{{ contact.getId() }}" href="{{ plugin.getAdminUri('Contact', 'jumpToEdit', { contactId: contact.getId() }) }}"><i class="far fa-pencil icon"></i></a>
+                    <a data-toggle="tooltip" data-title="Mitarbeiter löschen" class="ajax" data-confirm="Soll dieser Ansprechpartner wirklich gelöscht werden?" href="{{ data.plugin.getAdminUri('Contact', 'ajaxDelete', { contactId: contact.getId() }) }}"><i class="far fa-trash icon"></i></a>
                 </td>
             </tr>
         {% endfor %}

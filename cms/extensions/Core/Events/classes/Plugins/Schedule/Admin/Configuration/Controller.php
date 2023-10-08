@@ -35,6 +35,36 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     /**
      *
      */
+    public function ajaxBookingsRecalculateAction(
+        \Frootbox\Ext\Core\Events\Persistence\Repositories\Events $eventRepository,
+    ): Response
+    {
+        // Fetch events
+        $events = $eventRepository->fetch();
+
+        foreach ($events as $event) {
+
+            $bookedSeats = 0;
+
+            foreach ($event->getBookings() as $booking) {
+                $bookedSeats += $booking->getPersons();
+            }
+
+            $event->addConfig([
+                'bookable' => [
+                    'bookedSeats' => $bookedSeats,
+                ],
+            ]);
+
+            $event->save();
+        }
+
+        return self::getResponse('json');
+    }
+
+    /**
+     *
+     */
     public function ajaxPricesSetAction(
         \Frootbox\Http\Post $post,
         \Frootbox\Ext\Core\Events\Persistence\Repositories\Events $eventRepository,
@@ -139,6 +169,7 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
             'noEventsDetailPage' => $post->get('noEventsDetailPage'),
             'bookingPluginId' => $post->get('bookingPluginId'),
             'formId' => $post->get('formId'),
+            'aliasSubFolder' => $post->get('aliasSubFolder'),
         ]);
 
         $this->plugin->save();
@@ -154,6 +185,7 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
 
             $entity->addConfig([
                 'noEventsDetailPage' => $post->get('noEventsDetailPage'),
+                'aliasSubFolder' => $post->get('aliasSubFolder'),
             ]);
 
             $entity->save();

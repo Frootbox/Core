@@ -93,7 +93,7 @@ class Log extends \Frootbox\Persistence\AbstractLog
                 if (preg_match('#name#i', $field['title'])) {
                     $sender['name'] = $field['value'];
                 }
-                elseif (preg_match('#e\-mail#i', $field['title'])) {
+                elseif ($field['type'] == 'Email' or preg_match('#e\-mail#i', $field['title'])) {
                     $sender['email'] = $field['value'];
                 }
             }

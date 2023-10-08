@@ -48,6 +48,7 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
         $text->addConfig([
             'link' => $url,
             'email' => $post->get('email'),
+            'emailSubject' => $post->get('emailSubject'),
             'phone' => $post->get('phone'),
             'label' => $post->get('label'),
             'filelink' => $post->get('fileId'),
@@ -81,7 +82,13 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
         $text = $textsRepository->fetchByUid($get->get('uid'));
 
         // Fetch pages
-        $result = $pagesRepository->fetch();
+        $root = $pagesRepository->fetchOne([
+            'where' => [
+                'parentId' => 0,
+            ],
+        ]);
+
+        $result = $pagesRepository->getTree($root->getId());
 
         return self::getResponse('html', 200, [
             'text' => $text,

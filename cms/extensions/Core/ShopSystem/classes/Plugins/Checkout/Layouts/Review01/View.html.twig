@@ -14,6 +14,8 @@ variables:
 {% set p = view.getViewhelper('Partials', { plugin: plugin }) %}
 {% set t = i.getTranslator() %}
 
+{% set icons = view.getViewhelper('Ext/HerrUndFrauPixelExt/Icons/Icons', { createDummyOnFail: true  }) %}
+
 {{ i.injectScript({ path: 'Review01/public/init.js'}) | raw }}
 
 {{ v.asset('EXT:Core/ShopSystem/icons/css/all.css') | raw }}
@@ -27,23 +29,28 @@ variables:
     <div class="row">
         <div class="col-12">
 
-            {% if plugin.isFirst %}
-                <h1 data-editable data-uid="{{ plugin.getUid('title-review') }}">Bestellung abschließen</h1>
-            {% else %}
-                <h2 data-editable data-uid="{{ plugin.getUid('title-review') }}">Bestellung abschließen</h2>
-            {% endif %}
+            <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title-review') }}">Bestellung abschließen</h2>
 
             <form action="{{ i.getUriAjax({ action: 'checkout' }) }}" method="post" class="ajax-checkout-form">
 
                 <div class="row">
                     <div class="col-md-6">
 
-                        <h3>Rechnungsadresse</h3>
+                        <h3>Persönliche Daten</h3>
+
+                        {% if shopcart.getPersonal('company') %}
+                            <p>{{ shopcart.getPersonal('company') }}</p>
+                        {% endif %}
 
                         <p>{{ shopcart.getPersonal('firstname') }} {{ shopcart.getPersonal('lastname') }}</p>
                         <p>
                             {{ shopcart.getPersonal('street') }} {{ shopcart.getPersonal('streetNumber') }}<br />
                             {{ shopcart.getPersonal('postalCode') }} {{ shopcart.getPersonal('city') }}
+
+
+                            {% if shopcart.getPersonal('country') %}
+                                <br />{{ t.translate('Country.' ~ shopcart.getPersonal('country')) }}
+                            {% endif %}
                         </p>
 
                         {% if mailcheck %}
@@ -75,25 +82,82 @@ variables:
                     </div>
                     <div class="col-md-6">
 
-                        <h3>Lieferadresse</h3>
+                        {% if shopcart.getBilling('differentBillingRecipient') %}
+                            <h3>Rechnungsadresse</h3>
 
-                        {% if shopcart.getShipping('type') == 'shipToBillingAddress' %}
-                            <p>Rechnungsadresse ist Lieferadresse.</p>
-                        {% elseif shopcart.getShipping('type') == 'shipToAddress' %}
-                            <p>Lieferung an folgende Adresse:</p>
-                            <p>{{ shopcart.getShipping('firstname') }} {{ shopcart.getShipping('lastname') }}</p>
+                            {% if shopcart.getBilling('company') %}
+                                <p>{{ shopcart.getBilling('company') }}</p>
+                            {% endif %}
+
+                            <p>{{ shopcart.getBilling('firstname') }} {{ shopcart.getBilling('lastname') }}</p>
                             <p>
-                                {{ shopcart.getShipping('street') }} {{ shopcart.getShipping('streetNumber') }}<br />
+                                {{ shopcart.getBilling('street') }} {{ shopcart.getBilling('streetNumber') }}<br />
+                                {{ shopcart.getBilling('postalCode') }} {{ shopcart.getBilling('city') }}
 
-                                {% if shopcart.getShipping('addition') %}
-                                    {{ shopcart.getShipping('addition') }}<br />
+                                {% if shopcart.getBilling('country') %}
+                                    <br />{{ t.translate('Country.' ~ shopcart.getBilling('country')) }}
                                 {% endif %}
-
-
-                                {{ shopcart.getShipping('postalCode') }} {{ shopcart.getShipping('city') }}
                             </p>
-                        {% elseif shopcart.getShipping('type') == 'selfPickup' %}
-                            <p>Selbstabholung</p>
+
+
+                            {% if shopcart.getBilling('email') %}
+                                <p>{{ shopcart.getBilling('email') }}</p>
+                            {% endif %}
+
+                            {% if shopcart.getBilling('phone') %}
+                                <p>Telefon {{ shopcart.getBilling('phone') }}</p>
+                            {% endif %}
+                        {% endif %}
+
+                        {% if not plugin.getConfig('skipShipping') %}
+                            <h3>Lieferadresse</h3>
+
+                            {% if shopcart.getShipping('type') == 'shipToBillingAddress' %}
+                                <p>Rechnungsadresse ist Lieferadresse.</p>
+                            {% elseif shopcart.getShipping('type') == 'shipToAddress' %}
+                                <p>Lieferung an folgende Adresse:</p>
+                                <p>{{ shopcart.getShipping('firstname') }} {{ shopcart.getShipping('lastname') }}</p>
+                                <p>
+                                    {{ shopcart.getShipping('street') }} {{ shopcart.getShipping('streetNumber') }}<br />
+
+                                    {% if shopcart.getShipping('addition') %}
+                                        {{ shopcart.getShipping('addition') }}<br />
+                                    {% endif %}
+
+                                    {{ shopcart.getShipping('postalCode') }} {{ shopcart.getShipping('city') }}
+                                </p>
+
+                            {% elseif shopcart.getShipping('type') == 'selfPickup' %}
+                                <p>Selbstabholung</p>
+
+                                {% if shopcart.getShipping('selfpickupAddressId') %}
+
+                                    {% set address = shopcart.getSelfpickupAddress() %}
+
+                                    <p>
+                                        <b>{{ address.getTitle() }}</b><br />
+                                        {{ address.getStreet() }} {{ address.getStreetNumber() }}<br />
+                                        {{ address.getZipcode() }} {{ address.getCity() }}
+                                    </p>
+
+                                    <div data-editable data-nowidgets data-uid="{{ address.getUid('text-shipping') }}"></div>
+
+                                {% endif %}
+                            {% endif %}
+
+                            {% if shopcart.getShipping('deliveryDay') %}
+                                <p>
+
+                                    {% if shopcart.getShipping('type') == "selfPickup" %}
+                                        <b>gewünschtes Abholdatum:</b><br />
+                                    {% else %}
+                                        <b>gewünschtes Lieferdatum:</b><br />
+                                    {% endif %}
+
+                                    {{ shopcart.getShipping('deliveryDay') | date('d.m.Y') }} <a class="edit-pencil after" href="{{ plugin.getActionUri('choiceOfDelivery') }}">{{ icons.render('pencil') | raw }}</a>
+                                </p>
+                            {% endif %}
+
                         {% endif %}
 
                         <h3>Zahlungsart</h3>
@@ -122,6 +186,15 @@ variables:
 
                     </div>
                     <div class="col-md-6">
+
+                        {% if plugin.getConfig('ownOrderNumber') %}
+                            <div class="form-group">
+                                <label for="ownOrderNumber">eigene Bestellnummer</label>
+                                <input class="form-control" type="text" id="ownOrderNumber" name="ownOrderNumber" />
+                            </div>
+                        {% endif %}
+
+
 
                         {#
                         {% if not config.get('shop.coupons.disabled') %}

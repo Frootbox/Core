@@ -31,11 +31,15 @@
     <div class="row justify-content-center">
         {% for image in images %}
             <div class="image {{ colClass }} {% if not widget.getImageWidth() or not widget.getImageHeight() %}align-self-center{% endif %} condensed">
-                {% if not widget.getConfig('noMagnifier') %}
-                    <a href="{{ image.getUriThumbnail() }}" data-fancybox="gallery" data-caption="{{ image.getConfig('caption') }}">
+
+
+                {% if image.getConfig('link') %}
+                    <a href="{{ image.getConfig('link') }}">
+                {% elseif not widget.getConfig('noMagnifier') %}
+                        <a href="{{ image.getUriThumbnail() }}" data-fancybox="gallery" data-caption="{{ image.getConfig('caption') }}">
                 {% endif %}
 
-                    <picture class="fluid" data-fileid="{{ image.getId() }}">
+                    <picture class="fluid" data-linkable data-fileid="{{ image.getId() }}">
                         <img {% if widget.getImageWidth() > 0 %}width="{{ widget.getImageWidth() }}"{% endif %} {% if widget.getImageHeight() > 0 %}height="{{ widget.getImageHeight() }}"{% endif %} class="img-fluid" src="{{ image.getUri({ width: widget.getImageWidth(), height: widget.getImageHeight() }) }}" alt="{{ image.getAlt() }}" />
                     </picture>
 
@@ -43,7 +47,7 @@
                         <span class="title">{{ image.getTitleReal }}</span>
                     {% endif %}
 
-                {% if not widget.getConfig('noMagnifier') %}
+                {% if not widget.getConfig('noMagnifier') or image.getConfig('link') %}
                     </a>
                 {% endif %}
             </div>

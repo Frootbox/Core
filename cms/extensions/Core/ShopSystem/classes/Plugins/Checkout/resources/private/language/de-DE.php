@@ -11,6 +11,7 @@ return [
     'LayoutAction.Checkout' => 'Warenkorb Kasse',
     'LayoutAction.Review' => 'Kontrollseite',
     'LayoutAction.Complete' => 'Abschlusseite',
+    'LayoutAction.ChoiceOfDelivery' => 'Liefertag wählen',
 
 
     'AcceptPrivacyPolicy' => 'Ich habe die [^Datenschutzerklärung] gelesen und akzeptiere diese.',
@@ -45,4 +46,6 @@ return [
     'Country.BG' => 'Bulgarien',
     'Country.RO' => 'Romänien',
     'Country.HR' => 'Krotien',
+
+    'Field.VAT' => 'Ust. IdNr.',
 ];

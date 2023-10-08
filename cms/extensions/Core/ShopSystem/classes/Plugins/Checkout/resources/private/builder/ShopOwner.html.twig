@@ -85,10 +85,18 @@
 
                                             <h4>persönliche Daten</h4>
 
+                                            {% if shopcart.getPersonal('company') %}
+                                                <p>{{ shopcart.getPersonal('company') }}</p>
+                                            {% endif %}
+
                                             <p>
                                                 {{ shopcart.getPersonal('firstname') }} {{ shopcart.getPersonal('lastname') }}<br />
                                                 {{ shopcart.getPersonal('street') }} {{ shopcart.getPersonal('streetNumber') }}<br />
                                                 {{ shopcart.getPersonal('postalCode') }} {{ shopcart.getPersonal('city') }}
+
+                                                {% if shopcart.getPersonal('country') %}
+                                                    <br />{{ ('Core.ShopSystem.Plugins.Checkout.Country.' ~ shopcart.getPersonal('country')) | translate }}
+                                                {% endif %}
                                             </p>
                                             <p>
                                                 <a class="email-link" href="mailto:{{ shopcart.getPersonal('email') }}">{{ shopcart.getPersonal('email') }}</a>
@@ -100,13 +108,25 @@
 
                                             <br />
 
-                                            <h4>Rechnungsadresse</h4>
+                                            {% if shopcart.getBilling('differentBillingRecipient') %}
 
-                                            <p>
-                                                {{ shopcart.getPersonal('firstname') }} {{ shopcart.getPersonal('lastname') }}<br />
-                                                {{ shopcart.getPersonal('street') }} {{ shopcart.getPersonal('streetNumber') }}<br />
-                                                {{ shopcart.getPersonal('postalCode') }} {{ shopcart.getPersonal('city') }}
-                                            </p>
+                                                <h4>Rechnungsadresse</h4>
+
+                                                {% if shopcart.getBilling('company') %}
+                                                    <p>{{ shopcart.getBilling('company') }}</p>
+                                                {% endif %}
+
+                                                <p>
+                                                    {{ shopcart.getBilling('firstname') }} {{ shopcart.getBilling('lastname') }}<br />
+                                                    {{ shopcart.getBilling('street') }} {{ shopcart.getBilling('streetNumber') }}<br />
+                                                    {{ shopcart.getBilling('postalCode') }} {{ shopcart.getBilling('city') }}
+
+                                                    {% if shopcart.getBilling('country') %}
+                                                        <br />{{ ('Core.ShopSystem.Plugins.Checkout.Country.' ~ shopcart.getBilling('country')) | translate }}
+                                                    {% endif %}
+
+                                                </p>
+                                            {% endif %}
 
                                         </td>
                                         <td width="50" valign="top">
@@ -196,7 +216,7 @@
                                                 {% endfor %}
 
                                                 {% for option in item.getFieldOptions() %}
-                                                    <br />- {{ option.option }}{% if option.surcharge %} (+ {{ option.surcharge | number_format(2, ",", ".") }} &euro;){% endif %}
+                                                    <br />- {{ option.option }}{% if option.surcharge %} (+ {{ option.surcharge | number_format(2, ",", ".") }} &{{ currencySign }}o;){% endif %}
                                                 {% endfor %}
 
                                                 {% if item.getCustomNote() %}
@@ -211,10 +231,10 @@
                                                 {{ item.getAmount() }} x
                                             </td>
                                             <td class="text-right">
-                                                {{ item.getPriceGross() | number_format(2,',','.') }} EUR
+                                                {{ item.getPriceGross() | number_format(2,',','.') }} {{ currencySign }}
                                             </td>
                                             <td class="text-right">
-                                                {{ item.getTotal() | number_format(2,',','.') }} EUR
+                                                {{ item.getTotal() | number_format(2,',','.') }} {{ currencySign }}
                                             </td>
                                         </tr>
                                     {% endfor %}
@@ -225,24 +245,24 @@
                                         {% for coupon in shopcart.getRedeemedCoupons() %}
                                             <tr>
                                                 <td class="text-right" colspan="3">
-                                                    Coupon „{{ coupon.getCode() }}“ ({% if coupon.getConfig('valuePercent') %}{{ coupon.getConfig('valuePercent') }} %{% else %}{{ coupon.getValueLeft() | number_format(2,',','.') }} EUR{% endif %})
+                                                    Coupon „{{ coupon.getCode() }}“ ({% if coupon.getConfig('valuePercent') %}{{ coupon.getConfig('valuePercent') }} %{% else %}{{ coupon.getValueLeft() | number_format(2,',','.') }} {{ currencySign }}{% endif %})
 
                                                     <a class="coupon-dismiss" href="{{ data.plugin.getUriAjax('dismissCoupon', { couponCode: coupon.getCode() }) }}"><i class="fa fa-times"></i></a>
                                                 </td>
-                                                <td class="text-right">-{{ coupon.getRedeemedValue() | number_format(2,',','.') }} EUR</td>
+                                                <td class="text-right">-{{ coupon.getRedeemedValue() | number_format(2,',','.') }} {{ currencySign }}</td>
                                             </tr>
                                         {% endfor %}
 
                                         <tr>
                                             <td class="text-right" colspan="3">Versand &amp; Bearbeitung</td>
-                                            <td class="text-right">{{ shopcart.getShippingCosts() | number_format(2,',','.') }} EUR</td>
+                                            <td class="text-right">{{ shopcart.getShippingCosts() | number_format(2,',','.') }} {{ currencySign }}</td>
                                         </tr>
 
                                         {% for section in shopcart.getTaxSections() %}
 
                                             <tr>
-                                                <td class="text-right tax" colspan="3">inkl. {{ section.taxrate }} % MwSt. auf {{ section.total | number_format(2,',','.') }} EUR</td>
-                                                <td class="text-right tax">{{ section.tax | number_format(2,',','.') }} EUR</td>
+                                                <td class="text-right tax" colspan="3">inkl. {{ section.taxrate }} % MwSt. auf {{ section.total | number_format(2,',','.') }} {{ currencySign }}</td>
+                                                <td class="text-right tax">{{ section.tax | number_format(2,',','.') }} {{ currencySign }}</td>
                                                 {% if data.editable %}<td></td>{% endif %}
                                             </tr>
 
@@ -250,7 +270,7 @@
 
                                         <tr>
                                             <td class="text-right" colspan="3"><b>Gesamtsumme</b></td>
-                                            <td class="text-right"><b>{{ shopcart.getTotal() | number_format(2,',','.') }} EUR</b></td>
+                                            <td class="text-right"><b>{{ shopcart.getTotal() | number_format(2,',','.') }} {{ currencySign }}</b></td>
                                         </tr>
                                     </tfoot>
                                 </table>

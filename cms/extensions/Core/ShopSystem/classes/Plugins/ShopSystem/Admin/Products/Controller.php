@@ -22,22 +22,24 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     }
 
     /**
-     *
+     * @param \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Datasheets $datasheets
+     * @return Response
      */
     public function ajaxModalComposeAction (
-        \Frootbox\Admin\View $view,
         \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Datasheets $datasheets
     ): Response
     {
         // Fetch datasheets
         $result = $datasheets->fetch([
-
+            'where' => [
+                'pluginId' => $this->plugin->getId(),
+            ],
         ]);
 
-        $view->set('datasheets', $result);
-
-
-        return self::getResponse('plain');
+        return self::getResponse('plain', 200, [
+            'datasheets' => $result,
+            'lastDatasheetId' => $_SESSION['back']['shopsystem']['lastDatasheetId'] ?? null,
+        ]);
     }
 
     /**
@@ -176,8 +178,11 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         // Fetch datasheet
         $datasheet = $datasheetsRepository->fetchById($post->get('datasheetId'));
 
+        // Mark last datasheet
+        $_SESSION['back']['shopsystem']['lastDatasheetId'] = $datasheet->getId();
+
         // Insert new product
-        $product = $productsRepository->insert(new \Frootbox\Ext\Core\ShopSystem\Persistence\Product([
+        $product = $productsRepository->persist(new \Frootbox\Ext\Core\ShopSystem\Persistence\Product([
             'pageId' => $this->plugin->getPageId(),
             'pluginId' => $this->plugin->getId(),
             'datasheetId' => $datasheet->getId(),
@@ -193,6 +198,9 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
             $category->connectItem($product);
 
             $database->transactionCommit();
+
+            // Trigger save to create aliases
+            $product->save();
 
             // Compose response
             return self::getResponse('json', 200, [
@@ -249,6 +257,68 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
                     'plugin' => $this->plugin
                 ])
             ]
+        ]);
+    }
+
+    /**
+     *
+     */
+    public function ajaxDuplicateAction(
+        Get $get,
+        \Frootbox\Db\Db $database,
+        Products $productsRepository,
+        \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\ProductsData $productsDataRepository
+    ): Response
+    {
+        // Fetch product
+        $product = $productsRepository->fetchById($get->get('productId'));
+
+        // Start database transaction
+        $database->transactionStart();
+
+        // Clone product
+        $data = $product->getData();
+        $data['title'] .= ' (Kopie)';
+
+        if (!DEVMODE) {
+            $data['visibility'] = 1;
+        }
+
+        unset($data['id']);
+        unset($data['date']);
+        unset($data['updated']);
+        unset($data['alias']);
+
+        // Create new product
+        $newProduct = $productsRepository->insert(new \Frootbox\Ext\Core\ShopSystem\Persistence\Product($data));
+
+        // Duplicate fields
+        foreach ($product->getFields() as $field) {
+
+            /* @var \Frootbox\Ext\Core\ShopSystem\Persistence\ProductData $newField */
+            $newField = $productsDataRepository->fetchOne([
+                'where' => [
+                    'fieldId' => $field->getFieldId(),
+                    'productId' => $newProduct->getId()
+                ]
+            ], [
+                'createOnMiss' => true
+            ]);
+
+            $newField->setValueText($field->getValueText());
+            $newField->updateMetrics();
+            $newField->save();
+        }
+
+        // Duplicate categories
+        foreach ($product->getCategories() as $category) {
+            $category->connectItem($newProduct);
+        }
+
+        $database->transactionCommit();
+
+        return self::getResponse('json', 200, [
+            'triggerLink' => $this->plugin->getAdminUri('Products', 'details', [ 'productId' => $newProduct->getId() ]),
         ]);
     }
 
@@ -596,6 +666,7 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
 
         $product->setPageId($this->plugin->getPage()->getId());
         $product->setItemNumber((string) $post->get('itemNumber'));
+        $product->setItemNumberExternal((string) $post->get('itemNumberExternal'));
         $product->setPrice((float) $post->get('price'));
         $product->setTaxrate((float) $post->get('taxrate'));
         $product->setManufacturerId(!empty($post->get('manufacturerId')) ? $post->get('manufacturerId') : null);
@@ -610,6 +681,8 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         $product->addConfig([
             'priceOld' => $post->get('priceOld'),
             'directLink' => $post->get('directLink'),
+            'freeChoiceOfAmount' => !empty($post->get('freeChoiceOfAmount')),
+            'freeChoiceOfDeliveryDay' => !empty($post->get('freeChoiceOfDeliveryDay')),
         ]);
 
         if (!empty($post->get('titles'))) {
@@ -622,12 +695,11 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         // Set tags
         $product->setTags($post->get('tags'));
 
-        // Update products datsheet
+        // Update products datasheet
         if (!empty($newDatasheetId = $post->get('datasheetId')) and $newDatasheetId != $product->getDatasheetId()) {
 
             // Fetch new datasheet
             $datasheet = $datasheetsRepository->fetchById($newDatasheetId);
-
 
             // Cleanup old data fields
             $result = $productsDataRepository->fetch([
@@ -651,9 +723,14 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         ]);
 
         foreach ($result as $connection) {
-            $connection->save();
-        }
 
+            try {
+                $connection->save();
+            }
+            catch (\Frootbox\Exceptions\NotFound $e) {
+                $connection->delete();
+            }
+        }
 
         return self::getResponse('json');
     }
@@ -812,7 +889,11 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         $datasheet = $datasheetsRepository->fetchById($product->getDatasheetId());
 
         // Fetch available datasheets
-        $datasheets = $datasheetsRepository->fetch();
+        $datasheets = $datasheetsRepository->fetch([
+            'where' => [
+                'pluginId' => $this->plugin->getId(),
+            ],
+        ]);
 
         // Fetch available shippingcosts
         $shippingcosts = $shippingCostsRepository->fetch();

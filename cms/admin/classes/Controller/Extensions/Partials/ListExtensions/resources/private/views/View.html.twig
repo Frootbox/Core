@@ -5,6 +5,35 @@
 	<div class="message warning">Es wurden noch keine Erweiterungen installiert.</div>
 
 {% else %}
+
+
+	{% if templates | length %}
+
+		{% for extension in templates %}
+			<div class="card">
+				<div class="card-body">
+					<div class="row">
+						<div class="col-md-8">
+
+							<a href="{{ v.getUri('Extensions', 'details', { 'vendorId' : extension.getVendorId(), 'extensionId' : extension.getExtensionId() } ) }}">
+								<b>{{ extension.getVendorId() }}/{{ extension.getExtensionId() }}</b>
+							</a>
+
+						</div>
+						<div class="col-md-4 text-right">
+							<a class="ajax" href="{{ v.getUri('Extensions', 'ajaxSwitchState', { 'vendorId' : extension.getVendorId(), 'extensionId' : extension.getExtensionId() } ) }}">
+								<i class="fa fa-lightbulb icon visibility visibility-{% if extension.getIsactive() == 1 %}2{% else %}0{% endif %}"></i>
+							</a>
+							<a data-confirm="Soll diese Erweiterung wirklich gelöscht werden?" href="{{ v.getUri('Extensions', 'ajaxDelete', { 'vendorId' : extension.getVendorId(), 'extensionId' : extension.getExtensionId() } ) }}" class="ajax"><i class="far fa-trash icon"></i></a>
+						</div>
+					</div>
+
+				</div>
+			</div>
+		{% endfor %}
+
+	{% endif %}
+
 	<table class="table">
 		<thead>
 			<tr>
@@ -18,7 +47,9 @@
 
 			{% for extension in extensions %}
 				 <tr class="{% if data.highlight == extension.getId() %}highlighted{% endif %} {% if not extension.getIsactive() %}inactive{% endif %}" data-href="{{ v.getUri('Extensions', 'details', { 'vendorId' : extension.getVendorId(), 'extensionId' : extension.getExtensionId() } ) }}">
-					 <td>{{ extension.getVendorId() }}/{{ extension.getExtensionId() }}</td>
+					 <td>
+						 {{ extension.getVendorId() }}/{{ extension.getExtensionId() }}
+					 </td>
 					 <td>
 						 {{ extension.getVersion() }}
 					 </td>
@@ -29,7 +60,7 @@
 						 <a class="ajax" href="{{ v.getUri('Extensions', 'ajaxSwitchState', { 'vendorId' : extension.getVendorId(), 'extensionId' : extension.getExtensionId() } ) }}">
 							<i class="fa fa-lightbulb icon visibility visibility-{% if extension.getIsactive() == 1 %}2{% else %}0{% endif %}"></i>
 						 </a>
-						 <a data-confirm="Soll diese Erweiterung wirklich gelöscht werden?" href="{{ v.getUri('Extensions', 'ajaxDelete', { 'vendorId' : extension.getVendorId(), 'extensionId' : extension.getExtensionId() } ) }}" class="ajax"><i class="fa fa-times icon"></i></a>
+						 <a data-confirm="Soll diese Erweiterung wirklich gelöscht werden?" href="{{ v.getUri('Extensions', 'ajaxDelete', { 'vendorId' : extension.getVendorId(), 'extensionId' : extension.getExtensionId() } ) }}" class="ajax"><i class="far fa-trash icon"></i></a>
 					 </td>
 				 </tr>
 			{% endfor %}

@@ -3,7 +3,6 @@
 
 {% set products = d.getProducts({ options: { ignoreVisibility: true } }) %}
 
-
 {% if products.getCount() == 0 %}
     <div class="message warning">Es wurden noch keine Produkte erstellt.</div>
 {% else %}
@@ -31,4 +30,5 @@
 
         </tbody>
     </table>
+
 {% endif %}

@@ -1,0 +1,59 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+{% set i = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\Delegator', { object: controller }) %}
+
+<h2>
+    Buchungen
+    {#
+    <span class="headoptions">
+		<a data-toggle="tooltip" data-modal data-title="neue Ansprechperson hinzufügen" href="{{ plugin.getAdminUri('Contact', 'ajaxModalCompose') }}"><i class="fa fa-plus-circle"></i></a>
+	</span>
+    #}
+</h2>
+
+<p><a class="ajax" href="{{ plugin.getAdminUri('Index', 'index') }}"><i class="fa fa-chevron-circle-left"></i> zurück</a></p>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Gebucht</th>
+            <th>Event</th>
+            <th>Name</th>
+            <th>Kontakt</th>
+            <th>Adresse</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        {% for Booking in Bookings %}
+
+            {% set Event = Booking.getEvent() %}
+
+            <tr>
+                <td>{{ Booking.getDate() | date('d.m.Y') }}</td>
+                <td>
+                    {{ Event.getTitle() }}<br />
+                    {{ Event.getDateStart() | date('d.m.Y H:i') }} Uhr
+                </td>
+                <td>{{ Booking.getConfig('owner.firstName') }} {{ Booking.getConfig('owner.lastName') }}</td>
+                <td>
+                    {{ Booking.getConfig('owner.email') }}<br />
+                    {{ Booking.getConfig('owner.phone') }}
+                </td>
+                <td>
+                    {{ Booking.getConfig('owner.street') }} {{ Booking.getConfig('owner.streetNumber') }}<br />
+                    {{ Booking.getConfig('owner.zipCode') }} {{ Booking.getConfig('owner.city') }}
+                </td>
+            </tr>
+        {% endfor %}
+
+    </tbody>
+</table>
+
+{#
+
+{% for Booking in Bookings %}
+    {{ Booking | dump }}
+{% endfor %}
+
+#}

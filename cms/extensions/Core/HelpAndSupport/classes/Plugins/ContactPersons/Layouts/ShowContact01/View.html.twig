@@ -1,34 +1,70 @@
+{# config
+
+title: Standard
+variables:
+    skipBackButton:
+        type: bool
+        label: ohne zurück-Button
+
+/config #}
+
 {% set i = view.getViewhelper('Delegator', { object: plugin }) %}
 {% set b = view.getViewhelper('Breadcrumb', { singleton: true }) %}
 
+{% set icons = view.getViewhelper('Ext/HerrUndFrauPixelExt/Icons/Icons', { createDummyOnFail: true  }) %}
+
 {{ b.addSection(contact.getName()) }}
 
-<div class="row">
-    <div class="col-12 plugin Core HelpAndSupport ContactPersons ShowContact01">
-        <div class="inner-wrapper">
+<param name="cloak" value="1" />
 
-            {% if plugin.isFirst %}
-                <h1>{{ contact.getName() }}</h1>
-            {% else %}
-                <h2>{{ contact.getName() }}</h2>
-            {% endif %}
+{{ view.set('hideGlobalBlocks', true) }}
+{{ view.set({ pagedata: { title: contact.getName() } }) }}
 
-            <p class="backlink"><a href="{{ page.getUri() }}">zurück</a></p>
+<div class="plugin Core HelpAndSupport ContactPersons ShowContact01">
 
-            <div class="row">
-                <div class="col-md-4">
-                    <picture  data-editable data-uid="{{ contact.getUid('image')}}">
-                        <img class="round" width="400" height="400" src="{{ i.getDummyImage({ width: 400, height: 400 }) }}" alt="" />
-                    </picture>
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+
+                <div class="inner-wrapper">
+
+                    <h2 class="first main-title" data-editable data-uid="{{ contact.getUid('title-contact-page') }}">{{ contact.getName() }}</h2>
+
+                    {% if not variables.skipBackButton %}
+                        <p class="backlink"><a href="{{ page.getUri() }}">zurück</a></p>
+                    {% endif %}
+
+                    <div class="row">
+                        <div class="col-md-3">
+                            <picture  data-editable data-uid="{{ contact.getUid('image')}}">
+                                <img class="round" width="400" height="400" src="{{ i.getDummyImage({ width: 400, height: 400 }) }}" alt="" />
+                            </picture>
+                        </div>
+                        <div class="col-md-8">
+
+                            {% if contact.getPosition() %}
+                                <p><b>{{ contact.getPosition() }}</b></p>
+                            {% endif %}
+
+                            <div data-nowidgets data-editable data-uid="{{ contact.getUid('text') }}"></div>
+
+                            <p class="contact-links">
+                                {% if contact.getEmail() %}
+                                    <a href="mailto:{{ contact.getEmail() }}">{{ contact.getEmail() }}</a><br />
+                                {% endif %}
+
+                                {% if contact.getPhone() %}
+                                    <a href="tel:{{ contact.getPhone() }}">Tel. {{ contact.getPhone() }}</a><br />
+                                {% endif %}
+                            </p>
+
+                        </div>
+                    </div>
+
                 </div>
-                <div class="col-md-8">
 
-
-
-                </div>
             </div>
-            {{ contact }}
-
         </div>
     </div>
+
 </div>

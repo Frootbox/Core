@@ -47,4 +47,12 @@ class ResponseJson extends Response
     {
         return $this->data;
     }
+
+    /**
+     *
+     */
+    public function setData(array $data): void
+    {
+        $this->data = $data;
+    }
 }

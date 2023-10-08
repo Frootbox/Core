@@ -11,6 +11,7 @@ class References extends \Frootbox\View\Viewhelper\AbstractViewhelper
         'getReferences' => [
             [ 'name' => 'limit', 'default' => 10 ],
             [ 'name' => 'order', 'default' => 'orderId DESC' ],
+            [ 'name' => 'parameters', 'default' => [] ],
         ],
         'getReferencesByTags' => [
             'tags',
@@ -28,16 +29,24 @@ class References extends \Frootbox\View\Viewhelper\AbstractViewhelper
     public function getReferencesAction(
         $limit,
         $order,
+        array $parameters = null,
         \Frootbox\Ext\Core\Images\Plugins\References\Persistence\Repositories\References $referencesRepository
     ): \Frootbox\Db\Result
     {
+        $where = [
+            new \Frootbox\Db\Conditions\GreaterOrEqual('visibility',(IS_EDITOR ? 1 : 2)),
+        ];
+
+        if (!empty($parameters['pluginId'])) {
+            $where['pluginId'] = $parameters['pluginId'];
+        }
+
+
         // Fetch references
         $result = $referencesRepository->fetch([
             'limit' => $limit,
             'order' => [ $order ],
-            'where' => [
-                new \Frootbox\Db\Conditions\GreaterOrEqual('visibility',(IS_EDITOR ? 1 : 2)),
-            ],
+            'where' => $where,
         ]);
 
         return $result;

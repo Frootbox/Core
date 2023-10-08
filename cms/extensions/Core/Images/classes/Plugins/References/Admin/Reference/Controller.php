@@ -6,6 +6,7 @@
 namespace Frootbox\Ext\Core\Images\Plugins\References\Admin\Reference;
 
 use Frootbox\Admin\Controller\Response;
+use Frootbox\Http\Interfaces\ResponseInterface;
 
 class Controller extends \Frootbox\Admin\AbstractPluginController
 {
@@ -178,6 +179,23 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         ]);
     }
 
+    public function ajaxSearchAction(
+        \Frootbox\Http\Post $post,
+        \Frootbox\Admin\Viewhelper\GeneralPurpose $gp,
+    ):Response
+    {
+        return self::getResponse('json', 200, [
+            'replace' => [
+                'selector' => '#referencesReceiver',
+                'html' => $gp->injectPartial(\Frootbox\Ext\Core\Images\Plugins\References\Admin\Reference\Partials\ListReferences::class, [
+                    'plugin' => $this->plugin,
+                    'keyword' => $post->get('keyword'),
+                ]),
+            ],
+            'success' => 'Die Suche wurde ausgeführt.',
+        ]);
+    }
+
     /**
      *
      */
@@ -219,6 +237,7 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
 
         $reference->setTitle($title);
         $reference->setDateStart($post->get('dateStart') . ' ' . $post->get('dateStartTime'));
+        $reference->setLocationId($post->get('locationId'));
 
         $reference->unsetConfig('titles');
         $reference->addConfig([

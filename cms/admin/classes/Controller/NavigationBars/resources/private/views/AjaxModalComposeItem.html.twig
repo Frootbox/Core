@@ -20,7 +20,7 @@
                 {% for title,section in sections %}
                     <optgroup label="{{ title }}">
                         {% for type in section %}
-                            <option {% if type.title == "CMS-Seite" %}selected{% endif %} value="{{ type.className }}">{{ type.title }}</option>
+                            <option {% if type.title == "Seite" %}selected{% endif %} value="{{ type.className }}">{{ type.title }}</option>
                         {% endfor %}
                     </optgroup>
                 {% endfor %}

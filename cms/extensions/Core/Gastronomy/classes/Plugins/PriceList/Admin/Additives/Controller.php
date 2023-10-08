@@ -29,10 +29,13 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     {
         // Insert new additive
         $additive = $additivesRepository->insert(new \Frootbox\Ext\Core\Gastronomy\Plugins\PriceList\Persistence\Additive([
-            'orderId' => $post->get('orderId'),
+            // 'orderId' => $post->get('orderId'),
             'title' => $post->get('title'),
             'pageId' => $this->plugin->getPageId(),
-            'pluginId' => $this->plugin->getId()
+            'pluginId' => $this->plugin->getId(),
+            'config' => [
+                'symbol' => $post->get('orderId'),
+            ],
         ]));
 
         return self::getResponse('json', 200, [
@@ -80,14 +83,16 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         \Frootbox\Http\Get $get,
         \Frootbox\Http\Post $post,
         \Frootbox\Admin\Viewhelper\GeneralPurpose $gp,
-        \Frootbox\Ext\Core\Gastronomy\Plugins\PriceList\Persistence\Repositories\Additives $additivesRepository
+        \Frootbox\Ext\Core\Gastronomy\Plugins\PriceList\Persistence\Repositories\Additives $additivesRepository,
     ): Response
     {
         // Fetch additive
         $additive = $additivesRepository->fetchById($get->get('additiveId'));
 
         // Update additive
-        $additive->setOrderId($post->get('orderId'));
+        $additive->addConfig([
+            'symbol' => $post->get('symbol'),
+        ]);
         $additive->setTitle($post->get('title'));
         $additive->save();
 

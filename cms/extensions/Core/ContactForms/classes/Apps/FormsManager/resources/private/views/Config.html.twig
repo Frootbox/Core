@@ -17,6 +17,19 @@
     </li>
 </ul>
 
+<script>
+    $(function() {
+
+        $('#feedback').change(function() {
+
+            $('.feedback-option.form-group').hide();
+            $('.feedback-option.form-group[data-feedback="' + $(this).val() + '"]').show();
+        });
+
+        $('#feedback').trigger('change');
+    });
+</script>
+
 <div class="tab-content" id="myTabContent">
     <div class="tab-pane fade show active" id="info" role="tabpanel" aria-labelledby="info-tab">
 
@@ -40,12 +53,25 @@
                                 <input type="text" class="form-control" name="title" id="title" placeholder="Titel" value="{{ form.getTitle() }}">
                             </div>
                             <div class="form-group">
+                                <label for="categoryId">Kategorie</label>
+                                <select class="form-control" name="categoryId" id="categoryId">
+                                    <option value="">bitte wählen ...</option>
+                                    {% for category in categories %}
+                                        <option {% if category.getId() == form.getParentId() or form.getParentId() == 0 and category.getParentId() == 0 %}selected{% endif %} value="{{ category.getId() }}">{{ category.getTitle() }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
                                 <label for="feedback">Feedback</label>
                                 <select class="form-control" name="feedback" id="feedback">
                                     <option value="">bitte wählen ...</option>
                                     <option {% if form.getConfig('feedback') == "Popup" or form.getConfig('feedback') == "" %}selected{% endif %} value="Popup">Popup</option>
-                                    <option {% if form.getConfig('feedback') == "Page" %}selected{% endif %} value="Page">Unterseite</option>
+                                    <option {% if form.getConfig('feedback') == "Callback" %}selected{% endif %} value="Callback">Callback</option>
                                 </select>
+                            </div>
+                            <div class="feedback-option form-group" data-feedback="Callback">
+                                <label for="callback">Callback</label>
+                                <input type="text" class="form-control" name="callback" id="callback" placeholder="Callback" value="{{ form.getConfig('callback') }}">
                             </div>
 
                             <h3>E-Mail an den Betreiber</h3>
@@ -108,6 +134,20 @@
                                     <img style="margin-top: 20px; max-width: 150px;" src="{{ app.getAssetUri('images/text-below.svg') }}" alt="" />
                                 </div>
                             </div>
+
+                            {{ v.injectPartial('Frootbox/Ext/Core/FileManager/Editor/Partials/FileUpload', {
+                                label: 'automatischer Anhang',
+                                multiple: true,
+                                uid: form.getUid('autoAttachments'),
+                                helpText: 'Diese Dateien werden der autoamtischen Rückanwort an den Besucher als Anhang beigefügt.'
+                            }) | raw }}
+
+
+                            {{ v.injectPartial('Frootbox/Ext/Core/FileManager/Editor/Partials/FileManager', {
+                                uid: form.getUid('autoAttachments')
+                            }) | raw }}
+
+
 
                         </div>
                     </div>

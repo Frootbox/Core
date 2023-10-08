@@ -20,7 +20,7 @@
 					<td class="handle"><i class="fa fa-grip-lines"></i></td>
 					<td class="text-right">
 						<a class="ajax" href="{{ v.getStaticUri('Core/Addresses/AssetManager', 'ajaxSwitchVisibility', { addressId: address.getId() }) }}"><i data-asset="{{ address.getId() }}" class="fa fa-lightbulb visibility {{ address.getVisibilityString() }} icon"></i></a>
-						<a class="ajax" data-confirm="Soll diese Adresse wirklich gelöscht werden?" href="{{ v.getStaticUri('Core/Addresses/AssetManager', 'ajaxDelete', { addressId: address.getId() }) }}"><i class="fa fa-times icon"></i></a>
+						<a class="ajax" data-confirm="Soll diese Adresse wirklich gelöscht werden?" href="{{ v.getStaticUri('Core/Addresses/AssetManager', 'ajaxDelete', { addressId: address.getId(), repository: data.repository }) }}"><i class="far fa-trash icon"></i></a>
 					</td>
 				</tr>
 			{% endfor %}

@@ -145,7 +145,8 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
             $files[] = 'resources/public/favicon/mstile-150x150.png';
             $files[] = 'resources/public/favicon/safari-pinned-tab.svg';
             $files[] = 'resources/public/favicon/site.webmanifest.twig';
-            $files[] = 'resources/public/images/';
+            $files[] = 'resources/public/images/logo.svg';
+            $files[] = 'resources/public/images/logo-klima.svg';
         }
 
         $path = $this->getPath() . 'resources/private/templates/Extension/';
@@ -292,8 +293,12 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
     {
         // Fetch available extensions
         $result = $extensions->fetch([
+            'where' => [
+                'isactive' => 1,
+            ],
             'order' => [ 'vendorId', 'extensionId' ]
         ]);
+
         $view->set('extensions', $result);
 
         // Set configuration

@@ -1,0 +1,40 @@
+.plugin.Core.News.News.Index10 {
+
+  .teasers {
+    margin-bottom: -50px;
+
+    .teaser {
+      margin-bottom: 50px;
+      padding: 0 0 50px 0;
+      border-bottom: 2px solid $colorSpot2;
+
+      &:last-of-type {
+        border: none;
+        padding-bottom: 0;
+      }
+
+      img {
+        margin-bottom: 30px;
+
+        @media (min-width: 768px) {
+          margin-bottom: 0px;
+        }
+      }
+
+      p.read-more {
+        margin-top: 30px;
+
+        @media (min-width: 768px) {
+          margin-top: 0px;
+        }
+      }
+
+      div[data-editable] {
+        p:last-child {
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+
+}

@@ -74,13 +74,13 @@ variables:
 
                         <div class="category">
 
-                            <h3 data-editable data-uid="{{ category.getUid('title') }}">{{ category.getTitle() }}</h3>
+                            <h2 data-editable data-uid="{{ category.getUid('title') }}">{{ category.getTitle() }}</h2>
 
                             <div class="row">
 
                                 {% for product in categoryDelegator.getProducts() %}
 
-                                    {{ p.renderPartial('/Frootbox/Ext/Core/ShopSystem/Plugins/ShopSystem/ProductTeaser', { product: product, i: i, colClass: colClass }) | raw }}
+                                    {{ p.renderPartial('/Frootbox/Ext/Core/ShopSystem/Plugins/ShopSystem/ProductTeaser', { product: product, i: i, colClass: colClass, category: category }) | raw }}
 
 
                                     {#
@@ -144,6 +144,8 @@ variables:
 
 
             {% endif %}
+
+            <div data-editable data-uid="{{ plugin.getUid('index-bottom') }}"></div>
 
         </div>
     </div>

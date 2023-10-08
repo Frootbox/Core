@@ -57,12 +57,12 @@ variables:
 
 {{ b.addSection(product.getTitle(), product.getUri()) }}
 
-{{ view.set({ pagedata: { canonical: product.getUri({ absolute: true }) } }) }}
 
 {{ view.set({ pagedata: { title: product.getTitle() } }) }}
 
 {{ view.set({ pagedata: { ogTitle: product.getTitle() } }) }}
 {{ view.set({ pagedata: { ogDescription: text.getTextByUid(product.getUid('teaser')).getText() } }) }}
+{{ view.set({ pagedata: { canonical: product.getUri({ absolute: true }) } }) }}
 
 {% set image = product.getFileByUid('image') %}
 
@@ -107,10 +107,21 @@ variables:
                     <div class="row">
                         <div class="col-md-6">
                             <div class="price-container">
-                                <span class="price-tag">{{ product.getPriceGross() | number_format(2, ',', '.') }} EUR</span>
+                                <span class="price-tag">
+                                    {{ product.getPriceGross() | number_format(2, ',', '.') }} EUR
+
+                                    {% if product.getConfig('freeChoiceOfAmount') %}
+                                        pro {{ ("Core.ShopSystem.Plugins.ShopSystem.UnitShort" ~ product.getPackagingUnit()) | translate }}
+                                    {% endif %}
+                                </span>
                                 <span class="price-meta">
                                     inkl. Mehrwertsteuer<br />
-                                    zzgl. Versandkosten<br />
+
+                                    {% if product.getShippingId() %}
+                                        zzgl. Versandkosten<br />
+                                    {% else %}
+                                        inkl. Versandkosten<br />
+                                    {% endif %}
 
                                     {% if 'ShippingState' ~ product.getShippingState() != t.translate('ShippingState' ~ product.getShippingState()) %}
                                         {{ t.translate('ShippingState' ~ product.getShippingState()) }}
@@ -147,7 +158,7 @@ variables:
                                     $('.product-options').change(function ( event ) {
 
                                         $.ajax({
-                                            url: "{{ plugin.getUriAjax('getOptionsInStock') | raw }}",
+                                            url: "{{ plugin.getUriAjax('getOptionsInStock', { productId: product.getId() }) | raw }}",
                                             data: {
                                                 optionId: $(this).val(),
                                                 xdata: $('form.shopsystem-product-add-to-cart').serialize(),
@@ -311,7 +322,10 @@ variables:
 
                     {% if variables.showLowerBasketButton %}
 
+                        {#
                         xx{{ product.getConfig('directLink') }}xxx
+                        #}
+
 
                         {% if basketPlugin %}
                             <a class="btn btn-block btn-primary shopsystem-product-add-to-cart" href="{{ sp.getUri('Core/ShopSystem/Basket', 'addProduct', { productId: product.getId() }) }}">in den Warenkorb legen</a>

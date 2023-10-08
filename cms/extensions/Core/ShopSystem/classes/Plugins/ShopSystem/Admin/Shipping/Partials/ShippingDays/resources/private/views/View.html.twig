@@ -1,0 +1,110 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+{% set t = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\Translator') %}
+
+<style>
+
+    table.month td, table.month th {
+
+        text-align: center;
+    }
+
+    table.month td {
+        padding: 0;
+    }
+
+    table.month td a {
+        display: block;
+        margin: 0 1px 0 0;
+        padding: 30px 0;
+        color: #333;
+
+        transition: background 1s;
+    }
+
+    table.month td a.active {
+        background: #e1fbc5;
+    }
+
+    table.month td a.blocked {
+        background: #e06c75 !important;
+    }
+
+    table.month td a:hover {
+        text-decoration: none;
+    }
+
+    table.month td.today a {
+        font-weight: bold;
+        background: #fbd0c5;
+        background: #a8db71;
+    }
+
+    table.month td.past a {
+        background: none;
+    }
+
+    table.month td.soft {
+        color: #CCC;
+        vertical-align: middle;
+    }
+</style>
+
+<div class="row align-items-center">
+    <div class="col-md-4">
+        <a class="btn btn-primary ajax" href="{{ plugin.getAdminUri('Shipping', 'days', { date: monthPrev.format('Y-m-d') }) }}">weiter</a>
+    </div>
+    <div class="col-md-4 text-center">
+        <h3>{{ t.translate("Core.ShopSystem.Month" ~ (date | date('m'))) }} {{ date | date('Y') }}</h3>
+    </div>
+    <div class="col-md-4 text-right">
+        <a class="btn btn-primary ajax" href="{{ plugin.getAdminUri('Shipping', 'days', { date: monthNext.format('Y-m-d') }) }}">weiter</a>
+    </div>
+</div>
+
+<script>
+    $(function() {
+
+        /**
+         *
+         */
+        $(document).on('click', 'a.ssday-num', function(event) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            $(this).toggleClass('blocked');
+
+        });
+    });
+</script>
+
+<table class="table month">
+    <thead>
+    <tr>
+        <th width="60"></th>
+        <th class="day-title">Mo</th>
+        <th class="day-title">Di</th>
+        <th class="day-title">Mi</th>
+        <th class="day-title">Do</th>
+        <th class="day-title">Fr</th>
+        <th class="day-title">Sa</th>
+        <th class="day-title">So</th>
+    </tr>
+    </thead>
+    <tbody>
+
+    {% for week in weeks %}
+        <tr>
+            <td class="week-nr soft" >{{ week.nr }}</td>
+            {% for day in week.days %}
+                <td class="day {% if day.today %}today{% elseif day.past %}past{% endif %}"  data-title="Ereignis erstellen" data-size="xl" data-modal="{{ controller.getUri('Calendar/Event', 'ajaxModalCompose', { date: day.date | date('Y-m-d'), onCreate: 'reload' }) }}">
+                    <a data-date="{{ day.date | date('Y-m-d') }}" href="{{ plugin.getAdminUri('Shipping', 'ajaxToggleDay', { date: day.date | date('Y-m-d') }) }}" class="ajax day-num {% if day.isRegular %}active{% endif %} {% if day.isBlocked %}blocked{% endif %}">
+                        {{ day.date | date('d') }}
+                    </a>
+                </td>
+            {% endfor %}
+        </tr>
+    {% endfor %}
+
+    </tbody>
+</table>

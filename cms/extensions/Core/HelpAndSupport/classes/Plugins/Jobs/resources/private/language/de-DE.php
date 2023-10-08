@@ -21,5 +21,6 @@ return [
     'TypeParttime' => 'Teilzeit',
     'TypeFulltimeOrParttime' => 'Vollzeit oder Teilzeit',
     'TypeApprentice' => 'Ausbildung',
+    'TypeDualStudy' => 'Duales Studium',
 
 ];

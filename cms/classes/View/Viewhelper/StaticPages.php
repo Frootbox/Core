@@ -35,6 +35,7 @@ class StaticPages extends AbstractViewhelper
 
         $uri = 'static/Ext/' . $classData[0] . '/' . $classData[1] . '/' . $classData[2] . '/' . $action;
 
+
         // Inject payload into uri
         if (!empty($payloadData)) {
 

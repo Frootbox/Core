@@ -8,6 +8,7 @@ namespace Frootbox\Admin\Controller\Page;
 
 use DI\Container;
 use Frootbox\Admin\Controller\Response;
+use Frootbox\CacheControl;
 use Frootbox\Db\Db;
 
 /**
@@ -316,6 +317,7 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
                 $container->call([ $plugin, 'onBeforeDelete' ]);
             }
 
+
             // Delete plugin
             $plugin->delete();
         }
@@ -471,6 +473,9 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
             'seo' => [
                 'preventIndexing' => $post->get('preventIndexing'),
             ],
+            'search' => [
+                'preventIndexing' => $post->get('searchPreventIndexing'),
+            ],
             'aliasForced' => $post->get('aliasForced'),
         ]);
 
@@ -498,8 +503,9 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
     public function ajaxUpdateAdditionalConfig(
         \Frootbox\Http\Post $post,
         \Frootbox\Http\Get $get,
-        \Frootbox\Persistence\Repositories\Pages $pages
-    )
+        \Frootbox\CacheControl $cacheControl,
+        \Frootbox\Persistence\Repositories\Pages $pages,
+    ): Response
     {
         // Fetch page
         $page = $pages->fetchById($get->get('pageId'));
@@ -530,6 +536,9 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
                 $child->save();
             }
         }
+
+        // Dismiss cache
+        $cacheControl->clear();
 
         return self::getResponse('json', 200, [ ]);
     }

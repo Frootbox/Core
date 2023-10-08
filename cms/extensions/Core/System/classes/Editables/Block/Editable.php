@@ -8,7 +8,7 @@ namespace Frootbox\Ext\Core\System\Editables\Block;
 class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\System\Editables\EditableInterface
 {
     /**
-     *
+     * @return string
      */
     public function getPath(): string
     {
@@ -40,7 +40,7 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
 
             $elementHtml = (string) $element;
 
-            $element->setInnerHtml('<div data-blocks data-restrict="' . $element->getAttribute('data-restrict') . '" data-uid="' . $uid . '">' . $editorHtml . PHP_EOL . '<div class="blocks-content">' . $elementHtml . '</div></div>');
+            $element->setInnerHtml('<div data-blocks data-ignore="' . $element->getAttribute('data-ignore') . '" data-restrict="' . $element->getAttribute('data-restrict') . '" data-uid="' . $uid . '">' . $editorHtml . PHP_EOL . '<div class="blocks-content">' . $elementHtml . '</div></div>');
         });
 
         return $crawler->saveHTML();
@@ -63,6 +63,8 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
         $loops = [];
 
         $crawler->filter('[data-blocks][data-uid]')->each(function ($element) use ($blocks, $config, $container, &$loops) {
+
+            $loop = 0;
 
             $uid = $element->getAttribute('data-uid');
 
@@ -87,6 +89,8 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
             $wasCalledFirst = false;
 
             foreach ($result as $block) {
+
+                ++$loop;
 
                 if (!defined('EDITING')) {
                     if (!empty($block->getConfig('skipLanguages.' . GLOBAL_LANGUAGE))) {
@@ -113,6 +117,10 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
                 ]);
 
                 $wasCalledFirst = $block->getWasCalledFirst();
+
+                if (defined('EDITING')) {
+                    $html .= '<p style="margin: 15px 0; text-align: center;"><a data-predecessor="' . $block->getId() . '" data-uid="' . $uid . '" class="block-compose" style="display: inline-block; padding: 2px 7px; color: #FFF; background: #CCC; border-radius: 4px; font-size: 12px;" href=""><i class="far fa-plus"></i> Block hier hinzufügen</a></p>';
+                }
             }
 
             $element->setInnerHtml($html);

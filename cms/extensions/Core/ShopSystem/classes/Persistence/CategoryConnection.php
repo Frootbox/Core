@@ -69,6 +69,7 @@ class CategoryConnection extends \Frootbox\Persistence\CategoryConnection implem
             'pageId' => $product->getPageId(),
             'virtualDirectory' => $virtualDirectory,
             'visibility' => 2,
+            'uid' => $product->getUid('alias-category-' . $category->getId()),
             'payload' => $this->generateAliasPayload([
                 'action' => 'showProduct',
                 'productId' => $product->getId(),
@@ -133,6 +134,7 @@ class CategoryConnection extends \Frootbox\Persistence\CategoryConnection implem
                         'productId' => $product->getId(),
                         'categoryId' => $category->getId(),
                     ]),
+                    'uid' => $product->getUid('alias-category-' . $category->getId()),
                 ]);
             }
 
@@ -163,6 +165,7 @@ class CategoryConnection extends \Frootbox\Persistence\CategoryConnection implem
                         'productId' => $product->getId(),
                         'categoryId' => $category->getId(),
                     ]),
+                    'uid' => $product->getUid('alias-category-' . $category->getId()),
                 ]) ],
             ];
         }

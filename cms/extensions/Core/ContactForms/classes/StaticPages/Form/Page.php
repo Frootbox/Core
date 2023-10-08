@@ -8,7 +8,7 @@ namespace Frootbox\Ext\Core\ContactForms\StaticPages\Form;
 class Page extends \Frootbox\AbstractStaticPage
 {
     /**
-     * 
+     * @return string
      */
     public function getPath(): string
     {
@@ -124,6 +124,8 @@ class Page extends \Frootbox\AbstractStaticPage
         \Frootbox\Ext\Core\ContactForms\Persistence\Repositories\Forms $formsRepository,
     ): \Frootbox\View\ResponseJson
     {
+        $xparams = $post->get('_xparams') ?? [];
+
         // Fetch form
         $form = $formsRepository->fetchById($get->get('formId'));
 
@@ -160,8 +162,10 @@ class Page extends \Frootbox\AbstractStaticPage
         ];
 
         $backmail = null;
+        $backmailFallback = null;
         $recipients = [];
         $attachments = [];
+        $autoAttachments = [];
 
         foreach ($groups as $group) {
 
@@ -189,6 +193,20 @@ class Page extends \Frootbox\AbstractStaticPage
                 }
 
                 $value = $field->getValue();
+
+                if ($field->getType() == 'Checkbox' and !empty($field->getValue())) {
+
+                    // Add auto attachments
+                    $autoAttachmentsFromField = $files->fetch([
+                        'where' => [
+                            'uid' => $field->getUid('autoAttachments'),
+                        ],
+                    ]);
+
+                    foreach ($autoAttachmentsFromField as $file) {
+                        $autoAttachments[] = $file;
+                    }
+                }
 
                 if ($field->getType() == 'Channel' and !empty($value)) {
 
@@ -232,9 +250,18 @@ class Page extends \Frootbox\AbstractStaticPage
                     $field->setFiles($value);
                 }
 
+                $fieldType = $field->getType();
+
+                if ($field instanceof \Frootbox\Ext\Core\ContactForms\Persistence\Fields\Text\Field and !empty($field->getConfig('captureAutoBackmail'))) {
+                    if (filter_var($field->getValue(), FILTER_VALIDATE_EMAIL)) {
+                        $backmailFallback = $field->getValue();
+                        $fieldType = 'Email';
+                    }
+                }
+
                 $groupData['fields'][] = [
                     'fieldId' => $field->getId(),
-                    'type' => $field->getType(),
+                    'type' => $fieldType,
                     'className' => get_class($field),
                     'title' => $field->getTitle(),
                     'value' => $value,
@@ -252,7 +279,6 @@ class Page extends \Frootbox\AbstractStaticPage
 
             $logData['formData'][] = $groupData;
         }
-
 
         // Merge dedicated recipients with channel recipients
         if (!empty($form->getConfig('recipients'))) {
@@ -283,14 +309,7 @@ class Page extends \Frootbox\AbstractStaticPage
                 $subject = $form->getConfig('modSubject');
             }
             elseif (!empty($form->getTitle())) {
-
                 $subject = 'Anfrage: ' . $form->getTitle();
-
-                /*
-                if ($page->getTitle() != $this->getTitle()) {
-                    $subject .= '/' . $page->getTitle();
-                }
-                */
             }
             else {
                 $subject = 'Kontaktanfrage über Ihre Website';
@@ -306,6 +325,22 @@ class Page extends \Frootbox\AbstractStaticPage
                 $mail->addAttachment($attachment);
             }
 
+            // Add auto attachments
+            $autoAttachmentsFromForm = $files->fetch([
+                'where' => [
+                    'uid' => $form->getUid('autoAttachments'),
+                ],
+            ]);
+
+            foreach ($autoAttachmentsFromForm as $file) {
+                $autoAttachments[] = $file;
+            }
+
+            foreach ($autoAttachments as $file) {
+                $attachment = new \Frootbox\Mail\Attachment(FILES_DIR . $file->getPath(), $file->getName());
+                $mail->addAttachment($attachment);
+            }
+
             // Send mails
             if ($backmail !== null) {
                 $mail->setReplyTo($backmail);
@@ -318,6 +353,10 @@ class Page extends \Frootbox\AbstractStaticPage
 
                 $mailTransport->send($mail);
             }
+        }
+
+        if ($backmail === null and $backmailFallback !== null) {
+            $backmail = $backmailFallback;
         }
 
         // Prepare customers mail
@@ -352,7 +391,9 @@ class Page extends \Frootbox\AbstractStaticPage
             $mail->clearTo();
             $mail->addTo($backmail);
 
-            $mailTransport->send($mail);
+            $mailTransport->send($mail, [
+                'inlineImages' => true,
+            ]);
         }
 
         $payload = [];
@@ -361,13 +402,20 @@ class Page extends \Frootbox\AbstractStaticPage
             $tempfile->delete();
         }
 
-        if (empty($form->getConfig('feedback')) or $form->getConfig('feedback') == 'Page') {
+        if (!empty($xparams['redirect'])) {
+            $payload['redirect'] = $xparams['redirect'];
+        }
+        elseif (empty($form->getConfig('feedback')) or $form->getConfig('feedback') == 'Page') {
 
             if (!empty($get->get('pluginId'))) {
 
                 $plugin = $contentElements->fetchById($get->get('pluginId'));
                 $payload['redirect'] = $plugin->getActionUri('complete');
             }
+        }
+
+        if ($form->getConfig('feedback') == 'Callback' and !empty($form->getConfig('callback'))) {
+            $payload['callback'] = $form->getConfig('callback');
         }
 
         return new \Frootbox\View\ResponseJson($payload);

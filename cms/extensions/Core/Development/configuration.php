@@ -27,6 +27,7 @@ return [
             [ \Frootbox\Ext\Core\Development\Apps\PageManager\App::class, 'Frootbox/Ext/Core/Development' ],
             [ \Frootbox\Ext\Core\Development\Apps\Api\App::class, 'Frootbox/Ext/Core/Development' ],
             [ \Frootbox\Ext\Core\Development\Apps\Plugins\App::class, 'Frootbox/Ext/Core/Development' ],
+            [ \Frootbox\Ext\Core\Development\Apps\ExtensionCloner\App::class, 'Frootbox/Ext/Core/Development' ],
         ],
     ],
 ];

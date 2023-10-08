@@ -130,7 +130,7 @@
 {% set random = random(1000, 9999) %}
 
 <div class="form-group">
-    <label for="fileInput{{ random }}">Datei hinzufügen</label>
+    <label for="fileInput{{ random }}">{{ data.label | default("Datei hinzufügen") }}</label>
     <input aria-describedby="uploadHelp" data-upload="{{ serverpath }}static/Ext/Core/FileManager/Editor/upload?uid={{ data.uid }}&multiple={% if data.multiple %}1{% endif %}" {% if data.multiple %}multiple{% endif %} type="file" id="fileInput{{ random }}" class="form-control" />
 
     <small id="uploadHelp" class="form-text text-muted">

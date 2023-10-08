@@ -33,7 +33,8 @@
         {% if v.isExtensionInstalled('Core', 'Addresses') %}
             {{ v.injectPartial('\\Frootbox\\Ext\\Core\\Addresses\\Admin\\Partials\\Input\\Select', {
                 className: 'Frootbox\\Ext\\Core\\Events\\Persistence\\Venue',
-                pluginId: get.get('pluginId')
+                pluginId: get.get('pluginId'),
+                locationId: clone.getParentId()
             }) | raw }}
         {% endif %}
 

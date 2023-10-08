@@ -1,5 +1,8 @@
-body {
+html body {
   font-family: $fontDefault;
+  color: $fontBaseColor;
+  font-size: $fontBaseSize;
+  line-height: $fontBaseLineHeight;
 
   h1, h2, h3, h4 {
     clear: both;
@@ -65,10 +68,44 @@ body {
     color: $colorSpot1;
   }
 
+  ul {
+    margin: 30px 0;
+    padding: 0;
+
+    li {
+      left: 20px;
+    }
+  }
+
   .btn {
     &.btn-primary {
       background: $colorSpot1;
       border-color: $colorSpot1;
+    }
+  }
+
+  .spot-back {
+
+    &.spot-1 {
+      background: $colorSpot1;
+    }
+
+    &.spot-2 {
+      background: $colorSpot2;
+    }
+
+    color: #FFF;
+
+    h1, h2, h3, h4 {
+      color: #FFF;
+    }
+
+    .btn {
+      &.btn-primary {
+        color: #FFF;
+        background: transparent;
+        border-color: #FFF;
+      }
     }
   }
 
@@ -77,11 +114,6 @@ body {
   }
 
   div[data-blocks] {
-
-    .EditableBlock:last-of-type {
-      margin-bottom: 0;
-    }
-
     p:last-child, ul:last-child {
       margin-bottom: 0;
     }
@@ -94,28 +126,5 @@ body {
   .plugin, .EditableBlock {
     margin-top: var(--element-space);
     margin-bottom: var(--element-space);
-  }
-
-  .top-blocks {
-
-    .EditableBlock:first-of-type {
-      margin-top: 0;
-    }
-
-    .EditableBlock:last-of-type {
-      margin-bottom: 0;
-    }
-  }
-
-  .bottom-blocks {
-    .EditableBlock:first-of-type {
-      margin-top: 0;
-    }
-  }
-
-  .emotional {
-    .plugin {
-      margin-top: 0;
-    }
   }
 }

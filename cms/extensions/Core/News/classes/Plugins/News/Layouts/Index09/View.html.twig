@@ -1,0 +1,42 @@
+{# config
+
+title: Presseartikel
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+{% set years = i.getArticlesByYear({ limit: 2024 }) %}
+
+<div class="plugin Core News News Index09">
+
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+
+                <h2 class="main-title first" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+
+                <div data-editable data-uid="{{ plugin.getUid('teaser-text') }}"></div>
+
+                {% for year in years %}
+                    <h3>{{ year.year}}</h3>
+
+                    <table class="table">
+                        <tbody>
+                            {% for article in year.articles %}
+                                <tr>
+                                    <td width="140">{{ article.getDateStart | date("d.m.Y") }}</td>
+                                    <td>
+                                        <a class="show-article" href="{{ article.getUri() }}">{{ article.getTitle }}</a>
+                                        {% if article.getConfig('source') %}<br />{{ article.getConfig('source') }}{% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% endfor %}
+
+            </div>
+        </div>
+    </div>
+</div>

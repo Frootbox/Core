@@ -32,8 +32,15 @@
 
                     <div class="form-group form-check">
                         <input {% if plugin.getConfig('noReferencesDetailPage') %}checked{% endif %} type="checkbox" class="form-check-input" id="noReferencesDetailPage" name="noReferencesDetailPage">
-                        <label class="form-check-label" for="noReferencesDetailPage">keine Detailseite für Referenzen</label>
+                        <label class="form-check-label" for="noReferencesDetailPage">Keine Detailseite für Referenzen</label>
                     </div>
+
+                    {#
+                    <div class="form-group form-check">
+                        <input {% if plugin.getConfig('dedicatedLocationPerReference') %}checked{% endif %} type="checkbox" class="form-check-input" id="dedicatedLocationPerReference" name="dedicatedLocationPerReference">
+                        <label class="form-check-label" for="dedicatedLocationPerReference">Eigener Standort pro Referenz</label>
+                    </div>
+                    #}
 
                     {% if v.isExtensionInstalled('Core', 'ContactForms') %}
                         <div class="form-group">

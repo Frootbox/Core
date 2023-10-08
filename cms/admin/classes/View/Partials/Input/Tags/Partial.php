@@ -62,6 +62,17 @@ class Partial extends \Frootbox\Admin\View\Partials\AbstractPartial
             $availableTags[$tag->getTag()] = $tag->getTag();
         }
 
+        if ($this->hasData('presetFromConfig')) {
+            $configPath = $this->getData('presetFromConfig');
+
+            if (!empty($config->get($configPath))) {                
+                $view->set('availableTags', $config->get($configPath)->getData());
+                return;
+            }
+        }
+
+
+
         $view->set('availableTags', $availableTags);
     }
 }

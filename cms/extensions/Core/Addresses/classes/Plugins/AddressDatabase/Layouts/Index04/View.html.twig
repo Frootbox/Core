@@ -1,0 +1,60 @@
+{# config
+
+title: Standard
+variables:
+    columns:
+        type: int
+        label: Spalten
+        default: 3
+    skipHeadline:
+        type: bool
+        label: ohne Überschrift
+
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+
+{% if variables.columns == 1 %}
+    {% set colClass = "col-12" %}
+{% elseif variables.columns == 2 %}
+    {% set colClass = "col-md-6" %}
+{% elseif variables.columns == 3 %}
+    {% set colClass = "col-md-4" %}
+{% elseif variables.columns >= 4 %}
+    {% set colClass = "col-md-3" %}
+{% endif %}
+
+<div class="plugin Core Addresses AddressDatabase Index04">
+
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+
+                {% if not variables.skipHeadline %}
+                    <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+                {% endif %}
+
+                <div data-editable data-uid="{{ plugin.getUid('teaser') }}"></div>
+
+
+                {% set letters = i.getAddressesByLetter() %}
+
+
+                {% for letter, addresses in letters %}
+                    <h3 class="letter">{{ letter }}</h3>
+
+                    <ul>
+                        {% for address in addresses %}
+                            <li><a href="{{ address.getUri() }}">{{ address.getTitle() }}</a></li>
+                        {% endfor %}
+                    </ul>
+
+                {% endfor %}
+
+            </div>
+        </div>
+    </div>
+
+</div>

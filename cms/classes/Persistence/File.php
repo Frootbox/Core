@@ -155,7 +155,7 @@ class File extends AbstractRow
     }
 
     /**
-     *
+     * @return string
      */
     public function getNameClean(): string
     {
@@ -163,15 +163,31 @@ class File extends AbstractRow
         $ext = strtolower(array_pop($name));
 
         $name = $this->getName();
-        $name .= '.pdf';
 
         if (substr($name, strlen($ext) * -1) == $ext) {
             $name = substr($name, 0, (strlen($ext) + 1) * -1);
         }
 
+        $name = str_replace('_', '-', $name);
         $name = $this->getStringUrlSanitized($name) . '.' . $ext;
 
         return $name;
+    }
+
+    /**
+     *
+     */
+    public function getRotation(): ?int
+    {
+        if (!empty($this->getConfig('rotation'))) {
+            return (int) $this->getConfig('rotation');
+        }
+
+        if (!empty($this->getConfig('suggestRotation'))) {
+            return (int) $this->getConfig('suggestRotation');
+        }
+
+        return null;
     }
 
     /**
@@ -232,6 +248,18 @@ class File extends AbstractRow
 
         return $url;
     }
+
+    /**
+     *
+     */
+    public function getUriInline(array $params = null): string
+    {
+        $url = 'static/Ext/Core/FileManager/Download/inline/qs/f/' . $this->getId() . '/n/' . $this->getNameClean();
+
+        $url = (!empty($params['absolute']) ? SERVER_PATH_PROTOCOL : SERVER_PATH) . $url;
+
+        return $url;
+    }
     
     /**
      * 
@@ -254,7 +282,7 @@ class File extends AbstractRow
             'width' => $options['width'] ?? null,
             'height' => $options['height'] ?? null,
             'crop' => $options['crop'] ?? null,
-            'rotation' => $this->getConfig('rotation'),
+            'rotation' => $this->getRotation(),
             'path' => $this->getPath(),
         ]);
 

@@ -1,0 +1,52 @@
+{# config
+
+title: Produkt-Teaser
+subtitle: 
+variables:
+    skipHeadline:
+        label: ohne Überschrift
+        type: bool
+    imageHeight:
+        label: Bildhöhe
+        type: int
+        default: 350
+    imageWidth:
+        label: Bildhöhe
+        type: int
+        default: 350
+_e_xtends: HerrUndFrauPixelExt/BlocksLibrary/Teaser
+
+/config #}
+
+
+{% set i = view.getViewhelper('Delegator', { object: block }) %}
+{% set p = view.getViewhelper('Partials', { basePath: viewFolder }) %}
+
+{% set icons = view.getViewhelper('Ext/HerrUndFrauPixelExt/Icons/Icons', { createDummyOnFail: true  }) %}
+
+{% set variables = block.getVariables() %}
+
+{% set colClass = "col-md-4" %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+
+            {% if not variables.skipHeadline %}
+                <h2 class="first main-title" data-editable data-uid="{{ block.getUid('title') }}">Überschrift</h2>
+                <div data-editable data-uid="{{ block.getUid('text') }}"></div>
+            {% endif %}
+
+            <div class="teasers">
+                <div class="row">
+
+                    {% for product in products %}
+                        {{ p.renderPartial('/Frootbox/Ext/Core/ShopSystem/Plugins/ShopSystem/ProductTeaser', { product: product, colClass: colClass, i: i, variables: variables }) | raw }}
+                    {% endfor %}
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

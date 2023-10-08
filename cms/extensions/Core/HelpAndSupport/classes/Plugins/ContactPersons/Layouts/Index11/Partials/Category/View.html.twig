@@ -1,0 +1,9 @@
+<h2>{{ category.getTitle() }}</h2>
+
+<div class="row">
+    {% for contact in category.getContacts() %}
+        <div class="col-md-4">
+            {{ p.renderPartial('Vcard', { contact: contact }) | raw }}
+        </div>
+    {% endfor %}
+</div>

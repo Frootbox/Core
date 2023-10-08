@@ -56,10 +56,17 @@ class Grid extends \Frootbox\Persistence\AbstractConfigurableRow implements \Fro
     public function renderHtml(
         $order,
         \Frootbox\View\Engines\Interfaces\Engine $view,
-        \DI\Container $container
+        \DI\Container $container,
+        \Frootbox\Config\Config $config,
     ): string
     {
-        $html = '<div class="grid-outer-wrapper">
+        $html = (string) null;
+
+        if (!empty($config->get('general.view.grid.forceContainer'))) {
+            $html .= '<div class="container">';
+        }
+
+        $html .= '<div class="grid-outer-wrapper">
             <div class="row">';
 
         foreach ($this->getColumns() as $column) {
@@ -100,6 +107,10 @@ class Grid extends \Frootbox\Persistence\AbstractConfigurableRow implements \Fro
 
         $html .= '</div>
         </div>';
+
+        if (!empty($config->get('general.view.grid.forceContainer'))) {
+            $html .= '</div>';
+        }
 
         return $html;
     }

@@ -33,6 +33,10 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         // Fetch all available contacts
         $result = $contacts->fetch([
             // 'where' => [ 'pluginId' => $this->plugin->getId() ]
+            'order' => [
+                'lastName ASC',
+                'firstName ASC',
+            ]
         ]);
 
 

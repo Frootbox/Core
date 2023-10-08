@@ -14,4 +14,6 @@ return [
     '.YourDataHasBeenSend' => 'Ihre Daten wurden gesendet.',
     '.FormHasAlreadyBeenSent' => 'Das Formular wurde bereits gesendet.',
     '.DataCouldNotBeSent' => 'Die Daten konnten nicht gesendet werden.',
+
+    '.FormUploadMaximum' => 'maximal',
 ];

@@ -48,6 +48,27 @@
                                         </thead>
                                         <tbody>
 
+                                            {% if formlog.getLogData.addedPayload %}
+                                                {% for key, value in formlog.getLogData.addedPayload %}
+
+                                                    {% if value is iterable %}
+                                                        {% if value.public %}
+                                                            <tr>
+                                                                <td>{{ key }}</td>
+                                                                <td>
+                                                                    {% if value.url %}
+                                                                        <a href="{{ value.url }}">{{ value.title }}</a>
+                                                                    {% else %}
+                                                                        {{ value.title }}
+                                                                    {% endif %}
+                                                                </td>
+                                                            </tr>
+                                                        {% endif %}
+                                                    {% endif %}
+
+                                                {% endfor %}
+                                            {% endif %}
+
                                             {% for field in group.fields %}
                                                 <tr>
                                                     <td style="padding-right: 15px;">{{ field.title }}</td>

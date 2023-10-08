@@ -13,7 +13,8 @@ class Files extends AbstractViewhelper
             'uid'
         ],
         'getFileByUid' => [
-            'uid'
+            'uid',
+            [ 'name' => 'parameters', 'default' => [] ],
         ],
         'getFolder' => [
             'folderId'
@@ -30,18 +31,27 @@ class Files extends AbstractViewhelper
     ];
 
     /**
-     *
+     * @param string $uid
+     * @param array $parameters
+     * @param \Frootbox\Persistence\Repositories\Files $fileRepository
+     * @return \Frootbox\Persistence\File|null
      */
     public function getFileByUidAction(
         string $uid,
-        \Frootbox\Persistence\Repositories\Files $files
-    )
+        array $parameters,
+        \Frootbox\Persistence\Repositories\Files $fileRepository,
+    ): ?\Frootbox\Persistence\File
     {
-        $result = $files->fetchOne([
+        if (empty($parameters['order'])) {
+            $parameters['order'] = 'orderId DESC';
+        }
+
+        // Fetch file
+        $result = $fileRepository->fetchOne([
             'where' => [
                 'uid' => $uid,
             ],
-            'order' => [ 'orderId DESC' ],
+            'order' => [ $parameters['order'] ],
         ]);
 
         return $result;

@@ -28,6 +28,7 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         // Update config
         $this->plugin->addConfig([
             'noAddressDetailPage' => $post->get('noAddressDetailPage'),
+            'googleMapsApiKey' => $post->get('googleMapsApiKey'),
         ]);
 
         $this->plugin->save();

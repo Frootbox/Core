@@ -28,6 +28,11 @@
         title: 'Datenfelder'
     },
     {
+        url: plugin.getAdminUri('Locations', 'index'),
+        icon: 'fa-map-marker-alt',
+        title: 'Orte'
+    },
+    {
         url: plugin.getAdminUri('Configuration', 'index'),
         icon: 'far fa-cog',
         title: 'Konfiguration'
@@ -36,6 +41,7 @@
 
 <div id="referencesReceiver">
     {{ v.injectPartial('/Frootbox/Ext/Core/Images/Plugins/References/Admin/Reference/Partials/ListReferences', {
-        plugin : plugin
+        plugin : plugin,
+        keyword: get.get('keyword')
     }) | raw }}
 </div>

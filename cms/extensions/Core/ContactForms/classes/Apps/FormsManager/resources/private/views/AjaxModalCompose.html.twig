@@ -4,7 +4,7 @@
     'frame' : false,
 }) }}
 
-<form method="post" class="ajax" action="{{ app.getUri('ajaxCreate') }}">
+<form method="post" class="ajax" action="{{ app.getUri('ajaxCreate', { categoryId: get.get('categoryId') }) }}">
 
     <div class="modal-body">
 
@@ -15,6 +15,6 @@
 
     </div>
     <div class="modal-footer">
-        <button type="submit" class="btn btn-primary">Formular erstellen</button>
+        <button type="submit" class="btn btn-primary">Speichern</button>
     </div>
 </form>

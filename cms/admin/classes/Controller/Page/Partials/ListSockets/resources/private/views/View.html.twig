@@ -55,8 +55,8 @@
 																	<td class="text-right">
 																		<a class="ajax" href="{{ v.getUri('Plugin', 'ajaxSwitchVisibility', { elementId: xel.getId() } ) }}"><i data-element="{{ xel.getId() }}" class="fa fa-lightbulb visibility {{ xel.getVisibilityString() }}"></i></a>&nbsp;&nbsp;
 
-																		<a class="ajax" href="{{ v.getUri('Plugin', 'ajaxPanelConfig', { 'pluginId' : xel.getId() } ) }}"><i class="fa fa-cog"></i></a>&nbsp;&nbsp;
-																		<a class="ajax" data-confirm="Soll dieses Plugin wirklich gelöscht werden?" href="{{ v.getUri('Plugin', 'ajaxDelete', { 'pluginId' : xel.getId() } ) }}"><i class="fa fa-times"></i></a>
+																		<a class="ajax" href="{{ v.getUri('Plugin', 'ajaxPanelConfig', { 'pluginId' : xel.getId() } ) }}"><i class="far fa-cog"></i></a>&nbsp;&nbsp;
+																		<a class="ajax" data-confirm="Soll dieses Plugin wirklich gelöscht werden?" href="{{ v.getUri('Plugin', 'ajaxDelete', { 'pluginId' : xel.getId() } ) }}"><i class="far fa-trash"></i></a>
 																	</td>
 																</tr>
 															{% endfor %}
@@ -92,11 +92,11 @@
 							<a class="ajax" href="{{ v.getUri('Plugin', 'ajaxSwitchVisibility', { elementId: contentElement.getId() } ) }}"><i data-element="{{ contentElement.getId() }}" class="fa fa-lightbulb visibility {{ contentElement.getVisibilityString() }}"></i></a>&nbsp;&nbsp;
 
 							{% if contentElement.getType == 'Grid' %}
-								<a class="ajax" href="{{ v.getUri('Plugin', 'ajaxPanelConfigGrid', { gridId: contentElement.getId() } ) }}"><i class="fa fa-cog"></i></a>&nbsp;&nbsp;
+								<a class="ajax" href="{{ v.getUri('Plugin', 'ajaxPanelConfigGrid', { gridId: contentElement.getId() } ) }}"><i class="far fa-cog"></i></a>&nbsp;&nbsp;
 							{% else %}
-								<a class="ajax" href="{{ v.getUri('Plugin', 'ajaxPanelConfig', { pluginId: contentElement.getId() } ) }}"><i class="fa fa-cog"></i></a>&nbsp;&nbsp;
+								<a class="ajax" href="{{ v.getUri('Plugin', 'ajaxPanelConfig', { pluginId: contentElement.getId() } ) }}"><i class="far fa-cog"></i></a>&nbsp;&nbsp;
 							{% endif %}
-							<a class="ajax" data-confirm="Soll dieses Plugin wirklich gelöscht werden?" href="{{ v.getUri('Plugin', 'ajaxDelete', { pluginId: contentElement.getId() } ) }}"><i class="fa fa-times"></i></a>
+							<a class="ajax" data-confirm="Soll dieses Plugin wirklich gelöscht werden?" href="{{ v.getUri('Plugin', 'ajaxDelete', { pluginId: contentElement.getId() } ) }}"><i class="far fa-trash"></i></a>
 
 						</td>
 					</tr>

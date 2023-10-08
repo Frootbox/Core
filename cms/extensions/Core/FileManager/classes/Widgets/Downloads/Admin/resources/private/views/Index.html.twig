@@ -93,10 +93,12 @@
 
     <div class="modal-body">
 
+        {#
         <div class="form-group">
             <label for="title">Titel (optional)</label>
             <input type="text" class="form-control" name="title" id="title" value="{{ widget.getConfig('title') }}" />
         </div>
+        #}
 
         <div class="form-group form-check">
             <input type="checkbox" class="form-check-input" id="withHeadline" name="withHeadline" {% if widget.getConfig('withHeadline') %}checked{% endif %}>

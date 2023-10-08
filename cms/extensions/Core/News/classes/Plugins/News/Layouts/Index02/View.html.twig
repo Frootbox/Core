@@ -27,6 +27,10 @@ variables:
         type: int
         label: Artikel-Anzahl
         default: 9
+    withContainer:
+        label: mit Layout-Container
+        type: bool
+        default: false
 
 /config #}
 
@@ -47,62 +51,64 @@ variables:
     {% set colClass = "col-md-3" %}
 {% endif %}
 
-<div class="row">
-    <div class="col-12 plugin Core News News Index02">
-        <div class="inner-wrapper">
+<div class="plugin Core News News Index02">
 
-            {% if plugin.isFirst %}
-                <h1 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h1>
-            {% else %}
-                <h2 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
-            {% endif %}
+    {% if variables.withContainer %}<div class="container">{% endif %}
 
-            <div data-editable data-uid="{{ plugin.getUid('teaser-text') }}"></div>
+        <div class="row">
+            <div class="col-12">
+                <div class="inner-wrapper">
 
-            <div class="row articles">
+                    <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
 
-                {% for article in articles %}
-                    <div class="{{ colClass }} article-col">
-                        <div class="article" data-href>
-                            {% if not variables.noImage %}
-                                <picture class="fluid" data-editable {% if variables.noImageDummy %}data-skipempty="1"{% endif %} data-uid="{{ article.getUid('image')}}">
-                                    <img width="{{ variables.image_width }}" height="{{ variables.image_height }}" src="{{ i.getDummyImage({ width: variables.image_width, height: variables.image_height | default(300) }) }}" alt="" />
-                                </picture>
-                            {% endif %}
+                    <div data-editable data-uid="{{ plugin.getUid('teaser-text') }}"></div>
 
-                            <div class="text-pillow">
+                    <div class="row articles">
 
-                                <div class="pre-title" data-editable data-nowidgets data-uid="{{ article.getUid('pre-title') }}"></div>
+                        {% for article in articles %}
+                            <div class="{{ colClass }} article-col">
+                                <div class="article" data-href>
+                                    {% if not variables.noImage %}
+                                        <picture class="fluid" data-editable {% if variables.noImageDummy %}data-skipempty="1"{% endif %} data-uid="{{ article.getUid('image')}}">
+                                            <img width="{{ variables.image_width }}" height="{{ variables.image_height }}" src="{{ i.getDummyImage({ width: variables.image_width, height: variables.image_height | default(300) }) }}" alt="" />
+                                        </picture>
+                                    {% endif %}
 
-                                <h3 data-editable data-uid="{{ article.getUid('title') }}">{{ article.getTitle(globalLanguage) }}</h3>
+                                    <div class="text-pillow">
 
-                                {% if variables.showDate %}
-                                    <p class="_skipsearch">
-                                        {{ article.getDateStart.format('%d') }}.
-                                        {{ t.translate(article.getDateStart.format('Monthname%m')) }}
-                                        {{ article.getDateStart.format('%G') }}
-                                    </p>
-                                {% endif %}
+                                        <div class="pre-title" data-editable data-nowidgets data-uid="{{ article.getUid('pre-title') }}"></div>
 
-                                <div data-nowidgets data-editable data-uid="{{ article.getUid('teaser') }}"></div>
+                                        <h4 data-editable data-uid="{{ article.getUid('title') }}">{{ article.getTitle(globalLanguage) }}</h4>
 
-                                {% if article.showReadMore() %}
-                                    <p><a class="read-more _skipsearch" href="{{ article.getUri() }}" data-editable-element data-uid="{{ plugin.getUid('link-read-more') }}">{{ t.translate('LinkReadMore') }}</a></p>
-                                {% endif %}
+                                        {% if variables.showDate %}
+                                            <p class="_skipsearch">
+                                                {{ article.getDateStart.format('%d') }}.
+                                                {{ t.translate(article.getDateStart.format('Monthname%m')) }}
+                                                {{ article.getDateStart.format('%G') }}
+                                            </p>
+                                        {% endif %}
+
+                                        <div data-nowidgets data-editable data-uid="{{ article.getUid('teaser') }}"></div>
+
+                                        {% if article.showReadMore() %}
+                                            <p><a class="read-more _skipsearch" href="{{ article.getUri() }}" data-editable-element data-uid="{{ plugin.getUid('link-read-more') }}">{{ t.translate('LinkReadMore') }}</a></p>
+                                        {% endif %}
+                                    </div>
+
+                                </div>
                             </div>
+                        {% endfor %}
 
-                        </div>
                     </div>
-                {% endfor %}
+
+                    {% if articles.getCount() < articles.getTotal() %}
+                        <br />
+                        <p><a class="read-more" href="{{ plugin.getActionUri('archive') }}">{{ t.translate('MoreArticlesInArchive') }}</p>
+                    {% endif %}
+                </div>
 
             </div>
-
-            {% if articles.getCount() < articles.getTotal() %}
-                <br />
-                <p><a class="read-more" href="{{ plugin.getActionUri('archive') }}">{{ t.translate('MoreArticlesInArchive') }}</p>
-            {% endif %}
         </div>
+    {% if variables.withContainer %}</div>{% endif %}
 
-    </div>
 </div>
-

@@ -7,7 +7,7 @@ namespace Frootbox\Ext\Core\System\Migrations;
 
 class Version010206 extends \Frootbox\AbstractMigration
 {
-    protected $description = 'Führt die SIchtbarkeit der Blöcke ein.';
+    protected $description = 'Führt die Sichtbarkeit der Blöcke ein.';
 
     /**
      *

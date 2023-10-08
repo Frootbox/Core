@@ -10,7 +10,19 @@ class ListEntry extends \Frootbox\Persistence\AbstractAsset
     protected $model = Repositories\ListEntries::class;
 
     /**
-     *
+     * @return void
+     * @throws \Frootbox\Exceptions\RuntimeError
+     */
+    public function delete()
+    {
+        // Cleanup prices
+        $this->getPrices()->map('delete');
+
+        parent::delete();
+    }
+
+    /**
+     * @return \Frootbox\Persistence\Alias|null
      */
     public function getNewAlias(): ?\Frootbox\Persistence\Alias
     {
@@ -18,7 +30,7 @@ class ListEntry extends \Frootbox\Persistence\AbstractAsset
     }
 
     /**
-     *
+     * @return string|null
      */
     public function getNumber(): ?string
     {
@@ -26,23 +38,26 @@ class ListEntry extends \Frootbox\Persistence\AbstractAsset
     }
 
     /**
-     *
+     * @param array $parameters
+     * @return \Frootbox\Db\Result
+     * @throws \Frootbox\Exceptions\RuntimeError
      */
-    public function getPrices(): \Frootbox\Db\Result
+    public function getPrices(array $parameters = []): \Frootbox\Db\Result
     {
         // Fetch prices
         $pricesRepository = $this->getDb()->getRepository(\Frootbox\Ext\Core\Gastronomy\Plugins\PriceList\Persistence\Repositories\Prices::class);
         $result = $pricesRepository->fetch([
             'where' => [
-                'parentId' => $this->getId()
-            ]
+                'parentId' => $this->getId(),
+            ],
         ]);
 
         return $result;
     }
 
     /**
-     *
+     * @param string $number
+     * @return void
      */
     public function setNumber(string $number): void
     {

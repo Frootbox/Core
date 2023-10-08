@@ -21,6 +21,27 @@ function fbxShopSystemUpdateShipping()
 $(function() {
 
     /**
+     *
+     */
+    $(document).on('change', '#differentBillingRecipient', function(event) {
+
+        let container = $('.different-billing-address');
+
+        if ($('#differentBillingRecipient').is(':checked')) {
+
+            container.find('input, select').prop('disabled', false);
+            $('.different-billing-address').show();
+        }
+        else {
+
+            container.find('input, select').prop('disabled', true);
+            $('.different-billing-address').hide();
+        }
+    });
+
+    $('#differentBillingRecipient').trigger('change');
+
+    /**
      * Submit checkout form
      */
     $('form.ajax-checkout-form').submit(function ( event ) {
@@ -59,33 +80,31 @@ $(function() {
 
     $('input[name="shipping[type]"]').change(function () {
 
-        if ($(this).val() == 'shipToAddress') {
+        console.log($(this).val());
 
-            $('.shipping-form input, .shipping-form select').each(function ( ) {
+        $('.shipping-annotation').hide();
+        $('.shipping-annotation[data-type="' + $(this).val() + '"]').show();
 
-                if ($(this).attr('data-required') == 'required') {
-                    $(this).prop('required', true);
-                }
-            });
+        $('.shipping-annotation input, .shipping-annotation select').each(function ( ) {
 
-            $('.shipping-form').show();
-        }
-        else {
+            if ($(this).prop('required')) {
+                $(this).attr('data-required', 'required');
+            }
+        });
 
-            $('.shipping-form input, .shipping-form select').each(function ( ) {
+        $('.shipping-annotation input, .shipping-annotation select').prop('required', false);
 
-                if ($(this).prop('required')) {
-                    $(this).attr('data-required', 'required');
-                }
-            });
+        $('.shipping-annotation[data-type="' + $(this).val() + '"] input, .shipping-annotation[data-type="' + $(this).val() + '"] select').each(function() {
 
-            $('.shipping-form input, .shipping-form select').prop('required', false);
-            $('.shipping-form').hide();
-        }
+            if ($(this).attr('data-required') == 'required') {
+                $(this).prop('required', true);
+            }
+        });
 
         fbxShopSystemUpdateShipping();
     });
 
+    $('.shipping-annotation').hide();
     $('input[name="shipping[type]"]').filter(':checked').trigger('change');
 
 

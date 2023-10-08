@@ -1,0 +1,35 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    'frame' : false,
+}) }}
+
+<form method="post" class="ajax" action="{{ plugin.getAdminUri('Additives', 'ajaxUpdate', { additiveId: additive.getId() }) }}">
+
+    <div class="modal-body">
+
+        <div class="row">
+            <div class="col-3">
+
+                <div class="form-group">
+                    <label for="symbol">Nr.</label>
+                    <input required type="text" class="form-control" name="symbol" id="symbol" placeholder="Nr." value="{{ additive.getSymbol() }}">
+                </div>
+
+            </div>
+            <div class="col-9">
+
+                <div class="form-group">
+                    <label for="title">Titel</label>
+                    <input required type="text" class="form-control" name="title" id="title" placeholder="Titel" value="{{ additive.getTitle() }}">
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Speichern</button>
+    </div>
+
+</form>

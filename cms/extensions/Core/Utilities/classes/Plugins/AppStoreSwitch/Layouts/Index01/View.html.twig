@@ -1,0 +1,72 @@
+{# config
+
+title: Standard
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+<div class="plugin Core Utilities AppStoreSwitch Index01">
+
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="inner-wrapper">
+
+                    <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+
+                    <div data-editable data-uid="{{ plugin.getUid('teaser') }}"></div>
+
+                    <div class="row justify-content-between">
+                        <div class="col-md-5">
+
+                            <div data-editable data-nowidgets data-uid="{{ plugin.getUid('text-app-store') }}">
+                                <p>
+                                    Laden Sie die App jetzt herunter<br />im Apple App Store.
+                                </p>
+                            </div>
+
+                            <div class="store-panel">
+                                <div class="row align-items-center justify-content-between">
+                                    <div class="col-6 col-md-6">
+                                        <a href="{{ plugin.getConfig('urlAppStore') }}">
+                                            <img class="img-fluid" src="FILE:{{ viewFolder }}public/app-store-badge.svg" alt="" />
+                                        </a>
+                                    </div>
+                                    <div class="col-6 col-md-3">
+                                        <img class="img-fluid" src="https://api.qrserver.com/v1/create-qr-code/?format=svg&size=600x600&data={{ "https://www.google.com" | url_encode }}">
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-md-5">
+
+                            <div data-editable data-nowidgets data-uid="{{ plugin.getUid('text-play-store') }}">
+                                <p>
+                                    Laden Sie die App jetzt herunter<br />im Google Play Store.
+                                </p>
+                            </div>
+
+                            <div class="store-panel">
+                                <div class="row align-items-center justify-content-between">
+                                    <div class="col-6 col-md-6">
+                                        <a href="{{ plugin.getConfig('urlPlayStore') }}">
+                                            <img class="img-fluid" src="FILE:{{ viewFolder }}public/google-play-badge.svg" alt="" />
+                                        </a>
+                                    </div>
+                                    <div class="col-6 col-md-3">
+                                        <img class="img-fluid" src="https://api.qrserver.com/v1/create-qr-code/?format=svg&size=600x600&data={{ "https://www.google.com" | url_encode }}">
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+

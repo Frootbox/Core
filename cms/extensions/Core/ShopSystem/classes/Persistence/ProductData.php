@@ -18,7 +18,7 @@ class ProductData extends \Frootbox\Persistence\AbstractRow
         switch ($this->getType()) {
 
             default:
-                $integer = (int) $this->getValueText();
+                $integer = (float) (str_replace(',', '.', $this->getValueText()));
         }
 
         $integer *= 1000;

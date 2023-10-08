@@ -58,7 +58,7 @@
                 <select multiple="true" size="{{ additives.getCount() }}" class="form-control" aria-describedby="additivesHelp" id="additives" name="additives[]">
 
                     {% for additive in additives %}
-                        <option {% if price.hasAdditive(additive) %}selected{% endif %} value="{{ additive.getId() }}">{{ additive.getOrderId() }}: {{ additive.getTitle() }}</option>
+                        <option {% if price.hasAdditive(additive) %}selected{% endif %} value="{{ additive.getId() }}">{{ additive.getSymbol() }}: {{ additive.getTitle() }}</option>
                     {% endfor %}
                 </select>
                 <small id="additivesHelp" class="form-text text-muted">Mehrfach-Selektion durch gleichzeitiges Halten der Command-Taste und Klicken möglich.</small>

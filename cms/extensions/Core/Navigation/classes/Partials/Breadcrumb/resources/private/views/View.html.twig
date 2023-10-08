@@ -2,9 +2,9 @@
 
 {% set sections = b.getSections(xpage) %}
 
-
 {% if sections | length > 1 %}
     <nav aria-label="breadcrumb" class="breadcrumb-container">
+
         <ol class="breadcrumb d-none d-md-flex">
             {% for section in sections %}
 
@@ -12,9 +12,9 @@
                     <li class="breadcrumb-item {% if loop.last %}active{% endif %}" {% if loop.last %}aria-current="page"{% endif %}>
 
                         {% if section.href %}
-                            <a href="{{ section.href }}">{{ section.title }}</a>
+                            <a href="{{ section.href }}">{{ section.title | raw }}</a>
                         {% else %}
-                            <a href="#">{{ section.title}}</a>
+                            <a href="#">{{ section.title | raw }}</a>
                         {% endif %}
 
                     </li>
@@ -23,9 +23,7 @@
             {% endfor %}
         </ol>
 
-        <p class="d-md-none"><a class="back-link" href="{{ sections[(sections | length) - 2].href }}">zurück</a></p>
+        <p class="d-md-none read-more"><a class="back-link" href="{{ sections[(sections | length) - 2].href }}">zurück</a></p>
 
     </nav>
 {% endif %}
-
-

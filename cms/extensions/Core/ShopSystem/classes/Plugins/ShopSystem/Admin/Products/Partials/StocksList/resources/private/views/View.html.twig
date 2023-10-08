@@ -6,6 +6,7 @@
     <table class="table">
         <thead>
             <tr>
+                <th></th>
                 <th>Optionen</th>
                 <th>Bestand</th>
                 <th class="text-right">Preis</th>
@@ -16,6 +17,7 @@
 
             {% for stock in stocks %}
                 <tr class="{% if stock.getId() == data.highlight %}highlighted{% endif %}" data-title="Warenbestand bearbeiten" data-modal="{{ data.plugin.getAdminUri('Products', 'ajaxModalStocksEdit', { stockId: stock.getId() }) }}">
+                    <td>{{ stock.getId() }}</td>
                     <td>{{ stock.getOptionsAsString() }}</td>
                     <td>{{ stock.getAmount() }}</td>
                     <td class="text-right">{{ stock.getPrice() | number_format(2, ',', '.') }} EUR</td>

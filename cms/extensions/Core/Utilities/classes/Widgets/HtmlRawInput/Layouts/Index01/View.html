@@ -1,3 +1,5 @@
 {% set i = view.getViewhelper('Delegator', { object: widget }) %}
 
-{{ widget.getConfig('source') | raw }}
+<div class="html-wrapper">
+    {{ widget.getConfig('source') | raw }}
+</div>

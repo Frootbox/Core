@@ -1,0 +1,218 @@
+<style>
+
+    .sidebar {
+        position: absolute;
+        left: 134mm;
+        top: 25mm;
+    }
+
+    .sidebar p {
+        margin: 0 0 10px 0;
+        font-size: 7pt;
+        line-height: 14px;
+    }
+
+    .address-label {
+        position: absolute;
+        top: 25mm;
+        left: 0mm;
+    }
+
+    .address-label .top {
+        font-size: 6pt;
+    }
+
+    .address-label .address {
+        margin-top: .5cm;
+
+        font-size: 9pt;
+        line-height: 12pt;
+    }
+
+    .content {
+        margin: 60mm 0 0 0mm;
+    }
+
+    .content h1 {
+        font-size: 10pt;
+    }
+
+    .content p {
+        margin: 0 0 1.5mm 0;
+        font-size: 8pt;
+        line-height: 12pt;
+    }
+
+    table.positions {
+        margin-top: 10mm;
+        width: 200mm;
+    }
+
+    table.positions tr th {
+        text-align: left;
+        padding: 8px 0;
+    }
+
+    table.positions tr td {
+        padding: 8px 0;
+        vertical-align: top;
+    }
+
+    table.positions tbody tr td {
+        border-top: 1px solid #CCC;
+    }
+
+    table.positions tr td, table.positions tr th {
+        font-size: 10pt;
+    }
+
+    table.positions tfoot tr.border td {
+        border-top: 2px solid #CCC;
+    }
+
+</style>
+
+<page backimg="{{ background }}">
+
+    <page_footer>
+        <div style="font-size: 8pt">Rechnung Nr. {{ booking.getConfig('invoice.number') }}, Seite [[page_cu]] von [[page_nb]]</div>
+    </page_footer>
+
+    <div id="background"></div>
+
+
+    <div class="sidebar">
+        <p>
+            Re. Nr.: {{ booking.getConfig('invoice.number') }}<br />
+            Datum: {{ booking.getDate() | date('d.m.Y') }}
+
+            {% if booking.getConfig('ownOrderNumber') %}
+                <br />eigene Bestell-Nr.:
+                <br />{{ booking.getConfig('ownOrderNumber') }}
+            {% endif %}
+        </p>
+        <p>
+            {{ shopPlugin.getConfig('invoice.textBelowInvoiceNumber') | nl2br }}
+        </p>
+    </div>
+
+
+    <div class="address-label">
+        <div class="top">
+            {{ shopPlugin.getConfig('invoice.addressLine') }}
+        </div>
+        <div class="address">
+
+            {% if booking.getConfig('billing.differentBillingRecipient') %}
+                {% if booking.getConfig('billing.company') %}
+                    {{ booking.getConfig('billing.company') }}<br />
+                {% endif %}
+
+                {{ booking.getConfig('billing.firstname') }} {{ booking.getConfig('billing.lastname') }}<br />
+                {{ booking.getConfig('billing.street') }} {{ booking.getConfig('billing.streetNumber') }}<br />
+                {{ booking.getConfig('billing.postalCode') }} {{ booking.getConfig('billing.city') }}<br />
+
+                {{ ('Core.ShopSystem.Plugins.Checkout.Country.' ~ booking.getConfig('billing.country')) | translate }}
+            {% else %}
+                {% if booking.getConfig('personal.company') %}
+                    {{ booking.getConfig('personal.company') }}<br />
+                {% endif %}
+
+                {{ booking.getConfig('personal.firstname') }} {{ booking.getConfig('personal.lastname') }}<br />
+                {{ booking.getConfig('personal.street') }} {{ booking.getConfig('personal.streetNumber') }}<br />
+                {{ booking.getConfig('personal.postalCode') }} {{ booking.getConfig('personal.city') }}<br />
+
+                {{ ('Core.ShopSystem.Plugins.Checkout.Country.' ~ booking.getConfig('personal.country')) | translate }}
+            {% endif %}
+        </div>
+    </div>
+
+
+    <div class="content">
+
+        <h1>Rechnung Nr. {{ booking.getConfig('invoice.number') }}</h1>
+
+        <p>Liefer-/Leistungsdatum: 7. Breitbandforum Mecklenburg Vorpommern am 02.11.2023</p>
+    </div>
+
+
+        <table class="positions" cellpadding="0" cellspacing="0">
+            <col width="50">
+            <col width="75">
+            <col width="280">
+            <col width="100">
+            <col width="100">
+            <thead>
+            <tr>
+                <th style="font-size: 8pt;">Pos.</th>
+                <th style="font-size: 8pt;">Anzahl</th>
+                <th style="font-size: 8pt;">Beschreibung</th>
+                <th style="font-size: 8pt; text-align: right;">Betrag</th>
+                <th style="font-size: 8pt; text-align: right;">Summe</th>
+            </tr>
+            </thead>
+            <tbody>
+
+            {% for product in booking.getItems() %}
+                <tr>
+                    <td style="font-size: 8pt;">{{ loop.index }}</td>
+                    <td style="font-size: 8pt;">{{ product.amount }}</td>
+                    <td style="font-size: 8pt;">
+                        <b>{{ product.title }}</b>
+                        {% if product.customNote %}
+                            <br />{{ product.customNote | nl2br }}
+                        {% endif %}
+                    </td>
+                    <td style="text-align: right; font-size: 8pt;">
+                        {{ product.price | number_format(2, ',', '.')}} {{ currencySign }}
+                    </td>
+                    <td style="text-align: right; font-size: 8pt;">
+                        {{ product.getTotalNet() | number_format(2, ',', '.')}} {{ currencySign }}
+                    </td>
+                </tr>
+            {% endfor %}
+
+            </tbody>
+            <tfoot>
+            <tr class="border">
+                <td></td>
+                <td></td>
+                <td></td>
+                <td style="font-size: 8pt; text-align: right">
+                    Netto
+                </td>
+                <td style="font-size: 8pt; text-align: right">
+                    {{ booking.getTotalNet() | number_format(2, ',', '.')}} {{ currencySign }}
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td style="font-size: 8pt; text-align: right">
+                    zzgl. 19 % USt.
+                </td>
+                <td style="font-size: 8pt; text-align: right">
+                    {{ booking.getTax() | number_format(2, ',', '.')}} {{ currencySign }}
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td style="font-size: 8pt; text-align: right">
+                    <b>Total</b>
+                </td>
+                <td style="font-size: 8pt; text-align: right">
+                    <b>{{ booking.getTotal() | number_format(2, ',', '.')}} {{ currencySign }}</b>
+                </td>
+            </tr>
+            </tfoot>
+        </table>
+
+        <br /><br />
+
+        <p>Zahlbar bitte ohne Abzug innerhalb von 10 Tagen ab Rechnungsdatum.</p>
+        <p>Bitte überweisen Sie den Betrag auf unser u. a. Konto. Vielen Dank.</p>
+
+</page>

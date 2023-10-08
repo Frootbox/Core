@@ -1,0 +1,47 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<style>
+    .table.bookings tr.Cancelled td {
+        color: #CCC;
+        text-decoration: line-through;
+    }
+</style>
+
+{% if bookings.getCount == 0 %}
+    <div class="message warning">Es wurden noch keine Buchungen getätigt.</div>
+{% else %}
+    <table class="table bookings">
+        <thead>
+            <tr>
+                <th>Nr.</th>
+                <th>Datum</th>
+                <th>Name</th>
+                <th>E-Mail</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+
+            {% for booking in bookings %}
+                <tr class="ajax {% if booking.getId == data.highlight %}highlighted{% endif %} {{ booking.getState() }}" data-href="{{ data.plugin.getAdminUri('Bookings', 'details', { bookingId: booking.getId() }) }}">
+                    <td>{{ booking.getConfig('orderNumber') }}</td>
+                    <td>{{ booking.getDate() | date('d.m. H:i') }} Uhr</td>
+                    <td>
+                        {{ booking.getConfig('personal.firstname') }} {{ booking.getConfig('personal.lastname') }}
+                    </td>
+                    <td>
+                        {{ booking.getConfig('personal.email') }}
+                    </td>
+                    <td class="text-right">
+                        {% if booking.getState() != "Cancelled" %}
+                            <a class="ajax" data-confirm="Soll diese Buchung wirklich storniert werden?" href="{{ data.plugin.getAdminUri('Bookings', 'ajaxCancel', { bookingId: booking.getId() }) }}"><i class="far fa-trash"></i></a>
+                        {% else %}
+                            <a class="ajax" data-confirm="Soll diese Buchung wirklich wieder freigegeben werden?" href="{{ data.plugin.getAdminUri('Bookings', 'ajaxReSubmit', { bookingId: booking.getId() }) }}"><i class="far fa-clock-rotate-left"></i></a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+{% endif %}

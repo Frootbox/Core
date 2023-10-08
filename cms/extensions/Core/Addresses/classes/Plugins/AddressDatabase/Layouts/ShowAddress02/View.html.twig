@@ -1,0 +1,216 @@
+{# config
+
+title: Standard
+variables:
+    cloak:
+        type: bool
+        default: false
+        label: andere Plugins verdrängen
+    withContainer:
+        type: bool
+        label: mit Layout-Container
+    columns:
+        type: list
+        label: Spaltenaufteilung
+        default: 5-7
+        options:
+            5-7: "5-7"
+            6-6: "6-6"
+            7-5: "7-5"
+    imageWidth:
+        type: int
+        label: Bildbreite
+        default: 500
+    imageHeight:
+        type: int
+        label: Bildhöhe
+        default: 250
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set partials = view.getViewhelper('Partials') %}
+{% set b = view.getViewhelper('Breadcrumb', { singleton: true }) %}
+
+{% set t = i.getTranslator() %}
+
+{% set icons = view.getViewhelper('Ext/HerrUndFrauPixelExt/Icons/Icons', { createDummyOnFail: true  }) %}
+
+{{ b.addSection(address.getTitle(globalLanguage), address.getUri()) }}
+
+{{ view.set('hideGlobalBlocks', true) }}
+
+{% if variables.cloak %}
+    <param name="cloak" value="true" />
+{% endif %}
+
+{% if variables.columns == "6-6" %}
+    {% set col1 = 'col-md-6' %}
+    {% set col2 = 'col-md-6' %}
+{% elseif variables.columns == "7-5" %}
+    {% set col1 = 'col-md-7' %}
+    {% set col2 = 'col-md-5' %}
+{% else %}
+    {% set col1 = 'col-md-5' %}
+    {% set col2 = 'col-md-7' %}
+{% endif %}
+
+<script nonce="{{ settings.nonce }}">
+    var map = null;
+    var addresses = [];
+
+    {% if address.getLat() and address.getLng() %}
+    var address = {
+        lat: {{ address.getLat() }},
+        lng: {{ address.getLng() }},
+        addressId: {{ address.getId() }}
+    };
+
+    addresses.push(address);
+    {% endif %}
+
+
+
+    // Initialize and add the map
+    function initMap() {
+        // The location of Uluru
+        const uluru = { lat: addresses[0].lat, lng: addresses[0].lng };
+        // The map, centered at Uluru
+        map = new google.maps.Map(document.getElementById("map"), {
+            zoom: 14,
+            center: uluru,
+        });
+    }
+
+    window.initMap = initMap;
+</script>
+
+<script src="https://maps.googleapis.com/maps/api/js?key={{ plugin.getConfig('googleMapsApiKey') }}&callback=initMap&v=weekly" defer></script>
+
+<div class="plugin Core Addresses AddressDatabase ShowAddress02">
+
+    {% if variables.withContainer %}<div class="container">{% endif %}
+
+    <div class="row">
+        <div class="col-12">
+
+            <h2 class="first main-title" data-editable data-uid="{{ address.getUid('title') }}">{{ address.getTitle }}</h2>
+
+            {{ partials.render('\\Frootbox\\Ext\\Core\\Navigation\\Partials\\Breadcrumb', { page: page }) | raw }}
+
+            <br /><br />
+
+            <div id="map"></div>
+
+            <div class="row">
+                <div class="{{ col1 }}">
+
+                    <div class="text">
+                        <p>
+                            {{ address.getStreet() }} {{ address.getStreetNumber() }}<br />
+                            {{ address.getZipcode() }} {{ address.getCity() }}
+                        </p>
+                        <p>
+                            {% if address.getPhone() %}
+                                <a href="tel:{{ address.getPhone() }}">Telefon {{ address.getPhone() }}</a><br />
+                            {% endif %}
+
+                            {% if address.getFax() %}
+                                Fax {{ address.getFax() }}
+                            {% endif %}
+                        </p>
+                        <p>
+                            {% if address.getEmail() %}
+                                <a href="mailto:{{ address.getEmail() }}">{{ address.getEmail() }}</a><br />
+                            {% endif %}
+
+                            {% if address.getUrl() %}
+                                <a href="{{ address.getUrl() }}">{{ address.getUrl() }}</a>
+                            {% endif %}
+                        </p>
+
+                        <div data-editable data-uid="{{ address.getUid('text-annotation') }}"></div>
+
+                    </div>
+
+                </div>
+                <div class="{{ col2 }}">
+
+                    <div data-editable data-uid="{{ address.getUid('text') }}"></div>
+
+                    {% set openingTimes = address.getOpeningTimes() %}
+
+                    {% if openingTimes | length %}
+
+                        <h3>Öffnungszeiten</h3>
+
+                        <table class="table">
+                            {% for openingTime in openingTimes %}
+                                <tr>
+                                    <td>
+                                        {% for day,state in openingTime.getConfig('days') %}
+                                            {{ t.translate("WeekdayShort" ~ day) }}{% if not loop.last %},{% endif %}
+                                        {% endfor %}
+                                    </td>
+                                    <td>{{ icons.render('clock') | raw }} {{ openingTime.getConfig('timeFrom') }}–{{ openingTime.getConfig('timeTo') }} Uhr</td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+
+                    {% endif %}
+
+                </div>
+            </div>
+
+            <div data-blocks data-uid="{{ address.getUid('block-content') }}"></div>
+
+        </div>
+    </div>
+
+        <div class="row">
+            <div class="col-12">
+
+                <h2>Weitere Adressen an diesem Standort</h2>
+
+                {% set addresses =plugin.getAddresses({ limit: 6 }) %}
+
+                <div class="teasers">
+                    <div class="row">
+
+                        {% for address in addresses %}
+                            <div class="col-md-4 teaser h-card vcard" data-href>
+
+                                <h4 class="p-name">{{ address.getTitle() }}</h4>
+
+                                <p class="address adr">
+                                    {% if address.getAddition() %}<span>{{ address.getAddition() }}</span><br />{% endif %}
+                                    <span class="street-address">{{ address.getStreet() }} {{ address.getStreetNumber() }}</span><br />
+                                    <span class="postal-code">{{ address.getZipcode() }}</span> <span class="p-locality">{{ address.getCity() }}</span><br />
+                                    <span class="country-name">{{ address.getCountry() }}</span>
+                                </p>
+
+                                <p class="contact">
+                                    {% if address.getEmail() %}
+                                        <a href="mailto:{{ address.getEmail() }}">E-Mail</a>
+                                    {% endif %}
+
+                                    {% if address.getPhone() %}
+                                        <a href="tel:{{ address.getPhone() }}">Telefon</a>
+                                    {% endif %}
+                                </p>
+                                <p>
+                                    <a href="{{ address.getUri() }}">Mehr Informationen</a>
+                                </p>
+
+                            </div>
+                        {% endfor %}
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    {% if variables.withContainer %}</div>{% endif %}
+
+</div>

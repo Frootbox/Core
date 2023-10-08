@@ -1,0 +1,31 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{% if keywords.getCount > 0 %}
+
+	<table class="table" data-sort="{{ plugin.getAdminUri('Question', 'ajaxSort') }}">
+		<thead>
+			<tr>
+				<th>Schlagwort</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+
+			{% for keyword in keywords %}
+
+				<tr id="row-{{ question.getId }}" class="{% if data.highlight == keyword.getId() %}highlighted{% endif %}">
+					<td>{{ keyword.getTitle() }}</td>
+					<!--<td class="handle"><i class="fa fa-grip-lines"></i></td>-->
+					<td class="text-right">
+						<a data-toggle="tooltip" data-title="Sichtbarkeit umschalten" class="ajax" href="{{ v.getUri('Assets', 'ajaxSwitchVisibility', { assetId: keyword.getId() } ) }}"><i data-asset="{{ keyword.getId() }}" class="fa fa-lightbulb visibility {{ keyword.getVisibilityString() }} icon"></i></a>
+						<a target="keyword-edit-{{ keyword.getId() }}" href="{{ data.plugin.getAdminUri('Keyword', 'jumpToEdit', { keywordId: keyword.getId() }) }}"><i class="far fa-pencil icon"></i></a>
+						<a class="ajax" data-confirm="Soll dieses Schlagwort wirklich gelöscht werden?" href="{{ data.plugin.getAdminUri('Keyword', 'ajaxDelete', { keywordId: keyword.getId() }) }}"><i class="far fa-trash icon"></i></a>
+					</td>
+				</tr>
+
+			{% endfor %}
+
+		</tbody>
+	</table>
+
+{% endif %}

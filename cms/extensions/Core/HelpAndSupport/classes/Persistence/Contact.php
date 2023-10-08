@@ -35,6 +35,7 @@ class Contact extends \Frootbox\Persistence\AbstractPerson
             'virtualDirectory' => [
                 $this->getFirstName() . ' ' . $this->getLastName(),
             ],
+            'uid' => $this->getUid('alias'),
             'payload' => $this->generateAliasPayload([
                 'action' => 'showContact',
                 'contactId' => $this->getId(),

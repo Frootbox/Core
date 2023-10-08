@@ -22,7 +22,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
             $result = $pages->fetch([
                 'where' => [
                     'parentId' => $this->config['pageId'],
-                    new \Frootbox\Db\Conditions\NotEqual('visibility', 'Hidden')
+                    'visibility' => 'Public',
                 ],
                 'order' => [ 'lft ASC' ]
             ]);
@@ -33,7 +33,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
             $result = $pages->fetch([
                 'where' => [
                     'parentId' => $this->page->getId(),
-                    new \Frootbox\Db\Conditions\NotEqual('visibility', 'Hidden')
+                    'visibility' => 'Public',
                 ],
                 'order' => [ 'lft ASC' ]
             ]);
@@ -43,7 +43,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
                 $result = $pages->fetch([
                     'where' => [
                         'parentId' => $this->page->getParentId(),
-                        new \Frootbox\Db\Conditions\NotEqual('visibility', 'Hidden')
+                        'visibility' => 'Public',
                     ],
                     'order' => [ 'lft ASC' ]
                 ]);

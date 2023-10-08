@@ -1,0 +1,37 @@
+{# config
+
+title: Standard
+variables:
+    withContainer:
+        type: bool
+        label: mit Layout-Container
+
+/config #}
+
+<param name="cloak" value="1" />
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set b = view.getViewhelper('Breadcrumb', { singleton: true }) %}
+
+{{ b.addSection(keyword.getTitle(globalLanguage), keyword.getUri()) }}
+
+<div class="plugin Core HelpAndSupport KeywordIndex ShowKeyword01">
+    {% if variables.withContainer %}<div class="container">{% endif %}
+
+        <div class="row">
+            <div class="col-md-12">
+
+                <h2 class="first main-title" data-editable data-uid="{{ keyword.getUid('title') }}">{{ keyword.getTitle }}</h2>
+
+                <div data-editable data-uid="{{ keyword.getUid('teaser') }}"></div>
+
+                <div data-editable data-uid="{{ keyword.getUid('text') }}"></div>
+
+                <p><a href="{{ plugin.getActionUri('index') }}">zurück</a></p>
+
+
+            </div>
+        </div>
+
+    {% if variables.withContainer %}</div>{% endif %}
+</div>

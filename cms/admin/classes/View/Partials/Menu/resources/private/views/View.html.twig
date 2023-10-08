@@ -1,13 +1,12 @@
 {% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
 
-<nav>
-
+<nav class="admin-apps">
 
     <ul>
-        <li><a href="{{ v.getUri('Sitemap') }}"><i class="far fa-sitemap fa-fw"></i> Sitemap</a></li>
-        <li><a target="editMode" href="{{ serverpath }}edit"><i class="far fa-pencil fa-fw"></i> Bearbeitungsmodus</a></li>
-        <li><a href="{{ v.getUri('NavigationBars') }}"><i class="far fa-list fa-fw"></i> Navigationen</a></li>
-        <li><a href="{{ v.getUri('Extensions') }}"><i class="far fa-puzzle-piece fa-fw"></i> Erweiterungen</a></li>
+        <li class="app-sitemap"><a href="{{ v.getUri('Sitemap') }}"><i class="far fa-sitemap fa-fw"></i> Sitemap</a></li>
+        <li class="app-editmode"><a target="editMode" href="{{ serverpath }}edit"><i class="far fa-pencil fa-fw"></i> Bearbeitungsmodus</a></li>
+        <li class="app-navigations"><a href="{{ v.getUri('NavigationBars') }}"><i class="far fa-list fa-fw"></i> Navigationen</a></li>
+        <li class="app-extensions"><a href="{{ v.getUri('Extensions') }}"><i class="far fa-puzzle-piece fa-fw"></i> Erweiterungen</a></li>
 
         {% for app in v.getMenue() %}
             <li><a href="{{ v.getUri('App', 'index', { appId: app.getId() }) }}"><i class="far {{ app.getIcon() | default('fa-puzzle-piece') }} fa-fw"></i> {{ app.getTitle() }}</a></li>

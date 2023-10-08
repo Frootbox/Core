@@ -47,7 +47,25 @@
             <div class="card-body">
 
                 {% if user.getType == 'SuperAdmin' %}
-                    <a class="btn btn-secondary ajax" href="{{ plugin.getAdminUri('Configuration', 'ajaxImportConnectedPersons') }}">verknüpfte Personen von anderen Plugins importieren</a>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <a class="btn btn-block btn-secondary ajax" href="{{ plugin.getAdminUri('Configuration', 'ajaxImportConnectedPersons') }}">verknüpfte Personen von anderen Plugins importieren</a>
+                        </div>
+                        <div class="col-md-8">
+                            xxxx
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="row">
+                        <div class="col-md-4">
+                            <a class="btn btn-block btn-secondary ajax" href="{{ plugin.getAdminUri('Configuration', 'ajaxImportPersons') }}">Personen von anderen Plugins importieren</a>
+                        </div>
+                        <div class="col-md-8">
+                            <p>ALLE Ansprechpersonen von ALLEN anderen Ansprechpersonen-Plugins dieser Website in DIESES Plugin importieren.</p>
+                        </div>
+                    </div>
+
+
                 {% endif %}
 
             </div>

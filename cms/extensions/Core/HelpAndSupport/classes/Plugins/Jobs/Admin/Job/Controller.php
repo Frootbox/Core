@@ -18,7 +18,8 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     }
 
     /**
-     *
+     * @param \Frootbox\Ext\Core\Addresses\Persistence\Repositories\Addresses $addressesRepository
+     * @return \Frootbox\Db\Result
      */
     public function getAddresses(
         \Frootbox\Ext\Core\Addresses\Persistence\Repositories\Addresses $addressesRepository
@@ -35,12 +36,16 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     }
 
     /**
-     *
+     * @param \Frootbox\Http\Post $post
+     * @param \Frootbox\Ext\Core\HelpAndSupport\Plugins\Jobs\Persistence\Repositories\Jobs $jobsRepository
+     * @param \Frootbox\Admin\Viewhelper\GeneralPurpose $gp
+     * @return Response
+     * @throws \Frootbox\Exceptions\InputMissing
      */
     public function ajaxCreateAction(
         \Frootbox\Http\Post $post,
         \Frootbox\Ext\Core\HelpAndSupport\Plugins\Jobs\Persistence\Repositories\Jobs $jobsRepository,
-        \Frootbox\Admin\Viewhelper\GeneralPurpose $gp
+        \Frootbox\Admin\Viewhelper\GeneralPurpose $gp,
     ): Response
     {
         // Validate required input
@@ -63,6 +68,31 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
                     'plugin' => $this->plugin
                 ])
             ]
+        ]);
+    }
+
+    /**
+     *
+     */
+    public function ajaxDuplicateAction(
+        \Frootbox\Http\Get $get,
+        \Frootbox\CloningMachine $cloningMachine,
+        \Frootbox\Ext\Core\HelpAndSupport\Plugins\Jobs\Persistence\Repositories\Jobs $jobsRepository,
+    ): Response
+    {
+        // Fetch job
+        $job = $jobsRepository->fetchById($get->get('jobId'));
+
+        // Duplcate job
+        $newJob = $job->duplicate();
+        $newJob->setTitle($job->getTitle() . ' (Duplikat)');
+        $newJob->setAlias(null);
+        $newJob->save();
+
+        $cloningMachine->cloneContentsForElement($newJob, $job->getUidBase());
+
+        return self::getResponse('json', 200, [
+            'triggerLink' => $this->plugin->getAdminUri('Job', 'details', [ 'jobId' => $newJob->getId() ]),
         ]);
     }
 
@@ -114,8 +144,9 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         }
 
         $job->setTitle($title);
+        $job->setSubtitle($post->get('subtitle'));
         $job->setDateStart($post->get('dateStart'));
-        $job->setLocationId($post->get('locationId'));
+        $job->setLocationId(!empty($post->get('locationId')) ? $post->get('locationId') : null);
 
         $job->unsetConfig('titles');
         $job->addConfig([
@@ -123,6 +154,7 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
             'asSoonAsPossible' => $post->get('asSoonAsPossible'),
             'forceJobsDetailPage' => $post->get('forceJobsDetailPage'),
             'start' => $post->get('start'),
+            'limitation' => $post->get('limitation'),
             'type' => $post->get('typeText'),
             'typeId' => $post->get('typeId'),
             'link' => $post->get('link'),
@@ -141,7 +173,7 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
      */
     public function detailsAction(
         \Frootbox\Http\Get $get,
-        \Frootbox\Ext\Core\HelpAndSupport\Plugins\Jobs\Persistence\Repositories\Jobs $jobsRepository
+        \Frootbox\Ext\Core\HelpAndSupport\Plugins\Jobs\Persistence\Repositories\Jobs $jobsRepository,
     ): Response
     {
         // Fetch job
@@ -160,5 +192,22 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     ): Response
     {
         return self::getResponse();
+    }
+
+    /**
+     * @param \Frootbox\Http\Get $get
+     * @param \Frootbox\Ext\Core\HelpAndSupport\Plugins\Jobs\Persistence\Repositories\Jobs $jobsRepository
+     * @return Response
+     */
+    public function jumpToEditAction(
+        \Frootbox\Http\Get $get,
+        \Frootbox\Ext\Core\HelpAndSupport\Plugins\Jobs\Persistence\Repositories\Jobs $jobsRepository,
+    ): Response
+    {
+        // Fetch job
+        $job = $jobsRepository->fetchById($get->get('jobId'));
+
+        header('Location: ' . $job->getUriEdit());
+        exit;
     }
 }

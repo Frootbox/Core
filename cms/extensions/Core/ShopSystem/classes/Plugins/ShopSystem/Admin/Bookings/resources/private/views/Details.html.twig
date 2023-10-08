@@ -1,7 +1,28 @@
 {% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+{% set integration = view.getViewHelper('\\Frootbox\\Ext\\Core\\ShopSystem\\Viewhelper\\Integration') %}
 
 <h2 id="categoriesHead">
-    Buchungs Details
+    Buchungs-Details
+
+    <span class="headoptions">
+        <span class="dropdown">
+            <i class="far fa-bars dropdown-toggle" data-toggle="dropdown"></i>
+
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <a class="ajax dropdown-item" href="{{ plugin.getAdminUri('Bookings', 'ajaxEmailResendMod', { bookingId: booking.getId() }) }}"><i class="far fa-fw fa-envelope icon"></i>Buchungsbenachrichtigung erneut senden</a>
+
+                {% if plugin.getConfig('invoice.createOnCheckout') %}
+                    <a class="dropdown-item" href="{{ plugin.getAdminUri('Bookings', 'downloadInvoice', { bookingId: booking.getId() }) }}"><i class="far fa-fw fa-download icon"></i>Rechnung herunterladen</a>
+                {% endif %}
+
+                {% if integration.canTransferBooking() %}
+                    <a class="dropdown-item ajax" href="{{ plugin.getAdminUri('Bookings', 'ajaxBookingTransfer', { bookingId: booking.getId() }) }}"><i class="far fa-fw fa-cloud icon"></i>Buchung übertragen{% if booking.getConfig('transfer.id') %} (wurde übertragen){% endif %}</a>
+                {% endif %}
+
+            </div>
+        </span>
+    </span>
+
 </h2>
 
 <p><a class="ajax" href="{{ plugin.getAdminUri('Bookings', 'index', { highlight: booking.getId() }) }}"><i class="fa fa-chevron-circle-left"></i> zurück</a></p>
@@ -45,6 +66,20 @@
 
         <table class="table">
             <tbody>
+                {% if booking.getConfig('personal.company') %}
+                    <tr>
+                        <td>Firma</td>
+                        <td>{{ booking.getConfig('personal.company') }}</td>
+                    </tr>
+                {% endif %}
+
+                {% if booking.getConfig('personal.vat') %}
+                    <tr>
+                        <td>USt. IdNr.</td>
+                        <td>{{ booking.getConfig('personal.vat') }}</td>
+                    </tr>
+                {% endif %}
+
                 <tr>
                     <td width="25%">Name</td>
                     <td>{{ booking.getConfig('personal.firstname') }} {{ booking.getConfig('personal.lastname') }}</td>
@@ -70,9 +105,17 @@
         <h3>Lieferadresse</h3>
 
         {% if booking.getConfig('shipping.type') == "selfPickup" %}
-            <p>Selbstabholung.</p>
+            <div class="card">
+                <div class="card-body">
+                    <p>Selbstabholung.</p>
+                </div>
+            </div>
         {% elseif booking.getConfig('shipping.type') == 'shipToBillingAddress' %}
-            <p>Gleich wie Rechnungsadresse.</p>
+            <div class="card">
+                <div class="card-body">
+                    <p>Gleich wie Rechnungsadresse.</p>
+                </div>
+            </div>
         {% else %}
 
             <table class="table">
@@ -91,6 +134,16 @@
                 </tbody>
             </table>
 
+        {% endif %}
+
+        {% if booking.getConfig('shipping.deliveryDay') %}
+            <h3>gewünschter Liefertermin</h3>
+
+            <div class="card">
+                <div class="card-body">
+                    <p>{{ booking.getConfig('shipping.deliveryDay') | date('d.m.Y') }}</p>
+                </div>
+            </div>
         {% endif %}
 
         <h3>Bezahlung</h3>
@@ -137,6 +190,7 @@
                             {% if item.getAdditionalText() %}
                                 <br />{{ item.getAdditionalText() | nl2br }}
                             {% endif %}
+
                         </td>
                     </tr>
                 {% endfor %}
@@ -161,3 +215,86 @@
 
     </div>
 </div>
+
+<h3>Artikel</h3>
+
+<table class="table positions" cellpadding="0" cellspacing="0">
+    <col width="50">
+    <col width="75">
+    <col width="280">
+    <col width="100">
+    <col width="100">
+    <thead>
+    <tr>
+        <th style="font-size: 8pt;">Pos.</th>
+        <th style="font-size: 8pt;">Anzahl</th>
+        <th style="font-size: 8pt;">Beschreibung</th>
+        <th style="font-size: 8pt; text-align: right;">Betrag</th>
+        <th style="font-size: 8pt; text-align: right;">Summe</th>
+    </tr>
+    </thead>
+    <tbody>
+
+    {% for product in booking.getItems() %}
+        <tr>
+            <td style="font-size: 8pt;">{{ loop.index }}</td>
+            <td style="font-size: 8pt;">{{ product.amount }}</td>
+            <td style="font-size: 8pt;">
+                <b>{{ product.title }}</b>
+                {% if product.customNote %}
+                    <br />{{ product.customNote | nl2br }}
+                {% endif %}
+            </td>
+            <td style="text-align: right; font-size: 8pt;">
+                {{ product.getPriceFinal() | number_format(2, ',', '.')}} {{ currencySign }}
+            </td>
+            <td style="text-align: right; font-size: 8pt;">
+                {{ product.getTotal() | number_format(2, ',', '.')}} {{ currencySign }}
+            </td>
+        </tr>
+    {% endfor %}
+
+    </tbody>
+    <tfoot>
+
+    {#
+    <tr class="border">
+        <td></td>
+        <td></td>
+        <td></td>
+        <td style="font-size: 8pt; text-align: right">
+            Netto
+        </td>
+        <td style="font-size: 8pt; text-align: right">
+            {{ booking.getTotalNet() | number_format(2, ',', '.')}} {{ currencySign }}
+        </td>
+    </tr>
+    #}
+
+    {% for section in booking.getTaxSections() %}
+        <tr>
+            <td></td>
+            <td colspan="3" style="font-size: 8pt; text-align: right">
+                inkl. {{ section.taxrate }} % USt. auf {{ section.total | number_format(2, ",") }} {{ currencySign }}
+            </td>
+            <td style="font-size: 8pt; text-align: right">
+                {{ section.tax | number_format(2, ",") }} {{ currencySign }}
+            </td>
+        </tr>
+    {% endfor %}
+
+
+
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td style="font-size: 8pt; text-align: right">
+            <b>Total</b>
+        </td>
+        <td style="font-size: 8pt; text-align: right">
+            <b>{{ booking.getTotal() | number_format(2, ',', '.')}} {{ currencySign }}</b>
+        </td>
+    </tr>
+    </tfoot>
+</table>

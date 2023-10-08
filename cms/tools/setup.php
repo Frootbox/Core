@@ -95,6 +95,8 @@ try {
       `title` varchar(255) NOT NULL,
       `icon` varchar(24) DEFAULT NULL,
       `menuId` varchar(255) DEFAULT 'Global',
+      `config` text,
+      `access` varchar(45) DEFAULT 'Admin',
       PRIMARY KEY (`id`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     EOT;
@@ -116,13 +118,14 @@ try {
     EOT;
 
     $queries[] = <<<EOT
-     CREATE TABLE `aliases` (
+    CREATE TABLE `aliases` (
       `id` int(11) NOT NULL AUTO_INCREMENT,
       `date` datetime NOT NULL,
       `updated` datetime NOT NULL,
       `pageId` int(11) DEFAULT NULL,
       `itemId` int(11) DEFAULT NULL,
       `itemModel` varchar(255) CHARACTER SET latin1 DEFAULT NULL,
+      `uid` varchar(255) DEFAULT NULL,
       `alias` varchar(255) CHARACTER SET latin1 NOT NULL,
       `status` int(11) NOT NULL DEFAULT '200',
       `payload` text CHARACTER SET latin1,

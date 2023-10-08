@@ -59,9 +59,8 @@ class Front extends \Frootbox\GenericObject
         return $messages;
     }
 
-
     /**
-     *
+     * @return array
      */
     public function getTabs(): array
     {
@@ -69,7 +68,10 @@ class Front extends \Frootbox\GenericObject
     }
 
     /**
-     *
+     * @param string $controller
+     * @param string $action
+     * @param array|null $payload
+     * @return string
      */
     public static function getUri(
         string $controller,

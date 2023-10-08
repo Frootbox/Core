@@ -83,6 +83,11 @@ class Alias extends \Frootbox\Persistence\RowModels\ConfigurableRow
         return $payloadData ?? [];
     }
 
+    public function getSection(): string
+    {
+        return $this->data['section'] ?? 'index';
+    }
+
     /**
      *
      */

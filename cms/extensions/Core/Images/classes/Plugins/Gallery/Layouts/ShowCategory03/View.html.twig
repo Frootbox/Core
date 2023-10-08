@@ -1,0 +1,53 @@
+{# config
+
+title: ausgerichtete Galerie
+_variables:
+    columns:
+        type: int
+        label: Spalten
+        default: 4
+    image_width:
+        type: int
+        label: Bildbreite
+        default: 600
+    image_height:
+        type: int
+        label: Bildhöhe
+        default: 400
+    withLayoutContainer:
+        type: bool
+        label: mit Layout-Container
+
+/config #}
+
+{% set a = view.getViewhelper('Assets') %}
+
+{{ view.set('hideGlobalBlocks', true) }}
+
+{{ a.import('https://cdn.jsdelivr.net/npm/justifiedGallery@3.8.1/dist/js/jquery.justifiedGallery.min.js') | raw }}
+{{ a.import('https://cdn.jsdelivr.net/npm/justifiedGallery@3.8.1/dist/css/justifiedGallery.min.css') | raw }}
+
+
+<div class="plugin Core Images Gallery ShowCategory03">
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+
+                <h2 class="first main-title" data-editable data-uid="{{ category.getUid('title') }}">{{ category.getTitle }}</h2>
+
+                <p class="text-center"><a href="{{ category.getParent().getUri() }}">zurück</a></p>
+
+                <div id="basicExample">
+                    {% for image in category.getImages() %}
+                        <a href="{{ image.getUriThumbnail() }}">
+                            <img alt="caption for image 1" src="{{ image.getUriThumbnail() }}"/>
+                        </a>
+                    {% endfor %}
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>

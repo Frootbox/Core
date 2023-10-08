@@ -3,11 +3,13 @@
   .xcards {
     margin-bottom: -30px;
   }
+
   .xcard {
     margin-bottom: 30px;
-    padding: 30px;
+
     background: #ededed;
     border-radius: 5px;
+    overflow: hidden;
 
     transition: background-color 1s;
 
@@ -15,18 +17,25 @@
       background: #ddd;
     }
 
-    p:last-child {
-      margin-bottom: 0;
-    }
+    .content-wrapper {
+      padding: 30px;
+      p:last-child {
+        margin-bottom: 0;
+      }
 
-    header.h4, h4 {
-      margin: 0;
-      padding: 0 0 20px 0;
+      header.h4, h4 {
+        margin: 0;
+        padding: 0 0 20px 0;
 
-      text-align: left;
+        text-align: left;
 
-      h4 {
-        padding: 0;
+        h4 {
+          padding: 0;
+        }
+      }
+
+      .read-more {
+        margin-top: 30px;
       }
     }
   }

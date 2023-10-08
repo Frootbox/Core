@@ -3,6 +3,9 @@
 {% set partialId = 'partial' ~ random(100000, 999999) %}
 
 <script nonce="{{ settings.nonce }}">
+
+    var _FrootboxBlocksSearchCooldown;
+
     $(function ( ) {
 
         $('#{{ partialId }}').keyup(function ( event ) {
@@ -16,7 +19,16 @@
 
             var input = $(this);
 
-            var cooldown = window.setTimeout(function ( ) {
+            if (input.val().length == 0) {
+
+                window.clearTimeout(_FrootboxBlocksSearchCooldown);
+
+                $('#siteSearchResultsFlyer').remove();
+
+                return;
+            }
+
+            _FrootboxBlocksSearchCooldown = window.setTimeout(function ( ) {
 
                 $('#siteSearchResultsFlyer').remove();
 
@@ -56,7 +68,7 @@
 
             }, 500);
 
-            $(this).attr('data-cooldown', cooldown);
+            $(this).attr('data-cooldown', _FrootboxBlocksSearchCooldown);
         });
 
     });

@@ -1,0 +1,69 @@
+{# config
+
+title: Standard
+variables:
+    withContainer:
+        label: mit Container
+        type: bool
+        default: false
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+
+<div class="plugin Core ShopSystem Checkout Complete01">
+
+    {% if variables.withContainer %}<div class="container">{% endif %}
+
+        <div class="row">
+            <div class="col-12">
+
+                {% if shopcart.getShipping('type') == "selfPickup" %}
+                    <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('titleDeliveryDay') }}">Abholtag wählen</h2>
+                {% else %}
+                    <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('titleDeliveryDay') }}">Liefertag wählen</h2>
+                {% endif %}
+
+
+                <div class="row">
+                    <div class="col-md-6">
+
+                        <form action="{{ plugin.getActionUri('choiceOfDelivery') }}" method="post">
+
+                            <div class="form-group">
+                                <label for="month">Monat wählen</label>
+                                <select class="form-control" id="month" name="month">
+                                    {% for month in monthList %}
+                                        <option {% if selectedMonthString == month.format('Y-m') %}selected{% endif %} value="{{ month.format('Y-m-d') }}">{{ ("Core.ShopSystem.Month" ~ month.format('m')) | translate }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                        </form>
+
+                        <form action="{{ plugin.getAjaxUri('UpdateDeliveryDay') }}" method="post">
+
+                            <div class="form-group">
+                                <label for="deliveryDay">Tag wählen</label>
+                                <select class="form-control" id="deliveryDay" name="deliveryDay">
+
+                                    {% for date in dayList %}
+                                        <option {% if selectedDayString == date.format('Y-m-d') %}selected{% endif %} value="{{ date.format('Y-m-d') }}">{{ date.format('d.m.Y') }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">Liefertag wählen</button>
+
+                        </form>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    {% if variables.withContainer %}</div>{% endif %}
+
+</div>

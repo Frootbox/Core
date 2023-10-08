@@ -51,6 +51,13 @@
                 <input type="text" class="form-control" id="copyright" name="copyright" placeholder="Copyright" value="{{ file.getCopyright }}">
             </div>
 
+            {% if get.get('isLinkable') %}
+                <div class="form-group">
+                    <label for="link">Link</label>
+                    <input type="text" class="form-control" id="link" name="link" placeholder="Link" value="{{ file.getConfig('link') }}">
+                </div>
+            {% endif %}
+
             <button type="submit" class="btn btn-primary">Speichern</button>
         </div>
 

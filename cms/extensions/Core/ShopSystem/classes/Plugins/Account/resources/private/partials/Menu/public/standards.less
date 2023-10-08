@@ -1,11 +1,27 @@
+$colorBackgroundDark: #333 !default;
+$colorBackgroundDarkHover: #666 !default;
+$colorBackgroundDarkActive: #999 !default;
+
+$colorTextBackgroundDark: #FFF !default;
+
 .shopcart-account-menu {
+
   a {
     display: block;
     margin: 0 0 1px 0;
     padding: 8px 10px;
-    background: $colorSpot2;
+    background: $colorBackgroundDark;
 
-    color: #FFF;
+    color: $colorTextBackgroundDark;
     text-decoration: none;
+
+    &:hover {
+      color: $colorTextBackgroundDark;
+      background: $colorBackgroundDarkHover;
+    }
+
+    &.active {
+      background: $colorBackgroundDarkActive;
+    }
   }
 }

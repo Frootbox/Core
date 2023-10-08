@@ -394,4 +394,21 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     {
         return self::getResponse();
     }
+
+    /**
+     * @param \Frootbox\Http\Get $get
+     * @param \Frootbox\Ext\Core\Addresses\Persistence\Repositories\Addresses $addressesRepository
+     * @return Response
+     */
+    public function jumpToEditAction(
+        \Frootbox\Http\Get $get,
+        \Frootbox\Ext\Core\Addresses\Persistence\Repositories\Addresses $addressesRepository,
+    ): Response
+    {
+        // Fetch address
+        $address = $addressesRepository->fetchById($get->get('addressId'));
+
+        header('Location: ' . $address->getUriEdit());
+        exit;
+    }
 }

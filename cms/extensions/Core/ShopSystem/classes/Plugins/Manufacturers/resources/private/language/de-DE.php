@@ -4,5 +4,7 @@
  */
 
 return [
-    'Plugin.Title' => 'Hersteller'
+    'Plugin.Title' => 'Hersteller',
+
+    'LayoutAction.Index' => 'Übersicht',
 ];

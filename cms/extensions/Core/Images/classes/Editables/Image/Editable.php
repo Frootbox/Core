@@ -5,6 +5,8 @@
 
 namespace Frootbox\Ext\Core\Images\Editables\Image;
 
+use Frootbox\Config\Config;
+
 class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\System\Editables\EditableInterface
 {
     /**
@@ -20,12 +22,13 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
      */
     public function parse (
         $html,
-        \Frootbox\Persistence\Repositories\Files $files
+        \Frootbox\Config\Config $config,
+        \Frootbox\Persistence\Repositories\Files $files,
     ): string
     {
         // Replace picture tags
         $crawler = \Wa72\HtmlPageDom\HtmlPageCrawler::create($html);
-        $crawler->filter('picture[data-editable]')->each(function ( $element ) use ($files) {
+        $crawler->filter('picture[data-editable]')->each(function ( $element ) use ($files, $config) {
 
             $uid = $element->getAttribute('data-uid');
 
@@ -35,7 +38,8 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
 
                 $result = $files->fetch([
                     'where' => [ 'uid' => $uid ],
-                    'limit' => 1
+                    'order' => [ 'orderId DESC' ],
+                    'limit' => 1,
                 ]);
 
                 if ($result->getCount() == 0 and $element->getAttribute('data-fallback-uid') !== null) {
@@ -85,24 +89,34 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
                     $payload['height'] = $match[1];
                 }
 
+
                 $default = (preg_match('#<img.*?src="(.*?)".*?>#i', $innerHtml, $match)) ? $match[1] : (string) null;
 
                 $class = (preg_match('#<img.*?class="(.*?)".*?>#i', $innerHtml, $match)) ? $match[1] : (string) null;
 
                 // $alt = !empty($file->getConfig('caption')) ? strip_tags($file->getConfig('caption')) : $file->getName();
-                $html = '
-                <img data-image-edited="true" data-default="' . $default . '" class="' . $class . '" src="' . $file->getUriThumbnail($payload) . '" ' . ($payload['height'] ? 'height="' . $payload['height'] . '"' : '') . ' ' . ($payload['width'] ? 'width="' . $payload['width'] . '"' : '') . ' alt="' . $file->getAlt() . '" />
-            ';
+                $html = '<div class="ext-core-images-image">
+                    <img data-image-edited="true" data-default="' . $default . '" class="' . $class . '" src="' . $file->getUriThumbnail($payload) . '" ' . ($payload['height'] ? 'height="' . $payload['height'] . '"' : '') . ' ' . ($payload['width'] ? 'width="' . $payload['width'] . '"' : '') . ' alt="' . $file->getAlt() . '" />
+                ';
+
+                if (!empty($file->getConfig('caption')) and !empty($config->get('Ext.Core.Images.Editables.Image.Caption'))) {
+                    $html .= '<div class="caption">' . nl2br($file->getConfig('caption')) . '</div>';
+                }
+
+                if (!empty($file->getCopyright()) and !empty($config->get('Ext.Core.Images.Editables.Image.Copyright'))) {
+                    $html .= '<div class="copyright">' . nl2br($file->getCopyright()) . '</div>';
+                }
+
+
+                if ($element->getAttribute('data-skiplink') === null and !empty($file->getConfig('link'))) {
+                    $html = '<a href="' . $file->getConfig('link') . '">' . $html . '</a>';
+                }
+
+                $html .= '</div>';
 
                 if (preg_match('#<img.*?usemap="\#([a-z0-1]+)".*?>#i', $innerHtml, $match)) {
                     $html = str_replace('<img', '<img usemap="#' . $match[1]. '"', $html);
                 }
-
-
-                if (!empty($file->getConfig('link'))) {
-                    $html = '<a href="' . $file->getConfig('link') . '">' . $html . '</a>';
-                }
-
 
                 $element->setInnerHtml($html);
             }

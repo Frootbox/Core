@@ -2,7 +2,7 @@
 {% set icons = view.getViewhelper('Ext/HerrUndFrauPixelExt/Icons/Icons', { createDummyOnFail: true  }) %}
 
 <div class="contacts">
-    <div class="row">
+    <div class="row {% if variables.lastRowCentered %}justify-content-center{% endif %}">
         {% for contact in data.category.getContacts() %}
             <div class="{{ data.colClass }} contact">
 

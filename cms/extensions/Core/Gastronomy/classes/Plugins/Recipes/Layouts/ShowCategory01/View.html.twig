@@ -1,6 +1,10 @@
 {# config
 
 title: Standard
+variables:
+    withContainer:
+        type: bool
+        label: mit Layout-Container
 
 /config #}
 
@@ -9,43 +13,46 @@ title: Standard
 
 {{ b.addSection(category.getTitle(), category.getUri()) }}
 
+<div class="plugin Core Gastronomy Recipes Index01">
+    {% if variables.withContainer %}<div class="container">{% endif %}
 
-<div class="row">
-    <div class="col-12 plugin Core Gastronomy Recipes Index01">
+    <div class="row">
+        <div class="col-12">
 
-        {% if plugin.isFirst %}
-            <h1 data-editable data-uid="{{ category.getUid('title') }}">{{ category.getTitle }}</h1>
-        {% else %}
-            <h2 data-editable data-uid="{{ category.getUid('title') }}">{{ category.getTitle }}</h2>
-        {% endif %}
+            {% if plugin.isFirst %}
+                <h1 data-editable data-uid="{{ category.getUid('title') }}">{{ category.getTitle }}</h1>
+            {% else %}
+                <h2 data-editable data-uid="{{ category.getUid('title') }}">{{ category.getTitle }}</h2>
+            {% endif %}
 
-        <div data-editable data-uid="{{ plugin.getUid('teaser') }}"></div>
+            <div data-editable data-uid="{{ plugin.getUid('teaser') }}"></div>
 
-        {% set recipes = category.getItems({ order: 'title ASC' }) %}
+            {% set recipes = category.getItems({ order: 'title ASC' }) %}
 
-        <div class="row">
-            <div class="col-md-4">
+            <div class="row">
+                <div class="col-md-4">
 
-                <ul>
+                    <ul>
 
-                    {% for recipe in recipes %}
-                        <li><a href="{{ recipe.getUri() }}">{{ recipe.getTitle() }}</a></li>
+                        {% for recipe in recipes %}
+                            <li><a href="{{ recipe.getUri() }}">{{ recipe.getTitle() }}</a></li>
 
-                        {% if (loop.index % ((recipes.getCount() / 3) | round(0, 'ceil'))) == 0 and not loop.last %}
+                            {% if (loop.index % ((recipes.getCount() / 3) | round(0, 'ceil'))) == 0 and not loop.last %}
 
-                                </ul>
-                            </div>
-                            <div class="col-md-4">
+                                    </ul>
+                                </div>
+                                <div class="col-md-4">
 
-                                <ul>
-                        {% endif %}
-                    {% endfor %}
+                                    <ul>
+                            {% endif %}
+                        {% endfor %}
 
-                </ul>
+                    </ul>
 
+                </div>
             </div>
+
         </div>
-
     </div>
+    {% if variables.withContainer %}</div>{% endif %}
 </div>
-

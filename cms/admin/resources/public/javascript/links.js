@@ -9,6 +9,21 @@ $(function ( ) {
             return;
         }
 
+        if ($(this)[0].tagName == 'TR') {
+            if (event.target.tagName == 'svg' && $(event.target).parent('a').length) {
+
+                let link = $(event.target).parent('a');
+
+                if (link.attr('href').length) {
+                    return;
+                }
+            }
+        }
+
+        if (event.target.tagName == "INPUT") {
+            return;
+        }
+
         event.preventDefault();
         event.stopImmediatePropagation();
 

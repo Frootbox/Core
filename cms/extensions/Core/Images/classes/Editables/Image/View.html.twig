@@ -104,24 +104,10 @@
 
             fbxEditorOpenGenericModal();
 
-            /*
-            $.ajax({
-                url: editorconfig.urls.pictures.edit,
-                data: {
-                    uid: uid,
-                    width: img.attr('width'),
-                    height: img.attr('height')
-                },
-                success: function ( response ) {
-
-                    $('#fbxEditorGenericModal .modal-content').html(response.modal.html);
-                }
-            });
-            */
-
             $.ajax({
                 url: "{{ settings.serverpath }}cms/admin/Editor/callEditable?{{ SID }}",
                 data: {
+                    skipLink: (typeof $('picture[data-uid="' + uid + '"]').data('skiplink') !== 'undefined') ? 1 : 0,
                     method: 'ajaxModalEdit',
                     editable: 'Frootbox/Ext/Core/Images/Editables/Image',
                     uid: uid,
@@ -135,6 +121,5 @@
                 }
             });
         });
-
     });
 </script>

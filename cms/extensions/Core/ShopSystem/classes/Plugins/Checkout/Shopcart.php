@@ -7,8 +7,9 @@ namespace Frootbox\Ext\Core\ShopSystem\Plugins\Checkout;
 
 class Shopcart
 {
-    protected $personal = [];
-    protected $shipping = [];
+    protected ?array $personal = [];
+    protected ?array $shipping = [];
+    protected ?array $billing = [];
     protected $payment = [];
     protected $items = [];
     protected $data = [];
@@ -16,17 +17,20 @@ class Shopcart
 
     protected $db;
     protected $config;
+    protected \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Products $productRepository;
 
     /**
      *
      */
     public function __construct(
         \Frootbox\Db\Db $db,
-        \Frootbox\Config\Config $config
+        \Frootbox\Config\Config $config,
+        \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Products $productRepository,
     )
     {
         $this->config = $config;
         $this->db = $db;
+        $this->productRepository = $productRepository;
 
         if (!empty($_SESSION['cart']['products'])) {
             $this->items = &$_SESSION['cart']['products'];
@@ -38,6 +42,10 @@ class Shopcart
 
         if (!empty($_SESSION['cart']['shipping'])) {
             $this->shipping = &$_SESSION['cart']['shipping'];
+        }
+
+        if (!empty($_SESSION['cart']['billing'])) {
+            $this->billing = &$_SESSION['cart']['billing'];
         }
 
         if (!empty($_SESSION['cart']['paymentmethod'])) {
@@ -89,17 +97,22 @@ class Shopcart
                 $price = round($priceGross / (1 + ($product->getTaxrate() / 100)), 2);
             }
 
+
             $item = [
                 'key' => $key,
                 'productId' => $product->getId(),
                 'title' => $product->getTitle(),
                 'amount' => 0,
+                'amountMax' => $options['amountMax'] ?? null,
+                'boundTo' => $options['boundTo'] ?? null,
                 'price' => $price,
                 'priceGross' => $priceGross,
                 'taxRate' => $product->getTaxrate(),
                 'uri' => $product->getUri(),
-                'shippingId' => $product->getShippingId(),
+                'shippingId' => (array_key_exists('shippingId', $options) ? $options['shippingId'] : $product->getShippingId()),
                 'type' => (empty($options['type']) ? 'Product' : $options['type']),
+                'customNote' => $options['customNote'] ?? null,
+                'isAmountFixed' => !empty($options['isAmountFixed']),
             ];
 
             if (!empty($options['customNote'])) {
@@ -142,11 +155,28 @@ class Shopcart
             $_SESSION['cart']['products'][$key] = $item;
         }
 
-
         // Increase amount of product
-        ++$_SESSION['cart']['products'][$key]['amount'];
+        if (!empty($_SESSION['cart']['products'][$key]['boundTo'])) {
+
+            $boundItem = $this->getItem($_SESSION['cart']['products'][$key]['boundTo']);
+            $_SESSION['cart']['products'][$key]['amount'] = $boundItem->getAmount();
+        }
+        else {
+
+            $amount = !empty($options['amount']) ? (int) $options['amount'] : 1;
+            $_SESSION['cart']['products'][$key]['amount'] += $amount;
+        }
 
         return $this->getItem($key);
+    }
+
+    /**
+     *
+     */
+    public function clearItems(): void
+    {
+        unset($_SESSION['cart']['products']);
+        $this->items = [];
     }
 
     /**
@@ -202,17 +232,57 @@ class Shopcart
     /**
      *
      */
+    public function getBilling(string $attribute): ?string
+    {
+        return $this->billing[$attribute] ?? (string) null;
+    }
+
+    /**
+     * @return array
+     */
+    public function getBillingData(): array
+    {
+        return $this->billing;
+    }
+
+    /**
+     *
+     */
     public function getConfig(): \Frootbox\Config\Config
     {
         return $this->config;
     }
 
     /**
-     *
+     * @return \Frootbox\Db\Db
+     */
+    public function getDb(): \Frootbox\Db\Db
+    {
+        return $this->db;
+    }
+
+    /**
+     * @param string $key
+     * @return ShopcartItem
      */
     public function getItem(string $key): ShopcartItem
     {
         return new ShopcartItem($this->items[$key] ?? null);
+    }
+
+    /**
+     * @param int $productId
+     * @return ShopcartItem|null
+     */
+    public function getItemByProductId(int $productId): ?\Frootbox\Ext\Core\ShopSystem\Plugins\Checkout\ShopcartItem
+    {
+        foreach ($this->getItems() as $item) {
+            if ($item->getProductId() == $productId) {
+                return $item;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -246,7 +316,11 @@ class Shopcart
                 continue;
             }
 
-            $items[] = new ShopcartItem($itemData);
+            if (!empty($itemData['productId'])) {
+                $product = $this->productRepository->fetchById($itemData['productId']);
+            }
+
+            $items[] = new ShopcartItem($itemData, $product ?? null);
         }
 
         return $items;
@@ -384,6 +458,21 @@ class Shopcart
     }
 
     /**
+     * @return \Frootbox\Ext\Core\ShopSystem\Persistence\PickupLocation|null
+     * @throws \Frootbox\Exceptions\NotFound
+     */
+    public function getSelfpickupAddress(): ?\Frootbox\Ext\Core\ShopSystem\Persistence\PickupLocation
+    {
+        if (empty($this->shipping['selfpickupAddressId'])) {
+            return null;
+        }
+
+        // Fetch address
+        $repository = $this->db->getRepository(\Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\PickupLocation::class);
+        return $repository->fetchById($this->shipping['selfpickupAddressId']);
+    }
+
+    /**
      *
      */
     public function getShipping(string $attribute): ?string
@@ -392,7 +481,7 @@ class Shopcart
     }
 
     /**
-     *
+     * @return array
      */
     public function getShippingData(): array
     {
@@ -418,7 +507,12 @@ class Shopcart
                 continue;
             }
 
+            // Fetch shippingcosts
             $shippingcosts = $repository->fetchById($item->getShippingId());
+
+            if ($shippingcosts->isApplicableToCertainProduct()) {
+                continue;
+            }
 
             $newcosts = $shippingcosts->getCosts($item, $this);
 
@@ -432,6 +526,48 @@ class Shopcart
         }
 
         return $costs;
+    }
+
+    /**
+     *
+     */
+    public function getShippingMethod(): ?\Frootbox\Ext\Core\ShopSystem\Persistence\ShippingCosts
+    {
+        if ($this->getShipping('type') == 'selfPickup') {
+            return null;
+        }
+
+        $repository = $this->db->getRepository(\Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\ShippingCosts::class);
+
+        $costs = 0;
+        $method = null;
+
+        foreach ($this->getItems() as $item) {
+
+            if (empty($item->getShippingId())) {
+                continue;
+            }
+
+            // Fetch shippingcosts
+            $shippingcosts = $repository->fetchById($item->getShippingId());
+
+            if ($shippingcosts->isApplicableToCertainProduct()) {
+                continue;
+            }
+
+            $newcosts = $shippingcosts->getCosts($item, $this);
+
+            if ($newcosts === null) {
+                return null;
+            }
+
+            if ($newcosts > $costs or $costs === null) {
+                $costs = $newcosts;
+                $method = $shippingcosts;
+            }
+        }
+
+        return $shippingcosts ?? null;
     }
 
     /**
@@ -473,12 +609,14 @@ class Shopcart
                 $sections[$taxrate] = [
                     'taxrate' => $taxrate,
                     'total' => 0,
-                    'tax' => 0
+                    'tax' => 0,
+                    'net' => 0,
                 ];
             }
 
             $sections[$taxrate]['tax'] += $item->getTax();
-            $sections[$taxrate]['total'] += $item->getPriceGross() * $item->getAmount();
+            $sections[$taxrate]['total'] += $item->getPriceGrossFinal() * $item->getAmount();
+            $sections[$taxrate]['net'] += ($item->getPriceGrossFinal() * $item->getAmount()) - $item->getTax();
 
             $lastTaxrate = $taxrate;
         }
@@ -567,6 +705,20 @@ class Shopcart
     /**
      *
      */
+    public function getTotalNetItems(): float
+    {
+        $total = 0.0;
+
+        foreach ($this->getItems() as $item) {
+            $total += $item->getTotalNet();
+        }
+
+        return $total;
+    }
+
+    /**
+     *
+     */
     public function hasProduct(int $productId): bool
     {
         foreach ($this->items as $item) {
@@ -592,6 +744,26 @@ class Shopcart
     /**
      *
      */
+    public function reloadItems(): void
+    {
+        if (!empty($_SESSION['cart']['products'])) {
+            $this->items = &$_SESSION['cart']['products'];
+        }
+    }
+
+    /**
+     *
+     */
+    public function setBilling(?array $billingData): void
+    {
+        $this->billing = $billingData;
+
+        $_SESSION['cart']['billing'] = $this->billing;
+    }
+
+    /**
+     *
+     */
     public function setItem(ShopcartItem $item): void
     {
         $key = $item->getKey();
@@ -605,6 +777,7 @@ class Shopcart
         $this->items[$key]['price'] = $item->getPrice();
         $this->items[$key]['priceGross'] = $item->getPriceGross();
         $this->items[$key]['hasSurcharge'] = $item->hasSurcharge();
+        $this->items[$key]['shippingExtra'] = $item->getShippingExtra();
 
         // Check amount of bound items
         $amount = 0;
@@ -657,7 +830,8 @@ class Shopcart
     }
 
     /**
-     *
+     * @param array $personalData
+     * @return void
      */
     public function setPersonal(array $personalData): void
     {
@@ -669,7 +843,7 @@ class Shopcart
     /**
      *
      */
-    public function setShipping(array $shippingData): void
+    public function setShipping(?array $shippingData): void
     {
         $this->shipping = $shippingData;
 
@@ -682,5 +856,25 @@ class Shopcart
     public function setShippingCosts($costs)
     {
         $_SESSION['cart']['shipping']['costs'] = $costs;
+    }
+
+    public function updateShippingCosts(): void
+    {
+        foreach ($this->getItems() as $item) {
+
+            $shippingCosts = $item->getProduct()->getShippingCosts();
+
+            if (empty($shippingCosts)) {
+                continue;
+            }
+
+            if ($shippingCosts->isApplicableToCertainProduct()) {
+
+                $costs = $shippingCosts->getCosts($item, $this);
+
+                $item->setShippingExtra($costs);
+                $this->setItem($item);
+            }
+        }
     }
 }

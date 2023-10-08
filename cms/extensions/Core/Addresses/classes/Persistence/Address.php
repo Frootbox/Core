@@ -122,6 +122,7 @@ class Address extends \Frootbox\Persistence\AbstractRow
             'virtualDirectory' => [
                 $this->getTitle()
             ],
+            'uid' => $this->getUid('alias'),
             'payload' => $this->generateAliasPayload([
                 'action' => 'showAddress',
                 'addressId' => $this->getId()
@@ -180,5 +181,15 @@ class Address extends \Frootbox\Persistence\AbstractRow
         }
 
         return $url;
+    }
+
+    /**
+     * Check if location is visible to user
+     *
+     * @return bool
+     */
+    public function isVisible(): bool
+    {
+        return ($this->getVisibility() >= (IS_EDITOR ? 1 : 2));
     }
 }

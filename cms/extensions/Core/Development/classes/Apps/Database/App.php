@@ -168,6 +168,15 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
     {
         $path = $config->get('filesRootFolder') . 'backup/database/' . $get->get('file');
 
+        if (!file_exists($path)) {
+            d("FILE NOT FOUND");
+        }
+
+        // End output buffering
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
+
         http_response_code(200);
 
         header('Content-type: application/octet-stream');

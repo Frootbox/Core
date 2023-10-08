@@ -259,23 +259,33 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
      *
      */
     public function ajaxUpdateAlign (
+        \Frootbox\Http\Get $get,
+        \DI\Container $container,
         \Frootbox\Persistence\Content\Repositories\Widgets $widgets,
-        \Frootbox\Http\Get $get
     ): Response
     {
         // Fetch widget
         $widget = $widgets->fetchById($get->get('widgetId'));
 
         $widget->addConfig([
-            'align' => $get->get('align')
+            'align' => $get->get('align'),
         ]);
 
         $widget->save();
 
+        // Re-fetch widget
+        $widget = $widgets->fetchById($get->get('widgetId'));
+
+        $widgetHtml = $container->call([ $widget, 'renderHtml' ], [
+            'action' => 'Index'
+        ]);
+
         return self::getResponse('json', 200, [
             'widget' => [
                 'align' => $widget->getAlign(),
-                'width' => $widget->getWidth()
+                'width' => $widget->getWidth(),
+                'id' => $widget->getId(),
+                'html' => $widgetHtml,
             ]
         ]);
     }
@@ -284,11 +294,11 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
      *
      */
     public function ajaxUpdateConfig (
-        \Frootbox\Persistence\Content\Repositories\Widgets $widgets,
         \Frootbox\Http\Get $get,
-        \Frootbox\Http\Post $post,
         \DI\Container $container,
+        \Frootbox\Http\Post $post,
         \Frootbox\Config\Config $configuration,
+        \Frootbox\Persistence\Content\Repositories\Widgets $widgets,
     ): Response
     {
         // Validate required input
@@ -330,8 +340,8 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
         return self::getResponse('json', 200, [
             'widget' => [
                 'id' => $widget->getId(),
-                'html' => $widgetHtml
-            ]
+                'html' => $widgetHtml,
+            ],
         ]);
     }
 }

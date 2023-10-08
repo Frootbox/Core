@@ -82,6 +82,20 @@ class Thumbnail extends GenericObject
     /**
      *
      */
+    public function detectOrientation(): mixed
+    {
+        $prefix = $this->config->imagemagick->path ?? '/opt/local/bin/convert';
+
+        $command = $prefix . ' ' . $this->getPath() . ' -format %[orientation] info:';
+
+        $orientation = shell_exec($command);
+
+        return $orientation;
+    }
+
+    /**
+     *
+     */
     public function exists(): bool
     {
         return file_exists(FILES_DIR . $this->path) or file_exists($this->path);
@@ -103,15 +117,15 @@ class Thumbnail extends GenericObject
         }
 
         $data = [
-            $this->width,
-            $this->height,
+            (int) $this->width,
+            (int) $this->height,
             $this->crop,
-            $this->rotation,
+            (int) $this->rotation,
             $this->path,
         ];
 
         $fileName = md5(serialize($data)) . '.' . $this->type;
-        
+
         $path .= $fileName[0] . '/' . $fileName[1] . '/' . substr($fileName, 2);
 
         if (strpos($_SERVER['HTTP_ACCEPT'], 'image/webp') !== false and !empty($this->config->webp) and $this->type != 'svg') {
@@ -233,5 +247,13 @@ class Thumbnail extends GenericObject
         }
 
         return $this;
+    }
+
+    /**
+     *
+     */
+    public function setRotation(int $rotation): void
+    {
+        $this->rotation = $rotation;
     }
 }

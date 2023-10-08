@@ -250,6 +250,33 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
         ]);
     }
 
+    public function ajaxSearchAction(
+        \Frootbox\Http\Post $post,
+        Persistence\Repositories\Jobs $jobRepository,
+    ): Response
+    {
+        $sql = 'SELECT
+            j.*
+        FROM
+             assets j
+        WHERE        
+            j.pluginId = ' . $this->getId() . ' AND
+            j.className = :className AND
+            j.visibility >= ' . (IS_LOGGED_IN ? 1 : 2) . ' AND
+            (
+                j.title LIKE :keyword                
+            )
+        ORDER BY j.title ASC';
+
+        $addressesRepository = $this->getDb()->getRepository(\Frootbox\Ext\Core\Addresses\Persistence\Repositories\Addresses::class);
+        $result = $addressesRepository->fetchByQuery($sql, [
+            'className' => \Frootbox\Ext\Core\HelpAndSupport\Plugins\Jobs\Persistence\Job::class,
+            'keyword' => '%' . $post->get('keyword') . '%',
+        ]);
+
+        d($result);
+    }
+
     /**
      *
      */
@@ -354,34 +381,156 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
     }
 
     /**
-     *
+     * @param Persistence\Repositories\Jobs $jobsRepository
+     * @return Response
      */
     public function indexAction(
-        Persistence\Repositories\Jobs $jobsRepository
+        \Frootbox\Http\Get $get,
+        \Frootbox\Http\Post $post,
+        \Frootbox\Config\Config $configuration,
+        Persistence\Repositories\Jobs $jobRepository,
     ): Response
     {
-        // Fetch jobs
-        $result = $jobsRepository->fetch([
-            'where' => [
-                'pluginId' => $this->getId(),
-                new \Frootbox\Db\Conditions\GreaterOrEqual('visibility',(IS_LOGGED_IN ? 1 : 2)),
-            ],
-        ]);
+        if (!empty($get->get('keyword')) or !empty($get->get('jobTypeId')) or !empty($get->get('fieldOfActivity'))) {
+
+            $algoliaController = new \Frootbox\Ext\PixelFabrikLib\AlgoliaSearch\ExtensionController;
+
+            require $algoliaController->getPath() . 'vendor/autoload.php';
+
+            // Initialize algolia client
+            $client = \Algolia\AlgoliaSearch\SearchClient::create(
+                $configuration->get('Ext.PixelFabrikLib.AlgoliaSearch.appId'),
+                $configuration->get('Ext.PixelFabrikLib.AlgoliaSearch.apiKey')
+            );
+
+
+            $tagFilters[] = 'Asset/Ext/Core/HelpAndSupport/Job';
+            $filters = '';
+
+            if (!empty($get->get('jobTypeId'))) {
+
+                if ($get->get('jobTypeId') == 'Fulltime') {
+                    $tagFilters[] = [ 'Fulltime', 'FulltimeOrParttime' ];
+                }
+                elseif ($get->get('jobTypeId') == 'Parttime') {
+                    $tagFilters[] = [ 'Parttime', 'FulltimeOrParttime' ];
+                }
+                elseif ($get->get('jobTypeId') == 'FulltimeOrParttime') {
+                    $tagFilters[] = [ 'Fulltime', 'Parttime', 'FulltimeOrParttime' ];
+                }
+                else {
+                    $tagFilters[] = $get->get('jobTypeId');
+                }
+            }
+
+            if (!empty($get->get('fieldOfActivity'))) {
+                $tagFilters[] = 'tag-' . $get->get('fieldOfActivity');
+                $filters .= (!empty($filters) ? ' AND ' : '') . '_tags:tag-' . $get->get('fieldOfActivity');
+            }
+
+            // $filters .= ' AND _tags:' . GLOBAL_LANGUAGE;
+
+            $index = $client->initIndex('Website');
+
+            $result = $index->search($get->get('keyword'), [
+                'tagFilters' => $tagFilters,
+              //  'filters' => $filters,
+                'attributesToRetrieve' => [
+                    'title',
+                    'url',
+                    'categories'
+                ],
+                'attributesToSnippet' => [
+                    "context:20",
+                ],
+                'hitsPerPage' => 1000,
+                'page' => $get->get('page') ?? 0,
+            ]);
+
+            $list = [];
+
+            foreach ($result['hits'] as $job) {
+
+                preg_match('#:(\d+)$#', $job['objectID'], $match);
+
+                try {
+                    $list[] = $jobRepository->fetchById($match[1]);
+                }
+                catch ( \Frootbox\Exceptions\NotFound $e ) {
+                    // d($e);
+                }
+            }
+
+            $result = $list;
+            /*
+            // Fetch jobs
+            $result = $jobRepository->fetch([
+                'where' => [
+                    'pluginId' => $this->getId(),
+                    new \Frootbox\Db\Conditions\GreaterOrEqual('visibility',(IS_LOGGED_IN ? 1 : 2)),
+                ],
+                'order' => [ 'isSticky DESC', 'orderId DESC' ],
+            ]);
+            */
+        }
+        else {
+
+            $sql = 'SELECT
+                j.*
+            FROM
+                 assets j
+            WHERE        
+                j.pluginId = ' . $this->getId() . ' AND
+                j.className = :className AND
+                j.visibility >= ' . (IS_LOGGED_IN ? 1 : 2) . ' AND
+                (
+                    j.title LIKE :keyword OR
+                    j.subtitle LIKE :keyword       
+                )
+            ORDER BY
+                j.isSticky DESC,
+                j.orderId DESC';
+
+
+            $addressesRepository = $this->getDb()->getRepository(\Frootbox\Ext\Core\Addresses\Persistence\Repositories\Addresses::class);
+            $result = $addressesRepository->fetchByQuery($sql, [
+                'className' => \Frootbox\Ext\Core\HelpAndSupport\Plugins\Jobs\Persistence\Job::class,
+                'keyword' => '%' . $post->get('keyword') . '%',
+            ]);
+        }
+
+        if (MULTI_LANGUAGE and DEFAULT_LANGUAGE != GLOBAL_LANGUAGE and $this->getConfig('ignoreForeignTitles')) {
+
+            foreach ($result as $index => $job) {
+
+                $aliases  = json_decode($job->getDataRaw('aliases'), true);
+
+                if (empty($aliases['index'][GLOBAL_LANGUAGE])) {
+                    $result->removeByIndex($index);
+                }
+            }
+        }
 
         return new \Frootbox\View\Response([
-            'jobs' => $result
+            'keyword' => $post->get('keyword'),
+            'jobs' => $result,
         ]);
     }
 
     /**
-     *
+     * @param Persistence\Repositories\Jobs $jobRepository
+     * @return Response
      */
     public function showJobAction(
-        Persistence\Repositories\Jobs $jobsRepository
+        Persistence\Repositories\Jobs $jobRepository,
     ): Response
     {
         // Fetch job
-        $job = $jobsRepository->fetchById($this->getAttribute('jobId'));
+        $job = $jobRepository->fetchById($this->getAttribute('jobId'));
+
+        if (!$job->isVisible()) {
+            return new \Frootbox\View\ResponseRedirect($this->getActionUri('index'));
+        }
 
         return new \Frootbox\View\Response([
             'maxUploadSize' => round(\Frootbox\Persistence\Repositories\Files::getUploadMaxSize() / 1024 / 1024, 2),

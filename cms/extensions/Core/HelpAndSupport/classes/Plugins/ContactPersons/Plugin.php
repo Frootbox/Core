@@ -83,7 +83,8 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
     }
 
     /**
-     *
+     * @return \Frootbox\Db\Result
+     * @throws \Frootbox\Exceptions\RuntimeError
      */
     public function getContacts(): \Frootbox\Db\Result
     {
@@ -117,14 +118,16 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
     }
 
     /**
-     *
+     * @return \Frootbox\Db\Result
+     * @throws \Frootbox\Exceptions\RuntimeError
      */
     public function getTopCategories(
-        \Frootbox\Ext\Core\HelpAndSupport\Persistence\Repositories\Categories $categories
+
     ): \Frootbox\Db\Result
     {
         // Fetch top categories
-        $result = $categories->fetch([
+        $categoryRepository = $this->getDb()->getRepository(\Frootbox\Ext\Core\HelpAndSupport\Persistence\Repositories\Categories::class);
+        $result = $categoryRepository->fetch([
             'where' => [
                 'uid' => $this->getUid('categories'),
                 new \Frootbox\Db\Conditions\MatchColumn('parentId', 'rootId'),
@@ -159,6 +162,17 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
         ]);
 
         $result->map('delete');
+    }
+
+    /**
+     * @param string $url
+     * @return void
+     */
+    public function redirect301(string $url): void
+    {
+        ob_end_clean();
+        header('Location: ' . $url);
+        exit;
     }
 
     /**

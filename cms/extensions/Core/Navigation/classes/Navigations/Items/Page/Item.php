@@ -17,6 +17,7 @@ class Item extends \Frootbox\Ext\Core\Navigation\Navigations\Items\AbstractItem
         $pages = $pagesRepository->fetch([
             'where' => [
                 'parentId' => $this->getConfig('pageId'),
+                new \Frootbox\Db\Conditions\NotEqual('visibility', 'Hidden')
             ],
             'order' => [
                 'lft ASC',
@@ -133,7 +134,8 @@ class Item extends \Frootbox\Ext\Core\Navigation\Navigations\Items\AbstractItem
     }
 
     /**
-     *
+     * @param array|null $parameters
+     * @return bool
      */
     public function isActive(array $parameters = null): bool
     {
@@ -141,9 +143,14 @@ class Item extends \Frootbox\Ext\Core\Navigation\Navigations\Items\AbstractItem
             return false;
         }
 
+        // Obtain page object
         $page = $parameters['page'];
 
         if ($this->config['pageId'] == $page->getId()) {
+            return true;
+        }
+
+        if ($this->config['pageId'] == $page->getParentId() and $page->getParent()->getParentId() != 0) {
             return true;
         }
 

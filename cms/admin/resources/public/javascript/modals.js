@@ -26,6 +26,9 @@ $(function ( ) {
             },
             success : function ( html ) {
 
+                // Close all dropdown
+                $('.dropdown-toggle').dropdown('hide');
+
                 $('#genericModal .modal-body').remove();
                 $('#genericModal .modal-footer').remove();
 
@@ -39,10 +42,12 @@ $(function ( ) {
                  
                 $('#genericModal').modal('show');
 
-                $('#genericModal').on('shown.bs.modal', function () { 
-
+                $('#genericModal').on('shown.bs.modal', function () {
                     $('#genericModal .modal-body input').filter(function() { return $(this).val() == ""; }).first().focus();
                 });
+
+
+                initElements();
             },
             error : function ( xhr ) {
                 

@@ -162,6 +162,10 @@ class Category extends \Frootbox\Persistence\Category implements \Frootbox\Persi
      */
     protected function getNewAlias ( ): ?\Frootbox\Persistence\Alias
     {
+        if (!empty($this->getConfig('noCategoriesDetailPages'))) {
+            return null;
+        }
+
         $trace = $this->getTrace();
         $trace->shift();
 
@@ -190,6 +194,10 @@ class Category extends \Frootbox\Persistence\Category implements \Frootbox\Persi
      */
     public function getNewAliases(): array
     {
+        if (!empty($this->getConfig('noCategoriesDetailPages'))) {
+            return [];
+        }
+
         $trace = $this->getTrace();
         $trace->shift();
 
@@ -217,6 +225,7 @@ class Category extends \Frootbox\Persistence\Category implements \Frootbox\Persi
                     'language' => $language,
                     'pageId' => $this->getPageId(),
                     'virtualDirectory' => $vd,
+                    'uid' => $this->getUid('alias'),
                     'payload' => $this->generateAliasPayload([
                         'action' => 'showCategory',
                         'categoryId' => $this->getId()
@@ -233,6 +242,7 @@ class Category extends \Frootbox\Persistence\Category implements \Frootbox\Persi
                     'pageId' => $this->getPageId(),
                     'language' => $this->getLanguage() ?? GLOBAL_LANGUAGE,
                     'virtualDirectory' => $vd,
+                    'uid' => $this->getUid('alias'),
                     'payload' => $this->generateAliasPayload([
                         'action' => 'showCategory',
                         'categoryId' => $this->getId()
@@ -247,16 +257,18 @@ class Category extends \Frootbox\Persistence\Category implements \Frootbox\Persi
      */
     public function getProducts(
         array $options = null,
-        \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Products $productsRepository
     ): \Frootbox\Db\Result
     {
+        $productsRepository = $this->getDb()->getRepository(\Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Products::class);
+
         // Build sql
         $sql = 'SELECT
             p.*,
             i.config as connConfig,
             i.id as connId,
             i.alias,
-            i.aliases
+            i.aliases,
+            i.categoryId
         FROM
             shop_products p,
             categories_2_items i
@@ -269,11 +281,16 @@ class Category extends \Frootbox\Persistence\Category implements \Frootbox\Persi
 
         $sql .= '
             i.categoryId = ' . $this->getId() . ' AND
-            i.itemId = p.id
+            i.categoryClass = :categoryClass AND 
+            i.itemId = p.id AND
+            i.itemClass = :itemClass
         ORDER BY
             i.orderId DESC';
 
-        $result = $productsRepository->fetchByQuery($sql);
+        $result = $productsRepository->fetchByQuery($sql, [
+            ':categoryClass' => \Frootbox\Ext\Core\ShopSystem\Persistence\Category::class,
+            ':itemClass' => \Frootbox\Ext\Core\ShopSystem\Persistence\Product::class,
+        ]);
 
         return $result;
     }

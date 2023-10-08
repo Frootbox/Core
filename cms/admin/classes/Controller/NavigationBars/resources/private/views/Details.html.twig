@@ -10,9 +10,18 @@
 <h2>
     Navigation „{{ navigation.getTitle() }}“
     <span class="headoptions">
-        <a data-modal href="{{ v.getUri('NavigationBars', 'ajaxModalEdit', { navigationId: navigation.getId(), language: get.get('language') }) }}" data-title="Navigation bearbeiten"><i class="fa fa-pencil"></i></a>
-        <a href="{{ v.getUri('NavigationBars', 'sort', { navigationId: navigation.getId(), language: get.get('language') } ) }}"><i class="fa fa-sort-alt"></i></a>
-        <a data-modal href="{{ v.getUri('NavigationBars', 'ajaxModalComposeItem', { navigationId: navigation.getId(), language: get.get('language') }) }}" data-title="Navigations-Punkt erstellen"><i class="fa fa-plus-circle"></i></a>
+
+        <span class="dropdown">
+			<i class="far fa-bars dropdown-toggle" data-toggle="dropdown"></i>
+
+			<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+    			<a class="dropdown-item" href="{{ v.getUri('NavigationBars', 'ajaxModalEdit', { navigationId: navigation.getId(), language: get.get('language') }) }}" data-modal data-title="Navigation bearbeiten"><i class="far fa-fw fa-pencil icon"></i>Navigation bearbeiten</a>
+                <a class="dropdown-item" href="{{ v.getUri('NavigationBars', 'sort', { navigationId: navigation.getId(), language: get.get('language') } ) }}"><i class="far fa-fw fa-sort-alt icon"></i>Navigation sortieren</a>
+                <a class="dropdown-item" href="{{ v.getUri('NavigationBars', 'ajaxModalClone', { navigationId: navigation.getId(), language: get.get('language') } ) }}" data-modal data-title="Navigation klonen"><i class="far fa-fw fa-copy icon"></i>Navigation klonen</a>
+			</div>
+		</span>
+
+        <a data-toggle="tooltip" title="Neuen Hauptnavigationspunkt hinzufügen" data-modal href="{{ v.getUri('NavigationBars', 'ajaxModalComposeItem', { navigationId: navigation.getId(), language: get.get('language') }) }}" data-title="Navigations-Punkt erstellen"><i class="fa fa-plus-circle"></i></a>
     </span>
 </h2>
 

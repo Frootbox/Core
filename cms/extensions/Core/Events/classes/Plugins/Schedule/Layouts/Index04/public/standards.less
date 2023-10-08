@@ -1,0 +1,58 @@
+.plugin.Core.Events.Schedule.Index04 {
+
+  table {
+    display: block;
+
+    tbody {
+      display: block;
+      tr {
+        display: block;
+        margin: 30px 0;
+        padding: 15px;
+
+        background: #FFF;
+
+        td {
+          display: inline;
+          border: none;
+          padding: 0;
+
+          p.event-title {
+            margin: 0;
+            padding: 0;
+
+            font-weight: bold;
+          }
+
+          div[data-editable] {
+            p:last-child {
+              margin-bottom: 0;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  @media (min-width: 768px) {
+    table {
+      display: table;
+
+
+      tbody {
+        display: table-row-group;
+
+        tr {
+          display: table-row;
+          background: none;
+
+          td {
+            display: table-cell;
+            padding: .75rem;
+            border-top: 1px solid rgba(0, 0, 0, .1);
+          }
+        }
+      }
+    }
+  }
+}

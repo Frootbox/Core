@@ -14,7 +14,14 @@ use Frootbox\Admin\Controller\Response;
 class Controller extends \Frootbox\Admin\Controller\AbstractController
 {
     /**
-     *
+     * @param \Frootbox\Http\Get $get
+     * @param \Frootbox\Http\Post $post
+     * @param \Frootbox\Persistence\Repositories\Categories $categories
+     * @param \Frootbox\Persistence\Content\Repositories\ContentElements $contentElementsRepository
+     * @param \Frootbox\Admin\Viewhelper\GeneralPurpose $gp
+     * @return Response
+     * @throws \Frootbox\Exceptions\InputMissing
+     * @throws \Frootbox\Exceptions\NotFound
      */
     public function ajaxCreate(
         \Frootbox\Http\Get $get,
@@ -30,18 +37,26 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
         // Fetch parent category
         $parent = $categories->fetchById($get->get('parentId'));
 
-        // Fetch plugin
-        $plugin = $contentElementsRepository->fetchById($parent->getPluginId());
-
+        // Compose new category
         $className = $parent->getClassName();
-
-        $category = $parent->appendChild(new $className([
+        $newCategory = new $className([
             'pageId' => $parent->getPageId(),
-            'pluginId' => $parent->getPluginId(),
             'title' => $post->get('title'),
             'uid' => $parent->getDataRaw('uid'),
             'visibility' => (DEVMODE ? 2 : 1),
-        ]));
+        ]);
+
+        if (!empty($parent->getPluginId())) {
+
+            // Fetch plugin
+            $plugin = $contentElementsRepository->fetchById($parent->getPluginId());
+            $newCategory->setPluginId($parent->getPluginId());
+        }
+        else {
+            $plugin = null;
+        }
+
+        $parent->appendChild($newCategory);
 
         return self::getResponse('json', 200, [
             'modalDismiss' => true,
@@ -133,6 +148,19 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
             $category->addConfig([
                 'titles' => array_filter($post->get('titles')),
             ]);
+        }
+
+        $category->unsetConfig('noGenericDetailsPage');
+
+        if (!empty($post->get('noGenericDetailsPage'))) {
+            $category->addConfig([
+                'noGenericDetailsPage' => true,
+            ]);
+        }
+
+        // Update tags
+        if (!empty($post->get('tags'))) {
+            $category->setTags($post->get('tags'));
         }
 
         $category->save();

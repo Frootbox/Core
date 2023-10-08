@@ -3,5 +3,6 @@
         <span {% if renderer.options.editable %}data-editable-element data-uid="{{ field.getUid('title') }}"{% endif %}>{{ field.getTitle() }}</span><!--
         -->{% if field.getMandatory() %}<span class="mandatory">*</span>{% endif %}
     </label>
-    <input {% if field.isRequired() %}required{% endif %} type="text" class="form-control" id="field-{{ field.getId() }}" name="fields[{{ field.getId() }}]" placeholder="{% if renderer.options.placeholderLabel %}{{ field.getTitle() }}{% if field.isRequired() %}*{% endif %}{% endif %}">
+    <input {% if field.isRequired() %}required{% endif %} type="text" class="form-control" id="field-{{ field.getId() }}" name="fields[{{ field.getId() }}]" placeholder="{% if renderer.options.placeholderLabel %}{{ field.getTitle() }}{% if field.isRequired() %}*{% endif %}{% endif %}" value="{{ field.getValue() }}">
+    {% if field.getConfig('helpText') %}<small id="helpText{{ field.getId() }}" class="form-text text-muted">{{ field.getConfig('helpText') }}</small>{% endif %}
 </div>

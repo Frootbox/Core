@@ -1,0 +1,57 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ front.addTab('Website Kopierer', app.getUri('index')) }}
+
+<h2>
+    Website Kopierer
+</h2>
+
+<form action="{{ app.getUri('ajaxClone') }}" class="ajax" method="post">
+
+    <div class="card">
+        <div class="card-body">
+
+            <div class="row">
+                <div class="col-md-4">
+
+                    <div class="form-group">
+                        <label for="source">Quelle</label>
+                        <select class="form-control" id="source" name="source">
+
+                            {% for section,extensions in list %}
+                                <optgroup label="{{ section }}">
+                                    {% for extension in extensions %}
+                                        <option value="{{ extension.vendorId }}-{{ extension.extensionId }}">{{ extension.vendorId }}-{{ extension.extensionId }}</option>
+                                    {% endfor %}
+                                </optgroup>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <div class="form-group">
+                        <label for="targetVendorId">Ziel-Vendor</label>
+                        <select class="form-control" id="targetVendorId" name="targetVendorId">
+                            {% for vendor in vendors %}
+                                <option value="{{ vendor }}">{{ vendor }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="targetExtensionId">Ziel-Extension</label>
+                        <input type="text" class="form-control" id="targetExtensionId" name="targetExtensionId">
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Kopieren</button>
+        </div>
+    </div>
+
+</form>

@@ -16,11 +16,11 @@
 
 			{% for address in addresses %}
 				<tr id="row-{{ address.getId() }}" data-address="{{ address.getId() }}" class="ajax {% if data.highlight == address.getId %}highlighted{% endif %}" data-href="{{ data.plugin.getAdminUri('Address', 'details', { addressId: address.getId() }) }}">
-					<td>{{ address.getTitle }}</td>
+					<td><i class="far fa-building icon"></i> {{ address.getTitle }}</td>
 					<td class="handle"><i class="fa fa-grip-lines"></i></td>
 					<td class="text-right">
 						<a class="ajax" href="{{ data.plugin.getAdminUri('Address', 'ajaxSwitchVisibility', { addressId: address.getId() }) }}"><i data-address="{{ address.getId() }}" class="fa fa-lightbulb visibility {{ address.getVisibilityString() }} icon"></i></a>
-						<a class="ajax" data-confirm="Soll diese Adresse wirklich gelöscht werden?" href="{{ data.plugin.getAdminUri('Address', 'ajaxDelete', { addressId: address.getId() }) }}"><i class="fa fa-times icon"></i></a>
+						<a class="ajax" data-confirm="Soll diese Adresse wirklich gelöscht werden?" href="{{ data.plugin.getAdminUri('Address', 'ajaxDelete', { addressId: address.getId() }) }}"><i class="far fa-trash icon"></i></a>
 					</td>
 				</tr>
 			{% endfor %}

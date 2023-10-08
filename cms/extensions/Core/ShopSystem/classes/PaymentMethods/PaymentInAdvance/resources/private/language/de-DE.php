@@ -5,5 +5,4 @@
 
 return [
     'Method.Title' => 'Vorkasse',
-
 ];

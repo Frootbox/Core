@@ -1,0 +1,40 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<h2>
+    App Store Weiche
+    {#
+    <span class="headoptions">
+		<a data-toggle="tooltip" data-modal data-title="neue Einheit hinzufügen" href="{{ plugin.getAdminUri('Entity', 'ajaxModalCompose') }}"><i class="fa fa-plus-circle"></i></a>
+	</span>
+    #}
+</h2>
+
+<p><a class="ajax" href="{{ v.getUri('Page', 'ajaxPanelContent', { pageId: plugin.getPageId() }) }}"><i class="fa fa-chevron-circle-left"></i> zurück</a></p>
+
+<div class="card">
+    <div class="card-body">
+
+        <form class="ajax" method="post" action="{{ plugin.getAdminUri('Index', 'ajaxUpdate') }}">
+            <div class="form-group">
+                <label for="urlAppStore">App Store Link</label>
+                <input type="text" class="form-control" id="urlAppStore" name="urlAppStore" aria-describedby="emailHelp" value="{{ plugin.getConfig('urlAppStore') }}">
+                <small id="emailHelp" class="form-text text-muted">URL der App im Apple App Store</small>
+            </div>
+            <div class="form-group">
+                <label for="urlPlayStore">Play Store Link</label>
+                <input type="text" class="form-control" id="urlPlayStore" name="urlPlayStore" aria-describedby="emailHelp" value="{{ plugin.getConfig('urlPlayStore') }}">
+                <small id="emailHelp" class="form-text text-muted">URL der App im Google Play Store</small>
+            </div>
+            {#
+            <div class="form-group form-check">
+                <input type="checkbox" class="form-check-input" id="exampleCheck1">
+                <label class="form-check-label" for="exampleCheck1">Check me out</label>
+            </div>
+            #}
+
+            <button type="submit" class="btn btn-primary">Speichern</button>
+
+        </form>
+
+    </div>
+</div>

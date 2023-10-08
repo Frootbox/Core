@@ -1,5 +1,12 @@
 {% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
 
+<h4>
+	Formulare in „{{ category.getTitle() }}“
+	<span class="headoptions">
+		<a data-toggle="tooltip" data-modal data-title="neues Formular hinzufügen" href="{{ app.getUri('ajaxModalCompose', { categoryId: category.getId() }) }}"><i class="fa fa-plus-circle"></i></a>
+	</span>
+</h4>
+
 {% if forms | length == 0 %}
 	<div class="message warning">Es wurden noch keine Formulare erstellt.</div>
 {% else %}
@@ -18,7 +25,7 @@
 						{{ form.title }}
 					</td>
 					<td class="text-right">
-						<a class="ajax" data-confirm="Soll dieses Formular wirklich gelöscht werden?" href="{{ app.getUri('ajaxFormDelete', { formId: form.getId() }) }}"><i class="fa fa-times icon"></i></a>
+						<a class="ajax" data-confirm="Soll dieses Formular wirklich gelöscht werden?" href="{{ app.getUri('ajaxFormDelete', { formId: form.getId() }) }}"><i class="far fa-trash icon"></i></a>
 					</td>
 				</tr>
 			{% endfor %}

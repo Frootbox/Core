@@ -18,7 +18,8 @@
 
             var uid = $(this).attr('data-uid');
 
-            $(this).attr('data-content', '<span class="options edit-mode">' +
+            $(this).attr('data-content', '<span class="options edit-mode">Bild' +
+                '&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;' +
                 '<a class="images-picturefull-edit" href="#' + uid + '"><i class="far fa-pencil"><\/i><\/a>&nbsp;&nbsp;&nbsp;' +
                 '|&nbsp;&nbsp;&nbsp;' +
                 '<a class="images-picturefull-delete" href="#' + uid + '"><i class="far fa-trash"><\/i><\/a>&nbsp;&nbsp;&nbsp;' +
@@ -64,6 +65,39 @@
             });
 
         });
+
+        /**
+         *
+         */
+        $(document).on('click', 'a.images-picturefull-delete', function(event) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            if (!confirm('Soll dieses Bild wirklich geloescht werden?')) {
+                return;
+            }
+
+            // Extract uid from href="#uid"
+            var uid = $(this).attr('href').substr(1);
+
+            var img = $('figure[data-type="Images/PictureFull"][data-uid="' + uid + '"] img');
+
+            $.ajax({
+                url: "{{ settings.serverpath }}cms/admin/Editor/callEditable?{{ SID }}",
+                data: {
+                    method: 'ajaxDelete',
+                    editable: 'Frootbox/Ext/Core/Images/Editables/PictureFull',
+                    uid: uid,
+                    default: img.data('default'),
+                },
+                success: function ( response ) {
+
+                    img.attr('src', response.default);
+                }
+            });
+        });
+
     });
 
 </script>

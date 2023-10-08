@@ -54,6 +54,9 @@ class FormRenderer extends \Frootbox\View\Viewhelper\AbstractViewhelper
         $view->set('addedPayload', $parameters['payload'] ?? []);
         $view->set('config', $config);
         $view->set('plugin', $parameters['plugin'] ?? null);
+        $view->set('onSuccess', $parameters['onSuccess'] ?? null);
+        $view->set('addedClassName', $parameters['class'] ?? null);
+        $view->set('redirect', $parameters['redirect'] ?? null);
 
         if (!empty($parameters['options'])) {
             $this->options = $parameters['options'];
@@ -67,14 +70,17 @@ class FormRenderer extends \Frootbox\View\Viewhelper\AbstractViewhelper
     }
 
     /**
-     *
+     * @param \Frootbox\Ext\Core\ContactForms\Persistence\Fields\AbstractField $field
+     * @return string
      */
     public function renderField(\Frootbox\Ext\Core\ContactForms\Persistence\Fields\AbstractField $field): string
     {
         // Render source
-        $this->view->set('renderer', $this);
-        $this->view->set('field', $field);
+        $html = $this->view->render($field->getPath() . 'resources/private/views/Field.html.twig', [
+            'renderer' => $this,
+            'field' => $field,
+        ]);
 
-        return $this->view->render($field->getPath() . 'resources/private/views/Field.html.twig');
+        return $html;
     }
 }

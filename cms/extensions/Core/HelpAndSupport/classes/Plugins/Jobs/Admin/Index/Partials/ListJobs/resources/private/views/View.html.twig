@@ -8,6 +8,7 @@
 		<thead>
 			<tr>
 				<th>Jobangebot</th>
+				<th>Anstellung</th>
 				<th></th>
 				<th></th>
 			</tr>
@@ -16,18 +17,36 @@
 
 			{% for job in jobs %}
 
-				<tr id="row-{{ job.getId }}" class="{% if data.highlight == job.getId() %}highlighted{% endif %} ajax" data-href="{{ plugin.getAdminUri('Job', 'details', { jobId: job.getId() }) }}">
+				<tr id="row-{{ job.getId }}" class="{% if data.highlight == job.getId() %}highlighted{% endif %}">
 					<td>
-						{{ job.getTitle() }}
+						<a class="ajax" href="{{ plugin.getAdminUri('Job', 'details', { jobId: job.getId() }) }}">
+							<b>{{ job.getTitle() }}</b>
+
+							{% if job.getSubtitle() %}
+								<br /><span style="color: #999;">{{ job.getSubtitle() }}</span>
+							{% endif %}
+						</a><br />
 
 						{% for tag in job.getTags() %}
 							<span class="badge badge-info">{{ tag.getTag() }}</span>
 						{% endfor %}
 					</td>
+					<td>{{ ("Type" ~ job.getType()) }}</td>
 					<td class="handle"><i class="fa fa-grip-lines"></i></td>
-					<td class="text-right">
-						<a class="ajax" href="{{ v.getUri('Assets', 'ajaxSwitchVisibility', { assetId: job.getId() } ) }}"><i data-asset="{{ job.getId() }}" class="fa fa-lightbulb visibility {{ job.getVisibilityString() }} icon"></i></a>
-						<a class="ajax" data-confirm="Soll dieses Jobangebot wirklich gelöscht werden?" href="{{ data.plugin.getAdminUri('Index', 'ajaxDelete', { jobId: job.getId() }) }}"><i class="fa fa-times icon"></i></a>
+					<td nowrap class="text-right">
+						<a data-toggle="tooltip" data-title="Sichtbarkeit umschalten" class="ajax" href="{{ v.getUri('Assets', 'ajaxSwitchVisibility', { assetId: job.getId() } ) }}"><i data-asset="{{ job.getId() }}" class="fa fa-lightbulb visibility {{ job.getVisibilityString() }} icon"></i></a>
+
+						<a data-toggle="tooltip" data-title="Sticky umschalten" class="ajax" href="{{ v.getUri('Assets', 'ajaxSwitchSticky', { assetId: job.getId() } ) }}">
+
+							{% if job.getisSticky() %}
+								<i data-asset="{{ job.getId() }}" class="sticky fas fa-star icon" style="color: orange;"></i>
+							{% else %}
+								<i data-asset="{{ job.getId() }}" class="sticky far fa-star icon"></i>
+							{% endif %}
+						</a>
+
+						<a data-toggle="tooltip" data-title="Job bearbeiten" target="edit-job-{{ job.getId() }}" href="{{ plugin.getAdminUri('Job', 'jumpToEdit', { jobId: job.getId() }) }}"><i class="fa fa-pencil icon"></i></a>
+						<a class="ajax" data-toggle="tooltip" data-title="Job löschen" data-confirm="Soll dieses Jobangebot wirklich gelöscht werden?" href="{{ data.plugin.getAdminUri('Index', 'ajaxDelete', { jobId: job.getId() }) }}"><i class="far fa-trash icon"></i></a>
 					</td>
 				</tr>
 

@@ -1,0 +1,10 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    'frame' : false,
+}) }}
+
+
+{{ v.injectPartial('\\Frootbox\\Ext\\Core\\ContactForms\\Apps\\FormsManager\\Partials\\ListForms', {
+    app: app
+}) | raw }}

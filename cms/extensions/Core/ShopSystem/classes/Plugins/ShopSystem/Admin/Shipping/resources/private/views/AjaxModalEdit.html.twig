@@ -5,25 +5,22 @@
 }) }}
 
 
-<form method="post" class="ajax" action="{{ plugin.getAdminUri('Shipping', 'ajaxCreate', { categoryId: get.get('categoryId') }) }}">
+<form method="post" class="ajax" action="{{ plugin.getAdminUri('Shipping', 'ajaxUpdate', { shippingCostsId: shippingCosts.getId() }) }}">
 
     <div class="modal-body">
 
         <div class="form-group">
-            <label for="shippingcosts">Versandkosten</label>
-            <select class="form-control" id="shippingcosts" name="shippingcosts">
-                <option value="">kein Versand</option>
-                {% for shippingcost in shippingcosts %}
-                    <option value="{{ shippingcost.class }}">{{ shippingcost.title }}</option>
-                {% endfor %}
-            </select>
+            <label for="title">Bezeichnung</label>
+            <input type="text" class="form-control" id="title" name="title" aria-describedby="titleHelp" value="{{ shippingCosts.getTitle() }}">
+            <small id="titleHelp" class="form-text text-muted">Die Bezeichnung dient nur der Organisation im CMS.</small>
         </div>
 
-        <p><a class="ajax" href="{{ plugin.getAdminUri('Shipping', 'ajaxCopyToAll', { shippingId: get.get('shippingId') }) }}">Diese Versandkostenart auf alle Produkte übertragen.</a></p>
-
     </div>
+
+    {{ adminHtml | raw }}
+
     <div class="modal-footer">
-        <button type="submit" class="btn btn-primary">neue Versandkostenart hinzufügen</button>
+        <button type="submit" class="btn btn-primary">Speichern</button>
     </div>
 
 </form>

@@ -26,18 +26,50 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
         \Frootbox\Persistence\Content\Repositories\Texts $texts
     ): string
     {
-        // Replace picture tags
+        // Replace link tags
         $crawler = \Wa72\HtmlPageDom\HtmlPageCrawler::create($html);
         $crawler->filter('[data-editable-link][data-uid]')->each(function ( $element ) use ($texts, $filesRepository, $pagesRepository, $db) {
 
             $uid = $element->getAttribute('data-uid');
 
             // Fetch text
-            $text = $texts->fetchByUid($uid);
+            $where = [
+                'uid' => $uid,
+            ];
+
+            if (MULTI_LANGUAGE) {
+                $where['language'] = GLOBAL_LANGUAGE;
+            }
+
+            $text = $texts->fetchOne([
+                'where' => $where,
+            ]);
+
+            if (MULTI_LANGUAGE and !$text and $element->getAttribute('data-nolanguagefallback') === null) {
+
+                if (GLOBAL_LANGUAGE == DEFAULT_LANGUAGE) {
+
+                    $text = $texts->fetchOne([
+                        'where' => [
+                            'uid' => $uid,
+                            'language' => DEFAULT_LANGUAGE,
+                        ],
+                    ]);
+                }
+                else {
+
+                    $text = $texts->fetchOne([
+                        'where' => [
+                            'uid' => $uid,
+                        ],
+                    ]);
+                }
+            }
+
+            $attribute = ($element->getAttribute('href') !== null) ? 'href' : 'data-href';
+
 
             if ($text) {
-
-                $attribute = ($element->getAttribute('href') !== null) ? 'href' : 'data-href';
 
                 if (!empty($pageId = $text->getConfig('pageId'))) {
 
@@ -58,6 +90,11 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
                     $element->setAttribute($attribute, $url);
                 }
                 elseif (!empty($email = $text->getConfig('email'))) {
+
+                    if (!empty($subject = $text->getConfig('emailSubject'))) {
+                        $email .= '?subject=' . $subject;
+                    }
+
                     $element->setAttribute($attribute, 'mailto:' . $email);
                 }
                 elseif (!empty($phone = $text->getConfig('phone'))) {
@@ -65,12 +102,24 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
                 }
                 elseif (!empty($fileId = $text->getConfig('filelink'))) {
 
-                    $file = $filesRepository->fetchById($fileId);
+                    if (preg_match('#^([0-9]+)$#', $fileId)) {
+
+                        try {
+                            $file = $filesRepository->fetchById($fileId);
+                            $element->setAttribute($attribute, $file->getUriDownload());
+                        }
+                        catch (\Exception $e) {
+                            $element->setAttribute($attribute, '#file-not-found ');
+                        }
+
+                    }
+                    else {
+                        $element->setAttribute($attribute, '#not-a-file-id');
+                    }
+                }
+                elseif ($file = $filesRepository->fetchByUid($uid)) {
 
                     $element->setAttribute($attribute, $file->getUriDownload());
-                }
-                else {
-
                 }
 
                 if (!empty($text->getConfig('label'))) {
@@ -88,6 +137,12 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
                 if (!empty($text->getConfig('conversionId'))) {
                     $element->setAttribute('data-conversion', $text->getConfig('conversionId'));
                 }
+            }
+            elseif ($file = $filesRepository->fetchByUid($uid, [
+                'fallbackLanguageDefault' => true
+            ])) {
+
+                $element->setAttribute($attribute, $file->getUriDownload());
             }
             // Todo: Thats the old way and should be dropped soon
             else {

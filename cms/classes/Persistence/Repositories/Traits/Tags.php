@@ -27,6 +27,10 @@ trait Tags
             t.itemId = p.id
         ';
 
+        if (!empty($parameters['complyVisibility'])) {
+            $sql .= ' AND p.visibility >= ' . (IS_EDITOR ? 1 : 2);
+        }
+
         if (!empty($parameters['order'])) {
             $sql .= ' ORDER BY ' . $parameters['order'];
         }
@@ -47,6 +51,12 @@ trait Tags
             throw new \Exception('Parameter tags empty.');
         }
 
+        $tags = array_values($tags);
+
+        if (empty($parameters['mode'])) {
+            $parameters['mode'] = 'matchAll';
+        }
+
         $params = [];
 
         // Compose sql
@@ -60,14 +70,23 @@ trait Tags
 
             $sql .= ' ' . $this->getTable() . ' p
         WHERE
-            p.visibility >= ' . (IS_LOGGED_IN ? 1 : 2);
+            p.visibility >= ' . (IS_LOGGED_IN ? 1 : 2) . ' AND 
+        ( ';
+
+        $tagsGlue = $parameters['mode'] == 'matchAll' ? ' AND ' : ' OR ';
 
         foreach ($tags as $index => $tag) {
-            $sql .= ' AND
-                t' . $index . '.tag = :tag' . $index . ' AND
-                t' . $index . '.itemClass = :class AND
-                t' . $index . '.itemId = p.id ';
+
+            $sql .= ($index > 0 ? $tagsGlue : '') . '
+                (
+                    t' . $index . '.tag = :tag' . $index . ' AND
+                    t' . $index . '.itemClass = :class AND
+                    t' . $index . '.itemId = p.id 
+                ) ';
         }
+
+        $sql .= '
+         ) ';
 
         if (!empty($parameters['where'])) {
 
@@ -100,6 +119,8 @@ trait Tags
             }
         }
 
+        $sql .= ' GROUP BY p.id ';
+
         if (!empty($parameters['order'])) {
 
             $sql .= ' ORDER BY ';
@@ -108,6 +129,7 @@ trait Tags
                 $sql .= $order;
             }
         }
+
 
         if (!empty($parameters['limit'])) {
             $sql .= ' LIMIT ' . $parameters['limit'];

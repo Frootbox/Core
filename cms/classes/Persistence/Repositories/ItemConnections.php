@@ -35,6 +35,10 @@ class ItemConnections extends \Frootbox\Db\Model
             'uid' => $uid,
         ];
 
+        if (!empty($parameters['visibility'])) {
+            $connectionData['visibility'] = $parameters['visibility'];
+        }
+
         if (!empty($parameters['orderId'])) {
             $connectionData['orderId'] = $parameters['orderId'];
         }

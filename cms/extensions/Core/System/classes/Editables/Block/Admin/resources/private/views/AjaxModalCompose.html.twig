@@ -36,7 +36,7 @@
 
 </style>
 
-<form id="blockCreateForm" action="{{ controller.getActionUri('ajaxCreate', { uid: uid, pageId: get.get('pageId') }) }}" method="post" data-uid="{{ uid }}">
+<form id="blockCreateForm" action="{{ controller.getActionUri('ajaxCreate', { uid: uid, pageId: get.get('pageId'), predecessor: get.get('predecessor') }) }}" method="post" data-uid="{{ uid }}">
 
     <div class="modal-header">
         <h5 class="modal-title">Block-Vorlage hinzufügen</h5>
@@ -80,43 +80,52 @@
         {% else %}
 
             <div class="row">
-                {% for extension in blocksList %}
+                <div class="col-md-10">
 
-                    {% if blocksList | length > 1 %}
-                        <div class="col-12">
-                            <h3>{{ extension.extension }}</h3>
-                        </div>
-                    {% endif %}
+                    <div class="row">
+                        {% for extension in blocksList %}
 
-                    {% for section, blocks in extension.blocks %}
+                            {% if blocksList | length > 1 %}
+                                <div class="col-12">
+                                    <h3>{{ extension.extension }}</h3>
+                                </div>
+                            {% endif %}
 
-                        {% if section != "Default" %}
-                            <div class="col-12">
-                                <p><b>{{ section }}</b></p>
-                            </div>
-                        {% endif %}
+                            {% for section, blocks in extension.blocks %}
 
-                        {% for block in blocks %}
-                            <div class="col-2">
-                                <label>
-                                    <img style="box-shadow: 0 0 10px rgba(0, 0, 0, .2); width: 100%; height: auto;" src="{{ block.template.getThumbnailSrc() }}" alt="" />
+                                {% if section != "Default" %}
+                                    <div class="col-12">
+                                        <p><b>{{ section }}</b></p>
+                                    </div>
+                                {% endif %}
 
-                                    <input style="float: left; margin-top: 9px;" name="block" value="{{ block.vendorId }}-{{ block.extensionId }}-{{ block.blockId }}" type="radio" />
-                                    <span style="display: bock; float: left; margin: 5px 0 10px 8px; font-size: 16px; line-height: 20px;">
-                                        <b>{{ block.template.getTitle() }}</b>
-                                        <br />{{ block.template.getSubtitle() }}
-                                    </span>
+                                {% for block in blocks %}
+                                    <div class="col-2">
+                                        <label style="font-size: 11px;">
+                                            <img style="box-shadow: 0 0 10px rgba(0, 0, 0, .2); width: 100%; height: auto;" src="{{ block.template.getThumbnailSrc() }}" alt="" />
 
-                                </label>
-                            </div>
+                                            <input style="float: left; margin-top: 9px;" name="block" value="{{ block.vendorId }}-{{ block.extensionId }}-{{ block.blockId }}" type="radio" />
+                                            <span style="display: bock; float: left; margin: 5px 0 10px 8px; font-size: 16px; line-height: 20px;">
+                                                <b>{{ block.template.getTitle() }}</b>
+                                                <br />{{ block.template.getSubtitle() }}
+                                            </span>
+
+                                        </label>
+                                    </div>
+                                {% endfor %}
+
+                            {% endfor %}
+
                         {% endfor %}
+                    </div>
 
-                    {% endfor %}
-
-                {% endfor %}
+                </div>
+                <div class="col-md-2">
+                    <div class="sticky-top" style="top: 15px;">
+                        <button type="submit" class="btn btn-primary btn-block">Block hinzufügen</button>
+                    </div>
+                </div>
             </div>
-
-            <button type="submit" class="btn btn-primary">Block hinzufügen</button>
 
         {% endif %}
 

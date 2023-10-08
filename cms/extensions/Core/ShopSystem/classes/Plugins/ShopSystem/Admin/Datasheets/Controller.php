@@ -6,6 +6,7 @@
 namespace Frootbox\Ext\Core\ShopSystem\Plugins\ShopSystem\Admin\Datasheets;
 
 use Frootbox\Admin\Controller\Response;
+use Frootbox\Http\Interfaces\ResponseInterface;
 
 class Controller extends \Frootbox\Admin\AbstractPluginController
 {
@@ -238,8 +239,8 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         \Frootbox\Http\Get $get,
         \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\DatasheetFields $datasheetsFields,
         \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\ProductsData $productsDataRepository,
-        \Frootbox\Admin\Viewhelper\GeneralPurpose $gp
-    )
+        \Frootbox\Admin\Viewhelper\GeneralPurpose $gp,
+    ): Response
     {
         // Fetch fields
         $field = $datasheetsFields->fetchById($get->get('fieldId'));
@@ -250,7 +251,7 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
 
         $field->save();
 
-        // Update datasheets
+        // Update data fields
         $dataFields = $productsDataRepository->fetch([
             'where' => [
                 'fieldId' => $field->getId(),
@@ -264,8 +265,24 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
             $dataField->save();
         }
 
+        // Log action
+        $this->log('ShopDatasheetFieldUpdate', [
+            $field->getId(),
+            $field->getTitle(),
+            get_class($field),
+        ]);
+
+        // Compose response
         return self::getResponse('json', 200, [
-            'modalDismiss' => true
+            'modalDismiss' => true,
+            'replace' => [
+                'selector' => '#datasheetFieldsReceiver',
+                'html' => $gp->injectPartial(\Frootbox\Ext\Core\ShopSystem\Plugins\ShopSystem\Admin\Datasheets\Partials\FieldsList\Partial::class, [
+                    'plugin' => $this->plugin,
+                    'highlight' => $field->getId(),
+                    'datasheet' => $field->getDatasheet(),
+                ])
+            ]
         ]);
     }
 
@@ -389,6 +406,24 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
                 ])
             ]
         ]);
+    }
+
+    /**
+     *
+     */
+    public function ajaxUpdateAction(
+        \Frootbox\Http\Post $post,
+        \Frootbox\Http\Get $get,
+        \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Datasheets $datasheetRepository,
+    ): Response
+    {
+        // Fetch datasheet
+        $datasheet = $datasheetRepository->fetchById($get->get('datasheetId'));
+
+        $datasheet->setTitle($post->get('title'));
+        $datasheet->save();
+
+        return self::getResponse('json');
     }
 
     /**

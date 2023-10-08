@@ -15,6 +15,7 @@ class Page extends \Frootbox\AbstractStaticPage
     public function addProduct(
         \Frootbox\Http\Get $get,
         \Frootbox\Http\Post $post,
+        \Frootbox\Config\Config $configuration,
         \Frootbox\View\Engines\Interfaces\Engine $view,
         \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Products $productsRepository,
         \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Variants $variantsRepository,
@@ -22,9 +23,19 @@ class Page extends \Frootbox\AbstractStaticPage
         \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Option $optionRepository,
         \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Stock $stockRepository,
         \Frootbox\Ext\Core\ShopSystem\Plugins\Checkout\Shopcart $shopcart,
-        \DI\Container $container
+        \DI\Container $container,
     ): Response
     {
+        // Clear basket if requested
+        if (!empty($get->get('clearAll'))) {
+            $shopcart->clearItems();
+        }
+
+        if (!empty($post->get('personal'))) {
+            $shopcart->setPersonal($post->get('personal'));
+        }
+
+        // Obtain product ID
         $productId = $get->get('productId') ?? $post->get('productId');
 
         // Fetch product
@@ -123,6 +134,7 @@ class Page extends \Frootbox\AbstractStaticPage
                 'minimumAge' => $product->getMinimumAge(),
                 'hasOptions' => $product->hasOptions(),
                 'fieldOptions' => $options,
+                'xdata' => $post->get('xdata'),
             ];
 
             if (!empty($variantId) and $variantId != 'default') {
@@ -251,7 +263,6 @@ class Page extends \Frootbox\AbstractStaticPage
             }
         }
 
-
         // Set custom note
         if (!empty($post->get('customNote'))) {
 
@@ -278,14 +289,46 @@ class Page extends \Frootbox\AbstractStaticPage
 
         $followUp = $get->get('followup') ?? 'popup';
 
-
         $productCount = 0;
 
         foreach ($_SESSION['cart']['products'] as $item) {
             $productCount += $item['amount'];
         }
 
-        if ($followUp == 'popup') {
+        $item = new \Frootbox\Ext\Core\ShopSystem\Plugins\Checkout\ShopcartItem($item, $product);
+
+        $shopcart->reloadItems();
+
+        if (!empty($configuration->get('Ext.Core.ShopSystem.CartFilter'))) {
+
+            foreach ($configuration->get('Ext.Core.ShopSystem.CartFilter') as $filterClass) {
+
+                if (!class_exists($filterClass)) {
+                    continue;
+                }
+
+                $filter = new $filterClass($shopcart, $checkoutPlugin);
+
+                if (method_exists($filter, 'onAddingProduct')) {
+                    $container->call([ $filter, 'onAddingProduct' ], [
+                        'key' => $item->getKey(),
+                    ]);
+                }
+            }
+        }
+
+        if ($shippingCosts = $product->getShippingCosts()) {
+            if ($shippingCosts->isApplicableToCertainProduct()) {
+
+                $extraShipping = $shippingCosts->getCosts($item, $shopcart);
+
+                if ($extraShipping > 0) {
+                    $_SESSION['cart']['products'][$key]['shippingExtra'] = $extraShipping;
+                }
+            }
+        }
+
+        if (empty($get->get('redirect')) and empty($post->get('redirect')) and $followUp == 'popup') {
 
             $proceedUrl = $checkoutPlugin ? $checkoutPlugin->getActionUri('index', null, ['absolute' => true]) : null;
 
@@ -318,6 +361,18 @@ class Page extends \Frootbox\AbstractStaticPage
             if (!empty($get->get('redirect'))) {
                 return new \Frootbox\View\ResponseJson([
                     'continue' => $get->get('redirect'),
+                    'shopcart' => [
+                        'items' => $productCount,
+                    ],
+                ]);
+            }
+
+            if (!empty($post->get('redirect'))) {
+                return new \Frootbox\View\ResponseJson([
+                    'continue' => $post->get('redirect'),
+                    'shopcart' => [
+                        'items' => $productCount,
+                    ],
                 ]);
             }
 

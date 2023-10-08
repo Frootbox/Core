@@ -11,10 +11,22 @@
         <div class="row">
             <div class="col-md-5">
 
-                <div class="form-group">
-                    <label for="title">Titel</label>
-                    <input type="text" class="form-control" name="title" required id="title" placeholder="Titel" value="{{ field.getTitle() }}">
-                </div>
+                {% if not configuration.get('i18n.multiAliasMode') %}
+                    <div class="form-group">
+                        <label for="title">Titel</label>
+                        <input type="text" class="form-control" id="title" name="title" placeholder="Titel" value="{{ field.getTitle() }}">
+                    </div>
+                {% else %}
+                    {% for language in configuration.get('i18n.languages') %}
+
+                        <div class="form-group">
+                            <label for="title_{{ loop.index }}">Titel ({{ language }}){% if settings.default_language == language %}*{% endif %}</label>
+                            <input type="text" {% if settings.default_language == language %}required{% endif %} class="form-control" id="title_{{ loop.index }}" name="titles[{{ language }}]" placeholder="Titel ({{ language }})" value="{{ field.getTitleWithoutFallback(language) }}">
+                        </div>
+
+                    {% endfor %}
+                {% endif %}
+
                 <div class="form-group">
                     <label for="type">Typ</label>
                     <select size="1" name="type" id="type" class="form-control">
@@ -31,25 +43,30 @@
                 </div>
                 <div class="form-group">
                     <label for="helpText">Hinweis-Text</label>
-                    <input type="text" class="form-control" name="helpText" id="helpText" placeholder="Hinweis-Text" value="{{ field.getConfig('helpText') }}">
+                    <textarea class="form-control" name="helpText" id="helpText" placeholder="Hinweis-Text">{{ field.getConfig('helpText') }}</textarea>
                 </div>
                 <div class="form-group">
                     <label for="placeholder">Platzhalter</label>
                     <input type="text" class="form-control" name="placeholder" id="placeholder" placeholder="Platzhalter" value="{{ field.getConfig('placeholder') }}">
                 </div>
-
+                <div class="form-group">
+                    <label for="presetValue">voreingestellter Wert</label>
+                    <input type="text" class="form-control" name="presetValue" id="presetValue" placeholder="voreingestellter Wert" value="{{ field.getConfig('presetValue') }}">
+                </div>
+                <div class="form-group form-check">
+                    <input type="checkbox" class="form-check-input" id="presetValueFromGet" name="presetValueFromGet" {% if field.getConfig('presetValueFromGet') %}checked{% endif %} aria-describedby="presetValueFromGetHelp">
+                    <label class="form-check-label" for="presetValueFromGet">Wert von URL übernehmen</label>
+                    <small id="presetValueFromGetHelp" class="form-text text-muted"><code>?fields[{{ field.getId() }}]=xxxx</code></small>
+                </div>
             </div>
             <div class="col-md-7">
 
                 <div id="optionsReceiver">
-
                     {{ optionsHtml | raw }}
-
                 </div>
 
             </div>
         </div>
-
 
     </div>
     <div class="modal-footer">

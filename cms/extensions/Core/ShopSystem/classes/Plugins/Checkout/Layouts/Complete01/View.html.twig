@@ -15,12 +15,22 @@ variables:
     $(function ( ) {
         localStorage.setItem('fbxShopCartItemCount', null);
         $('.fbxShopCartItemCounter').hide();
+
+        gtag('event', 'conversion', {
+            'send_to': 'AW-10924757133/Uou3CNyW15cYEI2hqtko',
+            'value': {{ booking.getTotal() | number_format(2, ".") }},
+            'currency': 'EUR',
+            'transaction_id': '{{ booking.getId() }}'
+        });
     });
 
+
+
+    /*
     gtag('event', 'purchase', {
         "transaction_id": "{{ booking.getConfig('orderNumber') }}",
         "value": {{ booking.getTotal() | number_format(2, ".") }},
-        "currency": "EUR",
+        "currency": "{{ currencySign }}",
         "tax": {{ booking.getTax() }},
         "shipping": {{ booking.getShipping() | number_format(2, ".") }},
         "items": [
@@ -35,6 +45,7 @@ variables:
             {% endfor %}
         ]
     });
+    */
 </script>
 
 
@@ -55,25 +66,56 @@ variables:
 
             <h3 data-editable data-uid="{{ plugin.getUid('titleCompletedBooking') }}">Ihre Bestellung</h3>
 
-            <p class="text-center">Bestellnummer: {{ booking.getConfig('orderNumber') }}</p>
+            <p>Bestellnummer: {{ booking.getConfig('orderNumber') }}</p>
 
+            {% if not plugin.getConfig('skipShipping') %}
 
-            {% if booking.getConfig('shipping.type') %}
+                {% if booking.getConfig('shipping.type') == "selfPickup" %}
+                    {% if booking.getConfig('shipping.deliveryDay') %}
+                        <p><b>gewünschter Abholtag</b><br />
+                            {{ booking.getConfig('shipping.deliveryDay') | date('d.m.Y') }}</p>
+                    {% endif %}
+                {% elseif booking.getConfig('shipping.street') %}
 
-                <br />
+                    <br />
 
-                <iframe src="https://maps.google.com/maps?q={{ booking.getConfig('personal.street') }} {{ booking.getConfig('personal.streetNumber') }}, {{ booking.getConfig('personal.postalCode') }} {{ booking.getConfig('personal.city') }}&output=embed" width="100%" height="250" frameborder="0" style="border:0;" allowfullscreen="" aria-hidden="false" tabindex="0"></iframe>
+                    <iframe src="https://maps.google.com/maps?q={{ booking.getConfig('shipping.street') }} {{ booking.getConfig('shipping.streetNumber') }}, {{ booking.getConfig('shipping.postalCode') }} {{ booking.getConfig('shipping.city') }}&output=embed" width="100%" height="250" frameborder="0" style="border:0;" allowfullscreen="" aria-hidden="false" tabindex="0"></iframe>
 
-                <br /><br />
+                    <br /><br />
 
-                <div class="text-center">
-                    <p><b>Lieferadresse</b><p>
+                    <div class="text-center">
+                        <p>
+                            <b>Lieferadresse</b><br />
+                            {{ booking.getConfig('shipping.firstname') }} {{ booking.getConfig('shipping.lastname') }}<br />
+                            {{ booking.getConfig('shipping.street') }} {{ booking.getConfig('shipping.streetNumber') }}, {{ booking.getConfig('shipping.postalCode') }} {{ booking.getConfig('shipping.city') }}
+                        </p>
 
-                    <p>
-                        {{ booking.getConfig('personal.firstname') }} {{ booking.getConfig('personal.lastname') }}<br />
-                        {{ booking.getConfig('personal.street') }} {{ booking.getConfig('personal.streetNumber') }}, {{ booking.getConfig('personal.postalCode') }} {{ booking.getConfig('personal.city') }}
-                    </p>
-                </div>
+                        {% if booking.getConfig('shipping.deliveryDay') %}
+                            <p><b>gewünschter Liefertag</b><br />
+                                {{ booking.getConfig('shipping.deliveryDay') | date('d.m.Y') }}</p>
+                        {% endif %}
+                    </div>
+                {% else %}
+
+                    <br />
+
+                    <iframe src="https://maps.google.com/maps?q={{ booking.getConfig('personal.street') }} {{ booking.getConfig('personal.streetNumber') }}, {{ booking.getConfig('personal.postalCode') }} {{ booking.getConfig('personal.city') }}&output=embed" width="100%" height="250" frameborder="0" style="border:0;" allowfullscreen="" aria-hidden="false" tabindex="0"></iframe>
+
+                    <br /><br />
+
+                    <div class="text-center">
+                        <p>
+                            <b>Lieferadresse</b><br />
+                            {{ booking.getConfig('personal.firstname') }} {{ booking.getConfig('personal.lastname') }}<br />
+                            {{ booking.getConfig('personal.street') }} {{ booking.getConfig('personal.streetNumber') }}, {{ booking.getConfig('personal.postalCode') }} {{ booking.getConfig('personal.city') }}
+                        </p>
+
+                        {% if booking.getConfig('shipping.deliveryDay') %}
+                            <p><b>gewünschter Liefertag</b><br />
+                            {{ booking.getConfig('shipping.deliveryDay') | date('d.m.Y') }}</p>
+                        {% endif %}
+                    </div>
+                {% endif %}
             {% endif %}
 
             <br />
@@ -82,7 +124,7 @@ variables:
 
             <br />
 
-            <table class="table">
+            <table class="table positions">
                 <thead>
                     <tr>
                         <th>Artikel</th>
@@ -96,14 +138,14 @@ variables:
                     {% for item in booking.getItems() %}
                         <tr>
                             <td>
-                                {{ item.getTitle() }}
+                                <b>{{ item.getTitle() }}</b>
 
                                 {% for equipment in item.getEquipment() %}
                                     <br />+ {{ equipment.title }}
                                 {% endfor %}
 
                                 {% for option in item.getFieldOptions() %}
-                                    <br />- {{ option.option }}{% if option.surcharge %} (+ {{ option.surcharge | number_format(2, ",", ".") }} &euro;){% endif %}
+                                    <br />- {{ option.option }}{% if option.surcharge %} (+ {{ option.surcharge | number_format(2, ",", ".") }} &{{ currencySign }}o;){% endif %}
                                 {% endfor %}
 
                                 {% if item.getCustomNote() %}
@@ -115,36 +157,39 @@ variables:
                                 {% endif %}
                             </td>
                             <td class="text-right">{{ item.getAmount() }} x</td>
-                            <td class="text-right">{{ item.priceGross() | number_format(2, ",") }} EUR</td>
-                            <td class="text-right">{{ item.getTotal() | number_format(2, ",") }} EUR</td>
+                            <td class="text-right">{{ item.priceGrossFinal() | number_format(2, ",") }} {{ currencySign }}</td>
+                            <td class="text-right">{{ item.getTotal() | number_format(2, ",") }} {{ currencySign }}</td>
                         </tr>
                     {% endfor %}
 
                 </tbody>
                 <tfoot>
-                    <tr style="border-top: 3px solid #ccc;">
-                        <td class="text-right" colspan="3">Versand &amp; Bearbeitung</td>
-                        <td width="160" class="text-right">{{ booking.getShipping() | number_format(2, ",") }} EUR</td>
-                    </tr>
+
+                    {% if not plugin.getConfig('skipShipping') %}
+                        <tr>
+                            <td class="text-right" colspan="3">Versand &amp; Bearbeitung</td>
+                            <td width="160" class="text-right">{{ booking.getShipping() | number_format(2, ",") }} {{ currencySign }}</td>
+                        </tr>
+                    {% endif %}
 
                     {% for section in booking.getTaxSections() %}
                         <tr>
-                            <td class="text-right" colspan="3">inkl. {{ section.taxrate }} % MwSt. auf {{ section.total | number_format(2, ",") }} EUR</td>
-                            <td class="text-right" nowrap>{{ section.tax | number_format(2, ",") }} EUR</td>
+                            <td class="text-right" colspan="3">inkl. {{ section.taxrate }} % MwSt. auf {{ section.total | number_format(2, ",") }} {{ currencySign }}</td>
+                            <td class="text-right" nowrap>{{ section.tax | number_format(2, ",") }} {{ currencySign }}</td>
                         </tr>
                     {% endfor %}
 
                     {% for couponData in booking.getCoupons() %}
                         <tr>
                             <td class="text-right" colspan="3">Coupon {{ couponData.code }}</td>
-                            <td class="text-right" nowrap>-{{ couponData.redeemedValue | number_format(2, ",") }} EUR</td>
+                            <td class="text-right" nowrap>-{{ couponData.redeemedValue | number_format(2, ",") }} {{ currencySign }}</td>
                         </tr>
                     {% endfor %}
 
 
                     <tr>
                         <td class="text-right" colspan="3"><b>Summe</b></td>
-                        <td class="text-right" nowrap><b>{{ booking.getTotal() | number_format(2, ",") }} EUR</b></td>
+                        <td class="text-right" nowrap><b>{{ booking.getTotal() | number_format(2, ",") }} {{ currencySign }}</b></td>
                     </tr>
                 </tfoot>
             </table>

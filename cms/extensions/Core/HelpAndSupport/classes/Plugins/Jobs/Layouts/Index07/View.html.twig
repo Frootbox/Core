@@ -1,0 +1,47 @@
+{# config
+
+title: Standard
+_variables:
+    showCountry:
+        type: bool
+        label: Land anzeigen
+        default: false
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set t = i.getTranslator() %}
+
+{% set icons = view.getViewhelper('Ext/HerrUndFrauPixelExt/Icons/Icons', { createDummyOnFail: true  }) %}
+
+<div class="plugin Core HelpAndSupport Jobs Index07">
+
+    <div class="outer-wrapper">
+
+        <div class="background" data-uid="{{ plugin.getUid('background') }}" data-type="Images/Background"></div>
+
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+
+                    <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+
+                    <div data-editable data-uid="{{ plugin.getUid('teaser') }}"></div>
+
+
+                    <nav class="jobs">
+                        {% for job in jobs %}
+                            <a class="job" href="{{ job.getUri() }}">
+                                {{ icons.render('circle-arrow-right') | raw }}{{ job.getTitle() }}
+                            </a>
+                        {% endfor %}
+                    </nav>
+
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>

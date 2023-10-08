@@ -28,6 +28,8 @@ class Partial extends \Frootbox\Admin\View\Partials\AbstractPartial
         \Frootbox\Persistence\Repositories\Extensions $extensionsRepository
     ): Response
     {
+        $templates = [];
+
         // Fetch extensions
         $extensions = $extensionsRepository->fetch([
             'order' => [
@@ -35,8 +37,18 @@ class Partial extends \Frootbox\Admin\View\Partials\AbstractPartial
             ]
         ]);
 
+        foreach ($extensions as $extension) {
+
+            if ($extension->getType() != 'Template') {
+                continue;
+            }
+
+            $templates[] = $extension;
+        }
+
         return new Response('html', 200, [
-            'extensions' => $extensions
+            'extensions' => $extensions,
+            'templates' => $templates,
         ]);
     }
 }

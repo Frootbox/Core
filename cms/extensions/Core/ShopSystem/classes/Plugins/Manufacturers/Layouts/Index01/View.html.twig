@@ -17,7 +17,9 @@ variables:
     noTeaserText:
         type: bool
         label: ohne Teaser-Text
-
+    noHeadline:
+        type: bool
+        label: ohne Überschrift
 /config #}
 
 {% set i = view.getViewhelper('Delegator', { object: plugin }) %}
@@ -32,35 +34,39 @@ variables:
     {% set colClass = "col-3" %}
 {% endif %}
 
-<div class="row">
-    <div class="col-12 plugin Core ShopSystem Manufacturers Index01">
+<div class="plugin Core ShopSystem Manufacturers Index01">
 
-        {% if plugin.isFirst %}
-            <h1 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h1>
-        {% else %}
-            <h2 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
-        {% endif %}
+    <div class="row">
+        <div class="col-12">
 
-        <div data-editable data-uid="{{ plugin.getUid('teaser') }}"></div>
+            <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
 
-        <div class="row teasers">
-            {% for manufacturer in manufacturers %}
-                <div class="{{ colClass }} teaser" data-href="{{ manufacturer.getUri() }}">
-                    <picture class="fluid" data-skipempty="true" data-editable data-uid="{{ manufacturer.getUid('image')}}">
-                        <img width="600" height="350" src="{{ i.getDummyImage({ width: 600, height: 350}) }}" alt="" />
-                    </picture>
+            <div data-editable data-uid="{{ plugin.getUid('teaser') }}"></div>
 
-                    <h4 data-editable data-uid="{{ manufacturer.getUid('title') }}">{{ manufacturer.getTitle }}</h4>
+            <div class="row teasers">
+                {% for manufacturer in manufacturers %}
+                    <div class="{{ colClass }} teaser" data-href="{{ manufacturer.getUri() }}">
 
-                    {% if not variables.noTeaserText %}
-                        <div data-nowidgets data-editable data-uid="{{ manufacturer.getUid('teaser') }}"></div>
+                        <a href="{{ manufacturer.getUri() }}">
+                            <picture class="fluid" data-skipempty="true" data-editable data-uid="{{ manufacturer.getUid('image')}}">
+                                <img width="600" height="350" src="{{ i.getDummyImage({ width: 600, height: 350}) }}" alt="" />
+                            </picture>
+                        </a>
 
-                        <p><a class="read-more" href="{{ manufacturer.getUri() }}">weiterlesen</a></p>
-                    {% endif %}
-                </div>
-            {% endfor %}
+                        {% if not variables.noHeadline %}
+                            <h4 data-editable data-uid="{{ manufacturer.getUid('title') }}">{{ manufacturer.getTitle }}</h4>
+                        {% endif %}
+
+                        {% if not variables.noTeaserText %}
+                            <div data-nowidgets data-editable data-uid="{{ manufacturer.getUid('teaser') }}"></div>
+
+                            <p><a class="read-more" href="{{ manufacturer.getUri() }}">weiterlesen</a></p>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+
         </div>
-
     </div>
-</div>
 
+</div>

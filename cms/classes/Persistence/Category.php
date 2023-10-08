@@ -88,7 +88,8 @@ class Category extends \Frootbox\Persistence\RowModels\ConfigurableNestedSet
     }
 
     /**
-     *
+     * @param \Frootbox\Db\Row $item
+     * @return void
      */
     public function disconnectItem(\Frootbox\Db\Row $item): void
     {
@@ -97,6 +98,7 @@ class Category extends \Frootbox\Persistence\RowModels\ConfigurableNestedSet
         $result = $model->fetch([
             'where' => [
                 'categoryId' => $this->getId(),
+                'categoryClass' => get_class($this),
                 'itemId' => $item->getId(),
                 'itemClass' => get_class($item),
             ],

@@ -17,11 +17,7 @@ title: Standard
             <div class="col-12">
                 <div class="inner-wrapper">
 
-                    {% if plugin.isFirst %}
-                        <h1 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h1>
-                    {% else %}
-                        <h2 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
-                    {% endif %}
+                    <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
 
                     <div data-editable data-uid="{{ plugin.getUid('teaser') }}"></div>
 

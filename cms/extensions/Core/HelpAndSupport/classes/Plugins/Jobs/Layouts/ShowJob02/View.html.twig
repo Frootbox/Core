@@ -1,0 +1,52 @@
+{# config
+
+title: Standard
+variables:
+    skipContainer:
+        type: bool
+        label: mit Layout-Container
+
+/config #}
+
+<param name="cloak" value="1" />
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set t = i.getTranslator() %}
+{% set b = view.getViewhelper('Breadcrumb', { singleton: true }) %}
+{% set v = view.getViewhelper('View') %}
+{% set a = view.getViewhelper('Assets', {   }) %}
+{% set h = view.getViewhelper('Hreflang', { singleton: true }) %}
+
+{% set icons = view.getViewhelper('Ext/HerrUndFrauPixelExt/Icons/Icons', { createDummyOnFail: true  }) %}
+
+{{ b.addSection(job.getTitle(globalLanguage), job.getUri()) }}
+
+{{ view.set({ pagedata: { title: job.getTitle(globalLanguage) } }) }}
+{{ view.set('hideGlobalBlocks', true) }}
+
+{% set location = job.getLocation() %}
+
+{% for language, xalias in job.getLanguageAliases() %}
+    {{ h.addItem(language, xalias) }}
+{% endfor %}
+
+<div class="plugin Core HelpAndSupport Jobs ShowJob02">
+
+    <div class="top-blocks" data-blocks data-label="Blöcke über dem Jobangebot" data-uid="{{ job.getUid('block-content-top') }}"></div>
+
+    {% if not variables.skipContainer %}<div class="container">{% endif %}
+
+    <div class="row">
+        <div class="col-12">
+
+            <h2 class="first main-title" data-editable data-uid="{{ job.getUid('title') }}">{{ job.getTitle(globalLanguage) }}</h2>
+
+            <div class="content-teaser">
+                <div data-editable data-uid="{{ job.getUid('text') }}"></div>
+            </div>
+        </div>
+    </div>
+
+    {% if not variables.skipContainer %}</div>{% endif %}
+
+</div>

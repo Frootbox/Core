@@ -27,8 +27,8 @@
         /**
          *
          */
-        $('a.block-delete').click(function ( event ) {
-
+        $('a.list-block-delete').click(function ( event ) {
+            event.stopImmediatePropagation();
             event.preventDefault();
 
             $.ajax({
@@ -97,17 +97,17 @@
         {% for block in blocks %}
             <tr id="row-{{ block.getId() }}" data-block="{{ block.getId() }}">
                 <td>
-                    {% if block.getTitle() and block.getBlockId() != block.getTitle() %}
-                        <b>{{ block.getTitle() }}</b><br />
-                        {{ block.getBlockId() }}
+                    {% if block.getTitleClean() and block.getBlockId() != block.getTitleClean() %}
+                        <b>{{ block.getTitleClean() }}</b><br />
+                        {{ block.getNameFromView() | default(block.getBlockId()) }}
                     {% else %}
-                        <b>{{ block.getBlockId() }}</b>
+                        <b>{{ block.getNameFromView() | default(block.getBlockId()) }}</b>
                     {% endif %}
                 </td>
                 <td class="handle"><a href="#"><i class="fa fa-grip-lines"></i></a></td>
                 <td class="text-right">
                     <a class="block-switch" href="{{ controller.getActionUri('ajaxBlockSwitch', { blockId: block.getId() }) }}"><i class="fa fa-lightbulb xicon visibility {{ block.getVisibilityString() }}"></i></a>
-                    <a class="block-delete" href="{{ controller.getActionUri('ajaxBlockDelete', { blockId: block.getId() }) }}"><i class="far fa-trash xicon"></i></a>
+                    <a class="list-block-delete" href="{{ controller.getActionUri('ajaxBlockDelete', { blockId: block.getId() }) }}"><i class="far fa-trash xicon"></i></a>
                 </td>
             </tr>
         {% endfor %}

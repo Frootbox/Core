@@ -162,16 +162,14 @@ try {
         'serverpath_absolute' => SERVER_PATH_PROTOCOL,
         'basepath' => CORE_DIR,
         'default_language' => DEFAULT_LANGUAGE,
+        'devmode' => DEVMODE,
     ]);
 
     $front = $container->get(\Frootbox\Admin\Front::class);
     $view->set('front', $front);
 
-
     // Init user ession
     $session = $container->get(\Frootbox\Session::class);
-
-
 
 
     define('IS_LOGGED_IN', $session->isLoggedIn());

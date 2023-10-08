@@ -28,16 +28,15 @@ class Page
         $cachefilePath = 'cache/public/' . $cacheRevision . '/ext/' . $da[0] . '/' . $da[1] . '/' . $da[2] . '/' . $get->get('f');
         $cachefilePathFull = $configuration->get('filesRootFolder') . $cachefilePath;
 
-        if (!file_exists($cachefilePathFull)) {
+        if (false and !file_exists($cachefilePathFull)) {
 
             $file = new \Frootbox\Filesystem\File($cachefilePathFull);
+            $file->setSource(file_get_contents($localPath));
             $file->write();
-
-            copy($localPath, $cachefilePathFull);
         }
 
         header('Content-Type: image/png');
-        readfile($cachefilePathFull);
+        readfile($localPath);
         exit;
     }
 }

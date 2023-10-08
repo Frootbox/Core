@@ -32,7 +32,7 @@ class Partial extends \Frootbox\Admin\View\Partials\AbstractPartial
             'where' => [
                 'pluginId' => $plugin->getId(),
             ],
-            'order' => [ 'orderId DESC'],
+            'order' => [ 'isSticky DESC', 'orderId DESC' ],
         ]);
 
         $view->set('jobs', $result);

@@ -1,12 +1,42 @@
 {
+    "_repositories": [
+        {
+            "type": "path",
+            "url": "/Users/habbo/Sites/localhost/frootbox-repos/MVC",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "type": "path",
+            "url": "/Users/habbo/Sites/localhost/frootbox-repos/Paypal",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "type": "path",
+            "url": "/Users/habbo/Sites/localhost/frootbox-repos/Debug",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "type": "path",
+            "url": "/Users/habbo/Sites/localhost/frootbox-repos/Db",
+            "options": {
+                "symlink": true
+            }
+        }
+    ],
     "require": {
-        "frootbox/db":"dev-master",
+        "frootbox/db":"0.2.1",
         "frootbox/debug":"dev-master",
         "frootbox/exceptions":"dev-master",
         "frootbox/config":"0.0.7",
         "frootbox/http":"dev-master",
         "frootbox/filesystem":"dev-master",
-        "frootbox/mail":"dev-master",
+        "frootbox/mail":"^0.1",
         "frootbox/translation":"dev-master",
         "frootbox/date":"dev-master",
         "wa72/htmlpagedom": "3.0.0",
@@ -21,7 +51,8 @@
         "phpmailer/phpmailer": "6.6.*",
         "ifsnop/mysqldump-php": "v2.7",
         "tijsverkoyen/css-to-inline-styles": "*",
-        "frogbob/inky-php": "^0.0.2"
+        "frogbob/inky-php": "^0.0.2",
+        "spipu/html2pdf": "^5.2"
     },
 	"config": {
         "vendor-dir": "lib",

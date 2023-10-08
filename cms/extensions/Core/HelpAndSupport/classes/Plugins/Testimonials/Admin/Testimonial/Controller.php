@@ -109,6 +109,7 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         $entity = $entitiesRepository->fetchById($get->get('entityId'));
 
         // Update entity
+        $entity->setPageId($this->plugin->getPageId());
         $entity->setTitle($post->get('title'));
         $entity->setDateStart($post->get('dateStart') . ' ' . $post->get('timeStart'));
 

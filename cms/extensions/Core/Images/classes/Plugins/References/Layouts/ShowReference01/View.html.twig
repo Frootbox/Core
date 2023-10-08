@@ -12,11 +12,11 @@ variables:
 
 {{ b.addSection(reference.getTitle(), reference.getUri()) }}
 
-
 <param name="cloak" value="1" />
 <param name="layout" value="Default" />
 
 {{ view.set('overrideImageUid', reference.getUid('image')) }}
+{{ view.set('hideGlobalBlocks', true) }}
 {{ view.set({ pagedata: { title: reference.getTitle() } }) }}
 
 {{ view.addBreadcrumb(reference.getTitle(), reference.getUri()) }}
@@ -39,5 +39,7 @@ variables:
         </div>
 
     {% if variables.withContainer %}</div>{% endif %}
+
+    <div data-blocks data-label="Blöcke zur Referenz" data-uid="{{ reference.getUid('block-content') }}"></div>
 
 </div>

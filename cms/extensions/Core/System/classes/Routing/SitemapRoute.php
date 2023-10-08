@@ -26,7 +26,7 @@ class SitemapRoute extends \Frootbox\Routing\AbstractRoute
     {
         $target = $this->request->getRequestTarget();
 
-        // Fetch aliasses
+        // Fetch aliases
         $result = $aliasesRepository->fetch([
             'where' => [
                 'status' => 200,

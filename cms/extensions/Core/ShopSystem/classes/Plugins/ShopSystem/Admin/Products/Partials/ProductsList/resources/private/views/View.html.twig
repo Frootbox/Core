@@ -31,7 +31,7 @@
                     <td class="text-right">{{ product.getPriceGross() | number_format(2, ',', '.') }} EUR</td>
                     <td class="text-right">
                         <a class="ajax" data-toggle="tooltip" title="Produkt aktivieren/deaktivieren" href="{{ data.plugin.getAdminUri('Products', 'ajaxSwitchVisible', { productId: product.getId() }) }}"><i data-product="{{ product.getId() }}" class="fa fa-lightbulb icon visibility visibility-{{ product.getVisibility() }}"></i></a>
-                        <a class="ajax" data-toggle="tooltip" title="Produkt löschen" data-confirm="Soll dieses Produkt wirklich gelöscht werden?" href="{{ data.plugin.getAdminUri('Products', 'ajaxDelete', { productId: product.getId() }) }}"><i class="fa fa-times icon"></i></a>
+                        <a class="ajax" data-toggle="tooltip" title="Produkt löschen" data-confirm="Soll dieses Produkt wirklich gelöscht werden?" href="{{ data.plugin.getAdminUri('Products', 'ajaxDelete', { productId: product.getId() }) }}"><i class="far fa-trash icon"></i></a>
                     </td>
                 </tr>
             {% endfor %}

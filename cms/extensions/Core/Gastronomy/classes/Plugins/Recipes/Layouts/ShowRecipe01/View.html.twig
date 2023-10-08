@@ -1,7 +1,10 @@
 {# config
 
 title: Standard
-
+variables:
+    withContainer:
+        type: bool
+        label: mit Layout-Container
 /config #}
 
 {% set i = view.getViewhelper('Delegator', { object: plugin }) %}
@@ -10,36 +13,39 @@ title: Standard
 {{ b.addSections(category, { skipfirst: true }) }}
 {{ b.addSection(recipe.getTitle(), recipe.getUri()) }}
 
-<div class="row">
-    <div class="col-12 plugin Core Gastronomy Recipes Index01">
+<div class="plugin Core Gastronomy Recipes ShowRecipe01">
 
-        {% if plugin.isFirst %}
-            <h1 data-editable data-uid="{{ recipe.getUid('title') }}">{{ recipe.getTitle }}</h1>
-        {% else %}
-            <h2 data-editable data-uid="{{ recipe.getUid('title') }}">{{ recipe.getTitle }}</h2>
-        {% endif %}
-
-        <div data-editable data-uid="{{ recipe.getUid('teaser') }}"></div>
+    {% if variables.withContainer %}<div class="container">{% endif %}
 
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-12">
 
-                <h3>Zutaten</h3>
+                <h2 class="first main-title" data-editable data-uid="{{ recipe.getUid('title') }}">{{ recipe.getTitle }}</h2>
 
-                <div data-editable data-uid="{{ recipe.getUid('ingredients') }}"></div>
-            </div>
-            <div class="col-md-6">
+                <div data-editable data-uid="{{ recipe.getUid('teaser') }}"></div>
 
-                <picture class="fluid" data-skipempty="true" data-editable data-uid="{{ recipe.getUid('image')}}">
-                    <img width="600" height="350" src="{{ i.getDummyImage({ width: 600, height: 350}) }}" alt="" />
-                </picture>
+                <div class="row">
+                    <div class="col-md-6">
 
-                <h3>Zubereitung</h3>
+                        <h3>Zutaten</h3>
 
-                <div data-editable data-uid="{{ recipe.getUid('preparation') }}"></div>
+                        <div data-editable data-uid="{{ recipe.getUid('ingredients') }}"></div>
+                    </div>
+                    <div class="col-md-6">
+
+                        <picture class="fluid" data-skipempty="true" data-editable data-uid="{{ recipe.getUid('image')}}">
+                            <img width="600" height="350" src="{{ i.getDummyImage({ width: 600, height: 350}) }}" alt="" />
+                        </picture>
+
+                        <h3>Zubereitung</h3>
+
+                        <div data-editable data-uid="{{ recipe.getUid('preparation') }}"></div>
+                    </div>
+                </div>
+
             </div>
         </div>
 
-    </div>
-</div>
+    {% if variables.withContainer %}</div>{% endif %}
 
+</div>

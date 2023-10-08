@@ -4,5 +4,8 @@
  */
 
 return [
-    'Plugin.Title' => 'Schlagwortverzeichnis'
+    'Plugin.Title' => 'Schlagwortverzeichnis',
+
+    'LayoutAction.Index' => 'Übersicht',
+    'LayoutAction.ShowKeyword' => 'Schlagwort-Details',
 ];

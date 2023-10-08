@@ -67,9 +67,15 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
 
                 if ($row->hasColumn('title')) {
                     $row->setTitle($post->get('headline'));
+
+                    if ($row->hasColumn('subtitle')) {
+                        $row->setSubtitle($post->get('subtitle'));
+                    }
+
                     $row->save();
                 }
-            } elseif (MULTI_LANGUAGE) {
+            }
+            elseif (MULTI_LANGUAGE) {
 
                 $className = str_replace('-', '\\', $match[1]);
 

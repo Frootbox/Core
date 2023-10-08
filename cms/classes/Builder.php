@@ -28,7 +28,13 @@ class Builder
      */
     public function getBasePath(): string
     {
-        return $this->plugin->getPath() . 'Builder/';
+        $file = $this->plugin->getPath() . 'Builder/';
+
+        if (file_exists($file)) {
+            return $file;
+        }
+
+        return $this->plugin->getPath() . 'resources/private/builder/';
     }
 
     /**
@@ -42,9 +48,11 @@ class Builder
 
         foreach ($this->pluginsFolders as $path) {
             $paths[] = $path . $match[1] . '/' . $match[2] . '/' . $match[3] . '/Builder/';
+            $paths[] = $path . $match[1] . '/' . $match[2] . '/' . $match[3] . '/resources/private/builder/';
         }
 
         $paths[] = $this->plugin->getPath() . 'Builder/';
+        $paths[] = $this->plugin->getPath() . 'resources/private/builder/';
 
         return $paths;
     }
@@ -134,13 +142,13 @@ class Builder
     /**
      *
      */
-    public function render(string $file): string
+    public function render(string $file, array $payload = null): string
     {
         $file = $this->getFile($file);
 
-        $source = $this->view->render($file, [
-            'builder' => $this,
-        ]);
+        $payload['builder'] = $this;
+
+        $source = $this->view->render($file, $payload);
 
         return $source;
     }

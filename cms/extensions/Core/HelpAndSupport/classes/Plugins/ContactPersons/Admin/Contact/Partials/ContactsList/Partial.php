@@ -28,12 +28,23 @@ class Partial extends \Frootbox\Admin\View\Partials\AbstractPartial
     {
         $plugin = $this->getData('plugin');
 
+        $order = [ 'orderId DESC' ];
+
+        if (!empty($plugin->getConfig('defaultSorting'))) {
+            switch ($plugin->getConfig('defaultSorting')) {
+                case 'LastnameAsc':
+                    $order = [ 'lastName ASC', 'firstName ASC' ];
+                    break;
+            }
+        }
+
+
         // Fetch contacts
         $result = $contacts->fetch([
             'where' => [
                 'pluginId' => $plugin->getId(),
             ],
-            'order' => [ 'orderId DESC' ]
+            'order' => $order,
         ]);
 
         $view->set('contacts', $result);

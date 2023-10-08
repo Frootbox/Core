@@ -1,0 +1,38 @@
+<form method="post" class="ajax" action="{{ plugin.getAdminUri('Event', 'ajaxCloneMulti') }}">
+
+    {% set xevent = null %}
+
+    <table class="table">
+        <tbody>
+
+            {% for event in events %}
+
+                <input type="hidden" name="events[]" value="{{ event.getId() }}" />
+
+                {% set xevent = event %}
+
+                <tr>
+                    <td>#{{ event.getId() }}</td>
+                    <td>{{ event.getTitle() }}</td>
+                    <td>{{ event.getDateStart() | date('d.m.Y H:i') }}</td>
+                    <td>{{ event.getDateEnd() | date('d.m.Y H:i') }}</td>
+                </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+
+    <div class="modal-body">
+        <div class="form-group">
+            <label for="cloneToDay">klonen für Tag ...</label>
+            <input type="date" class="form-control" id="cloneToDay" name="cloneToDay" aria-describedby="emailHelp" value="{{ xevent.getDateStart() | date('Y-m-d') }}">
+            <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Veranstaltungen klonen</button>
+    </div>
+
+</form>
+

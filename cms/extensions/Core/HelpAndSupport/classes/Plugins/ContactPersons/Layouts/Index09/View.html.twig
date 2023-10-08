@@ -5,7 +5,9 @@ variables:
     skipContainer:
         type: bool
         label: ohne Layout-Container
-
+    skipHeadline:
+        type: bool
+        label: ohne Überschrift
 /config #}
 
 {% set i = view.getViewhelper('Delegator', { object: plugin }) %}
@@ -23,20 +25,22 @@ variables:
 
 <div class="plugin Core HelpAndSupport ContactPersons Index09">
 
-    {% if not variables.skipContainer %}<div class="container">{% endif %}
+    {% if not variables.skipHeadline %}
 
-        <div class="row">
-            <div class="col-12">
+        {% if not variables.skipContainer %}<div class="container">{% endif %}
 
-                <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+            <div class="row">
+                <div class="col-12">
 
+                    <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+
+                </div>
             </div>
-        </div>
 
-    {% if not variables.skipContainer %}</div>{% endif %}
+        {% if not variables.skipContainer %}</div>{% endif %}
 
+    {% endif %}
 
     {{ p.renderPartial('Category', { category: i.getCategory(), colClass: colClass, skipContainer: variables.skipContainer }) | raw }}
-
 
 </div>

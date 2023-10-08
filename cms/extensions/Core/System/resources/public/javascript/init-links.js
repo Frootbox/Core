@@ -43,13 +43,21 @@ $(function ( ) {
     /**
      *
      */
-    $(document).on('click', '[data-href]', function ( event ) {
+    $(document).on('click', '[data-href]', function(event) {
+
+
 
         if (typeof isEditing != "undefined" && isEditing) {
             return;
         }
 
         if (event.target.tagName == 'A') {
+            event.stopImmediatePropagation();
+            return;
+        }
+
+        if ($(event.target).parents('a').length) {
+            event.stopImmediatePropagation();
             return;
         }
 

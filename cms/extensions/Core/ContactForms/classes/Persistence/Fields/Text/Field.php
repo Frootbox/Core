@@ -14,4 +14,14 @@ class Field extends \Frootbox\Ext\Core\ContactForms\Persistence\Fields\AbstractF
     {
         return __DIR__ . DIRECTORY_SEPARATOR;
     }
+
+    /**
+     * Update field form post data
+     */
+    public function updateFromPost(\Frootbox\Http\Post $post): void
+    {
+        $this->addConfig([
+            'captureAutoBackmail' => !empty($post->get('captureAutoBackmail')),
+        ]);
+    }
 }

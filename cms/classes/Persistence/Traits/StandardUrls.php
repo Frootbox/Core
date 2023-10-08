@@ -12,7 +12,7 @@ trait StandardUrls
      */
     public function getPrivacyPolicyLink (
         \Frootbox\Config\Config $config,
-        \Frootbox\Persistence\Repositories\Pages $pagesRepository
+        \Frootbox\Persistence\Repositories\Pages $pagesRepository,
     ): ?string
     {
 

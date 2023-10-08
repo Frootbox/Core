@@ -1,7 +1,21 @@
 {% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
 
 <h2>
-    Adresse bearbeiten
+    Adresse #{{ address.getId() }} bearbeiten
+
+    <span class="headoptions">
+        {#
+        <span class="dropdown">
+            <i class="far fa-bars dropdown-toggle" data-toggle="dropdown"></i>
+
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <a class="dropdown-item ajax" href="{{ plugin.getAdminUri('Job', 'ajaxDuplicate', { jobId: job.getId() }) }}"><i class="far fa-copy"></i>duplizieren</a>
+            </div>
+        </span>
+        #}
+
+        <a data-toggle="tooltip" data-title="Adresse bearbeiten" target="edit-address-{{ address.getId() }}" href="{{ plugin.getAdminUri('Address', 'jumpToEdit', { addressId: address.getId() }) }}"><i class="fa fa-pencil"></i></a>
+    </span>
 </h2>
 
 <p><a class="ajax" href="{{ plugin.getAdminUri('Index', 'index', { highlight: address.getId() }) }}"><i class="fa fa-chevron-circle-left"></i> zurück</a></p>
@@ -156,7 +170,7 @@
                                     url: "https://maps.googleapis.com/maps/api/geocode/json",
                                     data: {
                                         address: $('#zipcode').val() + " " + $('#city').val() + ", " + $('#street').val() + " " + $('#streetNumber').val(),
-                                        key: "{{ config.get('addresses.google.geolocation.apiKey') | raw }}"
+                                        key: "{{ plugin.getConfig('googleMapsApiKey') | default(config.get('addresses.google.geolocation.apiKey')) | raw }}"
                                     },
                                     success: function (response) {
 
@@ -167,8 +181,6 @@
                             });
                         });
                     </script>
-
-
 
 
                     <div class="form-group">

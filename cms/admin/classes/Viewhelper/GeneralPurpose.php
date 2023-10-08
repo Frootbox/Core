@@ -14,16 +14,34 @@ class GeneralPurpose extends AbstractViewhelper
      * 
      */
     public function getMenueAction(
-        \Frootbox\Admin\Persistence\Repositories\Apps $apps,
-        \Frootbox\Config\Config $config
+        \Frootbox\Config\Config $config,
+        \Frootbox\Persistence\Repositories\Users $userRepository,
+        \Frootbox\Admin\Persistence\Repositories\Apps $appRepository,
     ): array
     {
+        // Fetch user
+        $user = $userRepository->fetchById($_SESSION['user']['id']);
+
+        $sql = 'SELECT * FROM admin_apps WHERE menuId = "Global" AND ( ';
+
+
+        switch ($user->getType()) {
+            case 'SuperAdmin':
+                $sql .= ' access = "SuperAdmin" OR ';
+
+            case 'Admin':
+                $sql .= ' access = "Admin" OR ';
+
+            case 'Editor':
+                $sql .= ' access = "Editor" OR ';
+        }
+
+        $sql .= ' 1 = 0 ) ';
+
+
         // Fetch menu apps
-        $result = $apps->fetch([
-            'where' => [
-                'menuId' => 'Global'
-            ]
-        ]);
+        $result = $appRepository->fetchByQuery($sql);
+
 
         $list = [ ];
 
@@ -35,6 +53,8 @@ class GeneralPurpose extends AbstractViewhelper
 
         }
         catch ( \Exception $e ) {
+
+            d($e);
 
         }
 
@@ -56,7 +76,7 @@ class GeneralPurpose extends AbstractViewhelper
             $url .= '&' . http_build_query($arguments['payload']);
         }
 
-        return $url;
+        return $url . '&' . SID;
     }
     
     /**
@@ -127,9 +147,53 @@ class GeneralPurpose extends AbstractViewhelper
         }
         
         return '<!-- unknown public library: ' . $libPath . ' -->'; 
-    }    
-    
-    
+    }
+
+    /**
+     * @param \Frootbox\Persistence\Repositories\Extensions $extensionRepository
+     * @return string
+     */
+    public function injectCustomCssAction(
+        \Frootbox\Persistence\Repositories\Extensions $extensionRepository,
+    ): string
+    {
+        // Get cache file path
+        $cachefilePathFull = FILES_DIR . 'cache/admin/custom.css';
+
+        if (file_exists($cachefilePathFull)) {
+            return '<style>' . file_get_contents($cachefilePathFull) . '</style>';
+        }
+
+        // Fetch extensions
+        $extensions = $extensionRepository->fetch([
+            'where' => [
+                'isactive'=> 1,
+            ],
+        ]);
+
+        $scss = (string) null;
+
+        foreach ($extensions as $extension) {
+
+            $path = $extension->getExtensionController()->getPath() . 'resources/private/css/admin-custom.scss';
+
+            if (file_exists($path)) {
+                $scss .= PHP_EOL . PHP_EOL . file_get_contents($path);
+            }
+        }
+
+        // Compile scss
+        $compiler = new \ScssPhp\ScssPhp\Compiler();
+        $css = $compiler->compileString($scss)->getCss();
+
+        // Write cache file
+        $cachefile = new \Frootbox\Filesystem\File($cachefilePathFull);
+        $cachefile->setSource($css);
+        $cachefile->write();
+
+        return '<style>' . $css . '</style>';
+    }
+
     /**
      * @param string $partialClass
      * @param array $data
@@ -152,8 +216,6 @@ class GeneralPurpose extends AbstractViewhelper
             $partial->setData($arguments['data']);
         }
 
-
-
         try {
 
             if (is_callable([ $partial, 'onBeforeRendering' ])) {
@@ -174,7 +236,6 @@ class GeneralPurpose extends AbstractViewhelper
             $html = '<div style="margin: 20px 0; padding: 10px; text-align: center; border: 1px solid red; color: red;">' . $exception->getMessage() . '</div>';
         }
 
-
         return trim($html);
     }
 
@@ -183,11 +244,13 @@ class GeneralPurpose extends AbstractViewhelper
      * @param string $extensionId
      */
     public function isExtensionInstalledAction(
-        \Frootbox\Persistence\Repositories\Extensions $extensionsRepository
-    )
+        \Frootbox\Persistence\Repositories\Extensions $extensionRepository,
+    ): bool
     {
         $arguments = $this->getArgumenets();
-        $result = $extensionsRepository->fetchOne([
+
+        // Fetch extension
+        $result = $extensionRepository->fetchOne([
             'where' => [
                 'vendorId' => $arguments['vendorId'],
                 'extensionId' => $arguments['extensionId'],

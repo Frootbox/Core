@@ -9,6 +9,12 @@ use Frootbox\View\Response;
 
 class Plugin extends \Frootbox\Persistence\AbstractPlugin
 {
+    protected $publicActions = [
+        'index',
+        'showCategory',
+        'showRecipe',
+    ];
+
     /**
      * Get plugins root path
      */

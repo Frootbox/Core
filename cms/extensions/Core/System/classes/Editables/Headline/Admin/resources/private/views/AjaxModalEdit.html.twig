@@ -79,10 +79,13 @@
             <label for="headline"><b>Überschrift</b></label>
             <textarea class="form-control" id="headline" name="headline" placeholder="Überschrift">{{ get.get('headline') }}</textarea>
         </div>
-        <div class="form-group">
-            <label for="supertitle">Übertitel</label>
-            <textarea class="form-control" id="supertitle" name="supertitle" placeholder="Übertitel">{{ get.get('supertitle') }}</textarea>
-        </div>
+
+        {% if not get.get('skipSuperTitle') %}
+            <div class="form-group">
+                <label for="supertitle">Übertitel</label>
+                <textarea class="form-control" id="supertitle" name="supertitle" placeholder="Übertitel">{{ get.get('supertitle') }}</textarea>
+            </div>
+        {% endif %}
 
         <div class="form-group">
             <label for="subtitle">Untertitel</label>

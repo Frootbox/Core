@@ -221,7 +221,23 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
      */
     public function indexAction(): Response
     {
-
         return self::getResponse();
+    }
+
+    /**
+     * @param Get $get
+     * @param \Frootbox\Ext\Core\HelpAndSupport\Persistence\Repositories\Contacts $contactRepository
+     * @return Response
+     */
+    public function jumpToEditAction(
+        \Frootbox\Http\Get $get,
+        \Frootbox\Ext\Core\HelpAndSupport\Persistence\Repositories\Contacts $contactRepository,
+    ): Response
+    {
+        // Fetch contact
+        $contact = $contactRepository->fetchById($get->get('contactId'));
+
+        header('Location: ' . $contact->getUriEdit());
+        exit;
     }
 }

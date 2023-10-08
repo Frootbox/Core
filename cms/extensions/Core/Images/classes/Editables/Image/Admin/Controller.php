@@ -36,7 +36,6 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
         return self::getResponse('json');
     }
 
-
     /**
      *
      */
@@ -123,7 +122,15 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
             $result->map('delete');
 
             // Fetch source
-            $source = file_get_contents($post->get('url'));
+            $context = stream_context_create(array(
+                'http'=>array(
+                    'method'=>"GET",
+                    'header'=>"Accept-language: en\r\n" .
+                        "Cookie: foo=bar\r\n" .  // check function.stream-context-create on php.net
+                        "User-Agent: Mozilla/5.0 (iPad; U; CPU OS 3_2 like Mac OS X; en-us) AppleWebKit/531.21.10 (KHTML, like Gecko) Version/4.0.4 Mobile/7B334b Safari/531.21.102011-10-16 20:23:10\r\n" // i.e. An iPad
+                )
+            ));
+            $source = file_get_contents($post->get('url'), false, $context);
             $tmpfname = tempnam(sys_get_temp_dir(), md5(microtime(true)));
             $info = pathinfo($post->get('url'));
 

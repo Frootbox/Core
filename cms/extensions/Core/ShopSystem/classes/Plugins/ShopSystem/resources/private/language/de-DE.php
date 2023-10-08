@@ -9,6 +9,7 @@ return [
 
     '.Exceptions.AccessDenied.ProductCurrentlyNotAvailable' => 'Das gewünschte Produkt ist derzeit leider nicht verfügbar.',
 
+    'LayoutAction.AjaxProduct' => 'Produktdetails (Ajax)',
     'LayoutAction.Index' => 'Übersicht',
     'LayoutAction.ProductRequest' => 'Produkt-Anfrage',
     'LayoutAction.ShowProduct' => 'Produktdetails',
@@ -22,6 +23,9 @@ return [
 
     'UnitEach' => 'Stück',
     'UnitLiter' => 'Liter',
+    'UnitSquareMeters' => 'Quadratmeter',
+
+    'UnitShortSquareMeters' => 'qm',
 
     'ItemNumber' => 'Artikelnummer',
 ];

@@ -43,10 +43,24 @@ $(function ( ) {
 					return;
 				}
 
+				if (typeof response.removeClass !== 'undefined') {
+					$(response.removeClass.selector).removeClass(response.removeClass.className)
+				}
 
+				if (typeof response.addClass !== 'undefined') {
+					$(response.addClass.selector).addClass(response.addClass.className)
+				}
 
 				if (typeof response.redirect !== 'undefined') {
 					window.location.href = response.redirect;
+				}
+
+				if (typeof response.triggerModal !== 'undefined') {
+
+					let title = response.modalTitle;
+					$('body').append('<a id="genericModalTriggerLink" data-title="' + title + '" data-modal href="' + response.triggerModal + '">xxxx</a>');
+					$('#genericModalTriggerLink').trigger('click');
+					$('#genericModalTriggerLink').remove();
 				}
 
 				if (typeof response.replace !== 'undefined') {
@@ -70,7 +84,9 @@ $(function ( ) {
 				}
 
 				if (typeof response.success !== 'undefined') {
-					toastr.success(response.success);
+					if (response.success != null) {
+						toastr.success(response.success);
+					}
 				}
 				else {
 					toastr.success('Die Daten wurden gespeichert.');

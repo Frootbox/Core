@@ -62,7 +62,9 @@ abstract class AbstractRow extends \Frootbox\Db\Row implements \JsonSerializable
         }
 
         // Clean tags
-        if (method_exists($this, 'getTags')) {
+        $traits = class_uses($this);
+
+        if (in_array(\Frootbox\Persistence\Traits\Tags::class, $traits)) {
             $this->getTags()->map('delete');
         }
 

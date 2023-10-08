@@ -121,6 +121,12 @@ class Partials extends AbstractViewhelper
             if (file_exists($stylesheet)) {
                 $html = '<link rel="stylesheet/less" type="text/css" href="FILE:' . $stylesheet . '">' . PHP_EOL . PHP_EOL . $html;
             }
+
+            $scriptFile = dirname($file) . '/public/init.js';
+
+            if (file_exists($scriptFile)) {
+                $html = '<script src="FILE:' . $scriptFile . '"></script>' . PHP_EOL . PHP_EOL . $html;
+            }
         }
 
         return $html;

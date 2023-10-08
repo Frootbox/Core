@@ -43,14 +43,16 @@ class Session {
 
         session_name($this->sessionName);
 
+        /*
         session_set_cookie_params([
             'lifetime' => 3600 * 48,
             'path' => SERVER_PATH,
             'domain' => $_SERVER['SERVER_NAME'],
             'secure' => IS_SSL,
             'httponly' => true,
-            'samesite' => 'Strict'
+           // 'samesite' => 'Strict'
         ]);
+*/
 
         // Start session
         if ($config->get('session.disableCookies')) {

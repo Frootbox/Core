@@ -21,6 +21,10 @@ variables:
     withRolloverEffect:
         type: bool
         label: mit Roll-Over Effekt
+    lastRowCentered:
+        type: bool
+        label: letzte Reihe zentriert
+
 /config #}
 
 {% set i = view.getViewhelper('Delegator', { object: plugin }) %}

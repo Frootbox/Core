@@ -473,31 +473,40 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
      * Update plugins configuration
      */
     public function ajaxUpdate(
-        \Frootbox\Http\Post $post,
         \Frootbox\Http\Get $get,
-        \Frootbox\Persistence\Content\Repositories\ContentElements $contentElements,
+        \Frootbox\Http\Post $post,
+        \DI\Container $container,
+        \Frootbox\Persistence\Content\Repositories\ContentElements $contentElementRepository,
     ): Response
     {
         // Validate required input
         $post->require([ 'title', 'socket' ]);
 
         // Fetch plugin
-        $plugin = $contentElements->fetchById($get->get('pluginId'));
+        $plugin = $contentElementRepository->fetchById($get->get('pluginId'));
 
         // Update plugin
         $plugin->setTitle($post->get('title'));
         $plugin->setInheritance($post->get('inheritance'));
         $plugin->setSocket($post->get('socket'));
 
-        if (!empty($post->get('pageId'))) {
-            $plugin->setPageId($post->get('pageId'));
-        }
-
         $plugin->addConfig([
             'skipLanguages' => $post->get('skipLanguages'),
         ]);
 
         $plugin->save();
+
+        // Move plugin to another page
+        if (!empty($post->get('pageId'))) {
+            $plugin->setPageId($post->get('pageId'));
+            $plugin->save();
+
+            if (method_exists($plugin, 'onAfterMovingPlugin')) {
+                $container->call([ $plugin, 'onAfterMovingPlugin' ]);
+            }
+        }
+
+        d("FERTIG");
         
         return self::getResponse('json', 200);
     }
@@ -589,7 +598,9 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
         // Fetch element
         $element = $contentElements->fetchById($get->get('pluginId'));
 
-        preg_match('#^Frootbox\\\\Ext\\\\([a-z]+)\\\\([a-z]+)\\\\Plugins\\\\([a-z]+)\\\\Plugin$#i', get_class($element), $plgData);
+        if (!preg_match('#^Frootbox\\\\Ext\\\\([a-z0-9]+)\\\\([a-z]+)\\\\Plugins\\\\([a-z]+)\\\\Plugin$#i', get_class($element), $plgData)) {
+            throw new \Exception('Plugin namespace unrecognized.');
+        }
 
         $viewFile = $element->getLayoutForAction($config, $get->get('action'));
 
@@ -621,7 +632,9 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
         // Fetch element
         $element = $contentElements->fetchById($get->get('pluginId'));
 
-        preg_match('#^Frootbox\\\\Ext\\\\([a-z]+)\\\\([a-z]+)\\\\Plugins\\\\([a-z]+)\\\\Plugin$#i', get_class($element), $plgData);
+        if (!preg_match('#^Frootbox\\\\Ext\\\\([a-z0-9]+)\\\\([a-z]+)\\\\Plugins\\\\([a-z]+)\\\\Plugin$#i', get_class($element), $plgData)) {
+            throw new \Exception('Plugin-Pfad nicht erkannt.');
+        }
 
         $viewFile = $element->getLayoutForAction($config, $get->get('action'));
 

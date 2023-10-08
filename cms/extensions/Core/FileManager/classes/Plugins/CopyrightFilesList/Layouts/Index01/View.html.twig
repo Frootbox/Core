@@ -20,15 +20,17 @@ variables:
     <div class="row">
         <div class="col-12">
 
-            <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+            <div class="inner-wrapper">
+                <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
 
-            <div data-editable data-uid="{{ plugin.getUid('text') }}"></div>
+                <div data-editable data-uid="{{ plugin.getUid('text') }}"></div>
 
-            <ul>
-                {% for file in files %}
-                    <li><a href="{{ file.getUri({ width: 300 }) }}">{{ file.getCopyright() }}</a></li>
-                {% endfor %}
-            </ul>
+                <ul>
+                    {% for file in files %}
+                        <li><a href="{{ file.getUri({ width: 300 }) }}">{{ file.getCopyright() }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
 
         </div>
     </div>

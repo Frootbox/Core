@@ -25,6 +25,10 @@
                         <input {% if plugin.getConfig('noAddressDetailPage') %}checked{% endif %} type="checkbox" class="form-check-input" id="noAddressDetailPage" name="noAddressDetailPage">
                         <label class="form-check-label" for="noAddressDetailPage">keine Detailseite für Adressen</label>
                     </div>
+                    <div class="form-group">
+                        <label for="googleMapsApiKey">Google Maps Api Key</label>
+                        <input type="text" class="form-control" id="googleMapsApiKey" name="googleMapsApiKey" value="{{ plugin.getConfig('googleMapsApiKey')  }}">
+                    </div>
 
                     <button type="submit" class="btn btn-primary">Speichern</button>
 

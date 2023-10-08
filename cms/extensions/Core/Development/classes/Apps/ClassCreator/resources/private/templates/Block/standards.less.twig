@@ -1,5 +1,17 @@
 .EditableBlock.{{ extension.getExtensionId() }}.{{ blockId}} {
 
+  div[data-editable]:not(:empty) {
+    margin-bottom: 40px;
+  }
+
+  .teasers {
+    margin-bottom: -50px;
+
+    .teaser {
+      margin-bottom: 50px;
+    }
+  }
+
   @media (min-width: 768px) {
 
   }

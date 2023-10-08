@@ -32,6 +32,14 @@ class Booking extends \Frootbox\Persistence\AbstractAsset
     /**
      *
      */
+    public function getPersons(): int
+    {
+        return (int) $this->getConfig('persons');
+    }
+
+    /**
+     *
+     */
     public function getTotal(): float
     {
         // Fetch event

@@ -6,7 +6,8 @@
         <span class="dropdown">
             <i class="far fa-bars dropdown-toggle" data-toggle="dropdown"></i>
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                <a class="dropdown-item" data-modal href="{{ plugin.getAdminUri('Import', 'ajaxModalCompose', { categoryId: category.getId() }) }}">Bilder importieren</a>
+                <a class="dropdown-item" data-modal href="{{ plugin.getAdminUri('Import', 'ajaxModalCompose', { categoryId: category.getId() }) }}"><i class="far fa-fw fa-file-import icon"></i>Bilder importieren</a>
+                <a class="dropdown-item ajax" href="{{ plugin.getAdminUri('Index', 'ajaxSortByFilename', { categoryId: category.getId() }) }}"><i class="far fa-fw fa-sort icon"></i>Bilder nach Dateinamen sortieren</a>
             </div>
         </span>
     </span>

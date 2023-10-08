@@ -63,6 +63,36 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     /**
      *
      */
+    public function ajaxImportPersonsAction(
+        \Frootbox\Ext\Core\HelpAndSupport\Persistence\Repositories\Contacts $contactRepository,
+    ): Response
+    {
+        // Fetch persons
+        $persons = $contactRepository->fetch([
+            'where' => [
+
+            ],
+        ]);
+
+        $loop = 0;
+
+        foreach ($persons as $person) {
+
+            $person->setPageId($this->plugin->getPageId());
+            $person->setPluginId($this->plugin->getId());
+            $person->save();
+
+            ++$loop;
+        }
+
+        return self::getResponse('json', 200, [
+            'success' => $loop . ' Kontakte wurden importiert.',
+        ]);
+    }
+
+    /**
+     *
+     */
     public function ajaxUpdateAction(
         \Frootbox\Http\Get $get,
         \Frootbox\Http\Post $post,
@@ -90,6 +120,7 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
             $person->addConfig([
                 'noPersonsDetailPage' => $post->get('noPersonsDetailPage'),
             ]);
+
             $person->save();
         }
 

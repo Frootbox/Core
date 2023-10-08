@@ -5,6 +5,8 @@
 
 namespace Frootbox\Ext\Core\HelpAndSupport\Plugins\KeywordIndex\Admin\Keyword;
 
+use JetBrains\PhpStorm\NoReturn;
+
 class Controller extends \Frootbox\Admin\AbstractPluginController
 {
     /**
@@ -79,5 +81,22 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     ): \Frootbox\Admin\Controller\Response
     {
         return self::getResponse('plain');
+    }
+
+    /**
+     * @param \Frootbox\Http\Get $get
+     * @param \Frootbox\Ext\Core\HelpAndSupport\Plugins\KeywordIndex\Persistence\Repositories\Keywords $keywordRepository
+     * @return \Frootbox\Admin\Controller\Response
+     */
+    #[NoReturn] public function jumpToEditAction(
+        \Frootbox\Http\Get $get,
+        \Frootbox\Ext\Core\HelpAndSupport\Plugins\KeywordIndex\Persistence\Repositories\Keywords $keywordRepository,
+    ): \Frootbox\Admin\Controller\Response
+    {
+        // Fetch keyword
+        $keyword = $keywordRepository->fetchById($get->get('keywordId'));
+
+        header('Location: ' . $keyword->getUriEdit());
+        exit;
     }
 }

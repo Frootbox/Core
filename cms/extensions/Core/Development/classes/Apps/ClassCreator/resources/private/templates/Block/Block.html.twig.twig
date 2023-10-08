@@ -20,7 +20,6 @@ _e_xtends: HerrUndFrauPixelExt/BlocksLibrary/Teaser
 
 {% set icons = view.getViewhelper('Ext/HerrUndFrauPixelExt/Icons/Icons', { createDummyOnFail: true  }) %}
 
-
 <div class="container">
     <div class="row">
         <div class="col-md-12">
@@ -29,9 +28,28 @@ _e_xtends: HerrUndFrauPixelExt/BlocksLibrary/Teaser
 
             <div data-editable data-uid="{{ block.getUid('text') }}"></div>
 
-            <picture data-editable data-uid="{{ block.getUid('image')}}">
-                <img width="570" height="410" src="{{ i.getDummyImage({ width: 570, height: 410 }) }}" alt="" />
-            </picture>
+            <div class="background" data-width="1600" data-type="Images/Background" data-uid="{{ block.getUid('background-6')}}"></div>
+
+            <div class="teasers">
+                <div class="row">
+
+                    {% for teaser in teasers %}
+                        <div class="col-md-4">
+                            <div class="teaser">
+
+                                <picture data-editable data-uid="{{ teaser.getUid('image')}}">
+                                    <img width="570" height="410" src="{{ i.getDummyImage({ width: 570, height: 410 }) }}" alt="" />
+                                </picture>
+
+                                <h4 class="first main-title" data-editable data-uid="{{ teaser.getUid('title') }}">{{ teaser.getTitle() }}</h4>
+
+                                <div data-editable data-nowidgets data-uid="{{ teaser.getUid('text') }}"></div>
+
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
 
         </div>
     </div>

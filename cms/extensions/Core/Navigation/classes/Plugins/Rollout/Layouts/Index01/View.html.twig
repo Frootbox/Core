@@ -10,18 +10,20 @@ title: Standard
 
 {{ i.injectScss({ path: 'Index01/public/standards.less'}) | raw }}
 
-<!--<div class="row d-none d-md-block">-->
-<div class="row">
-    <div class="col-12 plugin Core Navigation Rollout Index01">
+<div class="plugin Core Navigation Rollout Index01">
 
-        <nav>
-            {% if plugin.getConfig('showHomepageLink') %}
-                <a class="level-1 {% if page.getId() == startPage.getId() %}active{% endif %}" href="{{ startPage.getUri() }}">{{ startPage.getTitle() }}</a>
-            {% endif %}
+    <div class="row">
+        <div class="col-12">
 
-            {{ p.renderPartial('Pages', { pages: startPage.getChildrenVisible(), level: 1 }) | raw }}
-        </nav>
+            <nav>
+                {% if plugin.getConfig('showHomepageLink') %}
+                    <a class="level-1 {% if page.getId() == startPage.getId() %}active{% endif %}" href="{{ startPage.getUri() }}">{{ startPage.getTitle() }}</a>
+                {% endif %}
 
+                {{ p.renderPartial('Pages', { pages: startPage.getChildrenVisible(), level: 1 }) | raw }}
+            </nav>
+
+        </div>
     </div>
-</div>
 
+</div>

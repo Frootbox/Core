@@ -93,6 +93,7 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
         $file->addConfig([
             'caption' => $post->get('caption'),
             'alt' => $post->get('alt'),
+            'link' => $post->get('link'),
         ]);
 
         $file->save();
@@ -185,10 +186,10 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
      *
      */
     public function detailsAction(
-        \Frootbox\Persistence\Repositories\Folders $folders,
         \Frootbox\Http\Get $get,
-        \Frootbox\Persistence\Repositories\Files $filesRepository
-    )
+        \Frootbox\Persistence\Repositories\Files $filesRepository,
+        \Frootbox\Persistence\Repositories\Folders $folderRepository,
+    ): Response
     {
         // Fetch file
         $file = $filesRepository->fetchById($get->get('fileId'));
@@ -202,9 +203,17 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
             $exif = null;
         }
 
+        if (!empty($get->get('folderId'))) {
+
+            // Fetch folder
+            $folder = $folderRepository->fetchById($get->get('folderId'));
+        }
+
+
         return self::getResponse('html', 200, [
             'file' => $file,
             'exif' => $exif,
+            'folder' => $folder ?? null,
         ]);
     }
 
@@ -273,12 +282,19 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
         // Fetch file
         $file = $filesRepository->fetchById($get->get('fileId'));
 
+        // Generate paths
         $trashPath = FILES_DIR . 'trash/' . basename($file->getPath());
         $realPath = FILES_DIR . $file->getPath();
 
+        if (!file_exists($trashPath)) {
+            throw new \Exception('Die Datei existiert nicht im Papierkorb.');
+        }
+
         rename($trashPath, $realPath);
 
-        die("OK");
+        return self::getResponse('json', 200, [
+            'success' => 'Die Datei wurde wiederhergestellt.',
+        ]);
     }
 
     /**

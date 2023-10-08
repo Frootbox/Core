@@ -16,7 +16,8 @@ class Event extends \Frootbox\Persistence\AbstractAsset implements \Frootbox\Per
     protected $model = Repositories\Events::class;
 
     /**
-     *
+     * @return void
+     * @throws \Frootbox\Exceptions\RuntimeError
      */
     public function delete()
     {
@@ -33,16 +34,31 @@ class Event extends \Frootbox\Persistence\AbstractAsset implements \Frootbox\Per
         return parent::delete();
     }
 
-
-
     /**
-     *
+     * @return array
      */
     public function getLanguageAliases(): array
     {
         $aliases = json_decode($this->data['aliases'], true);
 
         return $aliases['index'];
+    }
+
+    /**
+     * @return \Frootbox\Db\Result
+     * @throws \Frootbox\Exceptions\RuntimeError
+     */
+    public function getBookings(): \Frootbox\Db\Result
+    {
+        $bookingRepository = $this->getDb()->getRepository(\Frootbox\Ext\Core\Events\Plugins\Booking\Persistence\Repositories\Bookings::class);
+        $bookings = $bookingRepository->fetch([
+            'where' => [
+                'parentId' => $this->getId()
+            ],
+            'order' => [ 'date DESC' ]
+        ]);
+
+        return $bookings;
     }
 
     /**
@@ -111,13 +127,20 @@ class Event extends \Frootbox\Persistence\AbstractAsset implements \Frootbox\Per
             return null;
         }
 
+        $virtualDirectory = [];
+
+        if ($this->getConfig('aliasSubFolder') != "None") {
+            $dateFormat = !empty($this->getConfig('aliasSubFolder')) ? $this->getConfig('aliasSubFolder') : '%Y-%m-%d';
+            $virtualDirectory[] = $this->getDateStart()->format($dateFormat);
+        }
+
+        $virtualDirectory[] = $this->getTitle();
+
         return new \Frootbox\Persistence\Alias([
             'language' => '',
             'pageId' => $this->getPageId(),
-            'virtualDirectory' => [
-                $this->getDateStart()->format('%Y-%m-%d'),
-                $this->getTitle()
-            ],
+            'virtualDirectory' => $virtualDirectory,
+            'uid' => $this->getUid('alias'),
             'payload' => $this->generateAliasPayload([
                 'action' => 'showEvent',
                 'eventId' => $this->getId()
@@ -144,13 +167,20 @@ class Event extends \Frootbox\Persistence\AbstractAsset implements \Frootbox\Per
                     continue;
                 }
 
+                $virtualDirectory = [];
+
+                if ($this->getConfig('aliasSubFolder') != "None") {
+                    $dateFormat = !empty($this->getConfig('aliasSubFolder')) ? $this->getConfig('aliasSubFolder') : '%Y-%m-%d';
+                    $virtualDirectory[] = $this->getDateStart()->format($dateFormat);
+                }
+
+                $virtualDirectory[] = $this->getTitle();
+
                 $list['index'][] = new \Frootbox\Persistence\Alias([
                     'language' => $language,
                     'pageId' => $this->getPageId(),
-                    'virtualDirectory' => [
-                        $this->getDateStart()->format('%Y-%m-%d'),
-                        $title,
-                    ],
+                    'virtualDirectory' => $virtualDirectory,
+                    'uid' => $this->getUid('alias'),
                     'payload' => $this->generateAliasPayload([
                         'action' => 'showEvent',
                         'eventId' => $this->getId(),
@@ -161,6 +191,15 @@ class Event extends \Frootbox\Persistence\AbstractAsset implements \Frootbox\Per
             return $list;
         }
         else {
+
+            $virtualDirectory = [];
+
+            if ($this->getConfig('aliasSubFolder') != "None") {
+                $dateFormat = !empty($this->getConfig('aliasSubFolder')) ? $this->getConfig('aliasSubFolder') : '%Y-%m-%d';
+                $virtualDirectory[] = $this->getDateStart()->format($dateFormat);
+            }
+
+            $virtualDirectory[] = $this->getTitle();
 
             return [
                 'index' => [
@@ -323,5 +362,6 @@ class Event extends \Frootbox\Persistence\AbstractAsset implements \Frootbox\Per
                 'bookedSeats' => $persons,
             ],
         ]);
+        $this->save();
     }
 }

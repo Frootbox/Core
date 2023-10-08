@@ -1,0 +1,19 @@
+{#
+<div class="form-group">
+    <label for="pageId">Seite</label>
+    <select required class="form-control" id="pageId" name="pageId">
+        <option value="">bitte wählen ...</option>
+        {% for page in item.getPages() %}
+            <option {% if page.getId() == item.getConfig('pageId') %}selected{% endif %} value="{{ page.getId() }}">{{ page.getTitle() }}</option>
+        {% endfor %}
+    </select>
+</div>
+<div class="form-group">
+    <label for="anchor">Anker</label>
+    <input type="text" value="{{ item.getConfig('anchor') }}" id="anchor" name="anchor" placeholder="Anker" class="form-control" />
+</div>
+<div class="form-group form-check">
+    <input type="checkbox" class="form-check-input" id="showChildren" name="showChildren" {% if item.getConfig('showChildren') %}checked{% endif %}>
+    <label class="form-check-label" for="showChildren">Unterseiten auflisten</label>
+</div>
+#}

@@ -200,6 +200,7 @@ trait Alias
             }
 
             // If payload matches and item matches, alias can be used
+            if ($alias->getUid() == $result->getUid())
             if ($result->getItemModel() == $alias->getItemModel() and $result->getItemId() == $alias->getItemId() and $result->getPayload() == $checkPayload) {
                 break;
             }
@@ -308,7 +309,6 @@ trait Alias
 
         if (MULTI_LANGUAGE and $this instanceof \Frootbox\Persistence\Interfaces\MultipleAliases) {
             $aliases = $this->generateAliases();
-
         }
         else {
 
@@ -358,14 +358,188 @@ trait Alias
             }
 
 
+            if (empty($alias->getUid())) {
+
+                d("Alias UID Missing.");
+            }
+
+            // Check if alias exists
+            $checkAlias = $aliasesRepository->fetchOne([
+                'where' => [
+                    'alias' => $aliasUri,
+                    'language' => $alias->getLanguage(),
+                ],
+            ]);
+
+            if ($checkAlias) {
+
+                if (empty($checkAlias->getUid())) {
+
+                    // Occupy check alias
+                    $checkAlias->setUid($alias->getUid());
+                    $checkAlias->save();
+                }
+
+                if ($checkAlias->getUid() == $alias->getUid()) {
+
+                    $checkAlias->setAlias($aliasUri);
+                    $checkAlias->setPayload(json_encode($alias->getPayload()));
+                    $checkAlias->save();
+
+                    $this->setAlias($checkAlias);
+                }
+                else {
+
+                    // Re-use old 301 alias
+                    if ($checkAlias->getStatus() == 301) {
+
+                        // Remove old alias
+                        $checkAlias->delete();
+
+                        // Persist new alias
+                        $alias->setAlias($aliasUri);
+                        $alias = $aliasesRepository->persist($alias);
+
+                        $this->setAlias($alias);
+                    }
+                    else {
+
+                        // Check of actual alias can stay
+                        $actualAlias = $aliasesRepository->fetchOne([
+                            'where' => [
+                                'uid' => $alias->getUid(),
+                                'status' => 200,
+                            ],
+                        ]);
+
+                        if (empty($actualAlias)) {
+
+                            $saveAliasUri = $this->getSaveUri($aliasUri, $aliasesRepository, $alias);
+                            $alias->setAlias($saveAliasUri);
+                            $alias = $aliasesRepository->persist($alias);
+
+                            $this->setAlias($alias);
+
+                            $result = $aliasesRepository->fetch([
+                                'where' => [
+                                    'uid' => $alias->getUid(),
+                                    'language' => $alias->getLanguage(),
+                                    new \Frootbox\Db\Conditions\NotEqual('id', $alias->getId()),
+                                ]
+                            ]);
+
+                            foreach ($result as $oldAlias) {
+                                $oldAlias->setStatus(301);
+                                $oldAlias->save();
+                            }
+                        }
+                        else {
+
+                            if (preg_match('#^' . $checkAlias->getAlias() . '\-([0-9]+)$#', $actualAlias->getAlias(), $match)) {
+                                $this->setAlias($actualAlias);
+                            }
+                            else {
+
+                                $saveAliasUri = $this->getSaveUri($aliasUri, $aliasesRepository, $alias);
+                                $alias->setAlias($saveAliasUri);
+                                $alias = $aliasesRepository->persist($alias);
+                                $this->setAlias($alias);
+
+                                $result = $aliasesRepository->fetch([
+                                    'where' => [
+                                        'uid' => $alias->getUid(),
+                                        'language' => $alias->getLanguage(),
+                                        new \Frootbox\Db\Conditions\NotEqual('id', $alias->getId()),
+                                    ]
+                                ]);
+
+                                foreach ($result as $oldAlias) {
+                                    $oldAlias->setStatus(301);
+                                    $oldAlias->save();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            else {
+
+                // Persist new alias
+                $alias->setAlias($aliasUri);
+                $alias = $aliasesRepository->persist($alias);
+
+                $result = $aliasesRepository->fetch([
+                    'where' => [
+                        'uid' => $alias->getUid(),
+                        'language' => $alias->getLanguage(),
+                        new \Frootbox\Db\Conditions\NotEqual('id', $alias->getId()),
+                    ]
+                ]);
+
+                foreach ($result as $oldAlias) {
+                    $oldAlias->setStatus(301);
+                    $oldAlias->save();
+                }
+
+                $this->setAlias($alias);
+            }
+
+
+            parent::save();
+
+            if ($this->hasColumn('visibility')) {
+
+                if (!empty($alias) and ((is_int($this->getVisibility()) and $this->getVisibility() < 2) or $this->getVisibility() == 'Moderated' or $this->getVisibility() == 'Locked')) {
+
+                    $nalias = $aliasesRepository->fetchOne([
+                        'where' => [
+                            'alias' => $this->getAlias($alias->getSection(), $alias->getLanguage()),
+                        ]
+                    ]);
+
+                    if (!empty($nalias) and $nalias->hasColumn('visibility')) {
+                        $nalias->setVisibility(0);
+                        $nalias->save();
+                    }
+                } elseif (!empty($alias) and ($this->getVisibility() == 'Public' or $this->getVisibility() == 'Hidden' or $this->getVisibility() === 2)) {
+
+                    $nalias = $aliasesRepository->fetchOne([
+                        'where' => [
+                            'alias' => $this->getAlias($alias->getSection(), $alias->getLanguage()),
+                        ]
+                    ]);
+
+                    if (!empty($nalias) and $nalias->hasColumn('visibility')) {
+                        $nalias->setVisibility(2);
+                        $nalias->save();
+                    }
+                } else {
+
+                    $nalias = $aliasesRepository->fetchOne([
+                        'where' => [
+                            'alias' => $this->getAlias($alias->getSection(), $alias->getLanguage()),
+                        ]
+                    ]);
+
+                    if (!empty($nalias)) {
+                        // $nalias->setVisibility($this->getVisibility() > 1 ? 1 : 0);
+                        $nalias->setVisibility($this->getVisibility());
+                        $nalias->save();
+                    }
+                }
+            }
+
+            continue;
             // Update existing alias
             if (
                 !empty($newAlias = $this->getAlias($alias->getSection(), $alias->getLanguage())) or
                 ($this instanceof \Frootbox\Persistence\Page and $this->getParentId() == 0)
             )
             {
-
                 if ($aliasUri != $newAlias) {
+
+                    d('OLD ' . $aliasUri . ' - NEW ' . $newAlias);
+                    d("UPDATE ALIAS URI");
 
                     $saveAliasUri = $this->getSaveUri($aliasUri, $aliasesRepository, $alias);
 
@@ -473,7 +647,6 @@ trait Alias
             } // Create new alias
             else {
 
-
                 $saveAliasUri = $this->getSaveUri($aliasUri, $aliasesRepository, $alias);
 
                 $alias->setAlias($saveAliasUri);
@@ -525,15 +698,20 @@ trait Alias
                         ]
                     ]);
 
-                    // $nalias->setVisibility($this->getVisibility() > 1 ? 1 : 0);
-                    $nalias->setVisibility($this->getVisibility());
-                    $nalias->save();
+                    if (!empty($nalias)) {
+
+                        // $nalias->setVisibility($this->getVisibility() > 1 ? 1 : 0);
+                        $nalias->setVisibility($this->getVisibility());
+                        $nalias->save();
+                    }
                 }
             }
 
         }
 
+
         $db->transactionCommit();
+
 
         return $this;
     }

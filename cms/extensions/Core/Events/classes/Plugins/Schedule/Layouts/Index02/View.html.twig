@@ -33,41 +33,48 @@ variables:
     {% set colClass = "col-md-3" %}
 {% endif %}
 
-<div class="row">
-    <div class="col-12 plugin Core Events Schedule Index02">
+<div class="plugin Core Events Schedule Index02">
 
-        {% if plugin.isFirst %}
-            <h1 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h1>
-        {% else %}
-            <h2 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
-        {% endif %}
+    <div class="row">
+        <div class="col-12">
 
-        <div data-editable data-uid="{{ plugin.getUid('text') }}"></div>
+            <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
 
-        {% if events | length == 0 %}
-            <div>
-                <p>Derzeit sind keine Veranstaltungen geplant.</p>
-            </div>
-        {% else %}
-            <div class="row">
+            <div data-editable data-uid="{{ plugin.getUid('text') }}"></div>
 
-                {% for event in events %}
-                    <div class="{{ colClass }}">
-                        <a href="{{ event.getUri }}" class="teaser">
-                            <picture class="fluid" data-editable data-uid="{{ event.getUid('image')}}">
-                                <img width="{{ variables.image_width }}" height="{{ variables.image_height }}" src="{{ i.getDummyImage({ width: variables.image_width, height: variables.image_height | default(300) }) }}" alt="" />
-                            </picture>
+            {% if events | length == 0 %}
+                <div>
+                    <p>Derzeit sind keine Veranstaltungen geplant.</p>
+                </div>
+            {% else %}
+                <div class="row">
 
-                            <span class="caption">
-                                <em>{{ event.getDateStart().format('%d.%m.') }}</em>
-                                <span class="title" data-editable-headline data-uid="{{ event.getUid('title') }}">{{ event.getTitle() }}</span>
-                            </span>
-                        </a>
-                    </div>
-                {% endfor %}
+                    {% for event in events %}
+                        <div class="{{ colClass }}">
+                            <div class="teaser" href="{{ event.getUri }}">
+                                <div class="row">
+                                    <div class="col-4 col-md-12">
+                                        <picture class="fluid" data-editable data-uid="{{ event.getUid('image')}}">
+                                            <img width="{{ variables.image_width }}" height="{{ variables.image_height }}" src="{{ i.getDummyImage({ width: variables.image_width, height: variables.image_height | default(300) }) }}" alt="" />
+                                        </picture>
+                                    </div>
+                                    <div class="col-8 col-md-12">
+                                        <a href="{{ event.getUri }}">
+                                            <span class="caption">
+                                                <em>{{ event.getDateStart().format('%d.%m.') }}</em>
+                                                <span class="title" data-editable-headline data-uid="{{ event.getUid('title') }}">{{ event.getTitle() }}</span>
+                                            </span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
 
-            </div>
-        {% endif %}
+                </div>
+            {% endif %}
 
+        </div>
     </div>
+
 </div>

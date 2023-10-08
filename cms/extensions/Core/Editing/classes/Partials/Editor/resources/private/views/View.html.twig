@@ -6,6 +6,8 @@
 
 {{ v.asset('EXT:Core/Editing/fontawesome/css/all.min.css') | raw }}
 
+
+
 <link href="https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300,700|Open+Sans:400,400i,700&display=swap" rel="stylesheet">
 
 {#
@@ -43,6 +45,10 @@
 
 <script nonce="{{ settings.nonce }}">
 
+    var isEditing = true;
+    var isEditingFreeText = false;
+
+
     $(function ( ) {
 
         $('body').addClass('editing');
@@ -51,40 +57,41 @@
             url: 'https://cdnjs.cloudflare.com/ajax/libs/TableDnD/0.9.1/jquery.tablednd.js',
             dataType: "script"
         });
+
+        ContentTools.DEFAULT_TOOLS = [
+            [
+                'bold',
+                'italic',
+                'link',
+                'align-left',
+                'align-center',
+                'align-right'
+            ], [
+                'heading',
+                'subheading',
+                'subsubheading',
+                'paragraph',
+                'unordered-list',
+                'ordered-list',
+                'table',
+                'blockquote',
+                'indent',
+                'unindent',
+                'line-break'
+            ], [
+                'undo',
+                'redo',
+                'remove'
+            ]
+        ];
+
+        ContentTools.Tools.Heading.tagName = 'h2';
+        ContentTools.Tools.Subheading.tagName = 'h3';
+
+
     });
 
-    var isEditing = true;
-    var isEditingFreeText = false;
 
-    ContentTools.DEFAULT_TOOLS = [
-        [
-            'bold',
-            'italic',
-            'link',
-            'align-left',
-            'align-center',
-            'align-right'
-        ], [
-            'heading',
-            'subheading',
-            'subsubheading',
-            'paragraph',
-            'unordered-list',
-            'ordered-list',
-            'table',
-            'blockquote',
-            'indent',
-            'unindent',
-            'line-break'
-        ], [
-            'undo',
-            'redo',
-            'remove'
-        ]
-    ]
-
-    ContentTools.Tools.Heading.tagName = 'h2';
-    ContentTools.Tools.Subheading.tagName = 'h3';
 
     var editorconfig = {
         urls: {
@@ -422,13 +429,15 @@
                 },
                 success: function ( response ) {
 
-                    var figure = $('figure[data-id="' + widgetId + '"]');
+                    console.log(response);
+                    var figure = $('figure[data-id="' + response.widget.id + '"]');
 
                     figure.removeClass('widget-left widget-right widget-center widget-justify');
                     figure.removeClass('col-1 col-2 col-3 col-4 col-5 col-6 col-7 col-8 col-9 col-10 col-11 col-12');
+                    figure.removeClass('col-md-1 col-md-2 col-md-3 col-md-4 col-md-5 col-md-6 col-md-7 col-md-8 col-md-9 col-md-10 col-md-11 col-md-12');
 
-                    figure.addClass('widget-' + align);
-                    figure.addClass('col-' + width);
+                    figure.addClass('widget-' + response.widget.align);
+                    figure.addClass('col-md-' + response.widget.width);
 
                 }
             });

@@ -8,8 +8,9 @@
             <i class="far fa-bars dropdown-toggle" data-toggle="dropdown"></i>
 
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                <a class="dropdown-item" target="product-show" href="{{ product.getUri }}"><i class="fa fa-fw fa-eye icon"></i>ansehen</a>
-                <a class="dropdown-item" target="product-edit" href="{{ product.getUriEdit }}"><i class="fa fa-fw fa-pencil icon"></i>bearbeiten</a>
+                <a class="dropdown-item ajax" href="{{ plugin.getAdminUri('Products', 'ajaxDuplicate', { productId: product.getId() }) }}"><i class="far fa-fw fa-copy icon"></i>Produkt duplizieren</a>
+                <a class="dropdown-item" target="product-show" href="{{ product.getUri }}"><i class="far fa-fw fa-eye icon"></i>Produkt live ansehen</a>
+                <a class="dropdown-item" target="product-edit" href="{{ product.getUriEdit }}"><i class="far fa-fw fa-pencil icon"></i>Produkt live bearbeiten</a>
             </div>
         </span>
     </span>
@@ -59,8 +60,6 @@
 
                 <form method="post" class="ajax" action="{{ plugin.getAdminUri('Products', 'ajaxUpdateInfo', { productId: product.getId() }) }}">
 
-
-
                     {% if not configuration.get('i18n.multiAliasMode') %}
                         <div class="form-group">
                             <label for="title">Titel</label>
@@ -77,12 +76,8 @@
                         {% endfor %}
                     {% endif %}
 
-
-
-
-
                     <div class="form-row">
-                        <div class="col-6">
+                        <div class="col-4">
 
                             <div class="form-group">
                                 <label for="itemNumber">Artikel-Nummer</label>
@@ -90,7 +85,15 @@
                             </div>
 
                         </div>
-                        <div class="col-6">
+                        <div class="col-4">
+
+                            <div class="form-group">
+                                <label for="itemNumberExternal">ext. Artikel-Nummer</label>
+                                <input type="text" class="form-control" id="itemNumberExternal" name="itemNumberExternal" placeholder="ext. Artikel-Nummer" value="{{ product.getItemNumberExternal() }}">
+                            </div>
+
+                        </div>
+                        <div class="col-4">
 
                             <div class="form-group">
                                 <label for="itemNumber">Produkt-ID</label>
@@ -213,6 +216,12 @@
                                     <optgroup label="Flüssigkeit">
                                         <option value="Liter" {% if product.getPackagingUnit() == "Liter" %}selected{% endif %}>Liter</option>
                                     </optgroup>
+                                    <optgroup label="Gewicht">
+                                        <option value="Gram" {% if product.getPackagingUnit() == "Gram" %}selected{% endif %}>Gramm</option>
+                                    </optgroup>
+                                    <optgroup label="Fläche">
+                                        <option value="SquareMeters" {% if product.getPackagingUnit() == "SquareMeters" %}selected{% endif %}>Quadratmeter</option>
+                                    </optgroup>
                                 </select>
                             </div>
                         </div>
@@ -244,6 +253,15 @@
                             </div>
 
                         </div>
+                    </div>
+
+                    <div class="form-group form-check">
+                        <input type="checkbox" class="form-check-input" id="freeChoiceOfAmount" name="freeChoiceOfAmount" {% if product.getConfig('freeChoiceOfAmount') %}checked{% endif %}>
+                        <label class="form-check-label" for="freeChoiceOfAmount">freie Wahl der Menge</label>
+                    </div>
+                    <div class="form-group form-check">
+                        <input type="checkbox" class="form-check-input" id="freeChoiceOfDeliveryDay" name="freeChoiceOfDeliveryDay" {% if product.getConfig('freeChoiceOfDeliveryDay') %}checked{% endif %}>
+                        <label class="form-check-label" for="freeChoiceOfDeliveryDay">Wahl des Liefertermins</label>
                     </div>
 
                     <div class="form-group">
@@ -299,7 +317,7 @@
                                         <label for="field_{{ field.getId() }}">{{ field.getTitle() }}</label>
                                         <div class="input-group mb-2">
 
-                                            {% if field.getType() == "OptionalList" %}
+                                            {% if field.getType() == "OptionalList" or field.getType() == "TextArea" %}
                                                 <textarea class="form-control" name="fields[{{ field.getId() }}]" id="field_{{ field.getId() }}" placeholder="{{ field.getTitle() }}">{{ field.getValueText() }}</textarea>
                                             {% else %}
                                                 <input type="text" class="form-control" name="fields[{{ field.getId() }}]" id="field_{{ field.getId() }}" placeholder="{{ field.getTitle() }}" value="{{ field.getValueText() }}">
@@ -321,7 +339,7 @@
 
                                     <div class="form-group">
                                         <label for="">Darstellung</label>
-                                        <input class="form-control" disabled value="{{ field.getValueDisplay() }}" />
+                                        <input class="form-control" disabled value="{{ field.getValueDisplay() | raw }}" />
                                     </div>
 
                                 </div>

@@ -1,0 +1,22 @@
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Zusatzstoff</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+
+        {% for additive in additives %}
+            <tr data-additive="{{ additive.getId() }}">
+                <td>{{ additive.getId() }}</td>
+                <td>{{ additive.getTitle() }}</td>
+                <td class="text-right">
+                    <a data-confirm="Soll dieser Zusatstoff wirklich gelöscht werden?" class="ajax" href="{{ plugin.getAdminUri('Configuration', 'ajaxAdditiveDelete', { additiveId: additive.getId() }) }}"><i class="far fa-trash"></i></a>
+                </td>
+            </tr>
+        {% endfor %}
+
+    </tbody>
+</table>

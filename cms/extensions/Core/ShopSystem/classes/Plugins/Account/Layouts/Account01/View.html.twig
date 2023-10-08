@@ -14,29 +14,24 @@ title: Standard
             <div class="col-12">
                 <div class="inner-wrapper">
 
-                    {% if plugin.isFirst %}
-                        <h1 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h1>
-                    {% else %}
-                        <h2 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
-                    {% endif %}
-
-                    <br /><br />
-
                     <div class="row">
                         <div class="col-md-4">
 
-
                             {{ p.renderPartial('Menu', { plugin: plugin }) | raw }}
-
 
                         </div>
                         <div class="col-md-8">
+
+                            <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+
+                            <div data-nowidgets data-editable data-uid="{{ plugin.getUid('account-text') }}">
+                                <p>Herzlich Willkommen in deinem Account im Online-Shop. Du kannst hier deine vergangenen Bestellungen einsehen.</p>
+                            </div>
 
                         </div>
                     </div>
 
 
-                    <br /><br /><br /><br /><br />
 
                 </div>
             </div>

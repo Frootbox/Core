@@ -21,7 +21,8 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         'login',
         'checkout',
         'complete',
-        'review'
+        'review',
+        'choiceOfDelivery',
     ];
 
     /**
@@ -34,12 +35,30 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
     }
 
     /**
+     * @param Config $configuration
+     * @return array
+     */
+    public function getCountries(
+        \Frootbox\Config\Config $configuration,
+    ): array
+    {
+        if (!empty($configuration->get('Ext.Core.ShopSystem.Countries'))) {
+            return $configuration->get('Ext.Core.ShopSystem.Countries')->getData();
+        }
+
+        if (!empty($configuration->get('shop.shipping.countries'))) {
+            return $configuration->get('shop.shipping.countries')->getData();
+        }
+
+        return [];
+    }
+
+    /**
      *
      */
     public function getNewsletterConnector(
         Container $container
-    )
-    {
+    ) {
         $newsletterConnector = $this->getShopConfig('newsletterConnector');
 
         if (empty($newsletterConnector)) {
@@ -57,8 +76,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
     public function getPaymentMethod(
         Container $container,
         \Frootbox\Persistence\Content\Repositories\ContentElements $contentElementsRepository
-    )
-    {
+    ) {
         if (empty($_SESSION['cart']['paymentmethod'])) {
             $paymentmethods = $this->getPaymentMethods($container);
 
@@ -77,7 +95,6 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
     }
 
 
-
     /**
      * Get plugins root path
      */
@@ -92,8 +109,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
     public function getPaymentMethodOutput(
         \Frootbox\View\Engines\Interfaces\Engine $view,
         \Frootbox\Ext\Core\ShopSystem\PaymentMethods\PaymentMethod $method
-    ): ?string
-    {
+    ): ?string {
         // Obtain view file
         $viewFile = $method->getPath() . 'resources/private/views/Output.html.twig';
 
@@ -112,8 +128,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
     public function getPaymentMethodOutputSave(
         \Frootbox\View\Engines\Interfaces\Engine $view,
         \Frootbox\Ext\Core\ShopSystem\PaymentMethods\PaymentMethod $method
-    ): ?string
-    {
+    ): ?string {
         // Obtain view file
         $viewFile = $method->getPath() . 'resources/private/views/OutputSave.html.twig';
 
@@ -145,8 +160,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
      */
     public function getPaymentMethods(
         Container $container,
-    ): array
-    {
+    ): array {
         $factory = $container->get(\Frootbox\TranslatorFactory::class);
         $contentElementsRepository = $container->get(\Frootbox\Persistence\Content\Repositories\ContentElements::class);
 
@@ -167,7 +181,6 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         $paymentmethods = [];
 
         foreach ($plugin->getConfig('paymentmethods') as $paymentMethodClass) {
-
             $paymentMethod = new $paymentMethodClass;
 
             // Load language file
@@ -209,11 +222,13 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
     public function getShopPlugin(): \Frootbox\Ext\Core\ShopSystem\Plugins\ShopSystem\Plugin
     {
         // Fetch shopsystem plugin
-        $contentElementsRepository = $this->db->getModel(\Frootbox\Persistence\Content\Repositories\ContentElements::class);
+        $contentElementsRepository = $this->db->getModel(
+            \Frootbox\Persistence\Content\Repositories\ContentElements::class
+        );
         $shopPlugin = $contentElementsRepository->fetchOne([
             'where' => [
-                'className' => \Frootbox\Ext\Core\ShopSystem\Plugins\ShopSystem\Plugin::class
-            ]
+                'className' => \Frootbox\Ext\Core\ShopSystem\Plugins\ShopSystem\Plugin::class,
+            ],
         ]);
 
         return $shopPlugin;
@@ -222,9 +237,39 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
     /**
      *
      */
-    public function ajaxBankCheckAction(
+    public function isShopActive(): bool
+    {
+        // Check both from and to
+        if (!empty($this->getConfig('shopInactive.from')) and !empty($this->getConfig('shopInactive.to'))) {
+            $from = new \DateTime($this->getConfig('shopInactive.from'));
+            $to = new \DateTime($this->getConfig('shopInactive.to'));
 
-    ): Response
+            if ($from->format('U') <= $_SERVER['REQUEST_TIME'] and $to->format('U') >= $_SERVER['REQUEST_TIME']) {
+                return false;
+            }
+        } // Check from
+        elseif (!empty($this->getConfig('shopInactive.from'))) {
+            $from = new \DateTime($this->getConfig('shopInactive.from'));
+
+            if ($from->format('U') <= $_SERVER['REQUEST_TIME']) {
+                return false;
+            }
+        } // Check to
+        elseif (!empty($this->getConfig('shopInactive.to'))) {
+            $to = new \DateTime($this->getConfig('shopInactive.to'));
+
+            if ($to->format('U') >= $_SERVER['REQUEST_TIME']) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     *
+     */
+    public function ajaxBankCheckAction(): Response
     {
         d($this->getAttribute('iban'));
     }
@@ -236,9 +281,8 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         \Frootbox\Http\Post $post,
         \Frootbox\Session $session,
         \Frootbox\Persistence\Repositories\Users $usersRepository,
-    ): Response
-    {
-        $post->require([ 'username', 'password' ]);
+    ): Response {
+        $post->require(['username', 'password']);
 
         // Fetch user
         $user = $usersRepository->fetchOne([
@@ -282,14 +326,18 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
      */
     public function ajaxCheckoutAction(
         Shopcart $shopcart,
-        \Frootbox\Db\Db $dbms,
         Container $container,
+        \Frootbox\Db\Db $dbms,
         \Frootbox\Http\Post $post,
         \Frootbox\Session $session,
+        \Frootbox\Builder $builder,
         \Frootbox\Config\Config $config,
         \Frootbox\View\Engines\Interfaces\Engine $view,
         \Frootbox\TranslatorFactory $translationFactory,
+        \Frootbox\Persistence\Repositories\Files $fileRepository,
         \Frootbox\Persistence\Repositories\Users $usersRepository,
+        \Frootbox\Ext\Core\ShopSystem\Integrations\Delegator $delegator,
+        \Frootbox\Mail\Transports\Interfaces\TransportInterface $mailTransport,
         \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Bookings $bookingsRepository,
         \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Coupons $couponsRepository,
         \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Stock $stockRepository,
@@ -297,7 +345,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
     ): Response
     {
         // Validate required input
-        $post->require([ 'privacyPolicy', 'rightOfWithdrawal' ]);
+        $post->require(['privacyPolicy', 'rightOfWithdrawal']);
 
         // Check cart count
         if ($shopcart->getItemCount() == 0) {
@@ -306,13 +354,10 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
 
         // Check shopcart
         foreach ($shopcart->getItems() as $item) {
-
             $product = $productsRepository->fetchById($item->getProductId());
 
             foreach ($product->getDatasheet()->getGroups() as $group) {
-
                 if (empty($item->getFieldOption($group->getId()))) {
-
                     // Fetch product
                     $product = $productsRepository->fetchById($item->getProductId());
 
@@ -340,7 +385,6 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
 
         // Check stocks and update
         foreach ($shopcart->getItems() as $item) {
-
             $options = [];
 
             foreach ($item->getFieldOptions() as $option) {
@@ -349,13 +393,13 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
 
             ksort($options, SORT_NUMERIC);
 
-            $sql = 'SELECT * FROM `shop_products_stocks` WHERE productId = ' . $item->getProductId() . ' AND JSON_CONTAINS(groupData, \'' . addslashes(json_encode($options)). '\');';
+            $sql = 'SELECT * FROM `shop_products_stocks` WHERE productId = ' . $item->getProductId(
+                ) . ' AND JSON_CONTAINS(groupData, \'' . addslashes(json_encode($options)) . '\');';
 
 
             $result = $stockRepository->fetchByQuery($sql);
 
             foreach ($result as $stock) {
-
                 if ($item->getAmount() > $stock->getAmount()) {
                     throw new \Exception('Out of stock.');
                 }
@@ -367,7 +411,6 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
 
         // Process coupon
         if (!empty($post->get('couponCode'))) {
-
             $coupon = $couponsRepository->fetchOne([
                 'where' => [
                     'uid' => $post->get('couponCode')
@@ -390,7 +433,6 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         $couponData = [];
 
         foreach ($shopcart->getRedeemedCoupons() as $coupon) {
-
             $couponData[] = [
                 'couponId' => $coupon->getId(),
                 'redeemedValue' => $coupon->getRedeemedValue(),
@@ -400,7 +442,6 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
 
         // Generate newly booked coupons
         foreach ($shopcart->getItems() as $item) {
-
             if ($item->getType() != 'GenericCoupon') {
                 continue;
             }
@@ -436,11 +477,13 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         $booking = new \Frootbox\Ext\Core\ShopSystem\Persistence\Booking([
             'pluginId' => $this->getId(),
             'pageId' => $this->getPageId(),
+            'state' => 'Booked',
             'title' => $shopcart->getPersonal('firstname') . ' ' . $shopcart->getPersonal('lastname'),
             'config' => [
                 'note' => $post->get('note'),
                 'personal' => $shopcart->getPersonalData(),
                 'shipping' => $shopcart->getShippingData(),
+                'billing' => $shopcart->getBillingData(),
                 'payment' => $shopcart->getPaymentInfo(),
                 'products' => $shopcart->getItemsRaw(),
                 'additionalinput' => $post->get('additionalinput'),
@@ -449,6 +492,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
                     'shippingCosts' => $shopcart->getShippingCosts(),
                     'taxSections' => $shopcart->getTaxSections(),
                 ],
+                'ownOrderNumber' => $post->get('ownOrderNumber'),
             ],
         ]);
 
@@ -457,11 +501,12 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         }
 
         if (!IS_LOGGED_IN and !empty($post->get('password'))) {
-
-            $user = $usersRepository->insert(new \Frootbox\Persistence\User([
-                'email' => $shopcart->getPersonal('email'),
-                'type' => 'User',
-            ]));
+            $user = $usersRepository->insert(
+                new \Frootbox\Persistence\User([
+                    'email' => $shopcart->getPersonal('email'),
+                    'type' => 'User',
+                ])
+            );
 
             $user->setPassword($post->get('password'));
             $user->save();
@@ -474,13 +519,13 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
 
         // Generate order number
         $orderNumber = $shopPlugin->getConfig('orderNumberTemplate') ? $shopPlugin->getConfig('orderNumberTemplate') : '{R:100-999}-{R:A-Z}-{ID}';
+        $orderNumber = str_replace('{ID}', '{NR}', $orderNumber);
 
-        $orderNumber = preg_replace_callback('#\{R:([0-9]+)-([0-9]+)\}#', function ( $match ) {
+        $orderNumber = preg_replace_callback('#\{R:([0-9]+)-([0-9]+)\}#', function ($match) {
             return rand($match[1], $match[2]);
         }, $orderNumber);
 
-        $orderNumber = preg_replace_callback('#\{R:A-Z(:([0-9]+))?\}#', function ( $match ) {
-
+        $orderNumber = preg_replace_callback('#\{R:A-Z(:([0-9]+))?\}#', function ($match) {
             $length = !empty($match[2]) ? $match[2] : 1;
 
             $range = strtoupper(md5(microtime(true)));
@@ -488,8 +533,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
             return substr($range, 0, $length);
         }, $orderNumber);
 
-        $orderNumber = preg_replace_callback('#\{R:a-z(:([0-9]+))?\}#', function ( $match ) {
-
+        $orderNumber = preg_replace_callback('#\{R:a-z(:([0-9]+))?\}#', function ($match) {
             $length = !empty($match[2]) ? $match[2] : 1;
 
             $range = md5(microtime(true));
@@ -497,7 +541,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
             return substr($range, 0, $length);
         }, $orderNumber);
 
-        $orderNumber = str_replace('{ID}', $booking->getId(), $orderNumber);
+        $orderNumber = str_replace('{NR}', $booking->getId(), $orderNumber);
 
         $booking->addConfig([
             'orderNumber' => $orderNumber,
@@ -513,9 +557,12 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         $view->set('serverpath', SERVER_PATH_PROTOCOL);
 
         if (!empty($shopPlugin->getConfig('textAbove'))) {
-
             $text = $shopPlugin->getConfig('textAbove');
-            $text = str_replace('{name}', $shopcart->getPersonal('firstname') . ' ' . $shopcart->getPersonal('lastname'), $text);
+            $text = str_replace(
+                '{name}',
+                $shopcart->getPersonal('firstname') . ' ' . $shopcart->getPersonal('lastname'),
+                $text
+            );
 
             $view->set('textAbove', $text);
         }
@@ -531,100 +578,170 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         $paymentInfoSave = $paymentMethod->renderSummarySave($view, $shopcart->getPaymentData());
 
         $view->set('paymentInfo', $paymentInfoSave);
+        $view->set('netPrices', $this->getConfig('showNetPrices'));
+        $view->set('currencySign', $shopPlugin->getCurrencySign());
 
-        $file = $this->getPath() . 'resources/private/builder/Mail.html.twig';
-        $sourceSave = $view->render($file);
 
-
-        $file = $this->getPath() . 'resources/private/builder/ShopOwner.html.twig';
+        $builder->setPlugin($this)->setTemplate('Mail');
+        $sourceSave = $builder->render('Mail.html.twig');
 
         $paymentInfo = $paymentMethod->renderSummary($view, $shopcart->getPaymentData());
         $view->set('paymentInfo', $paymentInfo);
 
-        $source = $view->render($file);
+        $source = $builder->render('Mail.html.twig');
 
         // Mark coupons redeemed
         foreach ($shopcart->getRedeemedCoupons() as $coupon) {
-
             if ($coupon->getValueLeft() > $coupon->getRedeemedValue()) {
                 $coupon->setState('RedeemedPartially');
                 $remaining = $coupon->getConfig('remaining') ?? $coupon->getValue();
                 $coupon->addConfig([
                     'remaining' => ($remaining - $coupon->getRedeemedValue()),
                 ]);
-            }
-            else {
+            } else {
                 $coupon->setState('Redeemed');
             }
 
             $coupon->save();
         }
 
+        // Generate invoice
+        if (!empty($shopPlugin->getConfig('invoice.createOnCheckout'))) {
+
+            $booking->addConfig([
+                'invoice' => [
+                    'number' => $shopPlugin->createInvoiceNumber(),
+                ],
+            ]);
+
+            $booking->save();
+
+            // Render source
+            $builder->setPlugin($this)->setTemplate('Invoice');
+
+            // $builder->setBaseFile($this->getPath() . 'resources/private/builder/Invoice.html.twig');
+
+            // Fetch background file
+            $file = $fileRepository->fetchByUid($shopPlugin->getUid('invoice-footer'));
+
+            $pdfSource = $builder->render('Invoice.html.twig', [
+                'plugin' => $this,
+                'shopPlugin' => $shopPlugin,
+                'booking' => $booking,
+                'background' => ($file ? FILES_DIR . $file->getPath() : null),
+                'currencySign' => $shopPlugin->getCurrencySign(),
+            ]);
+
+            $tmpInvoiceFile = FILES_DIR . 'tmp/shop-invoice-' . $booking->getId() . '.pdf';
+
+            $html2pdf = new \Spipu\Html2Pdf\Html2Pdf(
+                lang: 'de',
+                margins: array(20, 30, 0, 25),
+            );
+
+            $html2pdf->writeHTML($pdfSource);
+
+            // Write pdf
+            $html2pdf->output(
+                name: $tmpInvoiceFile,
+                dest: 'F'
+            );
+        }
+
+        // Generate confirmation of order
+        if (!empty($shopPlugin->getConfig('confirmationOfOrder.createOnCheckout'))) {
+
+            // Render source
+            $builder->setPlugin($this)->setTemplate('ConfirmationOfOrder');
+            // $builder->setBaseFile($this->getPath() . 'resources/private/builder/ConfirmationOfOrder.html.twig');
+
+            // Fetch background file
+            $file = $fileRepository->fetchByUid($shopPlugin->getUid('confirmationOfOrder-background'));
+
+
+            $pdfSource = $builder->render('ConfirmationOfOrder.html.twig', [
+                'paymentInfoSave' => $paymentInfoSave,
+                'plugin' => $this,
+                'shopPlugin' => $shopPlugin,
+                'booking' => $booking,
+                'background' => ($file ? FILES_DIR . $file->getPath() : null),
+                'currencySign' => $shopPlugin->getCurrencySign(),
+            ]);
+
+            $tmpConfirmationOfOrderFile = FILES_DIR . 'tmp/shop-confirmationoforder-' . $booking->getId() . '.pdf';
+
+            $html2pdf = new \Spipu\Html2Pdf\Html2Pdf(
+                lang: 'de',
+                margins: array(20, 30, 0, 25),
+            );
+
+            $html2pdf->writeHTML($pdfSource);
+
+            // Write pdf
+            $html2pdf->output(
+                name: $tmpConfirmationOfOrderFile,
+                dest: 'F'
+            );
+        }
+
         $dbms->transactionCommit();
 
-        // TODO change to general mail transport
-        $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
+        // Compose mails
+        $subject = !empty($shopPlugin->getConfig('subject')) ? $shopPlugin->getConfig('subject') : 'Shop-Bestellung';
+        $mail = new \Frootbox\Mail\Envelope;
+        $mail->setSubject($subject);
+        $mail->setBodyHtml($sourceSave);
+        $mail->setReplyTo($config->get('mail.defaults.from.address'));
 
-        // Server settings
-        $mail->isSMTP();
-        $mail->Host = $config->get('mail.smtp.host');
-        $mail->SMTPAuth = true;
-        $mail->Username = $config->get('mail.smtp.username');
-        $mail->Password = $config->get('mail.smtp.password');
-        $mail->SMTPSecure = 'ssl';
-        $mail->Port = 465;
-        $mail->CharSet = "utf-8";
-        $mail->Encoding = 'base64';
-        $mail->SMTPOptions = array (
-            'ssl' => array (
-                'verify_peer' => false,
-                'verify_peer_name' => false,
-                'allow_self_signed' => true,
-            ),
-        );
+        if (!empty($tmpInvoiceFile)) {
+            $attachment = new \Frootbox\Mail\Attachment($tmpInvoiceFile, 'Rechnung-' . $booking->getConfig('invoice.number'). '.pdf');
+            $mail->addAttachment($attachment);
+        }
 
-        $mail->setFrom($config->get('mail.defaults.from.address'), $config->get('mail.defaults.from.name'));
+        if (!empty($tmpConfirmationOfOrderFile)) {
+            $attachment = new \Frootbox\Mail\Attachment($tmpConfirmationOfOrderFile, 'Bestellung-' . $booking->getConfig('orderNumber'). '.pdf');
+            $mail->addAttachment($attachment);
+        }
 
-        // Content
-        $mail->isHTML(true);
-        $mail->Subject = 'Shop-Bestellung';
-        $mail->Body = $sourceSave;
+        $recipient = $shopcart->getBilling('email') ? $shopcart->getBilling('email') : $shopcart->getPersonal('email');
 
-        // Set addresses
-        $mail->addAddress($shopcart->getPersonal('email'));
-        $mail->addReplyTo($config->get('mail.defaults.from.address'));
+        $mail->clearTo();
+        $mail->addTo($recipient);
 
         try {
-
             // Send customer
-            $mail->send();
+            $mailTransport->send($mail);
 
             $mailSent = true;
-        }
-            // Ignore exceptions from mail sending because its very likely a mistyped email
-        catch ( \PHPMailer\PHPMailer\Exception $e ) {
+        } // Ignore exceptions from mail sending because it’s very likely a mistyped email
+        catch (\PHPMailer\PHPMailer\Exception $e) {
             $mailSent = false;
         }
 
-        $mail->clearAddresses();
-        $mail->clearReplyTos();
+        $mail->clearTo();
+        $mail->clearReplyTo();
 
         // Send moderator
         if (!empty($shopPlugin->getConfig('recipients'))) {
             $recipients = explode(',', $shopPlugin->getConfig('recipients'));
-        }
-        else {
-            $recipients = [ $config->get('mail.defaults.from.address') ];
+        } else {
+            $recipients = [$config->get('mail.defaults.from.address')];
         }
 
-        $mail->Body = $source;
+        $mail->setSubject('KOPIE: ' . $mail->getSubject());
+        $mail->setBodyHtml($source);
 
         foreach ($recipients as $email) {
-            $mail->addAddress($email);
+            $mail->addTo($email);
         }
 
-        $mail->addReplyTo($shopcart->getPersonal('email'));
-        $mail->send();
+        $mail->setReplyTo($shopcart->getPersonal('email'));
+        $mailTransport->send($mail);
+
+        // Check if bookings needs to be handed over to integrations
+        if ($delegator->canTransferBooking()) {
+            $delegator->transferBooking($booking);
+        }
 
         unset($_SESSION['cart']);
 
@@ -632,7 +749,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
             'bookingId' => $booking->getId(),
             'mailSent' => $mailSent,
             'success' => 'Die Buchung wurde erfolgreich abgeschlossen',
-            'continue' => $this->getActionUri('complete', [ 'bookingId' => $booking->getId(), 'mailSent' => $mailSent, ]),
+            'continue' => $this->getActionUri('complete', ['bookingId' => $booking->getId(), 'mailSent' => $mailSent,]),
         ]);
     }
 
@@ -669,7 +786,10 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         ]);
 
         return new \Frootbox\View\ResponseJson([
-            'html' => $partialsViewhelper->renderPartial('ItemsTable', [ 'plugin' => $this, 'shopcart' => $shopcart, 'editable' => false ]),
+            'html' => $partialsViewhelper->renderPartial(
+                'ItemsTable',
+                ['plugin' => $this, 'shopcart' => $shopcart, 'editable' => false]
+            ),
         ]);
     }
 
@@ -683,6 +803,9 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         \Frootbox\View\Viewhelper\Partials $partialsViewhelper
     ): Response
     {
+        // Obtain shop plugin
+        $shopPlugin = $this->getShopPlugin();
+
         $key = $this->getAttribute('key');
 
         $shopcart->dropItemByKey($key);
@@ -696,6 +819,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
                 'plugin' => $this,
                 'shopcart' => $shopcart,
                 'editable' => true,
+                'currencySign' => $shopPlugin->getCurrencySign(),
             ]),
             'shopcart' => [
                 'items' => $shopcart->getItemCount(),
@@ -729,6 +853,50 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
     }
 
     /**
+     *
+     */
+    public function ajaxProceedToLoginAction(
+        Shopcart $shopcart,
+        Container $container,
+        \Frootbox\Config\Config $configuration,
+    ): ResponseRedirect
+    {
+        // Check cart filter
+        if (!empty($configuration->get('Ext.Core.ShopSystem.CartFilter'))) {
+
+            foreach ($configuration->get('Ext.Core.ShopSystem.CartFilter') as $filterClass) {
+
+                if (is_array($filterClass)) {
+                    continue;
+                }
+
+                if (!class_exists($filterClass)) {
+                    continue;
+                }
+
+                $filter = new $filterClass($shopcart, $this);
+
+                if (method_exists($filter, 'onBeforeProceedToLogin')) {
+                    $response = $container->call([$filter, 'onBeforeProceedToLogin']);
+
+                    if ($response !== null) {
+                        return $response;
+                    }
+                }
+            }
+        }
+
+        // Check for free choice of delivery day
+        foreach ($shopcart->getItems() as $item) {
+            if (!empty($item->getProduct()->getConfig('freeChoiceOfDeliveryDay'))) {
+                return new \Frootbox\View\ResponseRedirect($this->getActionUri('choiceOfDelivery'));
+            }
+        }
+
+        return new \Frootbox\View\ResponseRedirect($this->getActionUri('login'));
+    }
+
+    /**
      * @param Shopcart $shopcart
      * @param \Frootbox\Http\Get $get
      * @param \Frootbox\View\Viewhelper\Partials $partialsViewhelper
@@ -741,8 +909,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         \Frootbox\Http\Get $get,
         \Frootbox\View\Viewhelper\Partials $partialsViewhelper,
         \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Coupons $couponsRepository
-    ): Response
-    {
+    ): Response {
         // Fetch coupn
         $coupon = $couponsRepository->fetchOne([
             'where' => [
@@ -756,8 +923,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
 
         try {
             $shopcart->couponRedeem($coupon);
-        }
-        catch ( \Exception $e ) {
+        } catch (\Exception $e) {
             die($e->getMessage());
         }
 
@@ -767,7 +933,10 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         ]);
 
         return new \Frootbox\View\ResponseJson([
-            'html' => $partialsViewhelper->renderPartial('ItemsTable', [ 'plugin' => $this, 'shopcart' => $shopcart, 'editable' => false ])
+            'html' => $partialsViewhelper->renderPartial(
+                'ItemsTable',
+                ['plugin' => $this, 'shopcart' => $shopcart, 'editable' => false]
+            )
         ]);
     }
 
@@ -788,8 +957,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Products $productsRepository,
         \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Variants $variantsRepository,
         \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Option $optionRepository,
-    ): Response
-    {
+    ): Response {
         // Obtain shopcart item
         $item = $shopcart->getItem($get->get('key'));
         $itemData = $_SESSION['cart']['products'][$get->get('key')];
@@ -798,13 +966,11 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         $product = $productsRepository->fetchById($item->getProductId());
 
         if (!empty($post->get('options'))) {
-
             $options = [];
             $optCheck = [];
             $surcharge = 0;
 
             foreach ($post->get('options') as $groupId => $optionId) {
-
                 // Fetch option
                 $option = $optionRepository->fetchById($optionId);
 
@@ -840,22 +1006,18 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
                 $tax = $itemData['priceGross'] / (1 + $product->getTaxrate() / 100) * ($product->getTaxrate() / 100);
                 $itemData['price'] = round($itemData['priceGross'] - $tax, 2);
                 $itemData['hasSurcharge'] = true;
-            }
-            elseif (!empty($surcharge)) {
-
+            } elseif (!empty($surcharge)) {
                 $itemData['priceGross'] += $surcharge;
                 $tax = $itemData['priceGross'] / (1 + $product->getTaxrate() / 100) * ($product->getTaxrate() / 100);
                 $itemData['price'] = round($itemData['priceGross'] - $tax, 2);
             }
 
             if (!empty($itemData['variantId']) and $itemData['variantId'] != 'default') {
-
                 // Fetch variant
                 $variant = $variantsRepository->fetchById($itemData['variantId']);
 
 
                 if (!empty($variant->getPrice())) {
-
                     $product->getPriceForVariant($variant);
 
                     $itemData['priceGross'] = $product->getPriceForVariant($variant);
@@ -873,7 +1035,10 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         ]);
 
         return new \Frootbox\View\ResponseJson([
-            'html' => $partialsViewhelper->renderPartial('ItemsTable', [ 'plugin' => $this, 'shopcart' => $shopcart, 'editable' => true ]),
+            'html' => $partialsViewhelper->renderPartial(
+                'ItemsTable',
+                ['plugin' => $this, 'shopcart' => $shopcart, 'editable' => true]
+            ),
             'item' => [
                 'key' => $item->getKey(),
                 'total' => round($item->getTotal(), 2),
@@ -893,8 +1058,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
     public function ajaxSetPaymentMethodAction(
         \Frootbox\View\Engines\Interfaces\Engine $view,
         \Frootbox\View\Viewhelper\Delegator $delegator
-    ): Response
-    {
+    ): Response {
         $_SESSION['cart']['paymentmethod']['methodClass'] = $this->getAttribute('paymentMethod');
 
         $paymentMethod = new $_SESSION['cart']['paymentmethod']['methodClass'];
@@ -928,6 +1092,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Products $productsRepository,
     ): Response
     {
+        // Validate required input
         $required = [
             'personal.firstname',
             'personal.lastname',
@@ -941,7 +1106,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
 
         $shipping = $post->get('shipping');
 
-        if ($shipping['type'] == 'shipToAddress') {
+        if (empty($this->getConfig('skipShipping')) and $shipping['type'] == 'shipToAddress') {
             $required = array_merge($required, [
                 'shipping.firstname',
                 'shipping.lastname',
@@ -957,17 +1122,20 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
 
         // Set data
         $shopcart->setPersonal($post->get('personal'));
-        $shopcart->setShipping($post->get('shipping'));
+        $shopcart->setBilling($post->get('billing'));
+
+        // Update shipping
+        $shipping = $post->get('shipping');
+        $shipping['deliveryDay'] = $shopcart->getShipping('deliveryDay');
+
+        $shopcart->setShipping($shipping);
 
         // Check shopcart
         foreach ($shopcart->getItems() as $item) {
-
             $product = $productsRepository->fetchById($item->getProductId());
 
             foreach ($product->getDatasheet()->getGroups() as $group) {
-
                 if (empty($item->getFieldOption($group->getId()))) {
-
                     // Fetch product
                     $product = $productsRepository->fetchById($item->getProductId());
 
@@ -978,23 +1146,44 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
             }
         }
 
+
         if (!empty($config->get('Ext.Core.ShopSystem.CartFilter.PostCheckout'))) {
-
             foreach ($config->get('Ext.Core.ShopSystem.CartFilter.PostCheckout') as $filterClass) {
-
                 $filter = new $filterClass($shopcart, $this);
-                $container->call([ $filter, 'run' ]);
+                $container->call([$filter, 'run']);
             }
         }
+
+        // Validate shipping costs
+        $shopcart->updateShippingCosts();
+        $method = $shopcart->getShippingMethod();
+
+        if ($method) {
+
+            if (!$method->isShippingAddressValid($shopcart)) {
+                throw new \Exception('Diese Postleitzahl können wir leider nicht beliefern.');
+            }
+        }
+
 
         // Update payment method
         $shopcart->setPaymentMethodClass($post->get('payment')['method']);
 
+        /*
+        // Check for free choice of delivery day
+        foreach ($shopcart->getItems() as $item) {
+            if (!empty($item->getProduct()->getConfig('freeChoiceOfDeliveryDay'))) {
+                return new \Frootbox\View\ResponseRedirect($this->getActionUri('choiceOfDelivery'));
+            }
+        }
+        */
+
+        // Redirect to payment if no choice of deliver<
         $paymentMethod = $shopcart->getPaymentMethod();
 
         if (method_exists($paymentMethod, 'postPaymentSelectionAction')) {
 
-            $result = $container->call([ $paymentMethod, 'postPaymentSelectionAction' ], [
+            $result = $container->call([$paymentMethod, 'postPaymentSelectionAction'], [
                 'config' => $config,
                 'shopcart' => $shopcart,
             ]);
@@ -1009,6 +1198,45 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         return new \Frootbox\View\ResponseJson([
             'redirect' => $this->getActionUri('review'),
         ]);
+    }
+
+    /**
+     *
+     */
+    public function ajaxUpdateDeliveryDayAction(
+        Shopcart $shopcart,
+        Container $container,
+        \Frootbox\Http\Post $post,
+        \Frootbox\Config\Config $config,
+    ): Response
+    {
+        if (empty($post->get('deliveryDay'))) {
+            return new \Frootbox\View\ResponseRedirect($this->getActionUri('choiceOfDelivery'));
+        }
+
+        // Obtain shipping data
+        $shipping = $shopcart->getShippingData();
+        $shipping['deliveryDay'] = $post->get('deliveryDay');
+
+        $shopcart->setShipping($shipping);
+
+        /*
+        // Redirect to payment
+        $paymentMethod = $shopcart->getPaymentMethod();
+
+        if (method_exists($paymentMethod, 'postPaymentSelectionAction')) {
+            $result = $container->call([$paymentMethod, 'postPaymentSelectionAction'], [
+                'config' => $config,
+                'shopcart' => $shopcart,
+            ]);
+
+            if (!empty($result['redirect'])) {
+                return new \Frootbox\View\ResponseRedirect($result['redirect']);
+            }
+        }
+        */
+
+        return new \Frootbox\View\ResponseRedirect($this->getActionUri('checkout'));
     }
 
     /**
@@ -1027,14 +1255,23 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         $item = $shopcart->getItem($get->get('key'));
         $item->setAmount($get->get('amount'));
 
+        // Update item
         $shopcart->setItem($item);
+
+        // Obtain shop plugin
+        $shopPlugin = $this->getShopPlugin();
 
         $partialsViewhelper->setParameters([
             'plugin' => $this,
         ]);
 
         return new \Frootbox\View\ResponseJson([
-            'html' => $partialsViewhelper->renderPartial('ItemsTable', [ 'plugin' => $this, 'shopcart' => $shopcart, 'editable' => true ]),
+            'html' => $partialsViewhelper->renderPartial('ItemsTable', [
+                'plugin' => $this,
+                'shopcart' => $shopcart,
+                'editable' => true,
+                'currencySign' => $shopPlugin->getCurrencySign(),
+            ]),
             'item' => [
                 'key' => $item->getKey(),
                 'total' => round($item->getTotal(), 2),
@@ -1058,6 +1295,9 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         \Frootbox\View\Viewhelper\Partials $partialsViewhelper,
     ): Response
     {
+        // Obtain shop plugin
+        $shopPlugin = $this->getShopPlugin();
+
         $shipping = $shopcart->getShippingData();
         $shipping['type'] = $get->get('shipping')['type'];
         $shipping['country'] = $get->get('shipping')['country'] ?? 'DE';
@@ -1075,7 +1315,12 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         ]);
 
         return new \Frootbox\View\ResponseJson([
-            'html' => $partialsViewhelper->renderPartial('ItemsTable', [ 'plugin' => $this, 'shopcart' => $shopcart, 'editable' => true ]),
+            'html' => $partialsViewhelper->renderPartial('ItemsTable', [
+                'plugin' => $this,
+                'shopcart' => $shopcart,
+                'editable' => true,
+                'currencySign' => $shopPlugin->getCurrencySign(),
+            ]),
         ]);
     }
 
@@ -1136,11 +1381,16 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Bookings $bookingsRepository,
     ): Response
     {
-        // fetch booking
+        // Obtain shop plugin
+        $shopPlugin = $this->getShopPlugin();
+
+        // Fetch booking
         $booking = $bookingsRepository->fetchById($this->getAttribute('bookingId'));
 
         return new Response([
             'booking' => $booking,
+            'shopPlugin' => $shopPlugin,
+            'currencySign' => $shopPlugin->getCurrencySign(),
         ]);
     }
 
@@ -1153,9 +1403,15 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
     public function checkoutAction(
         Shopcart $shopcart,
         \Frootbox\Session $session,
+        \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Coupons $couponRepository,
         \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Addresses $addressesRepository,
+        \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\PickupLocation $pickupLocationRepository,
     ): Response
     {
+        if (!$this->isShopActive()) {
+            return new \Frootbox\View\ResponseRedirect($this->getActionUri('index'));
+        }
+
         if (IS_LOGGED_IN) {
 
             // Obtain user
@@ -1169,10 +1425,184 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
             ]);
         }
 
+        // Obtain shop plugin
+        $shopPlugin = $this->getShopPlugin();
+
+        // Fetch pickup locations
+        $pickupLocations = $pickupLocationRepository->fetch();
+
         return new Response([
             'user' => $user ?? null,
             'shopcart' => $shopcart,
             'addresses' => $addresses ?? [],
+            'shopPlugin' => $shopPlugin,
+            'currencySign' => $shopPlugin->getCurrencySign(),
+            'pickupLocations' => $pickupLocations,
+        ]);
+    }
+
+    /**
+     *
+     */
+    public function choiceOfDeliveryAction(
+        Shopcart $shopcart,
+        \Frootbox\Http\Post $post,
+        \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\ShippingDay $shippingDayRepository,
+    ): Response
+    {
+        // Obtain shop plugin
+        $shopPlugin = $this->getShopPlugin();
+
+        $selectedMonth = $post->get('month') ?? $shopcart->getShipping('deliveryDay');
+
+        $now = new \DateTime();
+
+        if (!empty($selectedMonth)) {
+            $date = new \DateTime($selectedMonth);
+            $selectedMonthString = $date->format('Y-m');
+            $selectedDayString = $date->format('Y-m-d');
+        }
+        else {
+            $date = new \DateTime();
+        }
+
+        if ($date->format('Y-m') == $now->format('Y-m')) {
+            $date->setDate($date->format('Y'), $date->format('m'), $now->format('d'));
+        }
+        else {
+            $date->setDate($date->format('Y'), $date->format('m'), 1);
+        }
+
+        // Compute months
+        $months = [];
+        $monthDate = new \DateTime(date('Y-m') . '-01');
+
+        for ($i = 1; $i <= 3; ++$i) {
+            $months[] = clone $monthDate;
+
+            $monthDate->modify('+1 month');
+        }
+
+        $firstRegularDay = new \DateTime();
+
+        if (!empty($shopPlugin->getConfig('shipping.skipNextWorkdays'))) {
+
+            $addedDays = $shopPlugin->getConfig('shipping.skipNextWorkdays');
+
+            if ($firstRegularDay->format('N') == 6) {
+                $addedDays += 2;
+            }
+            else if ($firstRegularDay->format('N') == 7) {
+                $addedDays += 1;
+            }
+
+            $firstRegularDay->modify('+' . $addedDays . ' days');
+        }
+
+
+        $lastDate = new \DateTime($date->format('Y-m-d'));
+        $lastDate->modify('+ ' . (($date->format('t') - $date->format('d')) + 1) . ' days');
+
+        $period = new \DatePeriod(
+            $date,
+            new \DateInterval('P1D'),
+            $lastDate,
+        );
+
+        $dayList = [];
+
+        // Exclude public holidays
+        $country = ($shopcart->getShipping('type') == 'shipToBillingAddress') ? $shopcart->getPersonal('country') : $shopcart->getShipping('country');
+        $postalCode = (int) (($shopcart->getShipping('type') == 'shipToBillingAddress') ? $shopcart->getPersonal('postalCode') : $shopcart->getShipping('postalCode'));
+
+        $publicHolidays = [];
+
+        if (!empty($country)) {
+
+            $statesConfigFile = $this->getPath() . '/../../../resources/private/states/' . strtolower($country) . '.php';
+
+            if (file_exists($statesConfigFile)) {
+
+                $data = require $statesConfigFile;
+                $stateShort = null;
+
+                foreach ($data['postalCodes'] as $postalCodeData) {
+
+                    if ($postalCode >= $postalCodeData['from'] and $postalCode <= $postalCodeData['to']) {
+                        $stateShort = $postalCodeData['stateShort'];
+                        break;
+                    }
+                }
+
+                if (!empty($stateShort)) {
+                    $url = 'https://get.api-feiertage.de?years=' . $date->format('Y') . '&states=' . strtolower($stateShort);
+
+                    $response = file_get_contents($url);
+                    $response = json_decode($response, true);
+
+                    $publicHolidays = $response['feiertage'];
+                }
+            }
+        }
+
+        foreach ($period as $key => $actDate) {
+
+            $dateString = $actDate->format('Y-m-d');
+
+            // Check public holidays
+            foreach ($publicHolidays as $holiday) {
+                if ($dateString == $holiday['date']) {
+                   continue 2;
+                }
+            }
+
+            if ($firstRegularDay > $actDate) {
+                continue;
+            }
+
+            $isBlocked = $shippingDayRepository->fetchOne([
+                'where' => [
+                    'dateStart' => $dateString . ' 00:00:00',
+                ],
+            ]);
+
+            if ($isBlocked) {
+                continue;
+            }
+
+            if (!in_array($actDate->format('N'), $shopPlugin->getConfig('shipping.regularShippingDays'))) {
+                continue;
+            }
+
+            // Check excluded delivery days
+            if (!empty($shopPlugin->getConfig('postalExcludes'))) {
+
+                foreach ($shopPlugin->getConfig('postalExcludes') as $postalCodeRange) {
+
+                    $from = str_pad((int) $postalCodeRange['from'], 5, '0');
+                    $to = str_pad((int) $postalCodeRange['to'], 5, '0');
+
+                    if ($postalCode >= $from and $postalCode <= $to) {
+
+                        $weekDay = $actDate->format('w');
+
+                        if (!empty($postalCodeRange['days'][$weekDay])) {
+                            continue 2;
+                        }
+                    }
+                }
+            }
+
+            $dayList[] = $actDate;
+        }
+
+        return new Response([
+            'selectedMonth' => $selectedMonth,
+            'selectedMonthString' => $selectedMonthString ?? null,
+            'selectedDayString' => $selectedDayString ?? null,
+            'shopcart' => $shopcart,
+            'monthList' => $months,
+            'dayList' => $dayList,
         ]);
     }
 
@@ -1201,12 +1631,17 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
      * @return Response
      */
     public function indexAction(
-        Shopcart $shopcart
+        Shopcart $shopcart,
     ): Response
     {
+        // Obtain shop plugin
+        $shopPlugin = $this->getShopPlugin();
+
+
         // Generate response
         return new Response([
-            'shopcart' => $shopcart
+            'shopcart' => $shopcart,
+            'currencySign' => $shopPlugin->getCurrencySign(),
         ]);
     }
 
@@ -1218,7 +1653,15 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         \Frootbox\Session $session
     ): Response
     {
+        if (!$this->isShopActive()) {
+            return new \Frootbox\View\ResponseRedirect($this->getActionUri('index'));
+        }
+
         if ($session->isLoggedIn()) {
+            return new \Frootbox\View\ResponseRedirect($this->getActionUri('checkout'));
+        }
+
+        if (!empty($this->getConfig('skipCustomerLogin'))) {
             return new \Frootbox\View\ResponseRedirect($this->getActionUri('checkout'));
         }
 
@@ -1237,6 +1680,10 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         Shopcart                $shopcart,
     ): Response
     {
+        if (!$this->isShopActive()) {
+            return new \Frootbox\View\ResponseRedirect($this->getActionUri('index'));
+        }
+
         // Update payment method
         $paymentMethod = $shopcart->getPaymentMethod();
 
@@ -1263,11 +1710,16 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
      */
     public function reviewAction(
         Shopcart $shopcart,
+        \Frootbox\TranslatorFactory $translatorFactory,
         \Frootbox\View\Engines\Interfaces\Engine $view,
         \Frootbox\Persistence\Repositories\Users $usersRepository,
         \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Products $productsRepository,
     ): Response
     {
+        if (!$this->isShopActive()) {
+            return new \Frootbox\View\ResponseRedirect($this->getActionUri('index'));
+        }
+
         if ($shopcart->getItemCount() == 0) {
             return new \Frootbox\View\ResponseRedirect($this->getActionUri('index', null, [ 'absolute' => true ]));
         }
@@ -1275,6 +1727,20 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         if (empty($shopcart->getPersonal('email'))) {
             return new \Frootbox\View\ResponseRedirect($this->getActionUri('checkout', null, [ 'absolute' => true ]));
         }
+
+        // Check for free choice of delivery day
+        if (empty($shopcart->getShipping('deliveryDay'))) {
+            foreach ($shopcart->getItems() as $item) {
+                if (!empty($item->getProduct()->getConfig('freeChoiceOfDeliveryDay'))) {
+                    return new \Frootbox\View\ResponseRedirect($this->getActionUri('choiceOfDelivery'));
+                }
+            }
+        }
+
+
+        // Obtain shop plugin
+        $shopPlugin = $this->getShopPlugin();
+
 
         // Check shopcart
         foreach ($shopcart->getItems() as $item) {
@@ -1303,7 +1769,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         $domain = explode('@', $shopcart->getPersonal('email'))[1];
         $mailcheck = checkdnsrr($domain, 'MX');
 
-        if (!IS_LOGGED_IN) {
+        if (!IS_LOGGED_IN AND empty($this->getConfig('skipCustomerLogin'))) {
 
             $offerAccount = true;
 
@@ -1326,6 +1792,8 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
             'shopcart' => $shopcart,
             'mailcheck' => $mailcheck,
             'offerAccount' => $offerAccount,
+            'shopPlugin' => $shopPlugin,
+            'currencySign' => $shopPlugin->getCurrencySign(),
         ]);
     }
 }

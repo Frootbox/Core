@@ -172,7 +172,10 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
     }
 
     /**
-     *
+     * @param \Frootbox\Session $session
+     * @param \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Bookings $bookingsRepository
+     * @return Response
+     * @throws \Exception
      */
     public function orderAction(
         \Frootbox\Session $session,
@@ -190,7 +193,6 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         if ($order->getUserId() != $user->getId()) {
             throw new \Exception('AccessDenied');
         }
-
 
         return new \Frootbox\View\Response([
             'booking' => $order,
@@ -214,6 +216,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
             'where' => [
                 'userId' => $session->getUser()->getId(),
             ],
+            'order' => [ 'date DESC' ],
         ]);
 
         return new \Frootbox\View\Response([

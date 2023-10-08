@@ -103,8 +103,29 @@
                 {% endset %}
 
                 {{ v.injectPartial('Frootbox/Ext/Core/FileManager/Editor/Partials/FileUpload', {
+                    label: 'Hintergrundbild (Standard/Mobil) ',
                     multiple: false,
                     uid: get.get('uid'),
+                    onComplete: 'refreshEditable',
+                    helpText: helpText
+                }) | raw }}
+
+                {% set helpText %}
+                    <small id="helpText" class="form-text text-muted">
+                        {% if get.get('widthXl') and get.get('heightXl') %}
+                            optimale Maße: {{ get.get('widthXl') }}x{{ get.get('heightXl') }} Pixel
+                        {% elseif get.get('widthXl') %}
+                            optimale Breite: {{ get.get('widthXl') }} Pixel
+                        {% elseif get.get('heightXl') %}
+                            optimale Höhe: {{ get.get('heightXl') }} Pixel
+                        {% endif %}
+                    </small>
+                {% endset %}
+
+                {{ v.injectPartial('Frootbox/Ext/Core/FileManager/Editor/Partials/FileUpload', {
+                    label: 'Hintergrundbild (Standard/Desktop) ',
+                    multiple: false,
+                    uid: get.get('uid') ~ '-desktop',
                     onComplete: 'refreshEditable',
                     helpText: helpText
                 }) | raw }}

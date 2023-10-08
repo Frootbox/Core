@@ -46,6 +46,8 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         // Update config
         $this->plugin->addConfig([
             'noJobsDetailPage' => $post->get('noJobsDetailPage'),
+            'urlSuffixSubtitle' => $post->get('urlSuffixSubtitle'),
+            'ignoreForeignTitles' => !empty($post->get('ignoreForeignTitles')),
         ]);
 
         $this->plugin->save();
@@ -61,6 +63,7 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
 
             $job->addConfig([
                 'noJobsDetailPage' => $post->get('noJobsDetailPage'),
+                'urlSuffixSubtitle' => $post->get('urlSuffixSubtitle'),
             ]);
 
             $job->save();

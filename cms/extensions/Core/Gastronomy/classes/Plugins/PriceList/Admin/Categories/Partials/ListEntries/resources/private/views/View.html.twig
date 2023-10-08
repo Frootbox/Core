@@ -2,7 +2,8 @@
 {% set i = view.getViewhelper('\\Frootbox\\Admin\\Viewhelper\\Delegator', { object: data.plugin }) %}
 {% set t = i.getTranslator() %}
 
-{% if data.category.getListEntries() | length > 0 %}
+{% set entries = data.category.getListEntries({ ignoreVisible: true }) %}
+{% if entries | length > 0 %}
 
     <table class="table" data-sort="{{ data.plugin.getAdminUri('Positions', 'ajaxSort', { categoryId: data.category.getId() }) }}">
         <thead>
@@ -14,7 +15,7 @@
         </thead>
         <tbody>
 
-            {% for listEntry in data.category.getListEntries() %}
+            {% for listEntry in entries %}
                 <tr id="row-{{ listEntry.getId() }}" class="ajax {% if data.highlight == listEntry.getId() %}highlighted{% endif %}" data-listentry="{{ listEntry.getId() }}" data-href="{{ data.plugin.getAdminUri('Positions', 'ajaxPanelPositionEdit', { listEntryId: listEntry.getId(), categoryId: data.category.getId(), connId: listEntry.getConnId() }) }}">
                     <td>{{ listEntry.getTitle() }}</td>
                     <td class="handle" width="40"><i class="fa fa-grip-lines"></i></td>

@@ -280,7 +280,9 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
             ]);
 
             $connection->setOrderId($orderId--);
-            $connection->save();
+            $connection->save([
+                'skipAlias' => true,
+            ]);
         }
 
         return self::getResponse('json', 200);

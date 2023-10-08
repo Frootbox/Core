@@ -1,4 +1,4 @@
-
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
 
 <script nonce="{{ settings.nonce }}">
     var uid = "{{ get.get('uid') }}";
@@ -27,7 +27,8 @@
                     Accept: "application/json; charset=utf-8"
                 },
                 success: function ( response ) {
-                    $('[data-blocks][data-uid="' + response.uid + '"] div[data-block="' + response.blockId + '"]').html(response.html);
+                    // $('[data-blocks][data-uid="' + response.uid + '"] div[data-block="' + response.blockId + '"]').html(response.html);
+                    $('[data-blocks][data-uid="' + response.uid + '"]').html(response.html);
                     $('#fbxEditorGenericModal').modal('hide');
                 },
                 error: function ( xhr ) {
@@ -35,6 +36,68 @@
                     alert(xhr.responseText);
 
                     // $('#fbxEditorGenericModal .modal-content').html('<div class="modal-body">' + xhr.responseText + '<\/div>');
+                }
+            });
+        });
+
+        /**
+         * Override stylesheet
+         */
+        $(document).on('click', '.override-stylesheet', function(event) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            $.ajax({
+                url: "{{ settings.serverpath }}cms/admin/Editor/callEditable",
+                type: 'GET',
+                data: {
+                    method: 'ajaxOverrideStylesheet',
+                    editable: 'Frootbox/Ext/Core/System/Editables/Block',
+                    uid: uid,
+                    blockId: {{ block.getid }},
+                    variables: $(this).serialize()
+                },
+                headers: {
+                    Accept: "application/json; charset=utf-8"
+                },
+                success: function(response) {
+
+                    alert(response.scss);
+                },
+                error: function(xhr) {
+                    alert(xhr.responseText);
+                }
+            });
+        });
+
+        /**
+         * Override thumbnail
+         */
+        $(document).on('click', '.override-thumbnail', function(event) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            $.ajax({
+                url: "{{ settings.serverpath }}cms/admin/Editor/callEditable",
+                type: 'GET',
+                data: {
+                    method: 'ajaxOverrideThumbnail',
+                    editable: 'Frootbox/Ext/Core/System/Editables/Block',
+                    uid: uid,
+                    blockId: {{ block.getid }},
+                    variables: $(this).serialize()
+                },
+                headers: {
+                    Accept: "application/json; charset=utf-8"
+                },
+                success: function(response) {
+
+                    alert('Verzeichnis für Thumbnail im Template wurde erstellt.');
+                },
+                error: function(xhr) {
+                    alert(xhr.responseText);
                 }
             });
         });
@@ -93,6 +156,16 @@
                     <input type="number" class="form-control" value="{{ variable.value }}" name="variables[{{ variable.name }}]" id="var__{{ variable.name }}" placeholder="{{ variable.label }}">
                     {#<small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>#}
                 </div>
+            {% elseif variable.type == 'file' %}
+                <div class="form-group">
+                    <label for="var__{{ variable.name }}">{{ variable.label }}</label>
+
+                    {{ v.injectPartial('Frootbox/Ext/Core/FileManager/Editor/Partials/FileUpload', {
+                        multiple: false,
+                        uid: block.getUid('xconfig-file-' ~ variable.name),
+                        helpText: helpText
+                    }) | raw }}
+                </div>
             {% else %}
                 <div class="form-group">
                     <label for="var__{{ variable.name }}">{{ variable.label }}</label>
@@ -103,7 +176,71 @@
 
         {% endfor %}
 
+        <div class="form-group form-check">
+            <input type="checkbox" {% if block.getConfig('noPrint') %}checked{% endif %} class="form-check-input" id="noPrint" name="noPrint">
+            <label class="form-check-label" for="noPrint">keine Druckansicht</label>
+        </div>
+
+
+        <div class="row">
+            <div class="col-md-8">
+
+                <div class="row">
+                    <div class="col-3">
+                        <label for="marginTop">Abstand oben</label>
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control" value="{{ block.getConfig('margin.top') }}" name="marginTop" id="marginTop" placeholder="oben">
+                            <div class="input-group-append">
+                                <span class="input-group-text" id="basic-addon2">px</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <label for="marginRight">Abstand rechts</label>
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control" value="{{ block.getConfig('margin.right') }}" name="marginRight" id="marginRight" placeholder="rechts">
+                            <div class="input-group-append">
+                                <span class="input-group-text" id="basic-addon2">px</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <label for="marginBottom">Abstand unten</label>
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control" value="{{ block.getConfig('margin.bottom') }}" name="marginBottom" id="marginBottom" placeholder="unten">
+                            <div class="input-group-append">
+                                <span class="input-group-text" id="basic-addon2">px</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <label for="marginLeft">Abstand links</label>
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control" value="{{ block.getConfig('margin.left') }}" name="marginLeft" id="marginLeft" placeholder="links">
+                            <div class="input-group-append">
+                                <span class="input-group-text" id="basic-addon2">px</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-4">
+                <label for="cssClass">CSS Klasse</label>
+                <input type="text" class="form-control" value="{{ block.getConfig('css.className') }}" name="cssClass" id="cssClass" placeholder="CSS Klasse">
+            </div>
+        </div>
+
+
         <button type="submit" class="btn btn-primary">Speichern</button>
+
+        {% if settings.devmode %}
+            <p class="mt-3">
+                <a href="#" class="override-stylesheet">Stylesheet überladen</a>
+                &nbsp;&nbsp;&nbsp;
+                <a href="#" class="override-thumbnail">Thumbnail überladen</a>
+            </p>
+        {% endif %}
 
     </form>
 

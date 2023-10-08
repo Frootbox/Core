@@ -36,6 +36,7 @@
                     method: 'ajaxModalCompose',
                     editable: 'Frootbox/Ext/Core/System/Editables/Block',
                     uid: uid,
+                    predecessor: $(this).data('predecessor'),
                     attributes: data
                 },
                 headers: {
@@ -215,9 +216,9 @@
         });
 
         /**
-         *
+         * Delete layout block
          */
-        $(document).on('click', 'a.block-delete', function ( event ) {
+        $(document).on('click', 'a.block-delete', function(event) {
 
             event.preventDefault();
             event.stopImmediatePropagation();
@@ -301,6 +302,18 @@
                     if (typeof response.success != "undefined") {
                         alert(response.success);
                     }
+
+                    if (typeof response.removeClass !== 'undefined') {
+                        $(response.removeClass.selector).removeClass(response.removeClass.className)
+                    }
+
+                    if (typeof response.addClass !== 'undefined') {
+                        $(response.addClass.selector).addClass(response.addClass.className)
+                    }
+
+                    if (typeof response.admin !== 'undefined') {
+                        $('#fbxEditorGenericModal .modal-content').html(response.admin.html)
+                    }
                 }
             });
         });
@@ -321,6 +334,10 @@
                 data: form.serialize(),
                 success: function ( response ) {
 
+                    if (typeof response.replace !== 'undefined') {
+                        $(response.replace.selector).html(response.replace.html);
+                    }
+
                     if (typeof response.modal != "undefined" && typeof response.modal.html != "undefined") {
                         $('#fbxEditorGenericModal .modal-content').html(response.modal.html);
                     }
@@ -331,6 +348,14 @@
 
                     if (typeof response.success != "undefined") {
                         alert(response.success);
+                    }
+
+                    if (typeof response.admin !== 'undefined') {
+                        $('#fbxEditorGenericModal .modal-content').html(response.admin.html)
+                    }
+
+                    if (typeof response.modalDismiss != "undefined") {
+                        $('#fbxEditorGenericModal').modal('hide');
                     }
                 },
                 error: function(xhr) {

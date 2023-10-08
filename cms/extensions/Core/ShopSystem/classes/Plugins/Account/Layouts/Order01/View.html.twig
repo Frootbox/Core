@@ -18,13 +18,7 @@ title: Standard
             <div class="col-12">
                 <div class="inner-wrapper">
 
-                    {% if plugin.isFirst %}
-                        <h1 data-editable data-uid="{{ plugin.getUid('title-orders') }}">Bestellung</h1>
-                    {% else %}
-                        <h2 data-editable data-uid="{{ plugin.getUid('title-orders') }}">Bestellung</h2>
-                    {% endif %}
 
-                    <br /><br />
 
                     <div class="row">
                         <div class="col-md-4">
@@ -34,23 +28,39 @@ title: Standard
                         </div>
                         <div class="col-md-8">
 
-                            <h3 class="first">Rechnungsadresse</h3>
+                            <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title-orders') }}">Bestellung</h2>
 
-                            <p>
-                                {{ booking.getConfig('personal.firstname') }} {{ booking.getConfig('personal.lastname') }}<br />
-                                {{ booking.getConfig('personal.street') }} {{ booking.getConfig('personal.streetNumber') }}, {{ booking.getConfig('personal.postalCode') }} {{ booking.getConfig('personal.city') }}
-                            </p>
+                            <div class="row">
+                                <div class="col-md-6">
 
-                            <h3>Lieferadresse</h3>
+                                    <h3 class="first">Rechnungsadresse</h3>
 
-                            {% if booking.getConfig('shipping.type') == 'shipToBillingAddress' %}
-                                <p>wie Rechnungsadresse</p>
-                            {% else %}
-                                <p>
-                                    {{ booking.getConfig('shipping.firstname') }} {{ booking.getConfig('shipping.lastname') }}<br />
-                                    {{ booking.getConfig('shipping.street') }} {{ booking.getConfig('shipping.streetNumber') }}, {{ booking.getConfig('shipping.postalCode') }} {{ booking.getConfig('shipping.city') }}
-                                </p>
-                            {% endif %}
+                                    <p>
+                                        {{ booking.getConfig('personal.firstname') }} {{ booking.getConfig('personal.lastname') }}<br />
+                                        {{ booking.getConfig('personal.street') }} {{ booking.getConfig('personal.streetNumber') }}, {{ booking.getConfig('personal.postalCode') }} {{ booking.getConfig('personal.city') }}
+                                    </p>
+
+                                </div>
+                                <div class="col-md-6">
+
+                                    <h3 class="first">Lieferadresse</h3>
+
+                                    {% if booking.getConfig('shipping.type') == 'shipToBillingAddress' %}
+                                        <p>Wie Rechnungsadresse.</p>
+                                    {% elseif booking.getConfig('shipping.type') == 'selfPickup' %}
+                                        <p>Selbstabholung.</p>
+                                    {% else %}
+                                        <p>
+                                            {{ booking.getConfig('shipping.firstname') }} {{ booking.getConfig('shipping.lastname') }}<br />
+                                            {{ booking.getConfig('shipping.street') }} {{ booking.getConfig('shipping.streetNumber') }}, {{ booking.getConfig('shipping.postalCode') }} {{ booking.getConfig('shipping.city') }}
+                                        </p>
+                                    {% endif %}
+
+                                </div>
+                            </div>
+
+
+
 
                             <h3>Zahlungsart</h3>
 

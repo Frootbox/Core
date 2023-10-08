@@ -21,6 +21,20 @@ return [
         $view = $c->get($class);
         $view->setContainer($c);
 
+        if (defined('GLOBAL_LANGUAGE')) {
+
+            // Replace translations
+            $translationFactory = $c->get(\Frootbox\TranslatorFactory::class);
+            $translator = $translationFactory->get(GLOBAL_LANGUAGE);
+
+
+            // TODO move to re-usable twig extension later
+            $filter = new \Twig\TwigFilter('translate', function ($string) use ($translator) {
+                return $translator->translate($string);
+            });
+            $view->addFilter($filter);
+        }
+
         return $view;
     },
     \Frootbox\Mail\Transports\Interfaces\TransportInterface::class => function ( $c ) {

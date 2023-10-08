@@ -118,6 +118,18 @@ class Extension extends AbstractRow
 
         return new $className;
     }
+
+    /**
+     *
+     */
+    public function getType(): string
+    {
+        if (empty($this->getIsactive())) {
+            return 'Inactive';
+        }
+
+        return $this->getExtensionController()->getType();
+    }
     
     /**
      * 
@@ -134,7 +146,7 @@ class Extension extends AbstractRow
      */
     public function init(
         \Frootbox\Config\Config $config,
-        \Frootbox\Admin\Persistence\Repositories\Apps $appsRepository
+        \Frootbox\Admin\Persistence\Repositories\Apps $appsRepository,
     ): void
     {
         // Get base config
@@ -160,6 +172,25 @@ class Extension extends AbstractRow
             $statics->addConfig($baseConfig['autoinstall']['config']);
         }
 
+        // Update content security policy
+        if (!empty($baseConfig['autoinstall']['contentSecurityPolicy']['domains'])) {
+
+            $domains = !empty($config->get('contentSecurityPolicy.domains')) ? $config->get('contentSecurityPolicy.domains')->getData() : [];
+
+            foreach ($baseConfig['autoinstall']['contentSecurityPolicy']['domains'] as $domain) {
+                if (in_array($domain, $domains)) {
+                    continue;
+                }
+
+                $domains[] = $domain;
+            }
+
+            $statics->addConfig([
+                'contentSecurityPolicy' => [
+                    'domains' => $domains,
+                ],
+            ]);
+        }
 
         // Install extensions editables
         if (!empty($baseConfig['autoinstall']['editables'])) {
@@ -328,7 +359,7 @@ class Extension extends AbstractRow
         // Remove editables
         if (!empty($baseConfig['autoinstall']['editables'])) {
 
-            $editables = $config->get('editables')->getData();
+            $editables = !empty($config->get('editables')) ? $config->get('editables')->getData() : [];
 
             foreach ($editables as $index => $editable) {
 
@@ -364,10 +395,31 @@ class Extension extends AbstractRow
             }
         }
 
+        // Update content security policy
+        if (!empty($baseConfig['autoinstall']['contentSecurityPolicy']['domains'])) {
+
+            $domains = !empty($config->get('contentSecurityPolicy.domains')) ? $config->get('contentSecurityPolicy.domains')->getData() : [];
+
+            foreach ($baseConfig['autoinstall']['contentSecurityPolicy']['domains'] as $index => $domain) {
+                if (in_array($domain, $domains)) {
+                    unset($domains[$index]);
+                }
+            }
+
+            $statics->unsetConfig('contentSecurityPolicy.domains');
+            $statics->addConfig([
+                'contentSecurityPolicy' => [
+                    'domains' => $domains,
+                ],
+            ]);
+
+            $statics->write();
+        }
+
         // Remove custom post-routes
         if (!empty($baseConfig['autoinstall']['postroutes'])) {
 
-            $routes = $config->get('postroutes')->getData();
+            $routes = !empty($config->get('postroutes')) ? $config->get('postroutes')->getData() : [];
 
             foreach ($routes as $index => $xroute) {
 
@@ -405,7 +457,7 @@ class Extension extends AbstractRow
         }
 
         // Remove custom routes
-        if (!empty($baseConfig['autoinstall']['routes'])) {
+        if (!empty($baseConfig['autoinstall']['routes']) and !empty($config->get('routes'))) {
 
             $routes = $config->get('routes')->getData();
 

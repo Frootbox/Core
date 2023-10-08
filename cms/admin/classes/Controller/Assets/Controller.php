@@ -43,6 +43,66 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
      *
      * @throws \Frootbox\Exceptions\NotFound
      */
+    public function ajaxSwitchSticky(
+        \Frootbox\Db\Db $db,
+        \Frootbox\Http\Get $get,
+        \Frootbox\Db\Model $model
+    ): \Frootbox\Admin\Controller\Response
+    {
+        if (empty($get->get('repository'))) {
+
+            // Fetch asset
+            $model->setTable('assets');
+            $row = $model->fetchById($get->get('assetId'));
+        }
+        else {
+
+            // Fetch row from dedicated repository
+            $repository = $db->getRepository($get->get('repository'));
+            $row = $repository->fetchById($get->get('assetId'));
+        }
+
+        if ($row->getIsSticky()) {
+            $row->setIsSticky(0);
+            $row->save();
+
+            return self::getResponse('json', 200, [
+                'removeClass' => [
+                    'selector' => '.sticky[data-asset="' . $row->getId() . '"]',
+                    'className' => 'fas',
+                ],
+                'addClass' => [
+                    'selector' => '.sticky[data-asset="' . $row->getId() . '"]',
+                    'className' => 'far',
+                ],
+            ]);
+        }
+        else {
+            $row->setIsSticky(1);
+            $row->save();
+
+            return self::getResponse('json', 200, [
+                'removeClass' => [
+                    'selector' => '.sticky[data-asset="' . $row->getId() . '"]',
+                    'className' => 'far',
+                ],
+                'addClass' => [
+                    'selector' => '.sticky[data-asset="' . $row->getId() . '"]',
+                    'className' => 'fas',
+                ],
+            ]);
+        }
+    }
+
+    /**
+     * @param \Frootbox\Db\Db $db
+     * @param \Frootbox\Http\Get $get
+     * @param \Frootbox\Db\Model $model
+     *
+     * @return \Frootbox\Admin\Controller\Response
+     *
+     * @throws \Frootbox\Exceptions\NotFound
+     */
     public function ajaxSwitchVisibility(
         \Frootbox\Db\Db $db,
         \Frootbox\Http\Get $get,

@@ -60,6 +60,22 @@ class Reference extends \Frootbox\Persistence\AbstractAsset implements \Frootbox
     }
 
     /**
+     *
+     */
+    public function getLocation(): ?\Frootbox\Ext\Core\Images\Plugins\References\Persistence\Location
+    {
+        if (empty($this->getLocationId())) {
+            return null;
+        }
+
+        // Fetch location
+        $locationRepository = $this->getDb()->getRepository(\Frootbox\Ext\Core\Images\Plugins\References\Persistence\Repositories\Locations::class);
+        $location = $locationRepository->fetchById($this->getLocationId());
+
+        return $location;
+    }
+
+    /**
      * Generate references alias
      *
      * @return \Frootbox\Persistence\Alias|null
@@ -75,6 +91,7 @@ class Reference extends \Frootbox\Persistence\AbstractAsset implements \Frootbox
             'virtualDirectory' => [
                 $this->getTitle()
             ],
+            'uid' => $this->getUid('alias'),
             'payload' => $this->generateAliasPayload([
                 'action' => 'showReference',
                 'referenceId' => $this->getId()
@@ -107,6 +124,7 @@ class Reference extends \Frootbox\Persistence\AbstractAsset implements \Frootbox
                     'virtualDirectory' => [
                         $title,
                     ],
+                    'uid' => $this->getUid('alias'),
                     'payload' => $this->generateAliasPayload([
                         'action' => 'showReference',
                         'referenceId' => $this->getId()
@@ -125,6 +143,7 @@ class Reference extends \Frootbox\Persistence\AbstractAsset implements \Frootbox
                     'virtualDirectory' => [
                         $this->getTitle()
                     ],
+                    'uid' => $this->getUid('alias'),
                     'payload' => $this->generateAliasPayload([
                         'action' => 'showReference',
                         'referenceId' => $this->getId()

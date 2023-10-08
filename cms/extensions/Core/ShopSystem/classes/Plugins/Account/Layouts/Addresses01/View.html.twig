@@ -9,22 +9,15 @@ title: Standard
 {% set p = view.getViewhelper('Partials', { plugin: plugin }) %}
 {% set a = view.getViewhelper('Assets', {   }) %}
 
-{{ v.asset('EXT:Core/ShopSystem/icons/css/all.css') | raw }}
+{% set icons = view.getViewhelper('Ext/HerrUndFrauPixelExt/Icons/Icons', { createDummyOnFail: true  }) %}
 
-<div class="plugin Core ShopSystem Account Account01">
+
+<div class="plugin Core ShopSystem Account Addresses01">
     <div class="container">
 
         <div class="row">
             <div class="col-12">
                 <div class="inner-wrapper">
-
-                    {% if plugin.isFirst %}
-                        <h1 data-editable data-uid="{{ plugin.getUid('title-addresses') }}">Adressbuch</h1>
-                    {% else %}
-                        <h2 data-editable data-uid="{{ plugin.getUid('title-addresses') }}">Adressbuch</h2>
-                    {% endif %}
-
-                    <br /><br />
 
                     <div class="row">
                         <div class="col-md-4">
@@ -33,6 +26,8 @@ title: Standard
 
                         </div>
                         <div class="col-md-8">
+
+                            <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title-addresses') }}">Adressbuch</h2>
 
                             {% if addresses | length == 0 %}
                                 <div class="message">Es wurden noch keine Adressen erstellt.</div>
@@ -46,8 +41,8 @@ title: Standard
                                                     <a href="{{ plugin.getActionUri('addressEdit', { addressId: address.getId() }) }}">{{ address.getTitle() | default('neue Adresse') }}</a>
                                                 </td>
                                                 <td class="text-right">
-                                                    <a href="{{ plugin.getActionUri('addressEdit', { addressId: address.getId() }) }}"><i class="icon fal fa-pencil"></i></a>
-                                                    <a href="{{ plugin.getUriAjax('addressDelete', { addressId: address.getId() }) }}"><i class="icon fal fa-times-square"></i></a>
+                                                    <a href="{{ plugin.getActionUri('addressEdit', { addressId: address.getId() }) }}">{{ icons.render('pencil') | raw }}</a>
+                                                    <a href="{{ plugin.getUriAjax('addressDelete', { addressId: address.getId() }) }}">{{ icons.render('trash') | raw }}</a>
                                                 </td>
                                             </tr>
                                         {% endfor %}

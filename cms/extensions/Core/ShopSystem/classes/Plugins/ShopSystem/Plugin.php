@@ -5,6 +5,7 @@
 
 namespace Frootbox\Ext\Core\ShopSystem\Plugins\ShopSystem;
 
+use Frootbox\Config\Config;
 use Frootbox\View\Response;
 use Frootbox\View\ResponseJson;
 
@@ -13,10 +14,11 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
     use \Frootbox\Persistence\Traits\StandardUrls;
 
     protected $publicActions = [
+        'ajaxProduct',
         'index',
         'productRequest',
         'showProduct',
-        'showCategory'
+        'showCategory',
     ];
 
     /**
@@ -255,6 +257,43 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
     /**
      *
      */
+    public function createInvoiceNumber(): string
+    {
+        $number = $this->getConfig('invoice.currentNumber') ? (int) $this->getConfig('invoice.currentNumber') : 1;
+        $invoiceNumber = $this->getConfig('invoice.numberTemplate') ? $this->getConfig('invoice.numberTemplate') : '{NR}';
+
+        $invoiceNumber = str_replace('{NR}', $number, $invoiceNumber);
+
+        // Increment current invoice number
+        $this->addConfig([
+            'invoice' => [
+                'currentNumber' => ++$number,
+            ],
+        ]);
+
+        $this->save();
+
+        return $invoiceNumber;
+    }
+
+    /**
+     *
+     */
+    public function getBookings(): \Frootbox\Db\Result
+    {
+        // Fetch bookings
+        $bookingRepository = $this->getDb()->getRepository(\Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Bookings::class);
+
+        return $bookingRepository->fetch([
+            'where' => [
+                new \Frootbox\Db\Conditions\Equal('state', 'Booked'),
+            ],
+        ]);
+    }
+
+    /**
+     *
+     */
     public function getCategory(
         \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Categories $categoriesRepository
     ): ?\Frootbox\Ext\Core\ShopSystem\Persistence\Category
@@ -266,6 +305,45 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
         $category = $categoriesRepository->fetchById($this->getAttribute('categoryId'));
 
         return $category;
+    }
+
+    /**
+     * @param Config $configuration
+     * @return array
+     */
+    public function getCountries(
+        \Frootbox\Config\Config $configuration,
+    ): array
+    {
+        if (!empty($configuration->get('Ext.Core.ShopSystem.Countries'))) {
+            return $configuration->get('Ext.Core.ShopSystem.Countries')->getData();
+        }
+
+        if (!empty($configuration->get('shop.shipping.countries'))) {
+            return $configuration->get('shop.shipping.countries')->getData();
+        }
+
+        return [];
+    }
+
+    /**
+     *
+     */
+    public function getCurrencySign(): string
+    {
+        return $this->getConfig('currencySign') ? $this->getConfig('currencySign') : 'EUR';
+    }
+
+    /**
+     * @return \Frootbox\Db\Result
+     * @throws \Frootbox\Exceptions\RuntimeError
+     */
+    public function getDatasheets(): \Frootbox\Db\Result
+    {
+        // Fetch datasheets
+        $datasheetRepository = $this->getDb()->getRepository(\Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Datasheets::class);
+
+        return $datasheetRepository->fetch();
     }
 
     /**
@@ -281,10 +359,8 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
      */
     public function getProducts(
         array $parameters = null,
-        \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Products $productsRepository,
     ): \Frootbox\Db\Result
     {
-
         $params = [
             'where' => [
                 'pluginId' => $this->getId(),
@@ -296,9 +372,8 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
             $params['order'] = [ $parameters['order'] ];
         }
 
+        $productsRepository = $this->getDb()->getRepository(\Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Products::class);
         $result = $productsRepository->fetch($params);
-
-
 
         return $result;
     }
@@ -308,7 +383,6 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
      */
     public function getProductsByTags(
         $tag,
-        \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Products $productsRepository
     ): \Frootbox\Db\Result
     {
         $sql = 'SELECT 
@@ -322,6 +396,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
             t.itemId = p.id
         ';
 
+        $productsRepository = $this->getDb()->getRepository(\Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Products::class);
         $result = $productsRepository->fetchByQuery($sql, [ 'tag' => $tag ]);
 
         return $result;
@@ -346,11 +421,21 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
     /**
      *
      */
-    public function getTopCategories(
-        \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Categories $categoriesRepository
-    ): \Frootbox\Db\Result
+    public function getShopcart(
+        \Frootbox\Ext\Core\ShopSystem\Plugins\Checkout\Shopcart $shopcart,
+    ): \Frootbox\Ext\Core\ShopSystem\Plugins\Checkout\Shopcart
+    {
+        return $shopcart;
+    }
+
+    /**
+     * @return \Frootbox\Db\Result
+     * @throws \Frootbox\Exceptions\RuntimeError
+     */
+    public function getTopCategories(): \Frootbox\Db\Result
     {
         // Fetch categories
+        $categoriesRepository = $this->getDb()->getRepository(\Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Categories::class);
         $categories = $categoriesRepository->fetch([
             'where' => [
                 'uid' => $this->getUid('categories'),
@@ -366,20 +451,56 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
     /**
      *
      */
+    public function hasBookingForProduct(\Frootbox\Ext\Core\ShopSystem\Persistence\Product $product): bool
+    {
+        // Fetch bookings
+        $bookingRepository = $this->getDb()->getRepository(\Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Bookings::class);
+        $bookings = $bookingRepository->fetch([
+            'where' => [
+                new \Frootbox\Db\Conditions\NotEqual('state', 'Cancelled'),
+            ],
+        ]);
+
+        foreach ($bookings as $booking) {
+            foreach ($booking->getConfig('products') as $productData) {
+
+                if ($productData['productId'] == $product->getId()) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     *
+     */
     public function ajaxGetOptionsInStockAction(
         \Frootbox\Http\Get $get,
         \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Option $optionRepository,
+        \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Products $productRepository,
     ): Response
     {
-        // Fetch option
-        $option = $optionRepository->fetchById($get->get('optionId'));
+        // Fetch product
+        $product = $productRepository->fetchById($get->get('productId'));
 
-        $sql = 'SELECT * FROM `shop_products_stocks` WHERE productId = ' . $option->getProductId() . ' AND JSON_CONTAINS(groupData, \'{"' . $option->getGroupId() . '":"' . $option->getId() . '"}\');';
+        parse_str($get->get('xdata'), $xdata);
+        $xdata['options'] = array_filter($xdata['options']);
+        ksort($xdata['options']);
+
+        if (count($xdata['options'])) {
+            $sql = 'SELECT * FROM `shop_products_stocks` WHERE productId = ' . $product->getId() . ' AND JSON_CONTAINS(groupData, \'' . json_encode($xdata['options']) . '\');';
+        }
+        else {
+            $sql = 'SELECT * FROM `shop_products_stocks` WHERE productId = ' . $product->getId();
+        }
 
         $stmt = $this->getDb()->prepare($sql);
         $stmt->execute();
 
         $result = $stmt->fetchAll();
+
         $stocks = [];
 
         foreach ($result as $stock) {
@@ -398,9 +519,10 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
 
         // Fetch selected option
         parse_str($get->get('xdata'), $xdata);
+        $xdata['options'] = array_filter($xdata['options']);
         ksort($xdata['options']);
 
-        $sql = 'SELECT * FROM `shop_products_stocks` WHERE productId = ' . $option->getProductId() . ' AND JSON_CONTAINS(groupData, \'' . json_encode($xdata['options']) . '\');';
+        $sql = 'SELECT * FROM `shop_products_stocks` WHERE productId = ' . $product->getId() . ' AND JSON_CONTAINS(groupData, \'' . json_encode($xdata['options']) . '\');';
 
         $stmt = $this->getDb()->prepare($sql);
         $stmt->execute();
@@ -418,6 +540,33 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
         }
 
         return new ResponseJson($payload);
+    }
+
+    /**
+     *
+     */
+    public function ajaxProductAction(
+        \Frootbox\Http\Get $get,
+        \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Products $productRepository,
+
+    ): Response
+    {
+        if (!empty($get->get('productId'))) {
+            // Fetch product
+            $product = $productRepository->fetchById($get->get('productId'));
+        }
+        elseif (!empty($get->get('productName'))) {
+            $product = $productRepository->fetchOne([
+                'where' => [
+                    'title' => $get->get('productName'),
+                ],
+            ]);
+        }
+
+
+        return new \Frootbox\View\ResponseView([
+            'product' => $product,
+        ]);
     }
 
     /**
@@ -473,10 +622,11 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
     }
 
     /**
-     *
+     * @param \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Products $productsRepository
+     * @return Response
      */
     public function productRequestAction(
-        \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Products $productsRepository
+        \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Products $productsRepository,
     ): Response
     {
         // Fetch product
@@ -568,6 +718,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
             'product' => $product,
             'datasheet' => $datasheet,
             'category' => $category ?? null,
+            'currencySign' => $this->getCurrencySign(),
         ]);
     }
 }

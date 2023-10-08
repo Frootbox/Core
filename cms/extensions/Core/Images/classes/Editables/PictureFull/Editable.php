@@ -27,7 +27,12 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
         $crawler = \Wa72\HtmlPageDom\HtmlPageCrawler::create($html);
         $crawler->filter('figure[data-type="Images/PictureFull"][data-uid]')->each(function ( $element ) use ($files) {
 
+            // Extract uid
             $uid = $element->getAttribute('data-uid');
+
+            // Extract default image source
+            preg_match('#src="(.*?)"#', (string) $element, $matches);
+            $default = $matches[1];
 
             // Fetch file
             $file = $files->fetchByUid($uid, [
@@ -66,18 +71,20 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
             }
 
             $html = '<picture class="fluid">
-                            <img width="' . $width . '" src="' . $src . '" alt="' . $alt . '" />
+                            <img data-default="' . $default . '" width="' . $width . '" src="' . $src . '" alt="' . $alt . '" />
                         </picture>';
 
             if ($file and $file->getConfig('magnifier')) {
                 $html = '<a href="' . $bigsrc . '" data-fancybox="gallery">' . $html . '</a>';
             }
 
-            $html .= '        
-                    <figcaption>
-                        ' . ($file ? nl2br($file->getConfig('caption')) : null) . '
-                        ' . (($file and $file->getCopyright()) ? '<span class="copyright">' . $file->getCopyright() . '</span>' : '') . '
-                    </figcaption>';
+            if ($file and (!empty($file->getConfig('caption')) or !empty($file->getCopyright()))) {
+                $html .= '        
+                        <figcaption>
+                            ' . (($file and $file->getCopyright()) ? '<span class="copyright">' . $file->getCopyright() . '</span>' : '') . '
+                            ' . ($file ? nl2br($file->getConfig('caption')) : null) . '                            
+                        </figcaption>';
+            }
 
             $element->setInnerHtml($html);
         });

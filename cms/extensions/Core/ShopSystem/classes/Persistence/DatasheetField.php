@@ -29,6 +29,19 @@ class DatasheetField extends \Frootbox\Persistence\AbstractAsset
     }
 
     /**
+     * @return Datasheet
+     * @throws \Frootbox\Exceptions\NotFound
+     */
+    public function getDatasheet(): \Frootbox\Ext\Core\ShopSystem\Persistence\Datasheet
+    {
+        // Fetch datasheet
+        $datasheetRepository = $this->getDb()->getRepository(\Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Datasheets::class);
+        $datasheet = $datasheetRepository->fetchById($this->getParentId());
+
+        return $datasheet;
+    }
+
+    /**
      *
      */
     public function getHelpText(): ?string
@@ -147,6 +160,14 @@ class DatasheetField extends \Frootbox\Persistence\AbstractAsset
         $value = null;
 
         switch ($this->getType()) {
+
+            case 'SquareMeter':
+                $value = number_format($this->getValueInt() / 1000, 2, ',', '.') . ' m&sup2;';
+                break;
+
+            case 'Meter':
+                $value = number_format($this->getValueInt() / 1000, 2, ',', '.') . ' m';
+                break;
 
             case 'Kilojoule':
                 $kJ = (int) $this->getValueInt() / 1000;

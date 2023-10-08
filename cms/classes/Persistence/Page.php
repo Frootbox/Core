@@ -127,6 +127,7 @@ class Page extends \Frootbox\Persistence\RowModels\ConfigurableNestedSet impleme
                 $list['index'][] = new Alias([
                     'language' => $language,
                     'pageId' => $this->getId(),
+                    'uid' => $this->getUid('alias'),
                     'visibility' => 2,
                 ]);
             }
@@ -139,6 +140,7 @@ class Page extends \Frootbox\Persistence\RowModels\ConfigurableNestedSet impleme
                 'index' => [ new Alias([
                     'pageId' => $this->getId(),
                     'language' => $this->getLanguage(),
+                    'uid' => $this->getUid('alias'),
                     'visibility' => 2,
                 ]) ],
             ];
@@ -147,12 +149,19 @@ class Page extends \Frootbox\Persistence\RowModels\ConfigurableNestedSet impleme
 
     /**
      * Generate page alias
+     *
+     * @return Alias|null
      */
     public function getNewAlias(): ?Alias
     {
+        if ($this->getVisibility() == 'Locked') {
+            return null;
+        }
+
         $record = [
             'pageId' => $this->getId(),
             'language' => $this->getLanguage(),
+            'uid' => $this->getUid('alias'),
             'visibility' => 2,
         ];
 
@@ -181,6 +190,16 @@ class Page extends \Frootbox\Persistence\RowModels\ConfigurableNestedSet impleme
     public function getLayout()
     {
         return $this->getConfig('view.layout') ?? 'Default.html.twig';
+    }
+
+    /**
+     *
+     */
+    public function getOffspringCount(): int
+    {
+        if (isset($this->data['offspring'])) {
+            return (int) $this->data['offspring'];
+        }
     }
 
     /**
@@ -378,6 +397,14 @@ class Page extends \Frootbox\Persistence\RowModels\ConfigurableNestedSet impleme
         }
 
         return (empty($this->getConfig('seo.preventIndexing')) and $this->getType() != 'Error404');
+    }
+
+    /**
+     * @return bool
+     */
+    public function isIndexableForInternalSearch(): bool
+    {
+        return empty($this->getConfig('search.preventIndexing'));
     }
 
     /**

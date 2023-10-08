@@ -12,9 +12,37 @@ class Price extends \Frootbox\Persistence\AbstractAsset
     /**
      *
      */
+    public function getAdditives(): array
+    {
+        if (empty($this->getConfig('additives'))) {
+            return [];
+        }
+
+        $additives = [];
+
+        $additiveRepository = $this->getDb()->getRepository(\Frootbox\Ext\Core\Gastronomy\Plugins\PriceList\Persistence\Repositories\Additives::class);
+
+        foreach ($this->getConfig('additives') as $additiveId) {
+            $additives[] = $additiveRepository->fetchById($additiveId);
+        }
+
+        return $additives;
+    }
+
+    /**
+     *
+     */
     public function getNewAlias(): ?\Frootbox\Persistence\Alias
     {
         return null;
+    }
+
+    /**
+     *
+     */
+    public function getPrice(): ?float
+    {
+        return $this->getConfig('price');
     }
 
     /**

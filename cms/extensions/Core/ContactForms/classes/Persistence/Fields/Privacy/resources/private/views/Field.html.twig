@@ -1,9 +1,24 @@
 {% set i = view.getViewhelper('Delegator', { object: field }) %}
 {% set t = view.getViewhelper('Translator') %}
 
+{%  set privacyUrl = i.getPrivacyPolicyLink() %}
+
 <div class="form-group form-check small-text">
-    <input type="checkbox" required class="form-check-input" id="field-{{ field.getId() }}" name="fields[{{ field.getId() }}]">
+    <input type="checkbox" required class="form-check-input" id="field-{{ field.getId() }}" name="fields[{{ field.getId() }}]" aria-describedby="field-help-{{ field.getId() }}">
     <label class="form-check-label" for="field-{{ field.getId() }}">
-        {{ t.translate('AcceptPrivacyPolicy', [ i.getPrivacyPolicyLink() ]) | raw }}
+
+        {% if field.getConfig('privacyText') %}
+            {{ field.injectPrivacyLink(field.getConfig('privacyText'), privacyUrl) | raw | nl2br }}{% if field.getMandatory() %}<span class="mandatory">*</span>{% endif %}
+        {% elseif field.getConfig('linkedFile') %}
+            {{ t.translate('AcceptPrivacyPolicy', [ field.getFile().getUriDownload() ]) | raw }}{% if field.getMandatory() %}<span class="mandatory">*</span>{% endif %}
+        {% else %}
+            {{ t.translate('AcceptPrivacyPolicy', [ i.getPrivacyPolicyLink() ]) | raw }}{% if field.getMandatory() %}<span class="mandatory">*</span>{% endif %}
+        {% endif %}
+
     </label>
+
+    {% if field.getConfig('helpText') %}
+        <small id="field-help-{{ field.getId() }}" class="form-text text-muted">{{ field.injectPrivacyLink(field.getConfig('helpText'), privacyUrl) | raw | nl2br }}</small>
+    {% endif %}
+
 </div>

@@ -90,6 +90,57 @@ trait Tags
     /**
      *
      */
+    public function getTagsPublicList(array $parameters = null): array
+    {
+        // Obtain tags repository
+        $tagsRepository = $this->getDb()->getModel(\Frootbox\Persistence\Repositories\Tags::class);
+
+        $where = [
+            'itemId' => $this->getId(),
+            'itemClass' => get_class($this)
+        ];
+
+        if (!empty($parameters['ignore'])) {
+
+            foreach ($parameters['ignore'] as $ignoredTag) {
+
+                if (!empty($ignoredTag)) {
+                    $where[] = new \Frootbox\Db\Conditions\NotEqual('tag', $ignoredTag);
+                }
+            }
+        }
+
+        // Fetch tags
+        $tags = $tagsRepository->fetch([
+            'where' => $where,
+        ]);
+
+        foreach($tags as $index => $tag) {
+            if ($tag->getTag()[0] == '_') {
+                $tags->removeByIndex($index);
+            }
+        }
+
+        $tagsList = [];
+
+        foreach ($tags as $tag) {
+
+            if (!empty($parameters['unmatch'])) {
+
+                if (preg_match('#' . $parameters['unmatch'] . '#', $tag->getTag())) {
+                    continue;
+                }
+            }
+
+            $tagsList[] = $tag->getTag();
+        }
+
+        return $tagsList;
+    }
+
+    /**
+     *
+     */
     public function getTagsList(array $params = null): array
     {
         // Obtain tags repository

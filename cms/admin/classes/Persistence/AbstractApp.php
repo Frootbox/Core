@@ -8,6 +8,7 @@ namespace Frootbox\Admin\Persistence;
 abstract class AbstractApp extends \Frootbox\Persistence\AbstractRow
 {
     use \Frootbox\Persistence\Traits\Config;
+    use \Frootbox\Persistence\Traits\Uid;
 
     protected $table = 'admin_apps';
     protected $model = \Frootbox\Admin\Persistence\Repositories::class;

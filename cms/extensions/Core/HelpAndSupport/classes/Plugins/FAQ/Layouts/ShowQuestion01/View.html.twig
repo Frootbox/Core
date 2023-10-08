@@ -1,6 +1,10 @@
 {# config
 
 title: Standard
+variables:
+    withContainer:
+        type: bool
+        label: mit Layout-Container
 
 /config #}
 
@@ -11,27 +15,32 @@ title: Standard
 
 {{ view.set({ pagedata: { title: question.getTitle() } }) }}
 
+{{ view.set('hideGlobalBlocks', true) }}
+
 <param name="cloak" value="1" />
 
-<div class="row">
-    <div class="col-12 plugin Core HelpAndSupport FAQ ShowQuestion01">
+<div class="plugin Core HelpAndSupport FAQ ShowQuestion01">
 
-        {% if plugin.isFirst %}
-            <h1 data-editable data-uid="{{ question.getUid('title') }}">{{ question.getTitle }}</h1>
-        {% else %}
-            <h2 data-editable data-uid="{{ question.getUid('title') }}">{{ question.getTitle }}</h2>
-        {% endif %}
+    {% if variables.withContainer %}<div class="container">{% endif %}
 
-        {% set seeAlso = question.getSeeAlso() %}
+        <div class="row">
+            <div class="col-12">
 
-        {% if seeAlso | length > 0 %}
-            <p>Siehe auch: {% for xquestion in seeAlso %}{% if loop.index > 1 %}, {% endif %}<a href="{{ xquestion.getUri() }}">{{ xquestion.getTitle() }}</a>{% endfor %}</p>
-        {% endif %}
+                <h2 class="first main-title" data-editable data-uid="{{ question.getUid('title') }}">{{ question.getTitle }}</h2>
 
-        <div class="teaser" data-editable data-uid="{{ question.getUid('teaser') }}"></div>
+                {% set seeAlso = question.getSeeAlso() %}
 
-        <div data-blocks data-uid="{{ question.getUid('block-content') }}"></div>
+                {% if seeAlso | length > 0 %}
+                    <p>Siehe auch: {% for xquestion in seeAlso %}{% if loop.index > 1 %}, {% endif %}<a href="{{ xquestion.getUri() }}">{{ xquestion.getTitle() }}</a>{% endfor %}</p>
+                {% endif %}
 
-    </div>
+                <div class="teaser" data-editable data-uid="{{ question.getUid('teaser') }}"></div>
+
+                <div data-blocks data-uid="{{ question.getUid('block-content') }}"></div>
+
+            </div>
+        </div>
+
+    {% if variables.withContainer %}</div>{% endif %}
+
 </div>
-

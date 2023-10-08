@@ -24,7 +24,16 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     {
         // Set new config
         $this->plugin->addConfig([
-            'skipLinkage' => $post->get('skipLinkage')
+            'skipLinkage' => $post->get('skipLinkage'),
+            'skipCoupons' => $post->get('skipCoupons'),
+            'skipShipping' => $post->get('skipShipping'),
+            'showNetPrices' => $post->get('showNetPrices'),
+            'skipCustomerLogin' => $post->get('skipCustomerLogin'),
+            'ownOrderNumber' => $post->get('ownOrderNumber'),
+            'shopInactive' => [
+                'from' => $post->get('dateFrom'),
+                'to' => $post->get('dateTo'),
+            ],
         ]);
         $this->plugin->save();
 

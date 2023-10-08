@@ -21,10 +21,13 @@ table.table {
 		}
 
 		tr {
-
 			td {
 
 				a {
+					svg.preicon {
+						margin-right: 10px;
+					}
+
 					svg.visibility-0 {
 						color: red;
 					}
@@ -41,7 +44,7 @@ table.table {
 		}
 	}
 
-	tr[data-modal]:hover, tr[data-href]:hover, tr.active, tr.highlighted, tr.dragging {
+	tr.hover:hover, tr[data-modal]:hover, tr[data-href]:hover, tr.active, tr.highlighted, tr.dragging {
 
 		td {
 			background: #d93f52;

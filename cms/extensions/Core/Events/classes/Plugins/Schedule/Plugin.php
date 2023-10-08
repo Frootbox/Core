@@ -148,7 +148,6 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
      *
      */
     public function getEvents(
-        \Frootbox\Ext\Core\Events\Persistence\Repositories\Events $events,
         array $options = null,
     ): \Frootbox\Db\Result
     {
@@ -174,21 +173,27 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         WHERE
             e.visibility >= ' . (IS_LOGGED_IN ? 1 : 2) . ' AND  
             e.pluginId = ' . $this->getId() . ' AND
-            e.className = "Frootbox\\\\Ext\\\\Core\\\\Events\\\\Persistence\\\\Event" AND            
+            e.className = "Frootbox\\\\Ext\\\\Core\\\\Events\\\\Persistence\\\\Event" ';
+
+        if (empty($options['showPastDates'])) {
+
+            $sql .= ' AND            
             (
                 e.dateStart >= "' . date('Y-m-d H:i:s') . '" OR
                 (
                     e.dateStart <= "' . date('Y-m-d H:i:s') . '" AND
                     e.dateEnd >= "' . date('Y-m-d H:i:s') . '"
                 )
-            )            
-        ORDER BY
+            ) ';
+        }
+
+
+        $sql .= ' ORDER BY
             e.dateStart ASC';
 
-
         // Fetch events
-        /* @var \Frootbox\Db\Result $result */
-        $result = $events->fetchByQuery($sql);
+        $eventRepository = $this->getDb()->getRepository(\Frootbox\Ext\Core\Events\Persistence\Repositories\Events::class);
+        $result = $eventRepository->fetchByQuery($sql);
 
         if (!empty($options['onlyBookable'])) {
 
@@ -201,6 +206,78 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         }
 
         return $result;
+    }
+
+    /**
+     *
+     */
+    public function getEventsPast(
+        array $options = null,
+    ): \Frootbox\Db\Result
+    {
+        // Build sql
+        $sql = 'SELECT
+            e.*,
+            l.id as locationId,
+            l.title as locationTitle,
+            l.street as locationStreet,
+            l.streetNumber as locationStreetNumber,
+            l.zipcode as locationZipcode,
+            l.city as locationCity,
+            l.phone as locationPhone,
+            l.email as locationEmail,
+            l.config as locationConfig,
+            l.alias as locationAlias
+        FROM
+            assets e
+        LEFT JOIN
+            locations l
+        ON
+            e.parentId = l.id
+        WHERE
+            e.visibility >= ' . (IS_LOGGED_IN ? 1 : 2) . ' AND  
+            e.pluginId = ' . $this->getId() . ' AND
+            e.className = "Frootbox\\\\Ext\\\\Core\\\\Events\\\\Persistence\\\\Event" ';
+
+
+            $sql .= ' AND e.dateEnd <= "' . date('Y-m-d H:i:s') . '" ';
+
+
+        $sql .= ' ORDER BY
+            e.dateStart DESC';
+
+        // Fetch events
+        $eventRepository = $this->getDb()->getRepository(\Frootbox\Ext\Core\Events\Persistence\Repositories\Events::class);
+        $result = $eventRepository->fetchByQuery($sql);
+
+        if (!empty($options['onlyBookable'])) {
+
+            foreach ($result as $index => $event) {
+
+                if (!$event->isBookable()) {
+                    $result->removeByIndex($index);
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return \Frootbox\Db\Result
+     * @throws \Frootbox\Exceptions\RuntimeError
+     */
+    public function getVenues(): \Frootbox\Db\Result
+    {
+        // Fetch venues
+        $venueRepository = $this->getDb()->getRepository(\Frootbox\Ext\Core\Events\Persistence\Repositories\Venues::class);
+        $venues = $venueRepository->fetch([
+            'where' => [
+                'pluginId' => $this->getId(),
+            ],
+        ]);
+
+        return $venues;
     }
 
     /**

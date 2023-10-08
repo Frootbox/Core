@@ -37,6 +37,16 @@
             </select>
         </div>
 
+        {{ v.injectPartial('\\Frootbox\\Admin\\View\\Partials\\Input\\Tags', {
+            object: category
+        }) | raw }}
+
+        <div class="form-group form-check">
+            <input type="checkbox" class="form-check-input" id="noGenericDetailsPage" name="noGenericDetailsPage">
+            <label class="form-check-label" for="noGenericDetailsPage">Keine Detailseite für diese Kagtegorie</label>
+        </div>
+
+
     </div>
     <div class="modal-footer">
         <button type="submit" class="btn btn-primary">Speichern</button>

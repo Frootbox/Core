@@ -125,11 +125,16 @@ trait Uid
     /**
      *
      */
-    public function fetchResultByUid($uid): \Frootbox\Db\Result
+    public function fetchResultByUid($uid, array $parameters = null): \Frootbox\Db\Result
     {
+        if (empty($parameters['order'])) {
+            $parameters['order'] = 'date DESC';
+        }
+
         // Fetch text
         $result = $this->fetch([
-            'where' => [ 'uid' => $uid ]
+            'where' => [ 'uid' => $uid ],
+            'order' => [ $parameters['order'] ],
         ]);
 
         return $result;

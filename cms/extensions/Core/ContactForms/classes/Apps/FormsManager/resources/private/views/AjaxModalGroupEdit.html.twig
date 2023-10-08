@@ -22,6 +22,10 @@
             <label for="title">Titel (optional)</label>
             <input type="text" class="form-control" name="title" id="title" placeholder="Titel" value="{{ group.getTitle() }}">
         </div>
+        <div class="form-group">
+            <label for="className">CSS Klasse (optional)</label>
+            <input type="text" class="form-control" name="className" id="className" placeholder="CSS Klasse (optional)" value="{{ group.getConfig('className') }}">
+        </div>
         <div class="form-group form-check">
             <input {% if group.getConfig('alignItemsEnd') %}checked{% endif %} type="checkbox" class="form-check-input" id="alignItemsEnd" name="alignItemsEnd">
             <label class="form-check-label" for="alignItemsEnd">Elemente in Spalten unten anordnen</label>

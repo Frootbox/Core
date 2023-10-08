@@ -1,53 +1,65 @@
 {% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
 
-{% if references | length > 0 %}
+{% if references | length > 0 or data.keyword %}
 
 	<h3>Referenzen</h3>
 
-	<table class="table" data-sort="{{ plugin.getAdminUri('Reference', 'ajaxSort') }}">
-		<thead>
-			<tr>
-				<th>Referenz</th>
+	<script>
+		$(function() {
+			$('#keyword').focus();
+		});
+	</script>
 
-				{% if plugin.getOrdering() == "Manual" %}
-					<th></th>
-				{% elseif plugin.getOrdering() == "DateDesc" %}
-					<th>Datum</th>
-				{% endif %}
+	<form action="{{ plugin.getAdminUri('Reference', 'ajaxSearch') }}" class="ajax mb-3" method="post">
+		<input type="text" class="form-control" id="keyword" name="keyword" value="{{ data.keyword }}" placeholder="Suchwort eingeben ...">
+	</form>
 
-				<th></th>
-			</tr>
-		</thead>
-		<tbody>
-
-			{% for reference in references %}
-
-				<tr id="row-{{ reference.getId() }}" class="{% if data.highlight == reference.getId() %}highlighted{% endif %} ajax" data-href="{{ plugin.getAdminUri('Reference', 'details', { referenceId: reference.getId() }) }}">
-					<td>
-						{{ reference.getTitle() }}
-
-						{% for tag in reference.getTags() %}
-							<span class="badge badge-info">{{ tag.getTag() }}</span>
-						{% endfor %}
-					</td>
+	{% if references | length %}
+		<table class="table" data-sort="{{ plugin.getAdminUri('Reference', 'ajaxSort') }}">
+			<thead>
+				<tr>
+					<th>Referenz</th>
 
 					{% if plugin.getOrdering() == "Manual" %}
-						<td class="handle" style="cursor: pointer; vertical-align: middle;" width="40"><i class="fa fa-grip-lines"></i></td>
+						<th></th>
 					{% elseif plugin.getOrdering() == "DateDesc" %}
-						<td nowrap>
-							{{ reference.getDateStart() | date('d.m.Y H:i') }} Uhr
-						</td>
+						<th>Datum</th>
 					{% endif %}
 
-					<td class="text-right" nowrap>
-						<a class="ajax" href="{{ v.getUri('Assets', 'ajaxSwitchVisibility', { assetId: reference.getId() } ) }}"><i data-asset="{{ reference.getId() }}" class="fa fa-lightbulb visibility {{ reference.getVisibilityString() }} icon"></i></a>
-						<a class="ajax" data-confirm="Soll diese Referenz wirklich gelöscht werden?" href="{{ data.plugin.getAdminUri('Reference', 'ajaxDelete', { referenceId: reference.getId() }) }}"><i class="fa fa-times icon"></i></a>
-					</td>
+					<th></th>
 				</tr>
+			</thead>
+			<tbody>
 
-			{% endfor %}
+				{% for reference in references %}
 
-		</tbody>
-	</table>
+					<tr id="row-{{ reference.getId() }}" class="{% if data.highlight == reference.getId() %}highlighted{% endif %} ajax" data-href="{{ plugin.getAdminUri('Reference', 'details', { referenceId: reference.getId(), keyword: data.keyword }) }}">
+						<td>
+							{{ reference.getTitle() }}<br />
+
+							{% for tag in reference.getTags() %}
+								<span class="badge badge-info">{{ tag.getTag() }}</span>
+							{% endfor %}
+						</td>
+
+						{% if plugin.getOrdering() == "Manual" %}
+							<td class="handle" style="cursor: pointer; vertical-align: middle;" width="40"><i class="fa fa-grip-lines"></i></td>
+						{% elseif plugin.getOrdering() == "DateDesc" %}
+							<td nowrap>
+								{{ reference.getDateStart() | date('d.m.Y H:i') }} Uhr
+							</td>
+						{% endif %}
+
+						<td class="text-right" nowrap>
+							<a class="ajax" href="{{ v.getUri('Assets', 'ajaxSwitchVisibility', { assetId: reference.getId() } ) }}"><i data-asset="{{ reference.getId() }}" class="fa fa-lightbulb visibility {{ reference.getVisibilityString() }} icon"></i></a>
+							<a class="ajax" data-confirm="Soll diese Referenz wirklich gelöscht werden?" href="{{ data.plugin.getAdminUri('Reference', 'ajaxDelete', { referenceId: reference.getId() }) }}"><i class="far fa-trash icon"></i></a>
+						</td>
+					</tr>
+
+				{% endfor %}
+
+			</tbody>
+		</table>
+	{% endif %}
 
 {% endif %}

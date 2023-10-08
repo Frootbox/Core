@@ -7,6 +7,11 @@
 	Formular-Verwaltung
 </h2>
 
+<style>
+	td.inactive a {
+		color: #CCC;
+	}
+</style>
 
 <table class="table">
 	<thead>
@@ -19,8 +24,7 @@
 	<tbody>
 		{% for item in plugins %}
 			<tr>
-				<td>
-
+				<td class="{% if item.plugin.getVisibility() == 0 %}inactive{% endif %}">
 					<a target="_blank" href="{{ serverpath }}cms/admin/Sitemap/index#plugin:{{ item.plugin.getPage().getId() }}:{{ item.plugin.getId() }}:Index:index">{{ item.plugin.getTitle() }}</a><br />
 					<span style="color: #CCC; font-size: 11px;">
 						{% for page in item.plugin.getPage().getTrace() %}

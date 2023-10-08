@@ -64,3 +64,22 @@
 
     </div>
 </div>
+
+<h3>Datenblatt Details</h3>
+
+<div class="card">
+    <div class="card-body">
+
+        <form method="post" class="ajax" action="{{ plugin.getAdminUri('Datasheets', 'ajaxUpdate', { datasheetId: datasheet.getId() }) }}">
+
+            <div class="form-group">
+                <label for="title">Titel *</label>
+                <input required type="text" class="form-control" id="title" name="title" value="{{ datasheet.getTitle() }}">
+            </div>
+
+            <button type="submit" class="btn btn-primary">Speichern</button>
+
+        </form>
+
+    </div>
+</div>

@@ -10,7 +10,7 @@ use Frootbox\Admin\Controller\Response;
 class Controller extends \Frootbox\Admin\AbstractPluginController
 {
     /**
-     *
+     * @return string
      */
     public function getPath(): string
     {
@@ -61,7 +61,11 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     }
 
     /**
-     *
+     * @param \Frootbox\Http\Get $get
+     * @param \Frootbox\Http\Post $post
+     * @param \Frootbox\Ext\Core\Gastronomy\Plugins\PriceList\Persistence\Repositories\ListEntries $listEntriesRepository
+     * @return Response
+     * @throws \Frootbox\Exceptions\RuntimeError
      */
     public function ajaxUpdateAction(
         \Frootbox\Http\Get $get,
@@ -69,11 +73,22 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         \Frootbox\Ext\Core\Gastronomy\Plugins\PriceList\Persistence\Repositories\ListEntries $listEntriesRepository
     ): Response
     {
-        // Insert new list entry
+        // Fetch list entry
         $listEntry = $listEntriesRepository->fetchById($get->get('listEntryId'));
 
+        // Update entry
         $listEntry->setTitle($post->get('title'));
         $listEntry->setNumber($post->get('number'));
+
+        if (!empty($post->get('dateStart'))) {
+            $listEntry->setDateStart($post->get('dateStart'));
+        }
+
+        if (!empty($post->get('dateEnd'))) {
+            $listEntry->setDateEnd($post->get('dateEnd'));
+        }
+
+        // Persist changes
         $listEntry->save();
 
         return self::getResponse('json', 200);
@@ -102,10 +117,20 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         $view->set('price', $price);
 
         // Fetch additives
-        $result = $additivesRepository->fetch([
-            'where' => [ 'pluginId' => $this->plugin->getId() ],
-            'order' => [ 'orderId ASC' ]
-        ]);
+        if ($this->plugin->getConfig('shareAdditives')) {
+
+            $result = $additivesRepository->fetch([
+                'order' => [ 'orderId ASC' ]
+            ]);
+        }
+        else {
+
+            $result = $additivesRepository->fetch([
+                'where' => [ 'pluginId' => $this->plugin->getId() ],
+                'order' => [ 'orderId ASC' ]
+            ]);
+        }
+
         $view->set('additives', $result);
 
         return self::getResponse('plain');

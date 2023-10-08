@@ -4,7 +4,11 @@
     Shop-System
 
     <span class="headoptions">
-		<a data-toggle="tooltip" data-modal data-title="neue Formulargruppe hinzufügen" href="{{ plugin.getAdminUri('Group', 'ajaxModalCompose') }}"><i class="fa fa-plus-circle"></i></a>
+
+        {#
+        <a data-toggle="tooltip" data-modal data-title="neue Formulargruppe hinzufügen" href="{{ plugin.getAdminUri('Group', 'ajaxModalCompose') }}"><i class="fa fa-plus-circle"></i></a>
+        #}
+
 
         <span class="dropdown">
             <i class="fa fa-bars dropdown-toggle" data-toggle="dropdown" aria-hidden="true"></i>
@@ -49,6 +53,16 @@
         url: plugin.getAdminUri('Shipping', 'index'),
         icon: 'fa-truck',
         title: 'Versandkosten'
+    },
+    {
+        url: plugin.getAdminUri('Shipping', 'days'),
+        icon: 'fa-calendar',
+        title: 'Liefertage'
+    },
+    {
+        url: plugin.getAdminUri('Selfpickup', 'index'),
+        icon: 'far fa-hand-holding-box',
+        title: 'Selbstabholung'
     },
     {
         url: plugin.getAdminUri('Coupons', 'index'),

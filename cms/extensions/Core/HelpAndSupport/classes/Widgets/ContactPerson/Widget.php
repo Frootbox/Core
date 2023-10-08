@@ -19,7 +19,6 @@ class Widget extends \Frootbox\Persistence\Content\AbstractWidget {
             return null;
         }
 
-
         // Fetch contact
         $contact = $contacts->fetchById($this->config['contactId']);
 

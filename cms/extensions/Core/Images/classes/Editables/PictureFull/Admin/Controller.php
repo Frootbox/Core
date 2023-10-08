@@ -5,6 +5,8 @@
 
 namespace Frootbox\Ext\Core\Images\Editables\PictureFull\Admin;
 
+use Frootbox\Admin\Controller\Response;
+
 class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
 {
     /**
@@ -13,6 +15,30 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
     public function getPath ( ): string
     {
         return __DIR__ . DIRECTORY_SEPARATOR;
+    }
+
+    /**
+     * Delete image
+     */
+    public function ajaxDelete (
+        \Frootbox\Http\Get $get,
+        \Frootbox\Persistence\Repositories\Files $files
+    ): Response
+    {
+        // Fetch file
+        $file = $files->fetchByUid($get->get('uid'));
+
+        // Delete file
+        $file?->delete();
+
+        // Generate default
+        $default = $get->get('default');
+        $default = str_replace('FILE:', '', $default);
+        $default = str_replace(CORE_DIR, '', $default);
+
+        return self::getResponse('json', 200, [
+            'default' => $default,
+        ]);
     }
 
     /**

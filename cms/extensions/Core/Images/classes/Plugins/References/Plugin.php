@@ -219,7 +219,10 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
     }
 
     /**
-     *
+     * @param string $tag
+     * @param array|null $parameters
+     * @param Persistence\Repositories\References $referencesRepository
+     * @return \Frootbox\Db\Result
      */
     public function getReferencesByTag(
         string $tag,
@@ -227,6 +230,14 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
         \Frootbox\Ext\Core\Images\Plugins\References\Persistence\Repositories\References $referencesRepository
     ): \Frootbox\Db\Result
     {
+        if (empty($parameters['order'])) {
+            if ($this->getConfig('order') == 'Manual') {
+                $parameters['order'] = 'orderId DESC';
+            }
+        }
+
+        $parameters['complyVisibility'] = true;
+
         // Fetch references
         $references = $referencesRepository->fetchByTag($tag, $parameters);
 

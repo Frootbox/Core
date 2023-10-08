@@ -7,6 +7,11 @@ namespace Frootbox\Ext\Core\HelpAndSupport\Plugins\KeywordIndex;
 
 class Plugin extends \Frootbox\Persistence\AbstractPlugin
 {
+    protected $publicActions = [
+        'index',
+        'showKeyword',
+    ];
+
     /**
      *
      */
@@ -23,6 +28,37 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         ]);
 
         return $result;
+    }
+
+    /**
+     * @return array
+     * @throws \Frootbox\Exceptions\RuntimeError
+     */
+    public function getKeywordsByInitial(): array
+    {
+        // Fetch keywords
+        $keywordsRepository = $this->getDb()->getRepository(\Frootbox\Ext\Core\HelpAndSupport\Plugins\KeywordIndex\Persistence\Repositories\Keywords::class);
+        $keywords = $keywordsRepository->fetch([
+            'where' => [
+                'pluginId' => $this->getId()
+            ],
+            'order' => [ 'title ASC' ]
+        ]);
+
+        $list = [];
+
+        foreach ($keywords as $keyword) {
+
+            $initial = strtoupper(mb_substr($keyword->getTitle(), 0, 1));
+
+            if (!isset($list[$initial])) {
+                $list[$initial] = [];
+            }
+
+            $list[$initial][] = $keyword;
+        }
+
+        return $list;
     }
 
     /**

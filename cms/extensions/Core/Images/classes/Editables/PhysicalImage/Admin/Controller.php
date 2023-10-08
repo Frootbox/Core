@@ -60,7 +60,11 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
     }
 
     /**
-     *
+     * @param \Frootbox\Http\Get $get
+     * @param \Frootbox\Http\Post $post
+     * @param \Frootbox\Persistence\Repositories\Files $files
+     * @return Response
+     * @throws \Frootbox\Exceptions\NotFound
      */
     public function ajaxUpdate(
         \Frootbox\Http\Get $get,
@@ -71,12 +75,19 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
         // Fetch file
         $file = $files->fetchById($get->get('fileId'));
 
+        // Update file
         $file->setTitle($post->get('title'));
         $file->setCopyright($post->get('copyright'));
 
         $file->addConfig([
             'caption' => $post->get('caption'),
         ]);
+
+        if ($post->hasAttribute('link')) {
+            $file->addConfig([
+                'link' => $post->get('link'),
+            ]);
+        }
 
         $file->save();
 

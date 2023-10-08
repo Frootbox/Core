@@ -1,0 +1,12 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<h2>Veranstaltungsorte</h2>
+
+<p><a class="ajax" href="{{ plugin.getAdminUri('Index', 'index') }}"><i class="fa fa-chevron-circle-left"></i> zurück</a></p>
+
+<div id="venuesReceiver">
+    {{ v.injectPartial('/Frootbox/Ext/Core/Addresses/Admin/Partials/AddressManager', {
+        plugin: plugin,
+        repository: '\\Frootbox\\Ext\\Core\\Images\\Plugins\\References\\Persistence\\Repositories\\Locations'
+    }) | raw }}
+</div>

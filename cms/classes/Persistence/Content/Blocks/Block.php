@@ -13,15 +13,33 @@ class Block extends \Frootbox\Persistence\AbstractConfigurableRow
     protected $model = Repositories\Blocks::class;
     protected $viewFile = null;
 
-    protected $wasCalledFirst = false;
-    protected $isCaged = false;
+    protected bool $wasCalledFirst = false;
+    protected bool $isCaged = false;
 
     use \Frootbox\Persistence\Traits\DummyImage;
     use \Frootbox\Persistence\Traits\Uid;
     use \Frootbox\Persistence\Traits\Visibility;
 
     /**
-     *
+     * @return string
+     */
+    protected function getCssClass(): string
+    {
+        $cssClass = 'EditableBlock ' . $this->getExtensionId() . ' ' . $this->getBlockId() . ' ';
+
+        if (!empty($this->getConfig('noPrint'))) {
+            $cssClass .= 'fbx-ctr-noPrint';
+        }
+
+        if (!empty($this->getConfig('css.className'))) {
+            $cssClass .= ' ' . $this->getConfig('css.className');
+        }
+
+        return $cssClass;
+    }
+
+    /**
+     * @return AbstractAdminController
      */
     public function getAdminController(): \Frootbox\Persistence\Content\Blocks\AbstractAdminController
     {
@@ -41,6 +59,37 @@ class Block extends \Frootbox\Persistence\AbstractConfigurableRow
     }
 
     /**
+     * @return array
+     */
+    public function getInitConfig(): array
+    {
+        $template = new \Frootbox\View\HtmlTemplate($this->getViewFile(), [
+
+        ]);
+
+        $config = $template->getConfig();
+
+        return $config['initConfig'] ?? [];
+    }
+
+    /**
+     *
+     */
+    public function getNameFromView(): ?string
+    {
+        $source = file_get_contents($this->getViewFile());
+
+        if (!preg_match('#title: (.*?)\n#', $source, $match)) {
+            return null;
+        }
+
+        $title = trim($match[1]);
+        $title = str_replace('---', '', $title);
+
+        return $title;
+    }
+
+    /**
      *
      */
     public function getPathFromConfig(
@@ -53,6 +102,29 @@ class Block extends \Frootbox\Persistence\AbstractConfigurableRow
         $viewFile = $controller->getPath() . 'classes/Blocks/' . $this->getBlockId() . '/';
 
         return $viewFile;
+    }
+
+    public function getSettings(\Frootbox\Config\Config $config): array
+    {
+        $template = new \Frootbox\View\HtmlTemplate($this->viewFile, [
+            'variables' => $this->getConfig('template.variables'),
+        ]);
+    }
+
+    /**
+     *
+     */
+    public function getTitleClean(): ?string
+    {
+        $title = $this->getTitle();
+
+        if (empty($title)) {
+            return null;
+        }
+
+        $title = str_replace('---', '', $title);
+
+        return $title;
     }
 
     /**
@@ -222,29 +294,44 @@ class Block extends \Frootbox\Persistence\AbstractConfigurableRow
         ]);
 
         // Render block html
-
         $html = $view->render($this->viewFile, [
             'path' => $path,
             'template' => $template,
             'data' => $injectedVariables,
         ]);
 
-        // Auto inject css files
+        // Auto-inject css files
         $stylesheet = $path . 'standards.less';
 
         if (file_exists($stylesheet)) {
             $html .= PHP_EOL . PHP_EOL . '<link type="text/css" rel="stylesheet/less" href="FILE:' . $stylesheet . '" />';
         }
 
-        // Auto inject javascript files
-        $scriptfile = $path . 'init.js';
+        // Auto-inject javascript files
+        $scriptFile = $path . 'init.js';
 
-        if (file_exists($scriptfile)) {
-            $html .= PHP_EOL . PHP_EOL . '<script src="FILE:' . $scriptfile . '"></script>';
+        if (file_exists($scriptFile)) {
+            $html .= PHP_EOL . PHP_EOL . '<script src="FILE:' . $scriptFile . '"></script>';
         }
 
+        $customStyles = (string) null;
 
-        $html = '<div class="EditableBlock ' . $this->getExtensionId() . ' ' . $this->getBlockId() . '" data-class="' . !empty($this->getClassName()) . '" data-editable-block data-block="' . $this->getId() . '" data-loop="' . ($injectedVariables['loopId'] ?? 1) . '">' . $html . '</div>';
+        if (!empty($margin = $this->getConfig('margin'))) {
+
+            if (isset($margin['top']) and strlen($margin['top']) > 0) {
+                $customStyles .= 'margin-top: ' . $margin['top'] . 'px; ';
+            }
+
+            if (isset($margin['bottom']) and strlen($margin['bottom']) > 0) {
+                $customStyles .= 'margin-bottom: ' . $margin['bottom'] . 'px; ';
+            }
+        }
+
+        if (!empty($customStyles)) {
+            $customStyles = 'style="' . $customStyles . '"';
+        }
+
+        $html = '<div ' . $customStyles . ' class="' . $this->getCssClass() . '" data-class="' . !empty($this->getClassName()) . '" data-editable-block data-block="' . $this->getId() . '" data-loop="' . ($injectedVariables['loopId'] ?? 1) . '">' . $html . '</div>';
 
         return trim($html);
     }

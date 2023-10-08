@@ -29,6 +29,7 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
         $directory = new \Frootbox\Filesystem\Directory($extensionController->getPath() . 'classes/Persistence/Fields/');
 
         $list = [];
+        $loop = 0;
 
         foreach ($directory as $file) {
 
@@ -42,11 +43,13 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
 
             $title = $data['Field.Title'] ?? $file;
 
-            $list[] = [
+            $list[$title . ++$loop] = [
                 'title' => $title,
                 'fieldType' => $file,
             ];
         }
+
+        ksort($list);
 
         return $list;
     }
@@ -177,6 +180,7 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
         // Fetch form
         $form = $formsRepository->fetchById($get->get('formId'));
         $form->setTitle($post->get('title'));
+        $form->setParentId($post->get('categoryId'));
         $form->save();
 
         $form->addConfig([
@@ -187,6 +191,7 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
             'textAboveMail' => $post->get('textAboveMail'),
             'textBelowMail' => $post->get('textBelowMail'),
             'feedback' => $post->get('feedback'),
+            'callback' => $post->get('callback'),
             'autoReplyDeaktivated' => !empty($post->get('autoReplyDeaktivated')),
         ]);
 
@@ -196,21 +201,36 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
     }
 
     /**
-     *
+     * @param Get $get
+     * @param \Frootbox\Http\Post $post
+     * @param \Frootbox\Ext\Core\ContactForms\Persistence\Repositories\Forms $formsRepository
+     * @param \Frootbox\Ext\Core\ContactForms\Persistence\Repositories\Groups $groupsRepository
+     * @param \Frootbox\Ext\Core\ContactForms\Persistence\Repositories\Fields $fieldsRepository
+     * @param \Frootbox\Ext\Core\ContactForms\Persistence\Repositories\Categories $categoryRepository
+     * @param \Frootbox\Admin\Viewhelper\GeneralPurpose $gp
+     * @return Response
+     * @throws \Frootbox\Exceptions\InputMissing
+     * @throws \Frootbox\Exceptions\NotFound
      */
     public function ajaxCreateAction(
+        \Frootbox\Http\Get $get,
         \Frootbox\Http\Post $post,
         \Frootbox\Ext\Core\ContactForms\Persistence\Repositories\Forms $formsRepository,
         \Frootbox\Ext\Core\ContactForms\Persistence\Repositories\Groups $groupsRepository,
         \Frootbox\Ext\Core\ContactForms\Persistence\Repositories\Fields $fieldsRepository,
+        \Frootbox\Ext\Core\ContactForms\Persistence\Repositories\Categories $categoryRepository,
         \Frootbox\Admin\Viewhelper\GeneralPurpose $gp,
     ): Response
     {
         $post->require([ 'title' ]);
 
+        // Fetch category
+        $category = $categoryRepository->fetchById($get->get('categoryId'));
+
         // Insert new form
         $form = $formsRepository->insert(new \Frootbox\Ext\Core\ContactForms\Persistence\Form([
             'title' => $post->get('title'),
+            'parentId' => $category->getId(),
         ]));
 
         // Insert new group
@@ -267,14 +287,14 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
             ]);
 
             // Insert new field
-            $field = $fieldsRepository->insert($field);
+            $fieldsRepository->insert($field);
         }
-
 
         return new Response('json', 200, [
             'replace' => [
                 'selector' => '#formsReceiver',
                 'html' => $gp->injectPartial(\Frootbox\Ext\Core\ContactForms\Apps\FormsManager\Partials\ListForms::class, [
+                    'app' => $this,
                     'highlight' => $form->getId(),
                 ]),
             ],
@@ -449,10 +469,13 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
         $field->setTitle($post->get('title'));
         $field->setCustomClass($fieldClass);
         $field->addConfig([
+            'titles' => $post->get('titles'),
             'type' => $post->get('type'),
             'mandatory' => $post->get('mandatory'),
             'helpText' => $post->get('helpText'),
             'placeholder' => $post->get('placeholder'),
+            'presetValue' => $post->get('presetValue'),
+            'presetValueFromGet' => !empty($post->get('presetValueFromGet')),
         ]);
 
         $field->updateFromPost($post);
@@ -597,6 +620,7 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
             'columns' => $post->get('columns'),
             'alignItemsEnd' => $post->get('alignItemsEnd'),
             'oneFieldIsRequired' => $post->get('oneFieldIsRequired'),
+            'className' => $post->get('className'),
         ]);
 
         $group->save();
@@ -678,7 +702,7 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
      */
     public function ajaxModalGroupComposeAction(
         \Frootbox\Http\Get $get,
-        \Frootbox\Ext\Core\ContactForms\Persistence\Repositories\Forms $formsRepository
+        \Frootbox\Ext\Core\ContactForms\Persistence\Repositories\Forms $formsRepository,
     ): Response
     {
         // Fetch form
@@ -694,7 +718,7 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
      */
     public function ajaxModalGroupEditAction(
         \Frootbox\Http\Get $get,
-        \Frootbox\Ext\Core\ContactForms\Persistence\Repositories\Groups $groupsRepository
+        \Frootbox\Ext\Core\ContactForms\Persistence\Repositories\Groups $groupsRepository,
     ): Response
     {
         // Fetch group
@@ -705,13 +729,22 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
         ]);
     }
 
+    public function ajaxPanelFormsAction(
+
+    ): Response
+    {
+        return new Response('html', 200, [
+
+        ]);
+    }
+
     /**
      *
      */
     public function archiveAction(
         \Frootbox\Http\Get $get,
         \Frootbox\Ext\Core\ContactForms\Persistence\Repositories\Logs $logsRepository,
-        \Frootbox\Ext\Core\ContactForms\Persistence\Repositories\Forms $formsRepository
+        \Frootbox\Ext\Core\ContactForms\Persistence\Repositories\Forms $formsRepository,
     ): Response
     {
         // Fetch form
@@ -755,14 +788,27 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
      */
     public function configAction(
         \Frootbox\Http\Get $get,
-        \Frootbox\Ext\Core\ContactForms\Persistence\Repositories\Forms $formsRepository
+        \Frootbox\Ext\Core\ContactForms\Persistence\Repositories\Forms $formsRepository,
+        \Frootbox\Ext\Core\ContactForms\Persistence\Repositories\Categories $categoryRepository,
     ): Response
     {
         // Fetch form
         $form = $formsRepository->fetchById($get->get('formId'));
 
+        // Fetch parent category
+        $parent = $categoryRepository->fetchOne([
+            'where' => [
+                'uid' => $this->getUid('categories'),
+                'parentId' => 0,
+            ],
+        ]);
+
+        // Fetch category tree
+        $categories = $categoryRepository->getTree($parent->getId());
+
         return new Response('html', 200, [
             'form' => $form,
+            'categories' => $categories,
         ]);
     }
 

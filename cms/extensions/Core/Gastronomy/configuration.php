@@ -11,7 +11,7 @@ return [
         'id' => 'Core',
         'name' => 'Frootbox'
     ],
-    'version' => '0.0.3',
+    'version' => '0.0.5',
     'requires' => [
 
     ],
@@ -20,4 +20,4 @@ return [
            // \Frootbox\Ext\Core\UserManager\Apps\UserManager\App::class
         ]
     ]
-    ];
+];

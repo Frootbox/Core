@@ -5,6 +5,7 @@
 
 namespace Frootbox\Ext\Core\News\Plugins\News;
 
+use Frootbox\Ext\Core\Images\Viewhelper\References;
 use Frootbox\Http\Interfaces\ResponseInterface;
 
 class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\Persistence\Interfaces\Cloneable
@@ -14,6 +15,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
         'showArticle',
         'showCategory',
         'archive',
+        'ajaxSearch',
     ];
 
     /**
@@ -74,53 +76,82 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
      *
      */
     public function getArticles(
-        \Frootbox\Ext\Core\News\Persistence\Repositories\Articles $articles,
+        \Frootbox\Ext\Core\News\Persistence\Repositories\Articles $articleRepository,
         $limit = 100,
         $order = null,
         $skip = null,
-        $page = 1
+        $page = 1,
+        $tagsExclude = [],
     ): \Frootbox\Db\Result
     {
-        if ($order === null) {
 
-            switch ($this->getConfig('sorting')) {
+        switch ($this->getConfig('sorting')) {
 
-                default:
-                case 'DateStartDesc':
-                    $order = 'dateStart DESC';
-                    break;
+            default:
+            case 'DateStartDesc':
+                $order = 'dateStart DESC';
+                break;
 
-                case 'DateStartAsc':
-                    $order = 'dateStart ASC';
-                    break;
-            }
-
+            case 'DateStartAsc':
+                $order = 'dateStart ASC';
+                break;
         }
 
-        $where = [
-            'pluginId' => $this->getId(),
-            new \Frootbox\Db\Conditions\LessOrEqual('dateStart', date('Y-m-d H:i:s')),
-            new \Frootbox\Db\Conditions\GreaterOrEqual('visibility',(IS_LOGGED_IN ? 1 : 2)),
-        ];
+        if (!empty($tagsExclude)) {
 
-        if (!empty($skip)) {
-            foreach ($skip as $articleId) {
-                $where[] = new \Frootbox\Db\Conditions\NotEqual('id', $articleId);
+            $sql = 'SELECT
+                SQL_CALC_FOUND_ROWS
+                a.*
+            FROM
+                assets a
+            WHERE
+                a.className = :className AND
+                a.id NOT IN (SELECT itemId FROM tags WHERE itemClass = :className AND tag = :tag) AND
+                a.visibility >= ' . (IS_LOGGED_IN ? 1 : 2) . '
+            ORDER BY
+                ' . $order . '
+            LIMIT 
+                ' . ($limit * $page - $limit) . ',' . $limit . '
+            ';
+
+            $articles = $articleRepository->fetchByQuery($sql, [
+                'className' => \Frootbox\Ext\Core\News\Persistence\Article::class,
+                'tag' => $tagsExclude[0],
+            ]);
+
+            $articles->setItemsPerPage($limit);
+            $articles->getTotal();
+        }
+        else {
+
+            if ($order === null) {
+
+
+
             }
+            $where = [
+                'pluginId' => $this->getId(),
+                new \Frootbox\Db\Conditions\LessOrEqual('dateStart', date('Y-m-d H:i:s')),
+                new \Frootbox\Db\Conditions\GreaterOrEqual('visibility',(IS_LOGGED_IN ? 1 : 2)),
+            ];
+
+            if (!empty($skip)) {
+                foreach ($skip as $articleId) {
+                    $where[] = new \Frootbox\Db\Conditions\NotEqual('id', $articleId);
+                }
+            }
+
+            // Fetch articles
+            $articles = $articleRepository->fetch([
+                'calcFoundRows' => true,
+                'where' => $where,
+                'order' => [ $order ],
+                'limit' => $limit,
+                'page' => $page,
+            ]);
         }
 
-
-        // Fetch articles
-        $result = $articles->fetch([
-            'calcFoundRows' => true,
-            'where' => $where,
-            'order' => [ $order ],
-            'limit' => $limit,
-            'page' => $page,
-        ]);
-
-
-        return $result;
+        return $articles;
     }
 
     /**
@@ -166,6 +197,75 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
         return $list;
     }
 
+    /**
+     *
+     */
+    public function getAvailableTags(array $parameters = null): \Frootbox\Db\Result
+    {
+        // Obtain tags repository
+        $tagsRepository = $this->getDb()->getRepository(\Frootbox\Persistence\Repositories\Tags::class);
+
+        $payload = [
+            'className' => \Frootbox\Ext\Core\News\Persistence\Article::class,
+        ];
+
+        $sql = 'SELECT 
+            COUNT(t.id) as count, 
+            t.tag as tag
+        FROM
+            tags t,
+            assets a
+        WHERE
+            SUBSTR(t.tag, 1, 1) != "_" AND
+            t.itemClass = :className AND
+            a.className = t.itemClass AND
+            a.id = t.itemId AND
+            a.visibility >= ' . (IS_EDITOR ? 1 : 2) . '       
+            ';
+
+        if (!empty($parameters['exclude'])) {
+
+            $sql .= ' AND t.tag NOT IN ( ';
+            $comma = '';
+
+            foreach ($parameters['exclude'] as $index => $tag) {
+                $sql .= $comma . ':tag_' . $index;
+                $comma = ', ';
+
+                $payload['tag_' . $index] = $tag;
+            }
+
+            $sql .= ' ) ';
+        }
+
+        $sql .= ' GROUP BY
+            t.tag
+        ORDER BY        
+            t.tag ASC';
+
+        $result = $tagsRepository->fetchByQuery($sql, $payload);
+
+        return $result;
+    }
+
+    /**
+     *
+     */
+    public function ajaxSearchAction(
+        \Frootbox\Ext\Core\News\Persistence\Repositories\Articles $articleRepository,
+    ): \Frootbox\View\ResponseView
+    {
+        if ($this->hasAttribute('tags')) {
+            $articles = $articleRepository->fetchByTags($this->getAttribute('tags'), [
+                'order' => [ 'dateStart DESC' ],
+                'mode' => 'matchOne',
+            ]);
+        }
+
+        return new \Frootbox\View\ResponseView([
+            'articles' => $articles ?? [],
+        ]);
+    }
 
     /**
      *

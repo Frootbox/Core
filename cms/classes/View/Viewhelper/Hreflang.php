@@ -32,6 +32,9 @@ class Hreflang extends AbstractViewhelper
     {
         foreach ($this->items as $item) {
             if ($item['language'] == $language) {
+
+                $item['active'] = ($item['href'] == REQUEST_URI);
+
                 return $item;
             }
         }

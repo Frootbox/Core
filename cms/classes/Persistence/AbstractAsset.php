@@ -15,9 +15,12 @@ abstract class AbstractAsset extends \Frootbox\Persistence\AbstractRow
     protected $table = 'assets';
 
     /**
-     *
+     * @param $section
+     * @param $language
+     * @param array|null $options
+     * @return string|null
      */
-    public function getAlias($section = 'index', $language = null): ?string
+    public function getAlias(string $section = 'index', $language = null, array $options = null): ?string
     {
         $aliases = !empty($this->data['aliases']) ? json_decode($this->data['aliases'], true) : [];
 
@@ -36,7 +39,7 @@ abstract class AbstractAsset extends \Frootbox\Persistence\AbstractRow
             $alias = $this->data['alias'] ?? null;
         }
 
-        if (MULTI_LANGUAGE and GLOBAL_LANGUAGE != DEFAULT_LANGUAGE) {
+        if (empty($options['skipForceLanguage']) and MULTI_LANGUAGE and GLOBAL_LANGUAGE != DEFAULT_LANGUAGE) {
             $alias .= '?forceLanguage=' . GLOBAL_LANGUAGE;
         }
 
@@ -116,6 +119,43 @@ abstract class AbstractAsset extends \Frootbox\Persistence\AbstractRow
     /**
      *
      */
+    public function getSiblings(array $parameters = null): \Frootbox\Db\Result
+    {
+        if (empty($parameters['order'])) {
+            $parameters['order'] = 'Manual';
+        }
+
+        switch($parameters['order']) {
+
+            default:
+            case 'Manual':
+                $orderBy = 'orderId DESC';
+                break;
+
+            case 'DateDesc':
+                $orderBy = 'date DESC';
+                break;
+
+        }
+
+        $repository = $this->getRepository();
+
+        $result = $repository->fetch([
+            'where' => [
+                'pluginId' => $this->getPluginId(),
+                new \Frootbox\Db\Conditions\NotEqual('id', $this->getId()),
+                new \Frootbox\Db\Conditions\GreaterOrEqual('visibility',(IS_EDITOR ? 1 : 2)),
+            ],
+            'order' => [ $orderBy ],
+        ]);
+
+        return $result;
+    }
+
+
+    /**
+     *
+     */
     public function getTitle($language = null): ?string
     {
         if (!MULTI_LANGUAGE) {
@@ -154,5 +194,15 @@ abstract class AbstractAsset extends \Frootbox\Persistence\AbstractRow
         $userRepository = $this->getDb()->getRepository(\Frootbox\Persistence\Repositories\Users::class);
 
         return $userRepository->fetchById($this->getUserId());
+    }
+
+    /**
+     * Check if asset is visible to user
+     *
+     * @return bool
+     */
+    public function isVisible(): bool
+    {
+        return ($this->getVisibility() >= (IS_EDITOR ? 1 : 2));
     }
 }

@@ -5,6 +5,9 @@ variables:
     withContainer:
         type: bool
         label: mit Layout-Container
+    withBackToTop:
+        type: bool
+        label: mit "zurück-nach-oben" Link
     skipTableOfContents:
         type: bool
         label: ohne Inhaltsverzeichnis
@@ -14,7 +17,7 @@ variables:
 {% set i = view.getViewhelper('Delegator', { object: plugin }) %}
 
 
-<div class="plugin Core HelpAndSupport FAQ Index01">
+<div class="plugin Core HelpAndSupport FAQ Index01" id="faq{{ plugin.getId() }}">
     {% if variables.withContainer %}<div class="container">{% endif %}
 
         <div class="row">
@@ -47,6 +50,10 @@ variables:
                         {% endif %}
 
                         <div data-editable data-uid="{{ question.getUid('teaser') }}"></div>
+
+                        {% if variables.withBackToTop %}
+                            <p><a href="#faq{{ plugin.getId() }}">zurück nach oben</a></p>
+                        {% endif %}
                     {% endfor %}
 
                 {% endif %}
