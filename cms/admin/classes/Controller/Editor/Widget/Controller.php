@@ -198,6 +198,7 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
         // Fetch widget
         $widget = $widgets->fetchById($get->get('widgetId'));
 
+
         $className = $get->get('widgetClass');
 
         if (!empty($className)) {
@@ -226,6 +227,7 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
                 ];
             }
         }
+
 
         return self::getResponse('json', 200, $payload);
     }

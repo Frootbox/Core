@@ -111,14 +111,14 @@ variables:
                                     {{ product.getPriceGross() | number_format(2, ',', '.') }} EUR
 
                                     {% if product.getConfig('freeChoiceOfAmount') %}
-                                        pro {{ ("Core.ShopSystem.Plugins.ShopSystem.UnitShort" ~ product.getPackagingUnit()) | translate }}
+                                        {{ ("Core.ShopSystem.Plugins.ShopSystem.UnitPer") | translate }} {{ ("Core.ShopSystem.Plugins.ShopSystem.UnitShort" ~ product.getPackagingUnit()) | translate }}
                                     {% endif %}
                                 </span>
                                 <span class="price-meta">
-                                    inkl. Mehrwertsteuer<br />
+                                    {{ t.translate('IncludingVat') }}<br />
 
                                     {% if product.getShippingId() %}
-                                        zzgl. Versandkosten<br />
+                                        {{ t.translate('PlusShippingAndHandling') }}<br />
                                     {% else %}
                                         inkl. Versandkosten<br />
                                     {% endif %}
@@ -136,7 +136,7 @@ variables:
 
                                     {% if basketPlugin %}
                                         <!--<a class="btn btn-block btn-primary shopsystem-product-add-to-cart" href="{{ sp.getUri('Core/ShopSystem/Basket', 'addProduct', { productId: product.getId() }) }}">in den Warenkorb legen</a>-->
-                                        <button type="submit" class="btn btn-primary btn-block">in den Warenkorb legen</button>
+                                        <button type="submit" class="btn btn-primary btn-block">{{ t.translate('ButtonAddToCart') }}</button>
                                     {% elseif variables.useRequestAlternative %}
                                         <a class="btn btn-primary btn-block" href="{{ plugin.getActionUri('productRequest', { productId: product.getId() })}}">{{ t.translate('Request') }}</a>
                                     {% endif %}
@@ -146,6 +146,10 @@ variables:
 
                         </div>
                     </div>
+
+                    {% block paymentMethods %}
+
+                    {% endblock %}
 
                     <br /><br />
 
@@ -392,7 +396,7 @@ variables:
                     {% endblock %}
 
 
-                    <h4>Produktbeschreibung</h4>
+                    <h4>{{ t.translate('H4ProductDetails') }}</h4>
 
                     <div data-editable data-uid="{{ product.getUid('teaser') }}"></div>
 

@@ -8,6 +8,7 @@ namespace Frootbox\Ext\Core\News\Persistence;
 class CategoryConnection extends \Frootbox\Persistence\CategoryConnection implements \Frootbox\Persistence\Interfaces\MultipleAliases
 {
     use \Frootbox\Persistence\Traits\Alias;
+    use \Frootbox\Persistence\Traits\Uid;
 
     protected $model = Repositories\CategoriesConnections::class;
 
@@ -71,6 +72,7 @@ class CategoryConnection extends \Frootbox\Persistence\CategoryConnection implem
             'pageId' => $article->getPageId(),
             'virtualDirectory' => $virtualDirectory,
             'visibility' => 2,
+            'uid' => $this->getUid('alias'),
             'payload' => $this->generateAliasPayload([
                 'action' => 'showArticle',
                 'articleId' => $article->getId(),
@@ -130,6 +132,7 @@ class CategoryConnection extends \Frootbox\Persistence\CategoryConnection implem
                     'pageId' => $product->getPageId(),
                     'virtualDirectory' => $virtualDirectory,
                     'visibility' => 2,
+                    'uid' => $this->getUid('alias'),
                     'payload' => $this->generateAliasPayload([
                         'action' => 'showProduct',
                         'productId' => $product->getId(),

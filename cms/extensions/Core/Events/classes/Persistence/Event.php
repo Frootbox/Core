@@ -210,6 +210,7 @@ class Event extends \Frootbox\Persistence\AbstractAsset implements \Frootbox\Per
                             $this->getDateStart()->format('%Y-%m-%d'),
                             $this->getTitle()
                         ],
+                        'uid' => $this->getUid('alias'),
                         'payload' => $this->generateAliasPayload([
                             'action' => 'showEvent',
                             'eventId' => $this->getId()

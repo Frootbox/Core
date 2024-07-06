@@ -74,7 +74,7 @@ figure.widget {
 }
 
 div[data-editable] figure.widget:first-of-type {
-  padding-top: 0px;
+  padding-top: 0;
 }
 
 h2.disabled-headline {
@@ -116,4 +116,28 @@ body {
       opacity: .5;
     }
   }
+}
+
+.xicon.visibility.fa-traffic-light-stop {
+  color: red;
+}
+
+.xicon.visibility.fa-traffic-light-slow {
+  color: orange;
+}
+
+.xicon.visibility.fa-traffic-light-go {
+  color: green;
+}
+
+.editmode {
+
+    &.editors-note {
+      margin: 30px 0;
+      padding: 15px;
+
+      border: 4px dashed #f2d7d4;
+      color: #f2d7d4;
+      text-align: center;
+    }
 }

@@ -1,0 +1,123 @@
+
+<div id="error-messages" class="d-none message error"></div>
+
+<script src="https://js.stripe.com/v3/"></script>
+
+<form id="payment-form">
+
+    <div class="card">
+        <div class="card-body">
+            <div id="link-authentication-element">
+                <!--Stripe.js injects the Link Authentication Element-->
+            </div>
+            <div id="payment-element">
+                <!--Stripe.js injects the Payment Element-->
+            </div>
+
+            <div id="payment-message" class="hidden"></div>
+        </div>
+    </div>
+
+    {% if plugin.getShopConfig('generalTermsLink') %}
+        <div class="form-group form-check">
+            <input type="checkbox" required="" class="form-check-input" id="generalTerms" name="generalTerms">
+            <label class="form-check-label" for="generalTerms">{{ t.translate('AcceptGeneralTerms', [ plugin.getShopConfig('generalTermsLink') ]) | raw }}</label>
+        </div>
+    {% endif %}
+
+    <div class="form-group form-check">
+        <input type="checkbox" required="" class="form-check-input" id="privacyPolicy" name="privacyPolicy">
+        <label class="form-check-label" for="privacyPolicy">{{ t.translate('AcceptPrivacyPolicy', [ i.getPrivacyPolicyLink() ]) | raw }}</label>
+    </div>
+
+    <div class="form-group form-check">
+        <input type="checkbox" required="" class="form-check-input" id="rightOfWithdrawal" name="rightOfWithdrawal">
+        <label class="form-check-label" for="rightOfWithdrawal">{{ t.translate('AcceptRightOfWithdrawal', [ i.getRightOfWithdrawalLink() ]) | raw }}</label>
+    </div>
+
+    <div class="text-right">
+        <button class="mt-3 btn btn-primary" id="submit">
+            <span id="button-text">Jetzt kostenpflichtig bestellen</span>
+        </button>
+    </div>
+
+</form>
+
+<script>
+    const stripe = Stripe('{{ PublicKey }}');
+    const clientSecret = "{{ ClientSecret }}";
+
+    const appearance = {
+        theme: 'flat',
+        variables: { colorPrimaryText: '#262626' }
+    };
+    const options = { /* options */ };
+    const elements = stripe.elements({ appearance, clientSecret });
+    const paymentElement = elements.create('payment', options);
+    paymentElement.mount('#payment-element');
+
+    const form = document.getElementById('payment-form');
+    form.addEventListener('submit', async (e) => {
+
+        e.preventDefault();
+
+        if ($('#generalTerms').length && !$('#generalTerms').is(':checked')) {
+            $('#generalTerms').parents('div.form-check').find('label').addClass('has-error');
+            return;
+        }
+
+        if ($('#privacyPolicy').length && !$('#privacyPolicy').is(':checked')) {
+            $('#privacyPolicy').parents('div.form-check').find('label').addClass('has-error');
+            return;
+        }
+
+        if ($('#rightOfWithdrawal').length && !$('#rightOfWithdrawal').is(':checked')) {
+            $('#rightOfWithdrawal').parents('div.form-check').find('label').addClass('has-error');
+            return;
+        }
+
+        $.ajax({
+            url: $('#checkOutPreForm').attr('action'),
+            dataType: "json",
+            data: $('#checkOutPreForm').serialize(),
+            method: 'POST',
+            success: function(response) {
+
+                if (response.isCartValid) {
+                    confirmPayment();
+                }
+                else {
+                    alert("Fehler im Warenkorb!");
+                }
+            },
+            error: function(xhr) {
+
+                if (xhr.responseText.charAt(0) == '{') {
+                    var response = JSON.parse(xhr.responseText);
+                }
+                else {
+                    var response = {
+                        'error': xhr.responseText
+                    }
+                }
+
+                alert(response.error);
+            }
+        });
+    });
+
+    async function confirmPayment() {
+
+        const {error} = await stripe.confirmPayment({
+            elements,
+            confirmParams: {
+                return_url: "{{ ReturnUrl | raw }}"
+            }
+        });
+
+        if (error) {
+            $('#error-messages').removeClass('d-none');
+            $('#error-messages').text(error.message);
+        }
+    }
+</script>

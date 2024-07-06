@@ -56,151 +56,153 @@ variables:
     <div class="row">
         <div class="col-12">
 
-            <h1 data-editable data-uid="{{ plugin.getUid('titleCompleted') }}">Bestellung abgeschlossen</h1>
+            <div class="inner-wrapper">
 
-            {% if not plugin.getAttribute('mailSent') %}
-                <div style="margin: 20px 0; padding: 15px; border: 1px solid red; color: red;">Die E-Mail bestätigung konnte nicht gesendet werden. Die Bestellung ist trotzdem bei uns eingegangen. Notieren Sie für Rückfragen bitte die Bestell-ID {{ plugin.getAttribute('bookingId') }}.</div>
-            {% endif %}
+                <h1 data-editable data-uid="{{ plugin.getUid('titleCompleted') }}">{{ "Core.ShopSystem.Plugins.Checkout.H2OrderCompleted" | translate }}</h1>
 
-            <div data-editable data-uid="{{ plugin.getUid('text-complete') }}"><p>Ihre Buchung ist abgeschlossen. Sie haben eine Zusammenfassung der bestellten Artikel per E-Mail erhalten.</p><p>Wir bedanken uns für Ihr Interesse.</p></div>
+                {% if not plugin.getAttribute('mailSent') %}
+                    <div style="margin: 20px 0; padding: 15px; border: 1px solid red; color: red;">Die E-Mail bestätigung konnte nicht gesendet werden. Die Bestellung ist trotzdem bei uns eingegangen. Notieren Sie für Rückfragen bitte die Bestell-ID {{ plugin.getAttribute('bookingId') }}.</div>
+                {% endif %}
 
-            <h3 data-editable data-uid="{{ plugin.getUid('titleCompletedBooking') }}">Ihre Bestellung</h3>
+                <div data-editable data-uid="{{ plugin.getUid('text-complete') }}">
+                    <p>Ihre Buchung ist abgeschlossen. Sie haben eine Zusammenfassung der bestellten Artikel per E-Mail erhalten.</p><p>Wir bedanken uns für Ihr Interesse.</p>
+                </div>
 
-            <p>Bestellnummer: {{ booking.getConfig('orderNumber') }}</p>
+                <h3 data-editable data-uid="{{ plugin.getUid('titleCompletedBooking') }}">{{ "Core.ShopSystem.Plugins.Checkout.H2OrderCompleted" | translate }}</h3>
 
-            {% if not plugin.getConfig('skipShipping') %}
+                <p>{{ "Core.ShopSystem.Plugins.Checkout.Field.OrderNumber" | translate }}: {{ booking.getConfig('orderNumber') }}</p>
 
-                {% if booking.getConfig('shipping.type') == "selfPickup" %}
-                    {% if booking.getConfig('shipping.deliveryDay') %}
-                        <p><b>gewünschter Abholtag</b><br />
-                            {{ booking.getConfig('shipping.deliveryDay') | date('d.m.Y') }}</p>
-                    {% endif %}
-                {% elseif booking.getConfig('shipping.street') %}
+                {% if not plugin.getConfig('skipShipping') %}
 
-                    <br />
-
-                    <iframe src="https://maps.google.com/maps?q={{ booking.getConfig('shipping.street') }} {{ booking.getConfig('shipping.streetNumber') }}, {{ booking.getConfig('shipping.postalCode') }} {{ booking.getConfig('shipping.city') }}&output=embed" width="100%" height="250" frameborder="0" style="border:0;" allowfullscreen="" aria-hidden="false" tabindex="0"></iframe>
-
-                    <br /><br />
-
-                    <div class="text-center">
-                        <p>
-                            <b>Lieferadresse</b><br />
-                            {{ booking.getConfig('shipping.firstname') }} {{ booking.getConfig('shipping.lastname') }}<br />
-                            {{ booking.getConfig('shipping.street') }} {{ booking.getConfig('shipping.streetNumber') }}, {{ booking.getConfig('shipping.postalCode') }} {{ booking.getConfig('shipping.city') }}
-                        </p>
-
+                    {% if booking.getConfig('shipping.type') == "selfPickup" %}
                         {% if booking.getConfig('shipping.deliveryDay') %}
-                            <p><b>gewünschter Liefertag</b><br />
+                            <p><b>{{ "Core.ShopSystem.Plugins.Checkout.LabelPreferredPickupDate" | translate }}</b><br />
                                 {{ booking.getConfig('shipping.deliveryDay') | date('d.m.Y') }}</p>
                         {% endif %}
-                    </div>
-                {% else %}
+                    {% elseif booking.getConfig('shipping.street') %}
 
-                    <br />
+                        <br />
 
-                    <iframe src="https://maps.google.com/maps?q={{ booking.getConfig('personal.street') }} {{ booking.getConfig('personal.streetNumber') }}, {{ booking.getConfig('personal.postalCode') }} {{ booking.getConfig('personal.city') }}&output=embed" width="100%" height="250" frameborder="0" style="border:0;" allowfullscreen="" aria-hidden="false" tabindex="0"></iframe>
+                        <iframe src="https://maps.google.com/maps?q={{ booking.getConfig('shipping.street') }} {{ booking.getConfig('shipping.streetNumber') }}, {{ booking.getConfig('shipping.postalCode') }} {{ booking.getConfig('shipping.city') }}&output=embed" width="100%" height="250" frameborder="0" style="border:0;" allowfullscreen="" aria-hidden="false" tabindex="0"></iframe>
 
-                    <br /><br />
+                        <br /><br />
 
-                    <div class="text-center">
-                        <p>
-                            <b>Lieferadresse</b><br />
-                            {{ booking.getConfig('personal.firstname') }} {{ booking.getConfig('personal.lastname') }}<br />
-                            {{ booking.getConfig('personal.street') }} {{ booking.getConfig('personal.streetNumber') }}, {{ booking.getConfig('personal.postalCode') }} {{ booking.getConfig('personal.city') }}
-                        </p>
+                        <div class="text-center">
+                            <p>
+                                <b>{{ "Core.ShopSystem.H3DeliveryAddress" | translate }}</b><br />
+                                {{ booking.getConfig('shipping.firstname') }} {{ booking.getConfig('shipping.lastname') }}<br />
+                                {{ booking.getConfig('shipping.street') }} {{ booking.getConfig('shipping.streetNumber') }}, {{ booking.getConfig('shipping.postalCode') }} {{ booking.getConfig('shipping.city') }}
+                            </p>
 
-                        {% if booking.getConfig('shipping.deliveryDay') %}
-                            <p><b>gewünschter Liefertag</b><br />
-                            {{ booking.getConfig('shipping.deliveryDay') | date('d.m.Y') }}</p>
-                        {% endif %}
-                    </div>
-                {% endif %}
-            {% endif %}
+                            {% if booking.getConfig('shipping.deliveryDay') %}
+                                <p>
+                                    <b>{{ "Core.ShopSystem.LabelDesiredDeliveryDate" | translate }}</b><br />
+                                    {{ booking.getConfig('shipping.deliveryDay') | date('d.m.Y') }}
+                                </p>
+                            {% endif %}
+                        </div>
+                    {% else %}
 
-            <br />
+                        <br />
 
-            <h3>Artikel</h3>
+                        <iframe src="https://maps.google.com/maps?q={{ booking.getConfig('personal.street') }} {{ booking.getConfig('personal.streetNumber') }}, {{ booking.getConfig('personal.postalCode') }} {{ booking.getConfig('personal.city') }}&output=embed" width="100%" height="250" frameborder="0" style="border:0;" allowfullscreen="" aria-hidden="false" tabindex="0"></iframe>
 
-            <br />
+                        <br /><br />
 
-            <table class="table positions">
-                <thead>
-                    <tr>
-                        <th>Artikel</th>
-                        <th class="text-right">Menge</th>
-                        <th class="text-right">Preis</th>
-                        <th class="text-right">Summe</th>
-                    </tr>
-                </thead>
-                <tbody>
+                        <div class="text-center">
+                            <p>
+                                <b>{{ "Core.ShopSystem.H3DeliveryAddress" | translate }}</b><br />
+                                {{ booking.getConfig('personal.firstname') }} {{ booking.getConfig('personal.lastname') }}<br />
+                                {{ booking.getConfig('personal.street') }} {{ booking.getConfig('personal.streetNumber') }}, {{ booking.getConfig('personal.postalCode') }} {{ booking.getConfig('personal.city') }}
+                            </p>
 
-                    {% for item in booking.getItems() %}
-                        <tr>
-                            <td>
-                                <b>{{ item.getTitle() }}</b>
-
-                                {% for equipment in item.getEquipment() %}
-                                    <br />+ {{ equipment.title }}
-                                {% endfor %}
-
-                                {% for option in item.getFieldOptions() %}
-                                    <br />- {{ option.option }}{% if option.surcharge %} (+ {{ option.surcharge | number_format(2, ",", ".") }} &{{ currencySign }}o;){% endif %}
-                                {% endfor %}
-
-                                {% if item.getCustomNote() %}
-                                    <br />{{ item.getCustomNote() | nl2br }}
-                                {% endif %}
-
-                                {% if item.getAdditionalText() %}
-                                    <br />{{ item.getAdditionalText() | nl2br }}
-                                {% endif %}
-                            </td>
-                            <td class="text-right">{{ item.getAmount() }} x</td>
-                            <td class="text-right">{{ item.priceGrossFinal() | number_format(2, ",") }} {{ currencySign }}</td>
-                            <td class="text-right">{{ item.getTotal() | number_format(2, ",") }} {{ currencySign }}</td>
-                        </tr>
-                    {% endfor %}
-
-                </tbody>
-                <tfoot>
-
-                    {% if not plugin.getConfig('skipShipping') %}
-                        <tr>
-                            <td class="text-right" colspan="3">Versand &amp; Bearbeitung</td>
-                            <td width="160" class="text-right">{{ booking.getShipping() | number_format(2, ",") }} {{ currencySign }}</td>
-                        </tr>
+                            {% if booking.getConfig('shipping.deliveryDay') %}
+                                <p><b>{{ "Core.ShopSystem.LabelDesiredDeliveryDate" | translate }}</b><br />
+                                {{ booking.getConfig('shipping.deliveryDay') | date('d.m.Y') }}</p>
+                            {% endif %}
+                        </div>
                     {% endif %}
+                {% endif %}
 
-                    {% for section in booking.getTaxSections() %}
+                <br />
+
+                <h3>{{ "Core.ShopSystem.Plugins.Checkout.H3Articles" | translate }}</h3>
+
+                <br />
+
+                <table class="table positions">
+                    <thead>
                         <tr>
-                            <td class="text-right" colspan="3">inkl. {{ section.taxrate }} % MwSt. auf {{ section.total | number_format(2, ",") }} {{ currencySign }}</td>
-                            <td class="text-right" nowrap>{{ section.tax | number_format(2, ",") }} {{ currencySign }}</td>
+                            <th>{{ "Core.ShopSystem.TableHeadItems" | translate }}</th>
+                            <th class="text-right">{{ "Core.ShopSystem.TableHeadNumber" | translate }}</th>
+                            <th class="text-right">{{ "Core.ShopSystem.TableHeadPrice" | translate }}</th>
+                            <th class="text-right">{{ "Core.ShopSystem.TableHeadTotal" | translate }}</th>
                         </tr>
-                    {% endfor %}
+                    </thead>
+                    <tbody>
 
-                    {% for couponData in booking.getCoupons() %}
+                        {% for item in booking.getItems() %}
+                            <tr>
+                                <td>
+                                    <b>{{ item.getTitle() }}</b>
+
+                                    {% for equipment in item.getEquipment() %}
+                                        <br />+ {{ equipment.title }}
+                                    {% endfor %}
+
+                                    {% for option in item.getFieldOptions() %}
+                                        <br />- {{ option.option }}{% if option.surcharge %} (+ {{ option.surcharge | number_format(2, ",", ".") }} &{{ currencySign }}o;){% endif %}
+                                    {% endfor %}
+
+                                    {% if item.getCustomNote() %}
+                                        <br />{{ item.getCustomNote() | nl2br }}
+                                    {% endif %}
+
+                                    {% if item.getAdditionalText() %}
+                                        <br />{{ item.getAdditionalText() | nl2br }}
+                                    {% endif %}
+                                </td>
+                                <td class="text-right">{{ item.getAmount() }} x</td>
+                                <td class="text-right">{{ item.priceGrossFinal() | number_format(2, ",") }} {{ currencySign }}</td>
+                                <td class="text-right">{{ item.getTotal() | number_format(2, ",") }} {{ currencySign }}</td>
+                            </tr>
+                        {% endfor %}
+
+                    </tbody>
+                    <tfoot>
+
+                        {% if not plugin.getConfig('skipShipping') %}
+                            <tr>
+                                <td class="text-right" colspan="3">{{ "Core.ShopSystem.TableFootShippingAndFees" | translate }}</td>
+                                <td width="160" class="text-right">{{ booking.getShipping() | number_format(2, ",") }} {{ currencySign }}</td>
+                            </tr>
+                        {% endif %}
+
+                        {% for section in booking.getTaxSections() %}
+                            <tr>
+                                <td class="text-right" colspan="3">
+                                    {{ "Core.ShopSystem.Plugins.Checkout.VatIncludedOn" | translate(section.taxrate, (section.total | number_format(2,',','.')) ) }}
+                                </td>
+                                <td class="text-right" nowrap>{{ section.tax | number_format(2, ",") }} {{ currencySign }}</td>
+                            </tr>
+                        {% endfor %}
+
+                        {% for couponData in booking.getCoupons() %}
+                            <tr>
+                                <td class="text-right" colspan="3">Coupon {{ couponData.code }}</td>
+                                <td class="text-right" nowrap>-{{ couponData.redeemedValue | number_format(2, ",") }} {{ currencySign }}</td>
+                            </tr>
+                        {% endfor %}
+
+
                         <tr>
-                            <td class="text-right" colspan="3">Coupon {{ couponData.code }}</td>
-                            <td class="text-right" nowrap>-{{ couponData.redeemedValue | number_format(2, ",") }} {{ currencySign }}</td>
+                            <td class="text-right" colspan="3"><b>{{ "Core.ShopSystem.TableFootTotal" | translate }}</b></td>
+                            <td class="text-right" nowrap><b>{{ booking.getTotal() | number_format(2, ",", ".") }} {{ currencySign }}</b></td>
                         </tr>
-                    {% endfor %}
+                    </tfoot>
+                </table>
 
-
-                    <tr>
-                        <td class="text-right" colspan="3"><b>Summe</b></td>
-                        <td class="text-right" nowrap><b>{{ booking.getTotal() | number_format(2, ",") }} {{ currencySign }}</b></td>
-                    </tr>
-                </tfoot>
-            </table>
-
-
-
-            {#
-            <pre>
-                {{ dump(booking.getItems()) }}
-            </pre>
-            #}
+            </div>
 
         </div>
     </div>

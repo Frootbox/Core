@@ -10,7 +10,7 @@ use Frootbox\Admin\Controller\Response;
 class Controller extends \Frootbox\Admin\AbstractPluginController
 {
     /**
-     *
+     * @return string
      */
     public function getPath(): string
     {
@@ -18,10 +18,12 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     }
 
     /**
-     *
+     * @param \Frootbox\Http\Post $post
+     * @param \Frootbox\Ext\Core\News\Persistence\Repositories\Articles $articlesRepository
+     * @return Response
+     * @throws \Frootbox\Exceptions\RuntimeError
      */
     public function ajaxUpdateAction(
-        \Frootbox\Http\Get $get,
         \Frootbox\Http\Post $post,
         \Frootbox\Ext\Core\News\Persistence\Repositories\Articles $articlesRepository
     ): Response
@@ -30,6 +32,7 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         $this->plugin->addConfig([
             'sorting' => $post->get('sorting'),
             'noArticleDetailPage' => $post->get('noArticleDetailPage'),
+            'urlPrefixFullDate' => $post->get('urlPrefixFullDate'),
         ]);
 
         $this->plugin->save();
@@ -45,6 +48,7 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
 
             $article->addConfig([
                 'noArticleDetailPage' => $post->get('noArticleDetailPage'),
+                'urlPrefixFullDate' => $post->get('urlPrefixFullDate'),
             ]);
 
             $article->save();

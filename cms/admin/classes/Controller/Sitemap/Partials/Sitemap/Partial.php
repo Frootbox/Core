@@ -29,17 +29,17 @@ class Partial extends \Frootbox\Admin\View\Partials\AbstractPartial
         // Fetch root page
         $result = $pagesRepository->fetch([
             'where' => [
-                'language' => 'de-DE',
+                'language' => DEFAULT_LANGUAGE,
                 new \Frootbox\Db\Conditions\MatchColumn('rootId', 'id')
             ],
             'limit' => 1
         ]);
 
         if ($result->getCount() == 0) {
-            
+
             $rootPage = $pagesRepository->insertRoot(new \Frootbox\Persistence\Page([
                 'title' => 'Startseite',
-                'language' => 'de-DE',
+                'language' => DEFAULT_LANGUAGE,
             ]));
         }
         else {

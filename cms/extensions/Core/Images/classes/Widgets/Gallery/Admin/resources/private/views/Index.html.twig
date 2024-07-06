@@ -56,25 +56,40 @@
             uid: widget.getUid('images')
         }) | raw }}
 
-        <div class="form-group">
-            <label for="columns">Spalten</label>
-            <select class="form-control" id="columns" name="columns">
-                <option {% if widget.getColumns == 1 %}selected{% endif %} value="1">1</option>
-                <option {% if widget.getColumns == 2 %}selected{% endif %} value="2">2</option>
-                <option {% if widget.getColumns == 3 %}selected{% endif %} value="3">3</option>
-                <option {% if widget.getColumns == 4 %}selected{% endif %} value="4">4</option>
-                <option {% if widget.getColumns == 5 %}selected{% endif %} value="5">5</option>
-                <option {% if widget.getColumns == 6 %}selected{% endif %} value="6">6</option>
-                <option {% if widget.getColumns == 7 %}selected{% endif %} value="7">7</option>
-            </select>
+        <div class="row">
+            <div class="col-md-6">
+
+                <div class="form-group">
+                    <label for="columns">Spalten</label>
+                    <select class="form-control" id="columns" name="columns">
+                        <option {% if widget.getColumns == 1 %}selected{% endif %} value="1">1</option>
+                        <option {% if widget.getColumns == 2 %}selected{% endif %} value="2">2</option>
+                        <option {% if widget.getColumns == 3 %}selected{% endif %} value="3">3</option>
+                        <option {% if widget.getColumns == 4 %}selected{% endif %} value="4">4</option>
+                        <option {% if widget.getColumns == 5 %}selected{% endif %} value="5">5</option>
+                        <option {% if widget.getColumns == 6 %}selected{% endif %} value="6">6</option>
+                        <option {% if widget.getColumns == 7 %}selected{% endif %} value="7">7</option>
+                    </select>
+                </div>
+
+            </div>
+            <div class="col-md-6">
+
+                <div class="form-group">
+                    <label for="Sorting">Sortierung</label>
+                    <select class="form-control" id="Sorting" name="Sorting">
+                        <option {% if widget.getSorting() == 'Default' %}selected{% endif %} value="Default">manuell</option>
+                        <option {% if widget.getSorting() == 'Random' %}selected{% endif %} value="Random">zufällig</option>
+                    </select>
+                </div>
+
+            </div>
         </div>
 
         <div class="form-group form-check">
             <input {% if widget.getConfig('noMagnifier') %}checked{% endif %} type="checkbox" class="form-check-input" id="noMagnifier" name="noMagnifier">
             <label class="form-check-label" for="noMagnifier">keine Lupenfunktion</label>
         </div>
-
-
 
         <div class="form-row">
             <div class="col-6">

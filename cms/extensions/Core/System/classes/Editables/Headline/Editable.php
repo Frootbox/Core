@@ -137,6 +137,9 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
                 $id = ' id="' . $element->getAttribute('id') . '" ';
             }
 
+            if ($element->getAttribute('data-skip-id') !== null) {
+                $id = ' data-skip-id ';
+            }
 
             $template .= '<' . $tagName . ' ' . $id . ' data-editable data-uid="' . $uid . '" style="' . $styles . '">' . $headlineText . '</' . $tagName . '>';
 
@@ -153,50 +156,9 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
             $template .= '</header>';
 
             $element->replaceWith($template);
-
-            return;
-
-
-            if (!empty($element->getAttribute('data-subtitleabove')) or !empty($configuration->get('Ext.Core.System.Editables.Headline.subtitleAbove'))) {
-
-                $element->addClass('subtitle-on-top');
-
-                $html = (string) null;
-
-                if (!empty($text->getConfig('subtitle'))) {
-                    $html .= '<span class="subtitle">' . nl2br($text->getConfig('subtitle')) . '</span> ';
-                }
-
-                $html .= '<span class="head">' . nl2br($text->getConfig('headline')) . '</span> ';
-
-                $element->setInnerHtml($html);
-            }
-            else {
-
-                if ($element->getAttribute('data-skipsubline')) {
-                    $element->setInnerHtml('<span class="head">' . nl2br($text->getConfig('headline')) . '</span> ');
-                }
-                else {
-                    $element->setInnerHtml(nl2br($headlineText));
-                }
-            }
-
-            if ($text->getConfig('isVisible') === false) {
-                $element->addClass('disabled-headline');
-            }
-
-            if (!empty($text->getConfig('level'))) {
-                $element->setAttribute('data-changelevel', $text->getConfig('level'));
-            }
-
-            if (!empty($text->getConfig('elementId'))) {
-                $element->setAttribute('id', $text->getConfig('elementId'));
-            }
-
-            if (!empty($text->getConfig('style.textAlign'))) {
-                $element->setStyle('text-align', $text->getConfig('style.textAlign'));
-            }
         });
+
+
 
         // Replace "headlines" like taglines
         $crawler->filter('[data-editable-headline]')->each(function ( $element ) use ($texts, $configuration) {
@@ -223,6 +185,10 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
         $crawler->filter('h1, h2, h3, h4, h5')->each(function ( $element ) use ($texts) {
 
             if (!empty($element->getAttribute('id'))) {
+                return;
+            }
+
+            if ($element->getAttribute('data-skip-id') !== null) {
                 return;
             }
 

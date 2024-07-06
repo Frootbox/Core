@@ -51,7 +51,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
             // Build sql
             $sql = 'SELECT
                 c.id,                
-                ANY_VALUE(c.title) as title,
+                MAX(c.title) as title,
                 MIN(e.dateStart) as dateStart
             FROM
                 assets e,

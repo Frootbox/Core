@@ -1,0 +1,185 @@
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set p = view.getViewhelper('Partials', { plugin: plugin }) %}
+{% set t = i.getTranslator() %}
+
+<div class="plugin Core ShopSystem Checkout Payment01">
+
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+
+                <div class="inner-wrapper">
+
+                    <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title-review') }}">{{ "Core.ShopSystem.H1CompleteOrder" | translate }}</h2>
+
+                    <div class="row">
+                        <div class="col-md-6">
+
+                            <h3>Bestellung</h3>
+
+                            <table class="table checkout-items-table">
+                                <tbody>
+
+                                {% for item in shopcart.getItems() %}
+
+                                    {% set product = item.getProduct() %}
+
+                                    <tr data-item="{{ item.getKey() }}">
+                                        <td class="d-none d-md-table-cell">
+
+                                            {{ item.getTitle() }}
+
+                                            {% if (product and product.getConfig('freeChoiceOfAmount') and product.getPackagingUnit()) and not (item.isBound() or item.isAmountFixed()) %}
+                                                {{ item.getAmount() }} {{ ("Core.ShopSystem.Plugins.ShopSystem.UnitShort" ~ product.getPackagingUnit()) | translate }}
+                                            {% else %}
+                                                {{ item.getAmount() }} x
+                                            {% endif %}
+
+                                        </td>
+
+                                        <td class="text-right" nowrap>
+
+                                            {% if not plugin.getConfig('showNetPrices') %}
+                                                {% if item.getTotal() > 0 %}
+                                                    {{ item.getTotal() | number_format(2, ",", ".") }} EUR
+                                                {% else %}
+                                                    kostenlos
+                                                {% endif %}
+                                            {% else %}
+                                                {% if item.getTotalNet() > 0 %}
+                                                    {{ item.getTotalNet() | number_format(2, ",", ".") }} EUR
+                                                {% else %}
+                                                    kostenlos
+                                                {% endif %}
+                                            {% endif %}
+                                        </td>
+
+                                        {% if data.editable %}
+                                            <td class="text-right">
+
+                                                {% if not item.isBound() %}
+                                                    <a href="{{ data.plugin.getUriAjax('dropItem', { key: item.getKey() } ) }}" class="drop-item btn btn-danger"><i class="fal fa-times"></i></a>
+                                                {% endif %}
+
+                                            </td>
+                                        {% endif %}
+                                    </tr>
+                                {% endfor %}
+
+                                </tbody>
+                                <tfoot>
+
+
+                                {% if not plugin.getConfig('skipShipping') %}
+                                    <tr>
+                                        <td>
+                                            {% if shopcart.getShippingCosts() is same as (null) %}
+                                                zzgl. Versand
+                                            {% elseif shopcart.getShippingCosts() == 0 %}
+                                                {{ "Core.ShopSystem.FreeShipping" | translate }}
+                                            {% else %}
+                                                Versand
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-right">
+                                            {% if shopcart.getShippingCosts() is same as (null) or shopcart.getShippingCosts() == 0 %}
+
+                                            {% else %}
+                                                {{ shopcart.getShippingCosts() | number_format(2,',','.') }} EUR
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endif %}
+
+                                {% if shopcart.getTaxSections() %}
+                                    {% for section in shopcart.getTaxSections() %}
+                                        <tr>
+                                            <td class="tax">
+                                                {% if plugin.getConfig('showNetPrices') %}
+                                                    zzgl. {{ section.taxrate }} % USt. auf {{ section.net | number_format(2,',','.') }} EUR
+                                                {% else %}
+                                                    {{ "Core.ShopSystem.Plugins.Checkout.VatIncludedOn" | translate(section.taxrate, (section.total | number_format(2,',','.')) ) }}
+                                                {% endif %}
+                                            </td>
+                                            <td class="text-right tax">{{ section.tax | number_format(2,',','.') }} EUR</td>
+                                        </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td class="tax">
+                                            zzgl 0 % MwSt. auf {{ section.total | number_format(2,',','.') }} EUR
+                                        </td>
+                                        <td class="text-right tax">0,00 {{ currencySign }}</td>
+                                    </tr>
+                                {% endif %}
+
+                                <tr>
+                                    <td class="total">{{ "Core.ShopSystem.TableFootTotal" | translate }}</td>
+                                    <td class="total text-right" nowrap>{{ shopcart.getTotal() | number_format(2,',','.') }} EUR</td>
+                                </tr>
+                                </tfoot>
+                            </table>
+
+                            <style>
+                                label.has-error {
+                                    color: red;
+                                }
+                            </style>
+
+                            {% if plugin.getShopConfig('generalTermsLink') %}
+                                <div class="form-group form-check">
+                                    <input type="checkbox" required="" class="form-check-input" id="generalTerms" name="generalTerms">
+                                    <label class="form-check-label" for="generalTerms">{{ t.translate('AcceptGeneralTerms', [ plugin.getShopConfig('generalTermsLink') ]) | raw }}</label>
+                                </div>
+                            {% endif %}
+
+                            <div class="form-group form-check">
+                                <input type="checkbox" required="" class="form-check-input" id="privacyPolicy" name="privacyPolicy">
+                                <label class="form-check-label" for="privacyPolicy">{{ t.translate('AcceptPrivacyPolicy', [ i.getPrivacyPolicyLink() ]) | raw }}</label>
+                            </div>
+
+                            <div class="form-group form-check ">
+                                <input type="checkbox" required="" class="form-check-input" id="rightOfWithdrawal" name="rightOfWithdrawal">
+                                <label class="form-check-label" for="rightOfWithdrawal">{{ t.translate('AcceptRightOfWithdrawal', [ i.getRightOfWithdrawalLink() ]) | raw }}</label>
+                            </div>
+
+
+                        </div>
+                        <div class="col-md-6">
+
+                            <h3>Zahlung</h3>
+
+                            {% set PaymentMethod = i.getPaymentMethod() %}
+
+                            {% set PaymentMethodDelegator = view.getViewhelper('Delegator', { object: PaymentMethod }) %}
+
+                            <div id="paymentMethodHtmlReceiver">
+                                {{ PaymentMethodDelegator.renderInputHtml() | raw }}
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                    <br /><br />
+
+                    <div class="row justify-content-between align-items-center">
+                        {#
+                        <div class="col-md-6 text-right order-md-2">
+                            <button type="submit" class="btn btn-primary">{{ "Core.ShopSystem.ButtonOrderNow" | translate }}</button>
+                        </div>
+                        #}
+                        <div class="col-md-6 order-md-1">
+                            <a href="{{ plugin.getActionUri('login', { back: 1 }) }}" class="btn btn-secondary">{{ "Core.ShopSystem.ButtonGoBack" | translate }}</a>
+                        </div>
+                    </div>
+
+                    {{ p.renderPartial('BasketFooter', { shopcart: shopcart, plugin: plugin }) | raw }}
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>

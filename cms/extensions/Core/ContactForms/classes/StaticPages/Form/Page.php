@@ -118,6 +118,7 @@ class Page extends \Frootbox\AbstractStaticPage
         \Frootbox\Config\Config $config,
         \Frootbox\View\Engines\Interfaces\Engine $view,
         \Frootbox\Persistence\Repositories\Files $files,
+        \Frootbox\Persistence\Repositories\Pages $pageRepository,
         \Frootbox\Ext\Core\ContactForms\Persistence\Repositories\Logs $logs,
         \Frootbox\Mail\Transports\Interfaces\TransportInterface $mailTransport,
         \Frootbox\Persistence\Content\Repositories\ContentElements $contentElements,
@@ -402,6 +403,7 @@ class Page extends \Frootbox\AbstractStaticPage
             $tempfile->delete();
         }
 
+
         if (!empty($xparams['redirect'])) {
             $payload['redirect'] = $xparams['redirect'];
         }
@@ -411,6 +413,20 @@ class Page extends \Frootbox\AbstractStaticPage
 
                 $plugin = $contentElements->fetchById($get->get('pluginId'));
                 $payload['redirect'] = $plugin->getActionUri('complete');
+            }
+            elseif($form->getConfig('feedbackPageId')) {
+
+                try {
+
+                    $page = $pageRepository->fetchById($form->getConfig('feedbackPageId'));
+
+                    $payload['redirect'] = $page->getUri([
+                        'absolute' => true,
+                    ]);
+                }
+                catch (\Exception $e) {
+                    // Ignore
+                }
             }
         }
 

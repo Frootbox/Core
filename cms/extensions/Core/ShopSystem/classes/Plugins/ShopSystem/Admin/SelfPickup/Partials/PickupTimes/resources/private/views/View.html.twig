@@ -1,0 +1,34 @@
+<table class="table">
+    <thead>
+        <tr>
+            <th>von</th>
+            <th>bis</th>
+            <th>Vorlaufzeit</th>
+            <th>Tage</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        {% for Time in Times %}
+            <tr data-title="Abholzeit bearbeiten" data-modal="{{ plugin.getAdminUri('SelfPickup', 'ajaxModalTimeEdit', { PickupTimeId: Time.getId() }) }}">
+                <td>{{ Time.getDateStart() | date('H:i') }} Uhr</td>
+                <td>{{ Time.getDateEnd() | date('H:i') }} Uhr</td>
+                <td>
+                    {% if Time.getConfig('LeadTime') %}
+                        {{ Time.getConfig('LeadTime') }} Std.
+                    {% endif %}
+                </td>
+                <td>
+                    {% if Time.getConfig('Weekdays.1') %}Mo.{% endif %}
+                    {% if Time.getConfig('Weekdays.2') %}Di.{% endif %}
+                    {% if Time.getConfig('Weekdays.3') %}Mi.{% endif %}
+                    {% if Time.getConfig('Weekdays.4') %}Do.{% endif %}
+                    {% if Time.getConfig('Weekdays.5') %}Fr.{% endif %}
+                    {% if Time.getConfig('Weekdays.6') %}Sa.{% endif %}
+                    {% if Time.getConfig('Weekdays.7') %}So.{% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+
+    </tbody>
+</table>

@@ -20,6 +20,10 @@ variables:
 {% set i = view.getViewhelper('Delegator', { object: widget }) %}
 {% set f = view.getViewhelper('Files') %}
 
+{% if widget.getConfig('withHeadline') %}
+    <h4 class="first" data-editable data-uid="{{ widget.getUid('title-x') }}">Download</h4>
+{% endif %}
+
 {% set files = i.getFiles() %}
 
 {% if variables.columns == 1 %}

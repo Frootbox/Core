@@ -108,6 +108,13 @@
             <div class="card">
                 <div class="card-body">
                     <p>Selbstabholung.</p>
+
+                    {% if booking.getConfig('shipping.pickupDay') %}
+                        <p>
+                            {{ booking.getConfig('shipping.pickupDay') | date('d.m.Y') }}<br />
+                            {{ booking.getConfig('shipping.pickupTime') }}
+                        </p>
+                    {% endif %}
                 </div>
             </div>
         {% elseif booking.getConfig('shipping.type') == 'shipToBillingAddress' %}

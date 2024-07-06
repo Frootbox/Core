@@ -9,7 +9,9 @@ variables:
     withThumbnail:
         type: bool
         label: mit Thumbnail
-
+    withOwnTeaser:
+        type: bool
+        label: eigener Teaser-Text für Vorschau
 /config #}
 
 {% set i = view.getViewhelper('Delegator', { object: plugin }) %}
@@ -45,6 +47,8 @@ variables:
                     <div class="{{ colClass }}">
                         <div class="xcard" data-equalheight="{{ plugin.getUid('xcards-height') }}" data-href>
 
+
+
                             {% if variables.withThumbnail %}
                                 <picture class="fluid" data-editable data-uid="{{ job.getUid('image')}}">
                                     <img width="600" height="400" src="{{ i.getDummyImage({ width: 600, height: 400 }) }}" alt="" />
@@ -62,7 +66,7 @@ variables:
                                     {% endif %}
 
                                     {% if job.getLocation() %}
-                                        {{ job.getLocation().getCity() }} /
+                                        {{ job.getLocation().getTitle() }} /
                                         {% if variables.showCountry and job.getLocation().getCountry() %}
                                             / {{ job.getLocation().getCountry() }} /
                                         {% endif %}
@@ -77,7 +81,10 @@ variables:
                                     {% endif %}
                                 </p>
 
-                                <div data-editable data-nowidgets data-uid="{{ job.getUid('teaser') }}"></div>
+
+                                {% set uid = variables.withOwnTeaser ? job.getUid('teaser-own') : job.getUid('teaser') %}
+
+                                <div data-editable data-nowidgets data-uid="{{ uid }}"></div>
 
                                 {% if job.getUri() %}
                                     <p class="read-more"><a href="{{ job.getUri() }}"><span data-editable-element data-uid="{{ plugin.getUid('button-more-info') }}">mehr Infos</span></a></p>

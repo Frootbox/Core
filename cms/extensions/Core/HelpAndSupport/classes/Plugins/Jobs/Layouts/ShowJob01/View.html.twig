@@ -49,6 +49,7 @@ variables:
 
 <div class="plugin Core HelpAndSupport Jobs ShowJob01">
 
+
     {% if variables.withContainer %}<div class="container">{% endif %}
 
     <div class="row">
@@ -56,7 +57,6 @@ variables:
 
 
             <h2 class="first main-title" data-editable data-uid="{{ job.getUid('title') }}">{{ job.getTitle(globalLanguage) }}</h2>
-
 
             <div class="content-teaser">
                 <div data-editable data-uid="{{ job.getUid('teaser') }}"></div>
@@ -131,19 +131,22 @@ variables:
 
                     <div class="sticky-top">
 
-                        {% if plugin.getConfig('formId') %}
+                        {% if job.getConfig('formId') or plugin.getConfig('formId') %}
 
                             <h3 data-editable data-uid="{{ plugin.getUid('apply-now') }}">Jetzt bewerben!</h3>
 
                             {% set formRenderer = view.getViewhelper('Ext/Core/ContactForms/FormRenderer', {   }) %}
 
+
+
                             {{ formRenderer.render({
-                                formId: plugin.getConfig('formId'),
+                                formId: (job.getConfig('formId') ? job.getConfig('formId') : plugin.getConfig('formId')),
                                 options: {
                                     editable: true,
                                 },
                                 payload: {
-                                    'Job': job.getTitle()
+                                    'Job': job.getTitle(),
+                                    'Standort': location.getTitle()
                                 }
                             }) | raw }}
 

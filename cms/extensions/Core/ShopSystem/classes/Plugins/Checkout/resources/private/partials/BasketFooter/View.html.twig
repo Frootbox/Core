@@ -19,9 +19,9 @@
 <div class="Partial ShopSystem Checkout BasketFooter">
 
     <nav>
-        <a class="print-window" href="#">{{ icons.render('print') | raw }}Drucken</a>
-        <a target="_blank" href="{{ i.getPrivacyPolicyLink() }}">{{ icons.render('shield-check') | raw }}Datenschutz</a>
-        <a class="cancel" href="{{ plugin.getActionUri('cancel') }}">{{ icons.render('xmark') | raw }}Bestellvorgang abbrechen</a>
+        <a class="print-window" href="#">{{ icons.render('print') | raw }}{{ "Core.ShopSystem.LinkPrint" | translate }}</a>
+        <a target="_blank" href="{{ i.getPrivacyPolicyLink() }}">{{ icons.render('shield-check') | raw }}{{ "Core.ShopSystem.LinkPrivacy" | translate }}</a>
+        <a class="cancel" href="{{ plugin.getActionUri('cancel') }}">{{ icons.render('xmark') | raw }}{{ "Core.ShopSystem.LinkCancel" | translate }}</a>
     </nav>
 
 </div>

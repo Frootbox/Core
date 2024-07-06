@@ -12,7 +12,7 @@ use Frootbox\Http\Get;
 class App extends \Frootbox\Admin\Persistence\AbstractApp
 {
     /**
-     *
+     * @return string
      */
     public function getPath(): string
     {
@@ -193,6 +193,7 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
             'feedback' => $post->get('feedback'),
             'callback' => $post->get('callback'),
             'autoReplyDeaktivated' => !empty($post->get('autoReplyDeaktivated')),
+            'feedbackPageId' => $post->get('feedbackPageId'),
         ]);
 
         $form->save();
@@ -358,6 +359,73 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
         ]);
     }
 
+    public function ajaxExportAction(
+        \Frootbox\Http\Get $get,
+        \Frootbox\Ext\Core\ContactForms\Persistence\Repositories\Forms $formRepository,
+        \Frootbox\Ext\Core\ContactForms\Persistence\Repositories\Logs $logsRepository,
+    ): Response
+    {
+        /**
+         * Fetch form
+         */
+        $form = $formRepository->fetchById($get->get('formId'));
+
+        // Fetch logs
+        $result = $logsRepository->fetch([
+            'where' => [
+                'parentId' => $form->getId(),
+            ],
+            'order' => [
+                'date DESC',
+            ]
+        ]);
+
+        $loop = 0;
+
+        $f = fopen('php://memory', 'w');
+
+        foreach ($result as $row) {
+
+            $logData = $row->getLogData();
+
+            if ($loop == 0) {
+
+                $row = [];
+
+                foreach ($logData['formData'] as $group) {
+                    foreach ($group['fields'] as $field) {
+                        $row[] = $field['title'];
+                    }
+                }
+
+                fputcsv($f, $row, ';');
+            }
+
+            $row = [];
+
+
+            foreach ($logData['formData'] as $group) {
+                foreach ($group['fields'] as $field) {
+                    $row[] = $field['valueDisplay'];
+                }
+            }
+
+            fputcsv($f, $row, ';');
+
+            ++$loop;
+        }
+
+        fseek($f, 0);
+
+        header('Content-Type: text/csv');
+        // tell the browser we want to save it instead of displaying it
+        header('Content-Disposition: attachment; filename="export.csv";');
+        // make php send the generated csv lines to the browser
+        fpassthru($f);
+
+        exit;
+    }
+
     /**
      *
      */
@@ -465,8 +533,10 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
 
         $fieldClass = '\\Frootbox\\Ext\\Core\\ContactForms\\Persistence\\Fields\\' . $post->get('type') . '\\Field';
 
+        $title = $post->get('titles') ? $post->get('titles')[GLOBAL_LANGUAGE] : $post->get('title');
+
         // Update field
-        $field->setTitle($post->get('title'));
+        $field->setTitle($title);
         $field->setCustomClass($fieldClass);
         $field->addConfig([
             'titles' => $post->get('titles'),
@@ -750,7 +820,7 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
         // Fetch form
         $form = $formsRepository->fetchById($get->get('formId'));
 
-        // Fetch lofs
+        // Fetch logs
         $result = $logsRepository->fetch([
             'where' => [
                 'parentId' => $form->getId(),
@@ -788,6 +858,7 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
      */
     public function configAction(
         \Frootbox\Http\Get $get,
+        \Frootbox\Persistence\Repositories\Pages $pageRepository,
         \Frootbox\Ext\Core\ContactForms\Persistence\Repositories\Forms $formsRepository,
         \Frootbox\Ext\Core\ContactForms\Persistence\Repositories\Categories $categoryRepository,
     ): Response
@@ -806,8 +877,14 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
         // Fetch category tree
         $categories = $categoryRepository->getTree($parent->getId());
 
+        // Fetch pages
+        $pages = $pageRepository->fetch([
+            'order' => [ 'lft ASC' ],
+        ]);
+
         return new Response('html', 200, [
             'form' => $form,
+            'Pages' => $pages,
             'categories' => $categories,
         ]);
     }

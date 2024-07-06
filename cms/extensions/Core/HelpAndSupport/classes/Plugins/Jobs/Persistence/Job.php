@@ -48,7 +48,8 @@ class Job extends \Frootbox\Persistence\AbstractAsset implements \Frootbox\Persi
             return null;
         }
 
-        $title = trim($this->getTitle() . ' ' . $this->getSubtitle());
+
+        $title = $this->getTitle();
 
         if (!empty($this->getConfig('urlSuffixSubtitle'))) {
 
@@ -58,13 +59,29 @@ class Job extends \Frootbox\Persistence\AbstractAsset implements \Frootbox\Persi
             if (!empty($text) and !empty($text->getConfig('subtitle'))) {
                 $title .= ' ' . $text->getConfig('subtitle');
             }
+            else {
+                $title .= ' ' . $this->getSubtitle();
+            }
+
+            $title = trim($title);
         }
+
+        $virtualDirectory = [];
+
+        if (!empty($this->getConfig('urlPrefixId'))) {
+            $virtualDirectory[] = $this->getId();
+        }
+
+        if (!empty($this->getLocationId())) {
+            $location = $this->getLocation();
+            $virtualDirectory[] = $location->getTitle();
+        }
+
+        $virtualDirectory[] = $title;
 
         return new \Frootbox\Persistence\Alias([
             'pageId' => $this->getPageId(),
-            'virtualDirectory' => [
-                $title,
-            ],
+            'virtualDirectory' => $virtualDirectory,
             'uid' => $this->getUid('alias'),
             'payload' => $this->generateAliasPayload([
                 'action' => 'showJob',

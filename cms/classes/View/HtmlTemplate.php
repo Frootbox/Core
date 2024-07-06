@@ -61,10 +61,10 @@ class HtmlTemplate
     }
 
     /**
-     * 
+     * @return string
      */
-    public function getTemplateId ( ) {
-        
+    public function getTemplateId(): string
+    {
         return $this->config['templateId'] ?? basename($this->file);
     }
 
@@ -144,10 +144,11 @@ class HtmlTemplate
     }
 
     /**
-     *
+     * @param string $filepath
+     * @return $this
      */
-    public function load ( $filepath ): HtmlTemplate {
-
+    public function load(string $filepath): HtmlTemplate
+    {
         $this->file = $filepath;
         $this->source = file_get_contents($this->file);
 

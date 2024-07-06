@@ -208,6 +208,7 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
         $item->addConfig([
             'icon' => $post->get('icon'),
             'iconOnly' => $post->get('iconOnly'),
+            'BreakAfter' => $post->get('BreakAfter'),
         ]);
 
         $item->save();

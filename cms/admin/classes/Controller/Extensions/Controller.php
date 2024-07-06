@@ -619,7 +619,7 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
             $apps[] = [
                 'title' => $title,
                 'icon' => $icon,
-                'id' => $file,
+                'id' => $file->getName(),
             ];
         }
 

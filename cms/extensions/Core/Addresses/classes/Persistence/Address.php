@@ -7,11 +7,14 @@ namespace Frootbox\Ext\Core\Addresses\Persistence;
 
 class Address extends \Frootbox\Persistence\AbstractRow
 {
-    use \Frootbox\Persistence\Traits\Alias;
     use \Frootbox\Persistence\Traits\Config;
     use \Frootbox\Persistence\Traits\Uid;
     use \Frootbox\Persistence\Traits\Visibility;
     use \Frootbox\Persistence\Traits\Tags;
+
+    use \Frootbox\Persistence\Traits\Alias {
+        getUri as public getUriFromTrait;
+    }
 
     protected $table = 'locations';
     protected $model = Repositories\Addresses::class;
@@ -107,6 +110,14 @@ class Address extends \Frootbox\Persistence\AbstractRow
     }
 
     /**
+     * @return string|null
+     */
+    public function getMatterport(): ?string
+    {
+        return $this->getConfig('Profiles.Matterport');
+    }
+
+    /**
      * Generate addresses alias
      *
      * @return \Frootbox\Persistence\Alias|null
@@ -147,6 +158,31 @@ class Address extends \Frootbox\Persistence\AbstractRow
     }
 
     /**
+     * @return string|null
+     */
+    public function getPostalCode(): ?string
+    {
+        return $this->getZipcode();
+    }
+
+    /**
+     * @param array|null $options
+     * @return string|null
+     */
+    public function getUri(array $options = null): ?string
+    {
+        if (!empty($this->getConfig('redirect.internalUrl'))) {
+            return $this->getConfig('redirect.internalUrl');
+        }
+
+        if (!empty($this->getConfig('noAddressDetailPage'))) {
+            return null;
+        }
+
+        return self::getUriFromTrait($options);
+    }
+
+    /**
      *
      */
     public function getUrlCleaned(): string
@@ -184,6 +220,14 @@ class Address extends \Frootbox\Persistence\AbstractRow
     }
 
     /**
+     * @return string|null
+     */
+    public function getYoutube(): ?string
+    {
+        return $this->getConfig('Profiles.Youtube');
+    }
+
+    /**
      * Check if location is visible to user
      *
      * @return bool
@@ -191,5 +235,23 @@ class Address extends \Frootbox\Persistence\AbstractRow
     public function isVisible(): bool
     {
         return ($this->getVisibility() >= (IS_EDITOR ? 1 : 2));
+    }
+
+    public function setMatterport(?string $matterport): void
+    {
+        $this->addConfig([
+            'Profiles' => [
+                'Matterport' => $matterport,
+            ],
+        ]);
+    }
+
+    public function setYoutube(?string $youtube): void
+    {
+        $this->addConfig([
+            'Profiles' => [
+                'Youtube' => $youtube,
+            ],
+        ]);
     }
 }

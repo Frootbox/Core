@@ -13,7 +13,7 @@ use Frootbox\Admin\Controller\Response;
 class Partial extends \Frootbox\Admin\View\Partials\AbstractPartial
 {
     /**
-     * 
+     * @return string
      */
     public function getPath(): string
     {
@@ -21,7 +21,9 @@ class Partial extends \Frootbox\Admin\View\Partials\AbstractPartial
     }
 
     /**
-     *
+     * @param \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\ShippingDay $shippingDayRepository
+     * @return Response
+     * @throws \Frootbox\Exceptions\NotFound
      */
     public function onBeforeRendering(
         \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\ShippingDay $shippingDayRepository,
@@ -53,10 +55,10 @@ class Partial extends \Frootbox\Admin\View\Partials\AbstractPartial
             $addedDays = $plugin->getConfig('shipping.skipNextWorkdays');
 
             if ($firstRegularDay->format('N') == 6) {
-                $addedDays += 2;
+//                $addedDays += 2;
             }
             else if ($firstRegularDay->format('N') == 7) {
-                $addedDays += 1;
+ //               $addedDays += 1;
             }
 
             $firstRegularDay->modify('+' . $addedDays . ' days');
@@ -86,7 +88,7 @@ class Partial extends \Frootbox\Admin\View\Partials\AbstractPartial
                     $regularShippingDay = false;
                 }
 
-                if (!in_array($d, $plugin->getConfig('shipping.regularShippingDays'))) {
+                if (!empty($plugin->getConfig('shipping.regularShippingDays')) and !in_array($d, $plugin->getConfig('shipping.regularShippingDays'))) {
                     $regularShippingDay = false;
                 }
 

@@ -1,0 +1,24 @@
+{# config
+
+title: Nur Blöcke
+variables:
+    cloak:
+        type: bool
+        default: false
+        label: andere Plugins verdrängen
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+{{ view.set('hideGlobalBlocks', true) }}
+
+{% if variables.cloak %}
+    <param name="cloak" value="true" />
+{% endif %}
+
+<div class="plugin Core Addresses AddressDatabase ShowAddress04">
+
+    <div data-blocks data-uid="{{ address.getUid('block-content') }}"></div>
+
+</div>

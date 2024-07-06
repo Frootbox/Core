@@ -1,0 +1,65 @@
+{% set items = data.shopcart.getItems() %}
+
+<div class="Partial ShopSystem Checkout ItemsSummaryFinal">
+
+    <h3>{{ "Core.ShopSystem.H3ArticlesInShoppingCart" | translate }}</h3>
+
+
+    {% if items | length == 0 %}
+        <div class="xmessage">{{ "Core.ShopSystem.Message.NoItems" | translate }}</div>
+    {% else %}
+
+        <table class="table">
+            <tbody>
+                {% for item in items %}
+                    <tr>
+                        <td>
+                            {{ item.getAmount() }} x
+                        </td>
+                        <td>{{ item.getTitle() }}</td>
+                        <td class="text-right" nowrap>
+                            {% if not plugin.getConfig('showNetPrices') %}
+                                {% if item.getPriceGrossFinal() > 0 %}
+                                    {{ item.getPriceGrossFinal() | number_format(2, ",", ".") }} {{ currencySign }}
+                                {% else %}
+                                    kostenlos
+                                {% endif %}
+                            {% else %}
+                                {% if item.getPrice() > 0 %}
+                                    {{ item.getPrice() | number_format(2, ",", ".") }} {{ currencySign }}
+                                {% else %}
+                                    kostenlos
+                                {% endif %}
+                            {% endif %}
+                        </td>
+                        <td class="text-right" nowrap>
+
+                            {% if not plugin.getConfig('showNetPrices') %}
+                                {% if item.getTotal() > 0 %}
+                                    {{ item.getTotal() | number_format(2, ",", ".") }} {{ currencySign }}
+                                {% else %}
+                                    kostenlos
+                                {% endif %}
+                            {% else %}
+                                {% if item.getTotalNet() > 0 %}
+                                    {{ item.getTotalNet() | number_format(2, ",", ".") }} {{ currencySign }}
+                                {% else %}
+                                    kostenlos
+                                {% endif %}
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td class="total" colspan="3">{{ "Core.ShopSystem.TableFootTotal" | translate }}</td>
+                    <td class="total" nowrap>{{ data.shopcart.getTotal() | number_format(2,',','.') }} {{ currencySign }}</td>
+
+                </tr>
+            </tfoot>
+        </table>
+
+    {% endif %}
+
+</div>

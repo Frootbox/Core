@@ -3,11 +3,11 @@
 
 <h2>
     Buchungen
-    {#
+
     <span class="headoptions">
-		<a data-toggle="tooltip" data-modal data-title="neue Ansprechperson hinzufügen" href="{{ plugin.getAdminUri('Contact', 'ajaxModalCompose') }}"><i class="fa fa-plus-circle"></i></a>
+		<a data-toggle="tooltip" data-modal data-title="neue Buchung hinzufügen" href="{{ plugin.getAdminUri('Bookings', 'ajaxModalCompose') }}"><i class="fa fa-plus-circle"></i></a>
 	</span>
-    #}
+
 </h2>
 
 <p><a class="ajax" href="{{ plugin.getAdminUri('Index', 'index') }}"><i class="fa fa-chevron-circle-left"></i> zurück</a></p>
@@ -27,6 +27,7 @@
 
         {% for Booking in Bookings %}
 
+            {{ Booking | dump }}
             {% set Event = Booking.getEvent() %}
 
             <tr>

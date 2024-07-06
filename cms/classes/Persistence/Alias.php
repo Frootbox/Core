@@ -13,7 +13,9 @@ class Alias extends \Frootbox\Persistence\RowModels\ConfigurableRow
     protected $isIndexableForInternalSearch = true;
 
     /**
-     *
+     * @return \Frootbox\Db\Row
+     * @throws \Frootbox\Exceptions\NotFound
+     * @throws \Frootbox\Exceptions\RuntimeError
      */
     public function getItem()
     {
@@ -23,7 +25,7 @@ class Alias extends \Frootbox\Persistence\RowModels\ConfigurableRow
     }
 
     /**
-     *
+     * @return string|null
      */
     public function getItemModel(): ?string
     {
@@ -31,7 +33,9 @@ class Alias extends \Frootbox\Persistence\RowModels\ConfigurableRow
     }
 
     /**
-     *
+     * @return Page
+     * @throws \Frootbox\Exceptions\NotFound
+     * @throws \Frootbox\Exceptions\RuntimeError
      */
     public function getPage(): \Frootbox\Persistence\Page
     {
@@ -41,7 +45,9 @@ class Alias extends \Frootbox\Persistence\RowModels\ConfigurableRow
     }
 
     /**
-     *
+     * @param AbstractPlugin $contentElement
+     * @param \Frootbox\Http\Get $get
+     * @return array
      */
     public function getPayloadData(
         \Frootbox\Persistence\AbstractPlugin $contentElement,
@@ -83,13 +89,30 @@ class Alias extends \Frootbox\Persistence\RowModels\ConfigurableRow
         return $payloadData ?? [];
     }
 
+    /**
+     * @return \Frootbox\Db\Result
+     */
+    public function getSameTargetsByItem(): \Frootbox\Db\Result
+    {
+        return $this->getModel()->fetch([
+            'where' => [
+                'itemId' => $this->getItemId(),
+                'itemModel' => $this->getItemModel(),
+                'language' => $this->getLanguage(),
+            ],
+        ]);
+    }
+
+    /**
+     * @return string
+     */
     public function getSection(): string
     {
         return $this->data['section'] ?? 'index';
     }
 
     /**
-     *
+     * @return string
      */
     public function getUri():string
     {
@@ -97,7 +120,7 @@ class Alias extends \Frootbox\Persistence\RowModels\ConfigurableRow
     }
 
     /**
-     *
+     * @return array
      */
     public function getVirtualDirectory(): array
     {
@@ -105,7 +128,7 @@ class Alias extends \Frootbox\Persistence\RowModels\ConfigurableRow
     }
 
     /**
-     *
+     * @return bool
      */
     public function getIsIndexableForInternalSearch(): bool
     {
@@ -113,7 +136,8 @@ class Alias extends \Frootbox\Persistence\RowModels\ConfigurableRow
     }
 
     /**
-     *
+     * @param $aliasUri
+     * @return void
      */
     public function setAlias($aliasUri): void
     {
@@ -122,7 +146,8 @@ class Alias extends \Frootbox\Persistence\RowModels\ConfigurableRow
     }
 
     /**
-     *
+     * @param bool $isIndexableForInternalSearch
+     * @return void
      */
     public function setIsIndexableForInternalSearch(bool $isIndexableForInternalSearch): void
     {
@@ -130,7 +155,8 @@ class Alias extends \Frootbox\Persistence\RowModels\ConfigurableRow
     }
 
     /**
-     *
+     * @param $itemId
+     * @return void
      */
     public function setItemId($itemId): void
     {
@@ -139,7 +165,8 @@ class Alias extends \Frootbox\Persistence\RowModels\ConfigurableRow
     }
 
     /**
-     *
+     * @param string $itemModel
+     * @return void
      */
     public function setItemModel(string $itemModel): void
     {

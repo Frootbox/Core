@@ -10,7 +10,7 @@ use Frootbox\Admin\Controller\Response;
 class Controller extends \Frootbox\Admin\AbstractWidgetController
 {
     /**
-     *
+     * @return string
      */
     public function getPath(): string
     {
@@ -18,7 +18,9 @@ class Controller extends \Frootbox\Admin\AbstractWidgetController
     }
 
     /**
-     *
+     * @param \Frootbox\Http\Post $post
+     * @param \DI\Container $container
+     * @return \Frootbox\Admin\Controller\Response
      */
     public function ajaxUpdateAction(
         \Frootbox\Http\Post $post,
@@ -29,6 +31,7 @@ class Controller extends \Frootbox\Admin\AbstractWidgetController
             'imageWidth' => ((int) $post->get('width') == 0) ? null : $post->get('width'),
             'imageHeight' => ((int) $post->get('height') == 0) ? null : $post->get('height'),
             'imageColumns' => $post->get('columns'),
+            'Sorting' => $post->get('Sorting'),
             'noMagnifier' => $post->get('noMagnifier'),
         ]);
 

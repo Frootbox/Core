@@ -414,4 +414,21 @@ class Page extends \Frootbox\Persistence\RowModels\ConfigurableNestedSet impleme
     {
         $this->overrideIndexable = $indeaxble;
     }
+
+    /**
+     * @param string $language
+     * @return void
+     */
+    public function setLanguage(string $language): void
+    {
+        if ($this->getLanguage() != $language) {
+
+            foreach ($this->getAliases() as $alias) {
+                $alias->setLanguage($language);
+                $alias->save();
+            }
+
+            parent::setLanguage($language);
+        }
+    }
 }

@@ -11,7 +11,7 @@ use Frootbox\Session;
 class Controller extends \Frootbox\Admin\AbstractPluginController
 {
     /**
-     *
+     * @return string
      */
     public function getPath(): string
     {
@@ -227,6 +227,71 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         return self::getResponse('json', 200, [
             'success' => 'Die Mail wurde gesendet.',
         ]);
+    }
+
+    public function ajaxExportShopifyAction(
+        \Frootbox\Http\Get $get,
+        \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Bookings $bookingsRepository,
+    ): Response
+    {
+        // Fetch bookings
+        $bookings = $bookingsRepository->fetch();
+
+        $list[] = [
+            'First Name',
+            'Last Name',
+            'Email',
+            'Accepts Email Marketing',
+            'Company',
+            'Address1',
+            'Address2',
+            'City',
+            'Province Code',
+            'Country Code',
+            'Zip',
+            'Phone',
+            'Accepts SMS Marketing',
+            'Tags',
+            'Note',
+            'Tax Exempt',
+        ];
+
+
+        foreach ($bookings as $booking) {
+
+            $list[] = [
+                $booking->getConfig('personal.firstname'),
+                $booking->getConfig('personal.lastname'),
+                $booking->getConfig('personal.email'),
+                'yes',
+                null,
+                $booking->getConfig('personal.street') . ' ' . $booking->getConfig('personal.streetNumber'),
+                null,
+                $booking->getConfig('personal.city'),
+                null,
+                $booking->getConfig('personal.country'),
+                $booking->getConfig('personal.postalCode'),
+                $booking->getConfig('personal.phone'),
+                'yes',
+                null,
+                null,
+                'no',
+            ];
+        }
+
+        header('Content-Type: text/csv');
+        header('Content-Disposition: attachment; filename="export.csv";');
+
+        // Open a file in write mode ('w')
+        $fp = fopen('php://output', 'w');
+
+        // Loop through file pointer and a line
+        foreach ($list as $fields) {
+            fputcsv($fp, $fields, ',');
+        }
+
+        fclose($fp);
+
     }
 
     /**

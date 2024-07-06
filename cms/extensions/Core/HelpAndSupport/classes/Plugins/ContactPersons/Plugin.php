@@ -110,6 +110,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
         $contacts = $contactRepository->fetch([
             'where' => [
                 'pluginId' => $this->getId(),
+                new \Frootbox\Db\Conditions\GreaterOrEqual('visibility',(IS_LOGGED_IN ? 1 : 2)),
             ],
             'order' => $order,
         ]);

@@ -118,6 +118,18 @@
                 </div>
             {% endif %}
 
+            {% if v.isExtensionInstalled('Core', 'ContactForms') %}
+                <div class="form-group">
+                    <label for="formId">Bewerbungsformular</label>
+                    <select class="form-control" id="formId" name="formId">
+                        <option value="">Standardeinstellung</option>
+                        {% for form in i.getForms() %}
+                            <option {% if job.getConfig('formId') == form.getId %}selected{% endif %} value="{{ form.getId }}">{{ form.getTitle() }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            {% endif %}
+
             <button type="submit" class="btn btn-primary">Speichern</button>
 
         </form>

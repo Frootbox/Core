@@ -45,6 +45,7 @@ class Jobs extends \Frootbox\View\Viewhelper\AbstractViewhelper
         // Fetch jobs
         $result = $jobsRepository->fetchByTag($tag, [
             'complyVisibility' => true,
+            'order' => 'orderId DESC',
         ]);
 
         return $result;

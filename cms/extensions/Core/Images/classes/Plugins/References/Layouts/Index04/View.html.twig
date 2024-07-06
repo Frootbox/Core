@@ -1,0 +1,96 @@
+{# config
+
+title: Akkordeon
+variables:
+    skipHeadline:
+        type: bool
+        label: ohne Überschrift
+    skipReadmore:
+        type: bool
+        label: kein "weiterlesen"
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set f = view.getViewhelper('Files') %}
+
+{% set icons = view.getViewhelper('Ext/HerrUndFrauPixelExt/Icons/Icons', { createDummyOnFail: true  }) %}
+
+<div class="plugin Core Images References Index04">
+
+    <div class="container">
+        <div class="row">
+            <div class="col-12 ">
+
+                <div class="inner-wrapper">
+
+                    {% if not variables.skipHeadline %}
+                        <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+                    {% endif %}
+
+                    <div class="teaser-text" data-editable data-uid="{{ plugin.getUid('text') }}"></div>
+
+                    <div class="accordion" id="references-accordion-{{ block.getId() }}">
+
+                        {% for reference in i.getReferences() %}
+                            <div class="xcard">
+                                <div class="xcard-header" id="headingOne">
+
+                                    <div data-toggle="collapse" data-target="#collapse{{ reference.getId() }}" aria-expanded="true" aria-controls="collapse{{ reference.getId() }}" class="{% if loop.index != 1 %}collapsed{% endif %}">
+                                        <div class="row">
+                                            <div class="col-md-10">
+                                                <h3 data-editable data-uid="{{ reference.getUid('title') }}">{{ reference.getTitle }}</h3>
+                                            </div>
+                                            <div class="col-md-2 icon-arrow">
+                                                {{ icons.render('arrow-up-long') | raw }}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div id="collapse{{ reference.getId() }}" class="collapse {% if loop.index == 1 %}show{% endif %}" aria-labelledby="headingOne" data-parent="#references-accordion-{{ block.getId() }}">
+                                    <div class="xcard-body">
+
+                                        <div data-editable data-uid="{{ reference.getUid('text') }}"></div>
+
+                                        {% if reference.getUri() and not variables.skipReadmore and not variables.skipDetailsPage %}
+                                            <p class="read-more-container"><a class="read-more" href="{{ reference.getUri() }}"><span>weiterlesen</span></a></p>
+                                        {% endif %}
+
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+
+                    </div>
+
+                    {#
+                    <div class="row references">
+                        {% for reference in i.getReferences() %}
+                            <div class="reference col-md-4" {% if not variables.skipReadmore and not variables.skipDetailsPage %}data-href{% endif %}>
+
+                                {% if variables.withMagnifier %}<a href="{{ f.getFileByUid(reference.getUid('image')).getUriThumbnail() }}" data-fancybox="references-{{ plugin.getId() }}">{% endif %}
+                                    <picture class="fluid" data-editable {% if variables.noImageDummy %}data-skipempty="1"{% endif %} data-uid="{{ reference.getUid('image') }}">
+                                            <img width="{{ variables.image_width }}" height="{{ variables.image_height }}" src="{{ i.getDummyImage({ width: variables.image_width, height: variables.image_height | default(300) }) }}" alt="" />
+                                    </picture>
+                                {% if variables.withMagnifier %}</a>{% endif %}
+
+                                {% if variables.withReferenceTitle %}
+                                    <h4 class="" data-editable data-uid="{{ reference.getUid('title') }}"></h4>
+                                {% endif %}
+
+
+
+                            </div>
+                        {% endfor %}
+                    </div>
+                    #}
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>

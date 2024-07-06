@@ -8,10 +8,29 @@
 
     <div class="modal-body">
 
+        {% if not configuration.get('i18n.multiAliasMode') %}
+            <div class="form-group">
+                <label for="title">Titel</label>
+                <input type="text" class="form-control" id="title" name="title" placeholder="Titel" value="{{ field.getTitle() }}">
+            </div>
+        {% else %}
+            {% for language in configuration.get('i18n.languages') %}
+
+                <div class="form-group">
+                    <label for="title_{{ loop.index }}">Titel ({{ language }}){% if settings.default_language == language %}*{% endif %}</label>
+                    <input type="text" {% if settings.default_language == language %}required{% endif %} class="form-control" id="title_{{ loop.index }}" name="titles[{{ language }}]" placeholder="Titel ({{ language }})" value="{{ field.getTitleWithoutFallback(language) }}">
+                </div>
+
+            {% endfor %}
+        {% endif %}
+
+        {#
         <div class="form-group">
             <label for="title">Titel *</label>
             <input type="text" required class="form-control" name="title" id="title" placeholder="Titel" value="{{ field.getTitle() }}">
         </div>
+        #}
+
         <div class="form-group">
             <label for="type">Typ</label>
             <select class="form-control" name="type" id="type" size="1">

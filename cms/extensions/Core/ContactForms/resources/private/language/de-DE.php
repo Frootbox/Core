@@ -16,4 +16,6 @@ return [
     '.DataCouldNotBeSent' => 'Die Daten konnten nicht gesendet werden.',
 
     '.FormUploadMaximum' => 'maximal',
+
+    '.CookieConsentNotice' => 'Um das Formular nutzen zu können, müssen Sie unseren <a class="pxf-raise-cookieconsentmanager" href="#">Cookie-Richtlinien</a> zustimmen.',
 ];

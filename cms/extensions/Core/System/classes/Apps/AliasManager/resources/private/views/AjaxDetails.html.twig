@@ -29,8 +29,12 @@
 
             <div class="form-group">
                 <label for="title">Titel</label>
-                <input type="text" class="form-control" id="title" name="title" aria-describedby="emailHelp" placeholder="Titel" value="{{ alias.getCOnfig('seo.title') }}">
+                <input type="text" class="form-control" id="title" name="title" aria-describedby="emailHelp" placeholder="Titel" value="{{ alias.getConfig('seo.title') }}">
                 <small id="emailHelp" class="form-text text-muted">Seitentitel/SERP Snippet Titel</small>
+            </div>
+            <div class="form-group">
+                <label for="Language">Sprache</label>
+                <input type="text" class="form-control" id="Language" name="Language" aria-describedby="emailHelp" placeholder="Sprache" value="{{ alias.getLanguage() }}">
             </div>
             <div class="form-group">
                 <label for="description">Meta-Beschreibung</label>

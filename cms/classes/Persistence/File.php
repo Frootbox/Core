@@ -174,6 +174,21 @@ class File extends AbstractRow
         return $name;
     }
 
+    public function getOrientation(): string
+    {
+        list($width, $height) = getimagesize(FILES_DIR . $this->getPath());
+
+        if ($width > $height) {
+            return 'Landscape';
+        }
+        elseif ($width < $height) {
+            return 'Portrait';
+        }
+        else {
+            return 'Square';
+        }
+    }
+
     /**
      *
      */

@@ -86,11 +86,23 @@ class TranslatorFactory
             // Gather language files from plugins
             foreach ($contentElements as $plugin) {
 
-
                 $paths[] = [
                     'file' => $plugin->getPath() . 'resources/private/language/' . $language . '.php',
                     'scope' => substr(substr(get_class($plugin), 0, -7), 13)
                 ];
+
+                $additionalFiles = $plugin->getAdditionalLanguageFiles($language);
+
+                if (!empty($additionalFiles)) {
+
+                    foreach ($additionalFiles as $file) {
+
+                        $paths[] = [
+                            'file' => $file['file'],
+                            'scope' => $file['scope'],
+                        ];
+                    }
+                }
             }
         }
 

@@ -21,7 +21,8 @@
                     <td class="handle" width="40"><i class="fa fa-grip-lines"></i></td>
                     <td class="text-right">
                         <a class="ajax" href="{{ v.getUri('Assets', 'ajaxSwitchVisibility', { assetId: listEntry.getId() } ) }}"><i data-asset="{{ listEntry.getId() }}" class="fa fa-lightbulb visibility {{ listEntry.getVisibilityString() }} icon"></i></a>
-                        <a data-confirm="Soll dieser Preis wirklich gelöscht werden?" href="{{ data.plugin.getAdminUri('Index', 'ajaxListEntryDelete', { categoryId: category.getId(), listEntryId: listEntry.getId() }) }}" class="ajax"><i class="fa fa-times icon"></i></a>
+                        <a data-toggle="tooltip" data-modal data-title="Position aus Kategorie entfernen" href="{{ data.plugin.getAdminUri('Index', 'ajaxListEntryDisconnect', { categoryId: category.getId(), listEntryId: listEntry.getId() }) }}" class="ajax"><i class="far fa-link-horizontal-slash icon"></i></a>
+                        <a data-toggle="tooltip" data-modal data-title="Position löschen" data-confirm="Soll diese Position wirklich gelöscht werden?" href="{{ data.plugin.getAdminUri('Index', 'ajaxListEntryDelete', { categoryId: category.getId(), listEntryId: listEntry.getId() }) }}" class="ajax"><i class="far fa-trash icon"></i></a>
                     </td>
                 </tr>
             {% endfor %}

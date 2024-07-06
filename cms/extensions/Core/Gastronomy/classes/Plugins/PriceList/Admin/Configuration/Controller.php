@@ -33,6 +33,24 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         ]);
     }
 
+    public function ajaxCategoriesTriggerSaveAction(
+        \Frootbox\Ext\Core\Gastronomy\Plugins\PriceList\Persistence\Repositories\Categories $categoriesRepository,
+    ): Response
+    {
+        $categories = $categoriesRepository->fetch([
+            'where' => [
+                'pluginId' => $this->plugin->getId(),
+            ],
+            'order' => [ 'lft ASC' ],
+        ]);
+
+        foreach ($categories as $category) {
+            $category->save();
+        }
+
+        d("OK");
+    }
+
     public function ajaxModalAdditivesDuplicatesAction(
         \Frootbox\Ext\Core\Gastronomy\Plugins\PriceList\Persistence\Repositories\Additives $additivesRepository,
         \Frootbox\Ext\Core\Gastronomy\Plugins\PriceList\Persistence\Repositories\ListEntries $listEntryRepository,

@@ -77,6 +77,16 @@ class Method extends \Frootbox\Ext\Core\ShopSystem\PaymentMethods\PaymentMethod
 
         $result = json_decode($output, true);
 
+        if (!empty($result['name']) and $result['name'] == 'UNPROCESSABLE_ENTITY') {
+
+            if (!empty($result['message'])) {
+                throw new \Exception($result['message']);
+            }
+            else {
+                throw new \Exception('Unknoen error (UNPROCESSABLE_ENTITY).');
+            }
+        }
+
         $_SESSION['cart']['paymentmethod']['data']['transaction'] = $result;
 
         foreach ($result['links'] as $link) {

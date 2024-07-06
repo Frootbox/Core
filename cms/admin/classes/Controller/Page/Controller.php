@@ -476,14 +476,14 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
             'search' => [
                 'preventIndexing' => $post->get('searchPreventIndexing'),
             ],
-            'aliasForced' => $post->get('aliasForced'),
+            'aliasForced' => strtolower($post->get('aliasForced')),
         ]);
 
         $page->setTitle($title);
         $page->setVisibility($post->get('visibility'));
         $page->setType($post->get('type'));
         $page->save([
-            'forceAlias' => $post->get('aliasForced'),
+            'forceAlias' => strtolower($post->get('aliasForced')),
         ]);
 
         return self::getResponse('json', 200, [
@@ -544,11 +544,17 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
     }
 
     /**
-     *
+     * @param \Frootbox\Http\Get $get
+     * @param \Frootbox\Http\Post $post
+     * @param \Frootbox\Persistence\Repositories\Pages $pages
+     * @return Response
+     * @throws \Frootbox\Exceptions\InputMissing
+     * @throws \Frootbox\Exceptions\NotFound
+     * @throws \Frootbox\Exceptions\RuntimeError
      */
     public function ajaxUpdateLayout(
-        \Frootbox\Http\Post $post,
         \Frootbox\Http\Get $get,
+        \Frootbox\Http\Post $post,
         \Frootbox\Persistence\Repositories\Pages $pages
     ): Response
     {
@@ -568,8 +574,8 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
         ]);
 
         $page->setLanguage($post->get('language'));
-
         $page->save();
+
 
         // Copy config to all children
         if ($post->get('inheritConfig')) {

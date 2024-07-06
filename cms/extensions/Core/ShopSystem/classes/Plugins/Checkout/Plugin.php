@@ -23,7 +23,38 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         'complete',
         'review',
         'choiceOfDelivery',
+        'choiceOfSelfPickup',
+        'choiceOfSelfPickupTime',
     ];
+
+    /**
+     * @param string $language
+     * @return array|null
+     */
+    public function getAdditionalLanguageFiles(string $language): ?array
+    {
+        $list = [];
+
+        $directory = new \Frootbox\Filesystem\Directory(realpath($this->getPath() . '../../PaymentMethods'));
+
+        foreach ($directory as $file) {
+
+            if ($file->getName() == 'PaymentMethod.php') {
+                continue;
+            }
+
+            $languageFile = $file->getPath() . $file->getName() . '/resources/private/language/' .$language . '.php';
+
+            if (file_exists($languageFile)) {
+                $list[] = [
+                    'file' => $languageFile,
+                    'scope' => 'Core\ShopSystem\PaymentMethods\\' . $file->getName(),
+                ];
+            }
+        }
+
+        return $list;
+    }
 
     /**
      * @param string $layout
@@ -76,7 +107,8 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
     public function getPaymentMethod(
         Container $container,
         \Frootbox\Persistence\Content\Repositories\ContentElements $contentElementsRepository
-    ) {
+    ): ?\Frootbox\Ext\Core\ShopSystem\PaymentMethods\PaymentMethod
+    {
         if (empty($_SESSION['cart']['paymentmethod'])) {
             $paymentmethods = $this->getPaymentMethods($container);
 
@@ -184,15 +216,19 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
             $paymentMethod = new $paymentMethodClass;
 
             // Load language file
-            $path = $paymentMethod->getPath() . 'resources/private/language/de-DE.php';
-            $title = $paymentMethodClass;
-
             $scope = str_replace('\\', '.', substr(substr(get_class($paymentMethod), 0, -7), 13));
             $translator->setScope($scope);
 
-            if (file_exists($path)) {
-                $translator->addResource($path, $scope, false);
+
+            $path = $paymentMethod->getPath() . 'resources/private/language/' . GLOBAL_LANGUAGE . '.php';
+
+            if (!file_exists($path)) {
+                $path = $paymentMethod->getPath() . 'resources/private/language/de-DE.php';
             }
+
+            $translator->addResource($path, $scope, false);
+
+
 
             $paymentMethod->setTitle($translator->translate('Method.Title'));
 
@@ -217,7 +253,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
     }
 
     /**
-     *
+     * @return \Frootbox\Ext\Core\ShopSystem\Plugins\ShopSystem\Plugin
      */
     public function getShopPlugin(): \Frootbox\Ext\Core\ShopSystem\Plugins\ShopSystem\Plugin
     {
@@ -232,6 +268,27 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         ]);
 
         return $shopPlugin;
+    }
+
+    public function hasPaymentExtraStep(
+        Shopcart $shopCart,
+        Container $container,
+    ): bool
+    {
+        // Get payment methods
+        $paymentMethods = $this->getPaymentMethods($container);
+
+        /**
+         * @var \Frootbox\Ext\Core\ShopSystem\PaymentMethods\PaymentMethod $paymentMethod
+         */
+        foreach ($paymentMethods as $paymentMethod) {
+
+            if ($paymentMethod->forcesPaymentExtraStep()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -307,27 +364,37 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
     }
 
     /**
-     * @param Shopcart $shopcart
+     * @param \Frootbox\Ext\Core\ShopSystem\Plugins\Checkout\Shopcart $shopcart
+     * @param \DI\Container $container
      * @param \Frootbox\Db\Db $dbms
-     * @param Container $container
-     * @param Post $post
+     * @param \Frootbox\Http\Get $get
+     * @param \Frootbox\Http\Post $post
      * @param \Frootbox\Session $session
-     * @param Config $config
+     * @param \Frootbox\Builder $builder
+     * @param \Frootbox\Config\Config $config
      * @param \Frootbox\View\Engines\Interfaces\Engine $view
      * @param \Frootbox\TranslatorFactory $translationFactory
+     * @param \Frootbox\Persistence\Repositories\Files $fileRepository
      * @param \Frootbox\Persistence\Repositories\Users $usersRepository
+     * @param \Frootbox\Ext\Core\ShopSystem\Integrations\Delegator $delegator
+     * @param \Frootbox\Mail\Transports\Interfaces\TransportInterface $mailTransport
+     * @param \Frootbox\Persistence\Content\Repositories\ContentElements $contentElements
      * @param \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Bookings $bookingsRepository
      * @param \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Coupons $couponsRepository
-     * @return Response
+     * @param \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Stock $stockRepository
+     * @param \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Products $productsRepository
+     * @return \Frootbox\View\Response
      * @throws \Frootbox\Exceptions\InputInvalid
      * @throws \Frootbox\Exceptions\InputMissing
+     * @throws \Frootbox\Exceptions\NotFound
      * @throws \Frootbox\Exceptions\RuntimeError
-     * @throws \PHPMailer\PHPMailer\Exception
+     * @throws \Spipu\Html2Pdf\Exception\Html2PdfException
      */
     public function ajaxCheckoutAction(
         Shopcart $shopcart,
         Container $container,
         \Frootbox\Db\Db $dbms,
+        \Frootbox\Http\Get $get,
         \Frootbox\Http\Post $post,
         \Frootbox\Session $session,
         \Frootbox\Builder $builder,
@@ -338,14 +405,18 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         \Frootbox\Persistence\Repositories\Users $usersRepository,
         \Frootbox\Ext\Core\ShopSystem\Integrations\Delegator $delegator,
         \Frootbox\Mail\Transports\Interfaces\TransportInterface $mailTransport,
+        \Frootbox\Persistence\Content\Repositories\ContentElements $contentElements,
         \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Bookings $bookingsRepository,
         \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Coupons $couponsRepository,
         \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Stock $stockRepository,
         \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Products $productsRepository,
     ): Response
     {
-        // Validate required input
-        $post->require(['privacyPolicy', 'rightOfWithdrawal']);
+        if (empty($get->get('preChecked'))) {
+
+            // Validate required input
+            $post->require(['privacyPolicy', 'rightOfWithdrawal']);
+        }
 
         // Check cart count
         if ($shopcart->getItemCount() == 0) {
@@ -370,7 +441,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
 
         $dbms->transactionStart();
 
-        // Fetch shopsystem plugin
+        // Fetch shop-system plugin
         $shopPlugin = $this->getShopPlugin();
 
         // Obtain translator
@@ -422,13 +493,6 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
             }
         }
 
-        // Perform additional payment action
-        $paymentMethod = $shopcart->getPaymentMethod();
-
-        if (method_exists($paymentMethod, 'preCheckoutAction')) {
-            $paymentMethod->preCheckoutAction($shopcart);
-        }
-
         // Gather coupon data
         $couponData = [];
 
@@ -438,6 +502,14 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
                 'redeemedValue' => $coupon->getRedeemedValue(),
                 'code' => $coupon->getCode(),
             ];
+        }
+
+        // Validate payment if pre-checked
+        if (!empty($get->get('preChecked'))) {
+
+            $paymentMethod = $shopcart->getPaymentMethod();
+
+            $container->call([ $paymentMethod, 'onValidatePaymentAfterPreCheckout']);
         }
 
         // Generate newly booked coupons
@@ -549,6 +621,24 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
 
         $booking->save();
 
+        // Set order number to shopping-cart for later use in payment methods
+        $shopcart->setOrderNumber($orderNumber);
+
+        // Perform additional payment action
+        $paymentMethod = $shopcart->getPaymentMethod();
+
+        if (method_exists($paymentMethod, 'preCheckoutAction')) {
+            $paymentData = $container->call([ $paymentMethod, 'preCheckoutAction' ]);
+
+            $booking->addConfig([
+                'payment' => [
+                    'transactionData' => $paymentData,
+                ],
+            ]);
+
+            $booking->save();
+        }
+
         // Compose mails
         $view->set('translator', $translator);
         $view->set('shopcart', $shopcart);
@@ -589,6 +679,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         $view->set('paymentInfo', $paymentInfo);
 
         $source = $builder->render('Mail.html.twig');
+
 
         // Mark coupons redeemed
         foreach ($shopcart->getRedeemedCoupons() as $coupon) {
@@ -684,6 +775,11 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
             );
         }
 
+        // Check if bookings needs to be handed over to integrations
+        if ($delegator->canTransferBooking()) {
+            $delegator->transferBooking($booking);
+        }
+
         $dbms->transactionCommit();
 
         // Compose mails
@@ -738,9 +834,18 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         $mail->setReplyTo($shopcart->getPersonal('email'));
         $mailTransport->send($mail);
 
-        // Check if bookings needs to be handed over to integrations
-        if ($delegator->canTransferBooking()) {
-            $delegator->transferBooking($booking);
+        // Look for "booking completed" page
+        $pluginCompleted = $contentElements->fetchOne([
+            'where' => [
+                'className' => \Frootbox\Ext\Core\ShopSystem\Plugins\CheckoutCompleted\Plugin::class,
+            ],
+        ]);
+
+        if ($pluginCompleted) {
+            $uri = $pluginCompleted->getActionUri('index');
+        }
+        else {
+            $uri = $this->getActionUri('complete', ['bookingId' => $booking->getId(), 'mailSent' => $mailSent,]);
         }
 
         unset($_SESSION['cart']);
@@ -748,8 +853,8 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         return new \Frootbox\View\ResponseJson([
             'bookingId' => $booking->getId(),
             'mailSent' => $mailSent,
-            'success' => 'Die Buchung wurde erfolgreich abgeschlossen',
-            'continue' => $this->getActionUri('complete', ['bookingId' => $booking->getId(), 'mailSent' => $mailSent,]),
+            'success' => $translator->translate('Core.ShopSystem.Plugins.Checkout.CheckoutCompleted'),
+            'continue' => $uri,
         ]);
     }
 
@@ -849,6 +954,33 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
             'plugin' => $this,
             'item' => $item,
             'product' => $product,
+        ]);
+    }
+
+    /**
+     * @param \Frootbox\Ext\Core\ShopSystem\Plugins\Checkout\Shopcart $shopcart
+     * @param \Frootbox\Http\Post $post
+     * @return \Frootbox\View\ResponseJson
+     */
+    public function ajaxCheckoutPreAction(
+        Shopcart $shopcart,
+        \Frootbox\Http\Post $post,
+    ): ResponseJson
+    {
+        // Set note
+        $shopcart->setNote($post->get('Note'));
+
+
+
+
+        // Backup order
+        $cacheFile = FILES_DIR . 'orders/' . date('Y-m-d') . '/' . date('H-i') . '-' . rand(10000, 99999) . '.json';
+        $file = new \Frootbox\Filesystem\File($cacheFile);
+        $file->setSource(json_encode($_SESSION['cart']));
+        $file->write();
+
+        return new ResponseJson([
+            'isCartValid' => true,
         ]);
     }
 
@@ -1076,19 +1208,22 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
     }
 
     /**
+     * @param Shopcart $shopcart
      * @param Container $container
      * @param Post $post
      * @param Config $config
-     * @param Shopcart $shopcart
+     * @param \Frootbox\TranslatorFactory $translationFactory
      * @param \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Products $productsRepository
      * @return Response
      * @throws \Frootbox\Exceptions\InputMissing
+     * @throws \Frootbox\Exceptions\NotFound
      */
     public function ajaxSubmitDataAction(
+        Shopcart $shopcart,
         Container $container,
         \Frootbox\Http\Post $post,
         \Frootbox\Config\Config $config,
-        Shopcart $shopcart,
+        \Frootbox\TranslatorFactory $translationFactory,
         \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Products $productsRepository,
     ): Response
     {
@@ -1101,7 +1236,6 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
             'personal.postalCode',
             'personal.city',
             'personal.gender',
-            'payment.method',
         ];
 
         $shipping = $post->get('shipping');
@@ -1120,13 +1254,25 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         // Validate required fields
         $post->require($required);
 
+        // Obtain translator
+        $translator = $this->getTranslator($translationFactory);
+
         // Set data
         $shopcart->setPersonal($post->get('personal'));
-        $shopcart->setBilling($post->get('billing'));
+
+        // Update billing
+        if (!empty($post->get('billing'))) {
+
+            $billing = $shopcart->getBillingData();
+            $billing = array_merge($billing, $post->get('billing'));
+            $shopcart->setBilling($billing);
+        }
 
         // Update shipping
         $shipping = $post->get('shipping');
         $shipping['deliveryDay'] = $shopcart->getShipping('deliveryDay');
+        $shipping['pickupDay'] = $shopcart->getShipping('pickupDay');
+        $shipping['pickupTime'] = $shopcart->getShipping('pickupTime');
 
         $shopcart->setShipping($shipping);
 
@@ -1161,22 +1307,30 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         if ($method) {
 
             if (!$method->isShippingAddressValid($shopcart)) {
-                throw new \Exception('Diese Postleitzahl können wir leider nicht beliefern.');
+                throw new \Exception($translator->translate('Core.ShopSystem.Plugins.Checkout.Exceptions.ZipcodeAreaNoDelivery'));
             }
         }
 
+        if ($this->hasPaymentExtraStep($shopcart, $container)) {
+
+            return new \Frootbox\View\ResponseJson([
+                'redirect' => $this->getActionUri('payment'),
+            ]);
+        }
+
+        if (!empty($this->getConfig('PaymentExtraStep'))) {
+
+            return new \Frootbox\View\ResponseJson([
+                'redirect' => $this->getActionUri('selectPayment'),
+            ]);
+        }
+
+        if (empty($post->get('payment')['method'])) {
+            throw new \Exception('Die zahlungsart muss gewählt werden.');
+        }
 
         // Update payment method
         $shopcart->setPaymentMethodClass($post->get('payment')['method']);
-
-        /*
-        // Check for free choice of delivery day
-        foreach ($shopcart->getItems() as $item) {
-            if (!empty($item->getProduct()->getConfig('freeChoiceOfDeliveryDay'))) {
-                return new \Frootbox\View\ResponseRedirect($this->getActionUri('choiceOfDelivery'));
-            }
-        }
-        */
 
         // Redirect to payment if no choice of deliver<
         $paymentMethod = $shopcart->getPaymentMethod();
@@ -1200,41 +1354,115 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         ]);
     }
 
+    public function ajaxSubmitPaymentAction(
+        Shopcart $shopcart,
+        Container $container,
+        \Frootbox\Http\Get $get,
+        \Frootbox\Http\Post $post,
+    ): ResponseJson
+    {
+        // Get payment method
+        $paymentMethodClass = $post->get('PaymentMethod');
+        $paymentMethod = new $paymentMethodClass;
+
+        if ($shopcart->getPaymentMethodClass() != $paymentMethodClass and method_exists($paymentMethod, 'onUpdated')) {
+            $container->call([ $paymentMethod, 'onUpdated' ]);
+        }
+
+        // Update payment method
+        $shopcart->setPaymentMethodClass($paymentMethodClass);
+
+        if ($paymentMethod->isForcingNewPaymentFlow()) {
+            $url = $this->getActionUri('reviewFlow');
+
+        }
+        else {
+            $url = $this->getActionUri('review');
+        }
+
+        return new \Frootbox\View\ResponseJson([
+            'redirect' => $url,
+        ]);
+    }
+
     /**
-     *
+     * @param \Frootbox\Ext\Core\ShopSystem\Plugins\Checkout\Shopcart $shopcart
+     * @param \Frootbox\Http\Get $get
+     * @param \Frootbox\Http\Post $post
+     * @param \Frootbox\Config\Config $config
+     * @return \Frootbox\View\Response
+     * @throws \Frootbox\Exceptions\NotFound
      */
     public function ajaxUpdateDeliveryDayAction(
         Shopcart $shopcart,
-        Container $container,
+        \Frootbox\Http\Get $get,
         \Frootbox\Http\Post $post,
         \Frootbox\Config\Config $config,
     ): Response
     {
-        if (empty($post->get('deliveryDay'))) {
+        if (empty($post->get('deliveryDay')) and empty($get->get('deliveryDay'))) {
             return new \Frootbox\View\ResponseRedirect($this->getActionUri('choiceOfDelivery'));
         }
 
         // Obtain shipping data
         $shipping = $shopcart->getShippingData();
-        $shipping['deliveryDay'] = $post->get('deliveryDay');
+        $shipping['deliveryDay'] = $post->get('deliveryDay') ?? $get->get('deliveryDay');
 
         $shopcart->setShipping($shipping);
 
-        /*
-        // Redirect to payment
-        $paymentMethod = $shopcart->getPaymentMethod();
+        return new \Frootbox\View\ResponseRedirect($this->getActionUri('checkout'));
+    }
 
-        if (method_exists($paymentMethod, 'postPaymentSelectionAction')) {
-            $result = $container->call([$paymentMethod, 'postPaymentSelectionAction'], [
-                'config' => $config,
-                'shopcart' => $shopcart,
-            ]);
-
-            if (!empty($result['redirect'])) {
-                return new \Frootbox\View\ResponseRedirect($result['redirect']);
-            }
+    /**
+     *
+     */
+    public function ajaxUpdatePickupDayAction(
+        Shopcart $shopcart,
+        Container $container,
+        \Frootbox\Http\Get $get,
+        \Frootbox\Http\Post $post,
+        \Frootbox\Config\Config $config,
+    ): Response
+    {
+        if (empty($post->get('pickupDay')) and empty($get->get('pickupDay'))) {
+            return new \Frootbox\View\ResponseRedirect($this->getActionUri('choiceOfPickupDay'));
         }
-        */
+
+        // Obtain shipping data
+        $shipping = $shopcart->getShippingData();
+
+        $shipping['pickupDay'] = !empty($post->get('pickupDay')) ? $post->get('pickupDay') : $get->get('pickupDay');
+
+        $shopcart->setShipping($shipping);
+
+        return new \Frootbox\View\ResponseRedirect($this->getActionUri('ChoiceOfSelfPickupTime'));
+    }
+
+    /**
+     * @param \Frootbox\Ext\Core\ShopSystem\Plugins\Checkout\Shopcart $shopcart
+     * @param \Frootbox\Http\Post $post
+     * @return \Frootbox\View\Response
+     * @throws \Frootbox\Exceptions\NotFound
+     */
+    public function ajaxUpdateDeliveryTimeAction(
+        Shopcart $shopcart,
+        \Frootbox\Http\Post $post,
+        \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\SelfPickupTime $selfPickUpTimeRepository,
+    ): Response
+    {
+        /**
+         * Fetch pickup-time
+         * @var \Frootbox\Ext\Core\ShopSystem\Persistence\SelfPickupTime $pickUpTime
+         */
+        $pickUpTime = $selfPickUpTimeRepository->fetchById($post->get('PickupTime'));
+
+        // Obtain shipping data
+        $shipping = $shopcart->getShippingData();
+
+        $shipping['pickupTime'] = $pickUpTime->getTimeStart() . '–' . $pickUpTime->getTimeEnd();
+        $shipping['pickupTimeId'] = $pickUpTime->getId();
+
+        $shopcart->setShipping($shipping);
 
         return new \Frootbox\View\ResponseRedirect($this->getActionUri('checkout'));
     }
@@ -1450,6 +1678,10 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\ShippingDay $shippingDayRepository,
     ): Response
     {
+        if ($shopcart->getShipping('type') == 'selfPickup') {
+            return new ResponseRedirect($this->getActionUri('choiceOfSelfPickup'));
+        }
+
         // Obtain shop plugin
         $shopPlugin = $this->getShopPlugin();
 
@@ -1490,15 +1722,14 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
             $addedDays = $shopPlugin->getConfig('shipping.skipNextWorkdays');
 
             if ($firstRegularDay->format('N') == 6) {
-                $addedDays += 2;
+               // $addedDays += 2;
             }
             else if ($firstRegularDay->format('N') == 7) {
-                $addedDays += 1;
+               // $addedDays += 1;
             }
 
             $firstRegularDay->modify('+' . $addedDays . ' days');
         }
-
 
         $lastDate = new \DateTime($date->format('Y-m-d'));
         $lastDate->modify('+ ' . (($date->format('t') - $date->format('d')) + 1) . ' days');
@@ -1510,6 +1741,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         );
 
         $dayList = [];
+        $dayCheck = [];
 
         // Exclude public holidays
         $country = ($shopcart->getShipping('type') == 'shipToBillingAddress') ? $shopcart->getPersonal('country') : $shopcart->getShipping('country');
@@ -1570,7 +1802,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
                 continue;
             }
 
-            if (!in_array($actDate->format('N'), $shopPlugin->getConfig('shipping.regularShippingDays'))) {
+            if (!empty($shopPlugin->getConfig('shipping.regularShippingDays')) and !in_array($actDate->format('N'), $shopPlugin->getConfig('shipping.regularShippingDays'))) {
                 continue;
             }
 
@@ -1594,6 +1826,44 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
             }
 
             $dayList[] = $actDate;
+            $dayCheck[$actDate->format('Y-m-d')] = true;
+        }
+
+        $weeks = [];
+
+        $runningDate = clone $date;
+        $runningDate->modify('first day of this month');
+
+        $firstDayNum = $runningDate->format('N');
+
+        $runningDate->modify('-' . ($firstDayNum - 1) . ' days');
+
+        $checkMonth = $date->format('n');
+
+        for ($w = 0; $w < 6; ++$w) {
+
+            $week = [
+                'nr' => (int) $runningDate->format('W'),
+                'days' => [],
+            ];
+
+            for ($d = 1; $d <= 7; ++$d) {
+
+                $day = [
+                    'date' => $runningDate->format('Y-m-d'),
+                    'isActive' => !empty($dayCheck[$runningDate->format('Y-m-d')]),
+                ];
+
+                $week['days'][] = $day;
+
+                $runningDate->modify('+ 1 day');
+            }
+
+            $weeks[] = $week;
+
+            if ($checkMonth != $runningDate->format('n')) {
+                break;
+            }
         }
 
         return new Response([
@@ -1603,6 +1873,251 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
             'shopcart' => $shopcart,
             'monthList' => $months,
             'dayList' => $dayList,
+            'weeks' => $weeks,
+        ]);
+    }
+
+    /**
+     * @param \Frootbox\Ext\Core\ShopSystem\Plugins\Checkout\Shopcart $shopcart
+     * @param \Frootbox\Http\Post $post
+     * @param \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\SelfPickupDay $selfPickupDayRepository
+     * @param \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\SelfPickupTime $selfPickUpTimeRepository
+     * @return \Frootbox\View\Response
+     * @throws \Frootbox\Exceptions\NotFound
+     */
+    public function choiceOfSelfPickupAction(
+        Shopcart $shopcart,
+        \Frootbox\Http\Post $post,
+        \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\SelfPickupDay $selfPickupDayRepository,
+        \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\SelfPickupTime $selfPickUpTimeRepository,
+    ): Response
+    {
+        if ($shopcart->getShipping('type') != 'selfPickup') {
+            return new ResponseRedirect($this->getActionUri('choiceOfDelivery'));
+        }
+
+        // Obtain shop plugin
+        $shopPlugin = $this->getShopPlugin();
+
+        if ($this->hasAttribute('Month')) {
+
+            $xDate = new \DateTime($this->getAttribute('Month'));
+
+            if ($this->hasAttribute('Shift')) {
+                if ($this->getAttribute('Shift') == 'Prev') {
+                    $xDate->modify('-1 month');
+                }
+                else {
+                    $xDate->modify('+1 month');
+                }
+            }
+
+            $now = new \DateTime();
+
+            if ($xDate < $now) {
+                $xDate = clone $now;
+            }
+
+            $now->modify('+6 month');
+
+            if ($xDate > $now) {
+                $xDate = clone $now;
+            }
+
+            $selectedMonth = $xDate->format('Y-m-d');
+        }
+        else {
+            $selectedMonth = $post->get('month') ?? $shopcart->getShipping('deliveryDay');
+        }
+
+        $now = new \DateTime();
+
+        if (!empty($selectedMonth)) {
+            $date = new \DateTime($selectedMonth);
+            $selectedMonthString = $date->format('Y-m');
+            $selectedDayString = $date->format('Y-m-d');
+        }
+        else {
+            $date = new \DateTime();
+        }
+
+        if ($date->format('Y-m') == $now->format('Y-m')) {
+            $date->setDate($date->format('Y'), $date->format('m'), $now->format('d'));
+        }
+        else {
+            $date->setDate($date->format('Y'), $date->format('m'), 1);
+        }
+
+        // Fetch self pickup times
+        $pickUpTimes = $selfPickUpTimeRepository->fetch([
+            'where' => [
+                'pluginId' => $shopPlugin->getId(),
+            ],
+            'order' => [ 'dateStart ASC' ],
+        ]);
+
+        // Compute months
+        $months = [];
+        $monthDate = new \DateTime(date('Y-m') . '-01');
+
+        for ($i = 1; $i <= 3; ++$i) {
+            $months[] = clone $monthDate;
+
+            $monthDate->modify('+1 month');
+        }
+
+        $firstRegularDay = new \DateTime();
+
+        if (!empty($shopPlugin->getConfig('selfPickup.skipNextWorkdays'))) {
+
+            $addedDays = $shopPlugin->getConfig('selfPickup.skipNextWorkdays');
+
+            if ($firstRegularDay->format('N') == 6) {
+                $addedDays += 2;
+            }
+            else if ($firstRegularDay->format('N') == 7) {
+                $addedDays += 1;
+            }
+
+            $firstRegularDay->modify('+' . $addedDays . ' days');
+        }
+
+        $lastDate = new \DateTime($date->format('Y-m-d'));
+        $lastDate->modify('+ ' . (($date->format('t') - $date->format('d')) + 1) . ' days');
+
+        $period = new \DatePeriod(
+            $date,
+            new \DateInterval('P1D'),
+            $lastDate,
+        );
+
+        $dayList = [];
+        $dayCheck = [];
+
+        foreach ($period as $key => $actDate) {
+
+            $dateString = $actDate->format('Y-m-d');
+
+            if ($firstRegularDay > $actDate) {
+                continue;
+            }
+
+            $isBlocked = $selfPickupDayRepository->fetchOne([
+                'where' => [
+                    'dateStart' => $dateString . ' 00:00:00',
+                ],
+            ]);
+
+            if ($isBlocked) {
+                continue;
+            }
+
+            if (!empty($shopPlugin->getConfig('selfPickup.regularSelfPickupDays')) and !in_array($actDate->format('N'), $shopPlugin->getConfig('selfPickup.regularSelfPickupDays'))) {
+                continue;
+            }
+
+            $available = false;
+
+            foreach ($pickUpTimes as $pickUpTime) {
+
+                if ($pickUpTime->isAvailableForDate($actDate)) {
+                    $available = true;
+                    break;
+                }
+            }
+
+            if (!$available) {
+                continue;
+            }
+
+            $dayList[] = $actDate;
+            $dayCheck[$actDate->format('Y-m-d')] = true;
+        }
+
+        $weeks = [];
+
+        $runningDate = clone $date;
+        $runningDate->modify('first day of this month');
+
+        $firstDayNum = $runningDate->format('N');
+
+        $runningDate->modify('-' . ($firstDayNum - 1) . ' days');
+
+        $checkMonth = $date->format('n');
+
+        for ($w = 0; $w < 6; ++$w) {
+
+            $week = [
+                'nr' => (int) $runningDate->format('W'),
+                'days' => [],
+            ];
+
+            for ($d = 1; $d <= 7; ++$d) {
+
+                $day = [
+                    'date' => $runningDate->format('Y-m-d'),
+                    'isActive' => !empty($dayCheck[$runningDate->format('Y-m-d')]),
+                ];
+
+                $week['days'][] = $day;
+
+                $runningDate->modify('+ 1 day');
+            }
+
+            $weeks[] = $week;
+
+            if ($checkMonth != $runningDate->format('n')) {
+                break;
+            }
+        }
+
+        return new Response([
+            'selectedMonth' => $selectedMonth,
+            'selectedMonthString' => $selectedMonthString ?? null,
+            'selectedDayString' => $selectedDayString ?? null,
+            'shopcart' => $shopcart,
+            'monthList' => $months,
+            'dayList' => $dayList,
+            'weeks' => $weeks,
+        ]);
+    }
+
+    /**
+     * @return \Frootbox\View\Response
+     */
+    public function choiceOfSelfPickupTimeAction(
+        Shopcart $shopcart,
+        \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\SelfPickupTime $selfPickUpTimeRepository,
+    ): Response
+    {
+        // Obtain shop-plugin
+        $shopPlugin = $this->getShopPlugin();
+
+        // Fetch times
+        $pickUpTimes = $selfPickUpTimeRepository->fetch([
+            'where' => [
+                'pluginId' => $shopPlugin->getId(),
+            ],
+            'order' => [ 'dateStart ASC' ],
+        ]);
+
+        $list = [];
+
+        foreach ($pickUpTimes as $pickUpTime) {
+
+            $xdate = new \DateTime($pickUpTime->getDateEnd());
+            $date = new \DateTime($shopcart->getShipping('pickupDay'));
+            $date->setTime($xdate->format('H'), $xdate->format('i'));
+
+            if ($pickUpTime->isAvailableForDate($date)) {
+                $list[] = $pickUpTime;
+            }
+        }
+
+        // $selfPickupTimes = !empty($this->getConfig('SelfPickupTimes')) ? explode("\n", $this->getConfig('SelfPickupTimes')) : [];
+
+        return new Response([
+            'SelfPickupTimes' => $list,
         ]);
     }
 
@@ -1637,11 +2152,30 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         // Obtain shop plugin
         $shopPlugin = $this->getShopPlugin();
 
-
-        // Generate response
         return new Response([
             'shopcart' => $shopcart,
             'currencySign' => $shopPlugin->getCurrencySign(),
+        ]);
+    }
+
+    /**
+     * @param \Frootbox\Ext\Core\ShopSystem\Plugins\Checkout\Shopcart $shopCart
+     * @return \Frootbox\View\Response
+     */
+    public function paymentAction(
+        Shopcart $shopCart,
+    ): Response
+    {
+        if (!$this->isShopActive()) {
+            return new \Frootbox\View\ResponseRedirect($this->getActionUri('index'));
+        }
+
+        if ($shopCart->getItemCount() == 0) {
+            return new \Frootbox\View\ResponseRedirect($this->getActionUri('index'));
+        }
+
+        return new Response([
+            'shopcart' => $shopCart,
         ]);
     }
 
@@ -1675,9 +2209,9 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
      * @return Response
      */
     public function preReviewAction(
-        Container               $container,
+        Container $container,
         \Frootbox\Config\Config $config,
-        Shopcart                $shopcart,
+        Shopcart $shopcart,
     ): Response
     {
         if (!$this->isShopActive()) {
@@ -1728,15 +2262,126 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
             return new \Frootbox\View\ResponseRedirect($this->getActionUri('checkout', null, [ 'absolute' => true ]));
         }
 
-        // Check for free choice of delivery day
-        if (empty($shopcart->getShipping('deliveryDay'))) {
-            foreach ($shopcart->getItems() as $item) {
-                if (!empty($item->getProduct()->getConfig('freeChoiceOfDeliveryDay'))) {
-                    return new \Frootbox\View\ResponseRedirect($this->getActionUri('choiceOfDelivery'));
+        if ($shopcart->getShipping('type') == 'selfPickup') {
+            if (!empty($this->getShopConfig('choiceSelfPickupDay')) and empty($shopcart->getShipping('pickupDay'))) {
+                return new \Frootbox\View\ResponseRedirect($this->getActionUri('choiceOfSelfPickup'));
+            }
+        }
+        else {
+
+            // Check for free choice of delivery day
+            if (empty($shopcart->getShipping('deliveryDay'))) {
+                foreach ($shopcart->getItems() as $item) {
+                    if (!empty($item->getProduct()->getConfig('freeChoiceOfDeliveryDay'))) {
+                        return new \Frootbox\View\ResponseRedirect($this->getActionUri('choiceOfDelivery'));
+                    }
                 }
             }
         }
 
+
+        // Obtain shop plugin
+        $shopPlugin = $this->getShopPlugin();
+
+
+        // Check shopcart
+        foreach ($shopcart->getItems() as $item) {
+
+            $product = $productsRepository->fetchById($item->getProductId());
+
+            foreach ($product->getDatasheet()->getGroups() as $group) {
+
+                if (empty($item->getFieldOption($group->getId()))) {
+
+                    // Fetch product
+                    $product = $productsRepository->fetchById($item->getProductId());
+
+                    if (!empty($group->getOptionsForProduct($product)->getCount())) {
+                        return new \Frootbox\View\ResponseRedirect($this->getActionUri('checkout', null, [ 'absolute' => true ]));
+                    }
+                }
+            }
+        }
+
+        $method = $shopcart->getPaymentMethod();
+
+        $summary = $method->renderSummary($view, $shopcart->getPaymentData());
+
+        // Check customers email
+        $domain = explode('@', $shopcart->getPersonal('email'))[1];
+        $mailcheck = checkdnsrr($domain, 'MX');
+
+        if (!IS_LOGGED_IN AND empty($this->getConfig('skipCustomerLogin'))) {
+
+            $offerAccount = true;
+
+            $result = $usersRepository->fetchOne([
+                'where' => [
+                    'email' => $shopcart->getPersonal('email'),
+                ],
+            ]);
+
+            if ($result) {
+                $offerAccount = false;
+            }
+        }
+        else {
+            $offerAccount = false;
+        }
+
+        return new Response([
+            'paymentSummary'=> $summary,
+            'shopcart' => $shopcart,
+            'mailcheck' => $mailcheck,
+            'offerAccount' => $offerAccount,
+            'shopPlugin' => $shopPlugin,
+            'currencySign' => $shopPlugin->getCurrencySign(),
+        ]);
+    }
+
+
+    /**
+     * @param Shopcart $shopcart
+     * @param \Frootbox\View\Engines\Interfaces\Engine $view
+     * @param \Frootbox\Persistence\Repositories\Users $usersRepository
+     * @return Response
+     */
+    public function reviewFlowAction(
+        Shopcart $shopcart,
+        \Frootbox\TranslatorFactory $translatorFactory,
+        \Frootbox\View\Engines\Interfaces\Engine $view,
+        \Frootbox\Persistence\Repositories\Users $usersRepository,
+        \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Products $productsRepository,
+    ): Response
+    {
+        if (!$this->isShopActive()) {
+            return new \Frootbox\View\ResponseRedirect($this->getActionUri('index'));
+        }
+
+        if ($shopcart->getItemCount() == 0) {
+            return new \Frootbox\View\ResponseRedirect($this->getActionUri('index', null, [ 'absolute' => true ]));
+        }
+
+        if (empty($shopcart->getPersonal('email'))) {
+            return new \Frootbox\View\ResponseRedirect($this->getActionUri('checkout', null, [ 'absolute' => true ]));
+        }
+
+        if ($shopcart->getShipping('type') == 'selfPickup') {
+            if (!empty($this->getShopConfig('choiceSelfPickupDay')) and empty($shopcart->getShipping('pickupDay'))) {
+                return new \Frootbox\View\ResponseRedirect($this->getActionUri('choiceOfSelfPickup'));
+            }
+        }
+        else {
+
+            // Check for free choice of delivery day
+            if (empty($shopcart->getShipping('deliveryDay'))) {
+                foreach ($shopcart->getItems() as $item) {
+                    if (!empty($item->getProduct()->getConfig('freeChoiceOfDeliveryDay'))) {
+                        return new \Frootbox\View\ResponseRedirect($this->getActionUri('choiceOfDelivery'));
+                    }
+                }
+            }
+        }
 
         // Obtain shop plugin
         $shopPlugin = $this->getShopPlugin();

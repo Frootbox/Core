@@ -35,6 +35,7 @@ class Category extends \Frootbox\Persistence\Category
         return new \Frootbox\Persistence\Alias([
             'pageId' => $this->getPageId(),
             'virtualDirectory' => $vd,
+            'uid' => $this->getUid('alias'),
             'payload' => $this->generateAliasPayload([
                 'action' => 'showCategory',
                 'categoryId' => $this->getId()

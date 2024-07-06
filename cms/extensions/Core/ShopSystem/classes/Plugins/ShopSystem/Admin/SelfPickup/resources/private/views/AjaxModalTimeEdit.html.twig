@@ -1,0 +1,80 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    'frame' : false,
+}) }}
+
+<form method="post" class="ajax" action="{{ plugin.getAdminUri('SelfPickup', 'ajaxTimeUpdate', { PickUpTimeId: PickUpTime.getId() }) }}">
+
+    <div class="modal-body">
+
+        <div class="row">
+            <div class="col-md-3">
+
+                <div class="form-group">
+                    <label for="PickUpTimeStart">Von *</label>
+                    <input required type="time" class="form-control" id="PickUpTimeStart" name="PickUpTimeStart" value="{{ PickUpTime.getDateStart() | date('H:i') }}">
+                </div>
+
+            </div>
+            <div class="col-md-3">
+
+                <div class="form-group">
+                    <label for="PickUpTimeEnd">Bis *</label>
+                    <input required type="time" class="form-control" id="PickUpTimeEnd" name="PickUpTimeEnd" value="{{ PickUpTime.getDateEnd() | date('H:i') }}">
+                </div>
+
+            </div>
+            <div class="col-md-6">
+
+                <div class="form-group">
+                    <label for="LeadTime">min. Vorlaufzeit in Stunden</label>
+                    <input type="number" class="form-control" id="LeadTime" name="LeadTime" placeholder="min. Vorlaufzeit in Stunden" value="{{ PickUpTime.getConfig('LeadTime') }}">
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <label>
+                    Mo. <input type="checkbox" class="" name="Weekdays[1]" {% if PickUpTime.getConfig('Weekdays.1') %}checked{% endif %}>
+                </label>
+            </div>
+            <div class="col">
+                <label>
+                    Di. <input type="checkbox" class="" name="Weekdays[2]" {% if PickUpTime.getConfig('Weekdays.2') %}checked{% endif %}>
+                </label>
+            </div>
+            <div class="col">
+                <label>
+                    Mi. <input type="checkbox" class="" name="Weekdays[3]" {% if PickUpTime.getConfig('Weekdays.3') %}checked{% endif %}>
+                </label>
+            </div>
+            <div class="col">
+                <label>
+                    Do. <input type="checkbox" class="" name="Weekdays[4]" {% if PickUpTime.getConfig('Weekdays.4') %}checked{% endif %}>
+                </label>
+            </div>
+            <div class="col">
+                <label>
+                    Fr. <input type="checkbox" class="" name="Weekdays[5]" {% if PickUpTime.getConfig('Weekdays.5') %}checked{% endif %}>
+                </label>
+            </div>
+            <div class="col">
+                <label>
+                    Sa. <input type="checkbox" class="" name="Weekdays[6]" {% if PickUpTime.getConfig('Weekdays.6') %}checked{% endif %}>
+                </label>
+            </div>
+            <div class="col">
+                <label>
+                    So. <input type="checkbox" class="" name="Weekdays[7]" {% if PickUpTime.getConfig('Weekdays.7') %}checked{% endif %}>
+                </label>
+            </div>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Speichern</button>
+    </div>
+
+</form>

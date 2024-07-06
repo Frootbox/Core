@@ -5,7 +5,7 @@
 
 namespace Frootbox\Ext\Core\ShopSystem\Persistence;
 
-class DatasheetField extends \Frootbox\Persistence\AbstractAsset
+class DatasheetField extends \Frootbox\Persistence\AbstractAsset implements \Frootbox\Persistence\Interfaces\MultipleAliases
 {
     protected $model = Repositories\DatasheetFields::class;
 
@@ -63,11 +63,29 @@ class DatasheetField extends \Frootbox\Persistence\AbstractAsset
     }
 
     /**
+     *
+     */
+    public function getLanguageAliases(): array
+    {
+        $aliases = json_decode($this->data['aliases'], true);
+
+        return $aliases['index'] ?? [];
+    }
+
+    /**
      * Deactivate alias uris for datasheets
      */
     protected function getNewAlias ( ): ?\Frootbox\Persistence\Alias
     {
         return null;
+    }
+
+    /**
+     * @return array
+     */
+    public function getNewAliases(): array
+    {
+        return [];
     }
 
     /**
@@ -77,8 +95,9 @@ class DatasheetField extends \Frootbox\Persistence\AbstractAsset
     {
         $options = explode("\n", $this->getValueText());
 
-        return array_map('trim', $options);;
+        return array_map('trim', $options);
     }
+
     /**
      *
      */
@@ -106,6 +125,18 @@ class DatasheetField extends \Frootbox\Persistence\AbstractAsset
         }
 
         return $suffix;
+    }
+
+    /**
+     *
+     */
+    public function getTitleWithoutFallback($language = null): ?string
+    {
+        if (empty($language) or $language == DEFAULT_LANGUAGE) {
+            return parent::getTitle();
+        }
+
+        return $this->getConfig('titles')[$language] ?? null;
     }
 
     /**

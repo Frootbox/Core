@@ -19,7 +19,12 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     }
 
     /**
-     *
+     * @param \Frootbox\Http\Post $post
+     * @param \Frootbox\Ext\Core\Images\Plugins\References\Persistence\Repositories\References $referencesRepository
+     * @param \Frootbox\Admin\Viewhelper\GeneralPurpose $gp
+     * @return Response
+     * @throws \Frootbox\Exceptions\InputMissing
+     * @throws \Frootbox\Exceptions\RuntimeError
      */
     public function ajaxCreateAction(
         \Frootbox\Http\Post $post,
@@ -30,14 +35,26 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         // Validate required input
         $post->require([ 'title' ]);
 
-        // Create new reference
-        $reference = $referencesRepository->insert(new \Frootbox\Ext\Core\Images\Plugins\References\Persistence\Reference([
+        // Compose new reference
+        $reference = new \Frootbox\Ext\Core\Images\Plugins\References\Persistence\Reference([
             'pageId' => $this->plugin->getPageId(),
             'pluginId' => $this->plugin->getId(),
             'title' => $post->get('title'),
             'visibility' => (DEVMODE ? 2 : 1),
             'dateStart' => date('Y-m-d H:i:s'),
-        ]));
+        ]);
+
+        if (!empty($this->plugin->getConfig('noReferencesDetailPage'))) {
+
+            $reference->addConfig([
+                'noReferencesDetailPage' => true,
+            ]);
+        }
+
+        // Persist new reference
+        $reference = $referencesRepository->persist($reference);
+
+
 
         // Fix sorting
         $result = $referencesRepository->fetch([

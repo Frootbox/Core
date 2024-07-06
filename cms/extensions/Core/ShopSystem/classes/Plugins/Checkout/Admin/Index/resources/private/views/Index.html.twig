@@ -49,6 +49,10 @@
                                 <input {% if plugin.getConfig('ownOrderNumber') %}checked{% endif %} type="checkbox" class="form-check-input" id="ownOrderNumber" name="ownOrderNumber">
                                 <label class="form-check-label" for="ownOrderNumber">eigene Bestellnummer angeben</label>
                             </div>
+                            <div class="form-group form-check">
+                                <input {% if plugin.getConfig('PaymentExtraStep') %}checked{% endif %} type="checkbox" class="form-check-input" id="PaymentExtraStep" name="PaymentExtraStep">
+                                <label class="form-check-label" for="PaymentExtraStep">eigener Schritt für Zahlungsarten</label>
+                            </div>
 
                         </div>
                         <div class="col-md-6">
@@ -64,6 +68,14 @@
                                 <label for="dateTo">bis</label>
                                 <input type="date" class="form-control" id="dateTo" name="dateTo" value="{{ plugin.getConfig('shopInactive.to') }}" aria-describedby="emailHelp">
                                 <small id="emailHelp" class="form-text text-muted">Ab diesem Datum sind Bestellungen wieder aktiviert.</small>
+                            </div>
+
+                            <h3>Selbstabholung</h3>
+
+                            <div class="form-group">
+                                <label for="SelfPickupTimes">Abholzeiten</label>
+                                <textarea class="form-control" id="SelfPickupTimes" name="SelfPickupTimes" rows="3">{{ plugin.getConfig('SelfPickupTimes') }}</textarea>
+                                <small id="emailHelp" class="form-text text-muted">Eine Option pro Zeile.</small>
                             </div>
 
                         </div>

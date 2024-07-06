@@ -5,7 +5,6 @@
 
 namespace Frootbox\Ext\Core\HelpAndSupport\Plugins\Jobs;
 
-use Frootbox\Http\Interfaces\ResponseInterface;
 use Frootbox\View\Response;
 
 class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\Persistence\Interfaces\Cloneable
@@ -117,6 +116,26 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
         $subject = str_replace('[title]', $job->getTitle(), $subject);
 
         return $subject;
+    }
+
+    /**
+     * @param \Frootbox\Ext\Core\Addresses\Persistence\Address $location
+     * @return \Frootbox\Db\Result
+     * @throws \Frootbox\Exceptions\RuntimeError
+     */
+    public function getJobsByLocation(\Frootbox\Ext\Core\Addresses\Persistence\Address  $location): \Frootbox\Db\Result
+    {
+        // Fetch jobs
+        $repository = $this->getDb()->getRepository(Persistence\Repositories\Jobs::class);
+        $jobs = $repository->fetch([
+            'where' => [
+                'pluginId' => $this->getId(),
+                'locationId' => $location->getId(),
+                new \Frootbox\Db\Conditions\GreaterOrEqual('visibility', (IS_LOGGED_IN ? 1 : 2)),
+            ],
+        ]);
+
+        return $jobs;
     }
 
     /**

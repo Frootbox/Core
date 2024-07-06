@@ -6,6 +6,7 @@
 return [
     'Plugin.Title' => 'Referenzen',
     'LayoutAction.Index' => 'Übersicht',
-    'LayoutAction.ShowReference' => 'Referenz-Detailseite',
     'LayoutAction.Request' => 'Anfrage',
+    'LayoutAction.ShowCategory' => 'Kategorie-Detailseite',
+    'LayoutAction.ShowReference' => 'Referenz-Detailseite',
 ];

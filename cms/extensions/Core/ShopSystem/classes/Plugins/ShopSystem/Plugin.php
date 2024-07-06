@@ -277,18 +277,34 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
     }
 
     /**
-     *
+     * @param int|null $year
+     * @return \Frootbox\Db\Result
+     * @throws \Frootbox\Exceptions\RuntimeError
      */
-    public function getBookings(): \Frootbox\Db\Result
+    public function getBookings(array $parameters = []): \Frootbox\Db\Result
     {
         // Fetch bookings
         $bookingRepository = $this->getDb()->getRepository(\Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Bookings::class);
+        $payload = [
+            'ClassName' => \Frootbox\Ext\Core\ShopSystem\Persistence\Booking::class,
+        ];
 
-        return $bookingRepository->fetch([
-            'where' => [
-                new \Frootbox\Db\Conditions\Equal('state', 'Booked'),
-            ],
-        ]);
+        $sql = 'SELECT 
+            *,
+            DATE_FORMAT(date, "%Y") as year
+        FROM
+            assets
+        WHERE
+            className = :ClassName AND
+            state = "Booked"';
+
+        if (!empty($parameters['year'])) {
+            $sql .= ' HAVING year = ' . (int) $parameters['year'];
+        }
+
+        $result = $bookingRepository->fetchByQuery($sql, $payload);
+
+        return $result;
     }
 
     /**
@@ -449,16 +465,28 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
     }
 
     /**
-     *
+     * @param \Frootbox\Ext\Core\ShopSystem\Persistence\Product $product
+     * @param int|null $year
+     * @return bool
+     * @throws \Frootbox\Exceptions\RuntimeError
      */
-    public function hasBookingForProduct(\Frootbox\Ext\Core\ShopSystem\Persistence\Product $product): bool
+    public function hasBookingForProduct(
+        \Frootbox\Ext\Core\ShopSystem\Persistence\Product $product,
+        int $year = null,
+    ): bool
     {
+        /*
         // Fetch bookings
         $bookingRepository = $this->getDb()->getRepository(\Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Bookings::class);
         $bookings = $bookingRepository->fetch([
             'where' => [
                 new \Frootbox\Db\Conditions\NotEqual('state', 'Cancelled'),
             ],
+        ]);
+        */
+
+        $bookings = $this->getBookings([
+            'year' => date('Y')
         ]);
 
         foreach ($bookings as $booking) {
@@ -622,6 +650,31 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
     }
 
     /**
+     *
+     */
+    public function onBeforeDelete(
+        \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Datasheets $datasheets,
+        \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Products $productsRepository,
+    ): void
+    {
+        // Clear products
+        $products = $productsRepository->fetch([
+            'where' => [
+                'pluginId' => $this->getId(),
+            ],
+        ]);
+        $products->map('delete');
+
+        // Clear datasheets
+        $dataSheets = $datasheets->fetch([
+            'where' => [
+                'pluginId' => $this->getId(),
+            ],
+        ]);
+        $dataSheets->map('delete');
+    }
+
+    /**
      * @param \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Products $productsRepository
      * @return Response
      */
@@ -675,7 +728,13 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
     }
 
     /**
-     *
+     * @param \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Products $productsRepository
+     * @param \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Datasheets $datasheetsRepository
+     * @param \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Categories $categoriesRepository
+     * @param \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\CategoriesConnections $categoriesConnectionsRepository
+     * @return \Frootbox\View\Response
+     * @throws \Frootbox\Exceptions\AccessDenied
+     * @throws \Frootbox\Exceptions\NotFound
      */
     public function showProductAction(
         \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Products $productsRepository,

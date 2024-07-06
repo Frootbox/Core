@@ -1,0 +1,41 @@
+{# config
+
+title: Thumbnail-Karussell
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: widget }) %}
+{% set a = view.getViewhelper('Assets', {   }) %}
+
+{{ a.import('https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css') | raw }}
+{{ a.import('https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js') | raw }}
+{{ a.import('https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css') | raw }}
+
+{% set images = i.getImages() %}
+
+{% if images.getCount > 0 %}
+
+    <script nonce="{{ settings.nonce }}">
+        $(function ( ) {
+
+            $('.slider-stripe').slick({
+                slidesToShow: 5,
+                slidesToScroll: 1,
+                autoplay: true,
+                autoplaySpeed: 2000,
+                dots: false,
+            });
+        });
+    </script>
+
+    <div class="slider-stripe">
+        {% for image in images %}
+            <div style="padding: 20px;">
+                <div style="height: 70px; line-height: 70px; text-align: center;">
+                    <img style="display: inline;" height="70" src="{{ image.getUri({ width: null, height: 70 }) }}" alt="{{ image.getAlt() }}" />
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+{% endif %}

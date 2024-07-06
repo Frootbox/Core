@@ -18,11 +18,16 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
     ];
 
     /**
-     *
+     * @param array $parameters
+     * @return \Frootbox\Db\Result|null
+     * @throws \Frootbox\Exceptions\RuntimeError
      */
     public function getAddresses(array $parameters = []): ?\Frootbox\Db\Result
     {
         $limit = $parameters['limit'] ?? 1024;
+
+        $order = $parameters['order'] ?? [];
+
 
         // Fetch addresses
         $addressesRepository = $this->getDb()->getRepository(\Frootbox\Ext\Core\Addresses\Persistence\Repositories\Addresses::class);
@@ -32,7 +37,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
                 new \Frootbox\Db\Conditions\GreaterOrEqual('visibility',(IS_EDITOR ? 1 : 2)),
             ],
             'limit' => $limit,
-            // 'order' => [ 'title ASC' ],
+            'order' => $order,
         ]);
 
         return $result;
@@ -44,6 +49,10 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
      */
     public function getAddressesByLetter(array $parameters = []): array
     {
+        if (empty($parameters['order'])) {
+            $parameters['order'] = [ 'title ASC' ];
+        }
+
         $addresses = $this->getAddresses($parameters);
 
         $list = [];

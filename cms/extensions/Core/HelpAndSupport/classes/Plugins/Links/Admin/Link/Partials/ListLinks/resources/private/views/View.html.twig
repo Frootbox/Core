@@ -33,11 +33,13 @@
 
 					<td class="text-right">
 
+						<a class="ajax" href="{{ v.getUri('Assets', 'ajaxSwitchVisibility', { assetId: link.getId() } ) }}"><i data-asset="{{ link.getId() }}" class="fa fa-lightbulb visibility {{ link.getVisibilityString() }} icon"></i></a>
+
 						{% if link.getConfig('url') != "#" %}
 							<a target="_blank" href="{{ link.getConfig('url') }}"><i class="fa fa-link icon"></i></a>
 						{% endif %}
 
-						<a class="ajax" data-confirm="Soll dieser Link wirklich gelöscht werden?" href="{{ data.plugin.getAdminUri('Link', 'ajaxDelete', { linkId: link.getId() }) }}"><i class="fa fa-times icon"></i></a>
+						<a class="ajax" data-confirm="Soll dieser Link wirklich gelöscht werden?" href="{{ data.plugin.getAdminUri('Link', 'ajaxDelete', { linkId: link.getId() }) }}"><i class="far fa-trash icon"></i></a>
 					</td>
 				</tr>
 			{% endfor %}

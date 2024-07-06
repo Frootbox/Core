@@ -18,6 +18,10 @@
         <a class="tel" href="tel:{{ contact.getPhone() }}">{{ contact.getPhone() }}</a>
     {% endif %}
 
+    {% if contact.getPhone2() %}
+        <a class="tel" href="tel:{{ contact.getPhone2() }}">{{ contact.getPhone2() }}</a>
+    {% endif %}
+
     {% if contact.getEmail() %}
         <a class="email" href="mailto:{{ contact.getEmail() }}">{{ contact.getEmail() }}</a>
     {% endif %}

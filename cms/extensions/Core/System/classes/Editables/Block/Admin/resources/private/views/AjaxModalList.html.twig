@@ -25,11 +25,16 @@
         });
 
         /**
-         *
+         * Delete block
          */
-        $('a.list-block-delete').click(function ( event ) {
+        $('a.list-block-delete').click(function(event) {
+
             event.stopImmediatePropagation();
             event.preventDefault();
+
+            if (!confirm('Soll dieser Block wirklich gelöscht werden?')) {
+                return;
+            }
 
             $.ajax({
                 url: $(this).attr('href'),
@@ -41,17 +46,31 @@
         });
 
         /**
-         *
+         * Switch visibility of block
          */
-        $('a.block-switch').click(function ( event ) {
+        $('a.block-switch').click(function(event) {
 
             event.preventDefault();
 
             $.ajax({
                 url: $(this).attr('href'),
-                success: function ( response ) {
+                success: function(response) {
+
+                    console.log(response);
+
+                    if (response.visibility == "visibility-0") {
+                        $('[data-blocks][data-uid="' + response.uid + '"] [data-block="' + response.blockId + '"]').hide();
+                    }
+                    else {
+                        $('[data-blocks][data-uid="' + response.uid + '"] [data-block="' + response.blockId + '"]').show();
+                    }
+
                     $('#blockstable tr[data-block="' + response.blockId + '"] i.visibility').removeClass('visibility-0 visibility-1 visibility-2');
+                    $('#blockstable tr[data-block="' + response.blockId + '"] i.visibility').removeClass('fa-traffic-light-stop fa-traffic-light-slow fa-traffic-light-go');
                     $('#blockstable tr[data-block="' + response.blockId + '"] i.visibility').addClass(response.visibility);
+                    $('#blockstable tr[data-block="' + response.blockId + '"] i.visibility').addClass(response.visibilityIcon);
+
+
                 }
             });
         });
@@ -97,6 +116,9 @@
         {% for block in blocks %}
             <tr id="row-{{ block.getId() }}" data-block="{{ block.getId() }}">
                 <td>
+                    <img style="box-shadow: 0 0 10px rgba(0, 0, 0, .2); width: 60px; height: auto;" src="{{ block.getThumbnailSrc() }}" alt="" />
+                </td>
+                <td>
                     {% if block.getTitleClean() and block.getBlockId() != block.getTitleClean() %}
                         <b>{{ block.getTitleClean() }}</b><br />
                         {{ block.getNameFromView() | default(block.getBlockId()) }}
@@ -106,7 +128,9 @@
                 </td>
                 <td class="handle"><a href="#"><i class="fa fa-grip-lines"></i></a></td>
                 <td class="text-right">
-                    <a class="block-switch" href="{{ controller.getActionUri('ajaxBlockSwitch', { blockId: block.getId() }) }}"><i class="fa fa-lightbulb xicon visibility {{ block.getVisibilityString() }}"></i></a>
+                    <a class="block-switch" href="{{ controller.getActionUri('ajaxBlockSwitch', { blockId: block.getId() }) }}">
+                        {{ block.getVisibilityIcon() | raw }}
+                    </a>
                     <a class="list-block-delete" href="{{ controller.getActionUri('ajaxBlockDelete', { blockId: block.getId() }) }}"><i class="far fa-trash xicon"></i></a>
                 </td>
             </tr>

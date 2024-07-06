@@ -111,6 +111,36 @@ class Block extends \Frootbox\Persistence\AbstractConfigurableRow
         ]);
     }
 
+    public function getThumbnailSrc(): string
+    {
+        $controller = $this->getExtensionController();
+        $path = $controller->getPath() . 'classes/Blocks/' . $this->getBlockId() . '/';
+
+        $files = [
+            $path . 'thumbnail.jpg',
+            $path . 'thumbnail.png',
+        ];
+
+        $thumbnail = null;
+
+        foreach ($files as $file) {
+            if (file_exists($file)) {
+                $thumbnail = $file;
+                break;
+            }
+        }
+
+        if ($thumbnail === null) {
+            $thumbnail = CORE_DIR . 'cms/admin/resources/public/images/no-thumbnail.png';
+        }
+
+        $key = md5($thumbnail);
+
+        $_SESSION['staticfilemap'][$key] = $thumbnail;
+
+        return SERVER_PATH . 'static/Ext/Core/System/ServeStatic/serve?t=' . $key;
+    }
+
     /**
      *
      */
@@ -325,6 +355,10 @@ class Block extends \Frootbox\Persistence\AbstractConfigurableRow
             if (isset($margin['bottom']) and strlen($margin['bottom']) > 0) {
                 $customStyles .= 'margin-bottom: ' . $margin['bottom'] . 'px; ';
             }
+        }
+
+        if ($this->getVisibility() == 0) {
+            $customStyles .= ' display: none; ';
         }
 
         if (!empty($customStyles)) {

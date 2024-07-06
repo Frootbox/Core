@@ -8,16 +8,15 @@ namespace Frootbox\Admin\Controller\Plugin\Partials\ListLayouts;
 /**
  * 
  */
-class Partial extends \Frootbox\Admin\View\Partials\AbstractPartial {
-    
+class Partial extends \Frootbox\Admin\View\Partials\AbstractPartial
+{
     /**
-     * 
+     * @return string
      */
-    public function getPath ( ): string {
-        
+    public function getPath(): string
+    {
         return __DIR__ . DIRECTORY_SEPARATOR;
     }
-
 
     /**
      *
@@ -25,7 +24,8 @@ class Partial extends \Frootbox\Admin\View\Partials\AbstractPartial {
     public function onBeforeRendering (
         \Frootbox\Admin\View $view,
         \Frootbox\Config\Config $config
-    ) {
+    )
+    {
         // Obtain element
         $element = $this->data['plugin'];
 

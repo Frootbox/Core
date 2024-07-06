@@ -139,7 +139,7 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     }
 
     /**
-     *
+     * @return Response
      */
     public function ajaxModalConfigurationAction(
 

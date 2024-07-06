@@ -85,9 +85,9 @@
                     <td width="70"><img width="50" height="50" src="{{ file.getUri({ width: 50, height: 50 }) }}" alt="" /></td>
                     <td>
                         <input data-file="{{ file.getId }}" class="inplace" type="text" value="{{ file.getTitleReal() | default(file.getName()) }}" placeholder="Titel der Datei" /><br />
-                        <a data-file="{{ file.getId() }}" class="file-delete" href="{{ serverpath }}static/Ext/Core/FileManager/Editor/ajaxFileDelete?fileId={{ file.getId() }}"><i class="fa fa-times"></i></a>&nbsp;&nbsp;
-                        <a href="{{ file.getUriDownload() }}"><i class="fa fa-download"></i></a>&nbsp;&nbsp;
-                        <a target="cms_file_editing" href="{{ serverpath }}static/Ext/Core/FileManager/Editor/jumpToFile?fileId={{ file.getId() }}"><i class="fa fa-pencil"></i></a>
+                        <a data-file="{{ file.getId() }}" class="file-delete" href="{{ serverpath }}static/Ext/Core/FileManager/Editor/ajaxFileDelete?fileId={{ file.getId() }}"><i class="far fa-trash"></i></a>&nbsp;&nbsp;
+                        <a href="{{ file.getUriDownload() }}"><i class="far fa-download"></i></a>&nbsp;&nbsp;
+                        <a target="cms_file_editing" href="{{ serverpath }}static/Ext/Core/FileManager/Editor/jumpToFile?fileId={{ file.getId() }}"><i class="far fa-pencil"></i></a>
                     </td>
                     <td class="handle" style="cursor: pointer; vertical-align: middle;" width="40"><i class="fa fa-grip-lines"></i></td>
                 </tr>

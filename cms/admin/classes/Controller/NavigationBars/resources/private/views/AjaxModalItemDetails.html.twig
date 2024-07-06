@@ -32,6 +32,10 @@
 
         </div>
 
+        <div class="form-group form-check">
+            <input type="checkbox" class="form-check-input" id="BreakAfter" name="BreakAfter" {% if item.getConfig('BreakAfter') %}checked{% endif %}>
+            <label class="form-check-label" for="BreakAfter">Umbruch nach dem Menüpunkt</label>
+        </div>
 
         {{ html | raw }}
 

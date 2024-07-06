@@ -61,6 +61,11 @@ class Widget extends \Frootbox\Persistence\Content\AbstractWidget
             $video['type'] = 'Youtube';
             $video['id'] = explode('&', $match[1])[0];
         }
+        elseif (preg_match('#^https://www\.youtube\.com\/embed\/(.*?)\?(.*?)$#i', $this->config['url'], $match)) {
+
+            $video['type'] = 'Youtube';
+            $video['id'] = explode('&', $match[1])[0];
+        }
         elseif (preg_match('#^https://youtu\.be\/(.*?)$#i', $this->config['url'], $match)) {
 
             $video['type'] = 'Youtube';

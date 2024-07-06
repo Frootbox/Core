@@ -7,6 +7,7 @@ namespace Frootbox\Ext\Core\News\Plugins\News;
 
 use Frootbox\Ext\Core\Images\Viewhelper\References;
 use Frootbox\Http\Interfaces\ResponseInterface;
+use Frootbox\View\Response;
 
 class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\Persistence\Interfaces\Cloneable
 {
@@ -317,16 +318,29 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
     }
 
     /**
-     *
+     * @param \Frootbox\Ext\Core\News\Persistence\Repositories\Articles $articles
+     * @param \Frootbox\View\Engines\Interfaces\Engine $view
+     * @return \Frootbox\View\Response
+     * @throws \Frootbox\Exceptions\NotFound
      */
     public function showArticleAction(
         \Frootbox\Ext\Core\News\Persistence\Repositories\Articles $articles,
         \Frootbox\View\Engines\Interfaces\Engine $view
-    )
+    ): Response
     {
-        // Fetch article
+        /**
+         * Fetch article
+         * @var \Frootbox\Ext\Core\News\Persistence\Article $article
+         */
         $article = $articles->fetchById($this->getAttribute('articleId'));
-        $view->set('article', $article);
+
+        if (!$article->isVisible()) {
+            return new \Frootbox\View\ResponseRedirect($this->getActionUri('index'));
+        }
+
+        return new \Frootbox\View\Response([
+            'article' => $article,
+        ]);
     }
 
     /**

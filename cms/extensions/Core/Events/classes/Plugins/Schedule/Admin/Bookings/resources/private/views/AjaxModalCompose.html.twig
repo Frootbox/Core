@@ -1,0 +1,82 @@
+
+<form method="post" class="ajax" action="{{ plugin.getAdminUri('Bookings', 'ajaxCreate') }}">
+
+    <div class="modal-body">
+
+        <div class="form-group">
+            <label for="Persons">Personen</label>
+            <input type="number" min="1" class="form-control" name="Persons" id="Persons" placeholder="Personen" value="">
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+
+                <div class="form-group">
+                    <label for="FirstName">Vorname</label>
+                    <input type="text" class="form-control" name="FirstName" id="FirstName" placeholder="Vorname" value="">
+                </div>
+
+            </div>
+            <div class="col-md-6">
+
+                <div class="form-group">
+                    <label for="LastName">Nachname</label>
+                    <input type="text" class="form-control" name="LastName" id="LastName" placeholder="Nachname" value="">
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-8">
+
+                <div class="form-group">
+                    <label for="Street">Straße</label>
+                    <input type="text" class="form-control" name="Street" id="Street" placeholder="Straße" value="">
+                </div>
+
+            </div>
+            <div class="col-md-4">
+
+                <div class="form-group">
+                    <label for="StreetNumber">Nr.</label>
+                    <input type="text" class="form-control" name="StreetNumber" id="StreetNumber" placeholder="Nr." value="">
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+
+                <div class="form-group">
+                    <label for="ZipCode">PLZ</label>
+                    <input type="text" class="form-control" name="ZipCode" id="ZipCode" placeholder="PLZ" value="">
+                </div>
+
+            </div>
+            <div class="col-md-8">
+
+                <div class="form-group">
+                    <label for="City">Stadt</label>
+                    <input type="text" class="form-control" name="City" id="City" placeholder="Stadt" value="">
+                </div>
+
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="Email">E-Mail</label>
+            <input type="email" class="form-control" name="Email" id="Email" placeholder="E-Mail" value="">
+        </div>
+        <div class="form-group">
+            <label for="Phone">Telefon</label>
+            <input type="phone" class="form-control" name="Phone" id="Phone" placeholder="Telefon" value="">
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Speichern</button>
+    </div>
+
+</form>
+
+

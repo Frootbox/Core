@@ -21,6 +21,8 @@ return [
     'Request.Message' => 'Nachricht',
     'Request.Send' => 'Anfrage senden',
 
+    'UnitPer' => 'pro',
+
     'UnitEach' => 'Stück',
     'UnitLiter' => 'Liter',
     'UnitSquareMeters' => 'Quadratmeter',

@@ -18,6 +18,21 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     }
 
     /**
+     *
+     */
+    public function getForms(
+        \Frootbox\Ext\Core\ContactForms\Persistence\Repositories\Forms $formsRepository
+    ): \Frootbox\Db\Result
+    {
+        // Fetch addresses
+        $result = $formsRepository->fetch([
+
+        ]);
+
+        return $result;
+    }
+
+    /**
      * @param \Frootbox\Ext\Core\Addresses\Persistence\Repositories\Addresses $addressesRepository
      * @return \Frootbox\Db\Result
      */
@@ -72,7 +87,11 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     }
 
     /**
-     *
+     * @param \Frootbox\Http\Get $get
+     * @param \Frootbox\CloningMachine $cloningMachine
+     * @param \Frootbox\Ext\Core\HelpAndSupport\Plugins\Jobs\Persistence\Repositories\Jobs $jobsRepository
+     * @return Response
+     * @throws \Frootbox\Exceptions\RuntimeError
      */
     public function ajaxDuplicateAction(
         \Frootbox\Http\Get $get,
@@ -126,7 +145,11 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     }
 
     /**
-     *
+     * @param \Frootbox\Http\Get $get
+     * @param \Frootbox\Http\Post $post
+     * @param \Frootbox\Ext\Core\HelpAndSupport\Plugins\Jobs\Persistence\Repositories\Jobs $jobsRepository
+     * @return \Frootbox\Admin\Controller\Response
+     * @throws \Frootbox\Exceptions\RuntimeError
      */
     public function ajaxUpdateAction(
         \Frootbox\Http\Get $get,
@@ -145,7 +168,7 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
 
         $job->setTitle($title);
         $job->setSubtitle($post->get('subtitle'));
-        $job->setDateStart($post->get('dateStart'));
+        $job->setDateStart(!empty($post->get('dateStart')) ? $post->get('dateStart') : null);
         $job->setLocationId(!empty($post->get('locationId')) ? $post->get('locationId') : null);
 
         $job->unsetConfig('titles');
@@ -158,6 +181,7 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
             'type' => $post->get('typeText'),
             'typeId' => $post->get('typeId'),
             'link' => $post->get('link'),
+            'formId' => $post->get('formId'),
         ]);
 
         $job->save();

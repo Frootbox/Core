@@ -30,7 +30,7 @@ class Aliases extends \Frootbox\Db\Model
     ): \Frootbox\Db\Row
     {
         // Check new uid
-        if (empty($row->getUid())) {
+        if ($row->getType() != 'Manual' and empty($row->getUid())) {
             throw new \Exception('Mandatory UID missing from alias generation by ' . $row->getItemModel() . '.');
         }
 

@@ -76,7 +76,10 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
     }
 
     /**
-     *
+     * @param string $tag
+     * @param array|null $parameters
+     * @param \Frootbox\Ext\Core\HelpAndSupport\Plugins\Links\Persistence\Repositories\Links $linksRepository
+     * @return \Frootbox\Db\Result
      */
     public function getLinksByTag(
         string $tag,
@@ -84,6 +87,8 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         \Frootbox\Ext\Core\HelpAndSupport\Plugins\Links\Persistence\Repositories\Links $linksRepository,
     ): \Frootbox\Db\Result
     {
+        $parameters['complyVisibility'] = true;
+
         // Fetch links
         $references = $linksRepository->fetchByTag($tag, $parameters);
 

@@ -101,7 +101,7 @@ trait Alias
     /**
      *
      */
-    public function getUri(array $options = null): string
+    public function getUri(array $options = null): ?string
     {
 
         // Set base path
@@ -357,10 +357,8 @@ trait Alias
                 $aliasUri = $options['forceAlias'];
             }
 
-
             if (empty($alias->getUid())) {
-
-                d("Alias UID Missing.");
+                throw new \Exception("Alias UID missing for model " . $alias->getItemModel());
             }
 
             // Check if alias exists

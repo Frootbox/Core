@@ -54,7 +54,7 @@ class GeneralPurpose extends AbstractViewhelper
         }
         catch ( \Exception $e ) {
 
-            d($e);
+            d($e->getMessage());
 
         }
 

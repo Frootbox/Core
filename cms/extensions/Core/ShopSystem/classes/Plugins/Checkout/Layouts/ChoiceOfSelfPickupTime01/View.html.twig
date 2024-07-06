@@ -1,0 +1,50 @@
+{# config
+
+title: Standard
+variables:
+    withContainer:
+        label: mit Container
+        type: bool
+        default: false
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+
+<div class="plugin Core ShopSystem Checkout ChoiceOfSelfPickupTime01">
+
+    <div class="container">
+
+        <div class="row">
+            <div class="col-12">
+
+                <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('titleSelfPickupTime') }}">Abholzeit wählen</h2>
+
+                <div class="row">
+                    <div class="col-md-6">
+
+                        <form action="{{ plugin.getajaxUri('UpdateDeliveryTime') }}" method="post">
+
+                            {% for PickupTime in SelfPickupTimes %}
+                                <div class="form-group form-check">
+                                    <input type="radio" class="form-check-input" id="PickupTime{{ loop.index }}" name="PickupTime" value="{{ PickupTime.getId() }}">
+                                    <label class="form-check-label" for="PickupTime{{ loop.index }}">{{ PickupTime.getDateStart() | date('H:i') }}–{{ PickupTime.getDateEnd() | date('H:i') }} {{ "Core.ShopSystem.Plugins.Checkout.Time" | translate }}</label>
+                                </div>
+                            {% endfor %}
+
+                            <br />
+
+                            <button type="submit" class="btn btn-primary">{{ "Core.ShopSystem.ButtonGoFurther" | translate }}</button>
+
+                        </form>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>

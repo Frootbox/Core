@@ -32,6 +32,10 @@
                         <input type="checkbox" class="form-check-input" id="urlSuffixSubtitle" name="urlSuffixSubtitle" {% if plugin.getConfig('urlSuffixSubtitle') %}checked{% endif %}>
                         <label class="form-check-label" for="urlSuffixSubtitle">Untertitel in URL aufnehmen</label>
                     </div>
+                    <div class="form-group form-check">
+                        <input type="checkbox" class="form-check-input" id="urlPrefixId" name="urlPrefixId" {% if plugin.getConfig('urlPrefixId') %}checked{% endif %}>
+                        <label class="form-check-label" for="urlPrefixId">Job-ID in URL aufnehmen</label>
+                    </div>
 
                 </div>
                 <div class="col-md-6">

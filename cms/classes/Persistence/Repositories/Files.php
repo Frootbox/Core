@@ -72,7 +72,7 @@ class Files extends \Frootbox\Db\Model
             if (($extension == 'jpg' or $extension == 'jpeg') and (($exif = exif_read_data($path . $name, null, true)) !== false)) {
 
                 if (!empty($exif['IFD0']['Copyright'])) {
-                    $copyright = $exif['IFD0']['Copyright'];
+                    $copyright = substr($exif['IFD0']['Copyright'], 0, 255);
                 }
 
                 if (preg_match('#adobestock-([0-9]+)#', $name, $match)) {

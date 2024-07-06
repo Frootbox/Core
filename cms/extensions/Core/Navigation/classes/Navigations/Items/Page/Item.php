@@ -150,11 +150,12 @@ class Item extends \Frootbox\Ext\Core\Navigation\Navigations\Items\AbstractItem
             return true;
         }
 
+
         if ($this->config['pageId'] == $page->getParentId() and $page->getParent()->getParentId() != 0) {
             return true;
         }
 
-        if (!empty($parameters['inheritActiveFromeParent']) and $this->config['pageId'] == $page->getParentId()) {
+        if (!empty($parameters['inheritActiveFromeParent']) and $this->config['pageId'] == $page->getParentId() and $page->getParent()->getParentId() != 0) {
             return true;
         }
 

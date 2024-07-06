@@ -216,8 +216,18 @@ try {
         $translator = $translationFactory->get(GLOBAL_LANGUAGE);
 
         // TODO move to re-usable twig extension later
-        $filter = new \Twig\TwigFilter('translate', function ($string) use ($translator) {
-            return $translator->translate($string);
+        $filter = new \Twig\TwigFilter('translate', function ($string, string $inset1 = null, string $inset2 = null) use ($translator) {
+
+            $string = $translator->translate($string);
+
+            if ($inset2) {
+                $string = sprintf($string, $inset1, $inset2);
+            }
+            elseif ($inset1) {
+                $string = sprintf($string, $inset1);
+            }
+
+            return $string;
         });
         $view->addFilter($filter);
 
@@ -457,7 +467,9 @@ try {
                     $target = $alias->getConfig('target');
                 }
 
-                $target = SERVER_PATH_PROTOCOL . trim($target, '/');
+                if (!str_starts_with($target, 'https://')) {
+                    $target = SERVER_PATH_PROTOCOL . trim($target, '/');
+                }
 
                 header('Location: ' . $target, true, 301);
                 exit;
@@ -496,9 +508,31 @@ try {
 
 
     // TODO move to re-usable twig extension later
-    $filter = new \Twig\TwigFilter('translate', function ($string) use ($translator) {
+    $filter = new \Twig\TwigFilter('translate', function ($string, string $inset1 = null, string $inset2 = null) use ($translator) {
 
-        return $translator->translate($string);
+        $string = $translator->translate($string);
+
+        if ($inset2) {
+            $string = sprintf($string, $inset1, $inset2);
+        }
+        elseif ($inset1) {
+            $string = sprintf($string, $inset1);
+        }
+
+        return $string;
+    });
+    $view->addFilter($filter);
+
+    $filter = new \Twig\TwigFilter('truncate', function ($string, string $length) {
+
+        $da = explode("\n", wordwrap($string, $length));
+        $nstring = array_shift($da);
+
+        if (strlen($nstring) < $string) {
+            $nstring .= ' ...';
+        }
+
+        return $nstring;
     });
     $view->addFilter($filter);
 
@@ -710,7 +744,7 @@ try {
                         $action = $payload['action'] ?? 'index';
                         $method = $action . 'Action';
 
-
+                        $contentElement->setCurrentAction($action);
                         $contentElement->setPage($page);
 
                         // Call plugin action
@@ -947,7 +981,7 @@ try {
 
         $scriptSrc = !empty($configuration->get('contentSecurityPolicy.domains')) ? implode(' ', $configuration->get('contentSecurityPolicy.domains')->getData()) : '';
 
-        header("Content-Security-Policy: script-src * 'self' 'unsafe-inline' 'unsafe-eval' " . $scriptSrc . " www.google.com cookieconsent.herrundfraupixel.de 'nonce-" . SCRIPT_NONCE . "'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'");
+       // header("Content-Security-Policy: script-src * 'self' 'unsafe-inline' 'unsafe-eval' " . $scriptSrc . " www.google.com cookieconsent.herrundfraupixel.de 'nonce-" . SCRIPT_NONCE . "'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'");
         // header("Content-Security-Policy: script-src * 'self' 'unsafe-inline' 'unsafe-eval' " . $scriptSrc . " www.google.com cookieconsent.herrundfraupixel.de 'nonce-" . SCRIPT_NONCE . "'; base-uri 'self'; form-action 'self'; object-src 'none'");
         header('Strict-Transport-Security: max-age=31536000');
         header('X-Content-Type-Options: nosniff');

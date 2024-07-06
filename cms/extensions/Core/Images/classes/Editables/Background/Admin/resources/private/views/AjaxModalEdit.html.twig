@@ -91,7 +91,6 @@
 
 
                 {% set helpText %}
-                    <small id="helpText" class="form-text text-muted">
                         {% if get.get('width') and get.get('height') %}
                             optimale Maße: {{ get.get('width') }}x{{ get.get('height') }} Pixel
                         {% elseif get.get('width') %}
@@ -99,7 +98,6 @@
                         {% elseif get.get('height') %}
                             optimale Höhe: {{ get.get('height') }} Pixel
                         {% endif %}
-                    </small>
                 {% endset %}
 
                 {{ v.injectPartial('Frootbox/Ext/Core/FileManager/Editor/Partials/FileUpload', {
@@ -107,11 +105,10 @@
                     multiple: false,
                     uid: get.get('uid'),
                     onComplete: 'refreshEditable',
-                    helpText: helpText
+                    helpText: helpText | trim
                 }) | raw }}
 
                 {% set helpText %}
-                    <small id="helpText" class="form-text text-muted">
                         {% if get.get('widthXl') and get.get('heightXl') %}
                             optimale Maße: {{ get.get('widthXl') }}x{{ get.get('heightXl') }} Pixel
                         {% elseif get.get('widthXl') %}
@@ -119,7 +116,6 @@
                         {% elseif get.get('heightXl') %}
                             optimale Höhe: {{ get.get('heightXl') }} Pixel
                         {% endif %}
-                    </small>
                 {% endset %}
 
                 {{ v.injectPartial('Frootbox/Ext/Core/FileManager/Editor/Partials/FileUpload', {
@@ -127,7 +123,7 @@
                     multiple: false,
                     uid: get.get('uid') ~ '-desktop',
                     onComplete: 'refreshEditable',
-                    helpText: helpText
+                    helpText: helpText | trim
                 }) | raw }}
 
 

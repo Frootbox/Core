@@ -1,0 +1,29 @@
+{# config
+
+title: Standard
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+<div class="plugin Core ShopSystem CheckoutCompleted Index01">
+
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="inner-wrapper">
+
+                    <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+
+                    <div data-editable data-uid="{{ plugin.getUid('teaser') }}">
+                        <p>Ihre Buchung ist abgeschlossen. Sie haben eine Zusammenfassung der bestellten Artikel per E-Mail erhalten.</p>
+                        <p>Wir bedanken uns für Ihr Interesse.</p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+

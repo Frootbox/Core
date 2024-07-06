@@ -41,6 +41,12 @@ class References extends \Frootbox\View\Viewhelper\AbstractViewhelper
             $where['pluginId'] = $parameters['pluginId'];
         }
 
+        if (!empty($parameters['ignoreIds'])) {
+
+            foreach ($parameters['ignoreIds'] as $referenceId) {
+                $where[] = new \Frootbox\Db\Conditions\NotEqual('id', $referenceId);
+            }
+        }
 
         // Fetch references
         $result = $referencesRepository->fetch([

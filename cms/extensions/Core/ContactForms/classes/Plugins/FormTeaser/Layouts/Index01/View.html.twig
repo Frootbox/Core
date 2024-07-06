@@ -25,18 +25,21 @@ title: Standard
                         </div>
                         <div class="col-md-6 xcol order-md-1">
 
-                            {{ formRenderer.render({
-                                plugin: plugin,
-                                formId: plugin.getConfig('formId'),
-                                payload: {
+                            <div class="sticky-top">
 
-                                }
-                            }) | raw }}
+                                {{ formRenderer.render({
+                                    plugin: plugin,
+                                    formId: plugin.getConfig('formId'),
+                                    payload: {
+
+                                    }
+                                }) | raw }}
+
+                            </div>
 
                         </div>
 
                     </div>
-
 
                 </div>
             </div>

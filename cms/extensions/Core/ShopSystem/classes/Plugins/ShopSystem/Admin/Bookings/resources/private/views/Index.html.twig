@@ -2,6 +2,15 @@
 
 <h2 id="categoriesHead">
     Buchungen
+    <span class="headoptions">
+        <span class="dropdown">
+            <i class="far fa-bars dropdown-toggle" data-toggle="dropdown"></i>
+
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <a class="dropdown-item" target="product-edit" href="{{ plugin.getAdminUri('Bookings', 'ajaxExportShopify') }}"><i class="far fa-fw fa-download icon"></i>Datenexport für Shopify</a>
+            </div>
+        </span>
+    </span>
 </h2>
 
 <p><a class="ajax" href="{{ plugin.getAdminUri('Index', 'index') }}"><i class="fa fa-chevron-circle-left"></i> zurück</a></p>

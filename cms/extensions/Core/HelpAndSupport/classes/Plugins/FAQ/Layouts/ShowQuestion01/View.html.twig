@@ -19,6 +19,8 @@ variables:
 
 <param name="cloak" value="1" />
 
+{{ view.set('overrideImageUid', question.getUid('image')) }}
+
 <div class="plugin Core HelpAndSupport FAQ ShowQuestion01">
 
     {% if variables.withContainer %}<div class="container">{% endif %}
@@ -36,11 +38,11 @@ variables:
 
                 <div class="teaser" data-editable data-uid="{{ question.getUid('teaser') }}"></div>
 
-                <div data-blocks data-uid="{{ question.getUid('block-content') }}"></div>
-
             </div>
         </div>
 
     {% if variables.withContainer %}</div>{% endif %}
+
+    <div data-label="Blöcke unter der F.A.Q. Frage" data-blocks data-uid="{{ question.getUid('block-content') }}"></div>
 
 </div>

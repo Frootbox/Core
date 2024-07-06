@@ -45,6 +45,7 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
                 'where' => $where,
             ]);
 
+
             if (MULTI_LANGUAGE and !$text and $element->getAttribute('data-nolanguagefallback') === null) {
 
                 if (GLOBAL_LANGUAGE == DEFAULT_LANGUAGE) {

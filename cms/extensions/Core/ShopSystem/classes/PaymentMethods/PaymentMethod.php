@@ -9,6 +9,9 @@ abstract class PaymentMethod
 {
     protected $title;
     protected $isActive = false;
+    protected bool $forcesPaymentExtraStep = false;
+    protected bool $isForcingNewPaymentFlow = false;
+    protected bool $hasCheckoutControl = false;
 
     /**
      *
@@ -36,6 +39,19 @@ abstract class PaymentMethod
     }
 
     /**
+     * @return string
+     */
+    public function getImageDataUri(): string
+    {
+        $source = file_get_contents($this->getPath() . 'resources/public/logo.svg');
+
+        preg_match('#\<svg(.*?)\<\/svg\>#s',$source, $match);
+
+
+        return 'data:image/svg+xml;base64,' . base64_encode($match[0]);
+    }
+
+    /**
      *
      */
     public static function getMethods(): array
@@ -53,6 +69,7 @@ abstract class PaymentMethod
             // Load language file
             $path = $dir->path . '/' . $entry . '/resources/private/language/de-DE.php';
             $title = $entry;
+            $titleIntern = null;
 
             if (file_exists($path)) {
 
@@ -61,11 +78,16 @@ abstract class PaymentMethod
                 if (!empty($data['Method.Title'])) {
                     $title = $data['Method.Title'];
                 }
+
+                if (!empty($data['Method.TitleIntern'])) {
+                    $titleIntern = $data['Method.TitleIntern'];
+                }
             }
 
             $list[] = [
                 'id' => $entry,
                 'title' => $title,
+                'titleIntern' => $titleIntern ?? $title,
                 'class' => '\Frootbox\Ext\Core\ShopSystem\PaymentMethods\\' . $entry . '\\Method'
             ];
         }
@@ -89,28 +111,95 @@ abstract class PaymentMethod
     }
 
     /**
-     *
+     * @param \Frootbox\Ext\Core\ShopSystem\Persistence\Booking $booking
+     * @return string|null
+     */
+    public function getTitleFinalForBooking(\Frootbox\Ext\Core\ShopSystem\Persistence\Booking $booking): ?string
+    {
+        return $this->getTitle();
+    }
+
+
+    public function getViewExtendPath(string $path): string
+    {
+        return realpath($this->getPath() . $path);
+    }
+
+
+    /**
+     * @return bool
+     */
+    public function hasCheckoutControl(): bool
+    {
+        return $this->hasCheckoutControl;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasLogo(): bool
+    {
+        return file_exists($this->getPath() . 'resources/public/logo.svg');
+    }
+
+    /**
+     * @return bool
      */
     public function isActive(): bool
     {
         return $this->isActive;
     }
 
+    public function isForcingNewPaymentFlow(): bool
+    {
+        return $this->isForcingNewPaymentFlow;
+    }
+
     /**
-     *
+     * @return bool
+     */
+    public function forcesPaymentExtraStep(): bool
+    {
+        return $this->forcesPaymentExtraStep;
+    }
+
+    /**
+     * @param \Frootbox\View\Engines\Interfaces\Engine $view
+     * @return string
      */
     public function renderInputHtml(
-        \Frootbox\View\Engines\Interfaces\Engine $view
-    ): string
+        \DI\Container $container,
+        \Frootbox\View\Engines\Interfaces\Engine $view,
+    ): ?string
     {
-        // Obtain viewfile
-        $viewFile = $this->getPath() . 'resources/private/views/Input.html';
+        // Obtain view-file
+        $files = [];
+        $files[] = $this->getPath() . 'resources/private/views/Input.html.twig';
+        $files[] = $this->getPath() . 'resources/private/views/Input.html';
 
-        if (!file_exists($viewFile)) {
-            return (string) null;
+        $viewFile = null;
+
+        foreach ($files as $file) {
+
+            if (file_exists($file)) {
+                $viewFile = $file;
+                break;
+            }
         }
 
-        $html = $view->render($viewFile);
+        if (empty($viewFile)) {
+            return null;
+        }
+
+        if (method_exists($this, 'onBeforeRenderInput')) {
+            $payload = $container->call([ $this, 'onBeforeRenderInput' ]);
+        }
+        else {
+            $payload = [];
+        }
+
+        // Render input html
+        $html = $view->render($viewFile, $payload);
 
         return $html;
     }

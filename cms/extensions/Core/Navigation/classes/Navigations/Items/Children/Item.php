@@ -14,7 +14,7 @@ class Item extends \Frootbox\Ext\Core\Navigation\Navigations\Items\AbstractItem
      */
     public function getAutoItems(
         \Frootbox\Persistence\Repositories\Pages $pagesRepository,
-    ): array
+    ): \Frootbox\Db\Result
     {
         if (empty($this->getConfig('pageId'))) {
             return [];
@@ -27,7 +27,8 @@ class Item extends \Frootbox\Ext\Core\Navigation\Navigations\Items\AbstractItem
             'order' => [ 'lft ASC' ],
         ]);
 
-        $list = [];
+
+        $result = new \Frootbox\Db\Result([], $this->getDb());
 
         foreach ($pages as $page) {
 
@@ -36,10 +37,10 @@ class Item extends \Frootbox\Ext\Core\Navigation\Navigations\Items\AbstractItem
                 'href' => $page->getUri(),
             ]);
 
-            $list[] = $item;
+            $result->push($item);
         }
 
-        return $list;
+        return $result;
     }
 
     /**

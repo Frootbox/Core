@@ -1,4 +1,13 @@
 {
+    "repositories": [
+        {
+            "type": "path",
+            "url": "/Users/habbo/Sites/localhost/frootbox-repos/Mvc",
+            "options": {
+                "symlink": true
+            }
+        }
+    ],
     "_repositories": [
         {
             "type": "path",
@@ -36,7 +45,7 @@
         "frootbox/config":"0.0.7",
         "frootbox/http":"dev-master",
         "frootbox/filesystem":"dev-master",
-        "frootbox/mail":"^0.1",
+        "frootbox/mail":"@dev",
         "frootbox/translation":"dev-master",
         "frootbox/date":"dev-master",
         "wa72/htmlpagedom": "3.0.0",
@@ -52,7 +61,8 @@
         "ifsnop/mysqldump-php": "v2.7",
         "tijsverkoyen/css-to-inline-styles": "*",
         "frogbob/inky-php": "^0.0.2",
-        "spipu/html2pdf": "^5.2"
+        "spipu/html2pdf": "^5.2",
+        "stripe/stripe-php": "^13.9"
     },
 	"config": {
         "vendor-dir": "lib",

@@ -73,6 +73,70 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
     }
 
     /**
+     * @param \Frootbox\Db\Db $db
+     * @param \Frootbox\Http\Get $get
+     * @param \Frootbox\Persistence\Repositories\Categories $categories
+     * @param \Frootbox\Admin\Viewhelper\GeneralPurpose $gp
+     * @return \Frootbox\Admin\Controller\Response
+     * @throws \Frootbox\Exceptions\NotFound
+     */
+    public function ajaxBranchDuplicate(
+        \Frootbox\Db\Db $db,
+        \Frootbox\Http\Get $get,
+        \Frootbox\CloningMachine $cloningMachine,
+        \Frootbox\Persistence\Repositories\Categories $categories,
+        \Frootbox\Persistence\Repositories\ContentElements $contentElements,
+        \Frootbox\Admin\Viewhelper\GeneralPurpose $gp
+    ): Response
+    {
+        // Fetch category
+        $category = $categories->fetchById($get->get('categoryId'));
+
+        // Get parent
+        $parent = $category->getParent();
+
+        $db->transactionStart();
+
+        function copyNodeToParent($parent, $node, $cloningMachine) {
+
+            $newNode = clone $node;
+            $newNode = $parent->appendChild($newNode);
+
+            // Clone contents
+            $cloningMachine->cloneContentsForElement($newNode, $node->getUidBase());
+
+            foreach ($node->getItems() as $item) {
+                $newNode->connectItem($item);
+            }
+
+            foreach ($node->getChildren() as $child) {
+                copyNodeToParent($newNode, $child, $cloningMachine);
+            }
+        }
+
+        copyNodeToParent($parent, $category, $cloningMachine);
+
+        $categories->rewriteIds($parent->getRootId());
+
+        $db->transactionCommit();
+
+        $plugin = $get->get('pluginId') ? $contentElements->fetchById($get->get('pluginId')) : null;
+
+        return self::getResponse('json', 200, [
+            'modalDismiss' => true,
+            'replace' => [
+                'selector' => '#categoriesTreeReceiver',
+                'html' => $gp->injectPartial(\Frootbox\Admin\Controller\Assets\Categories\Partials\CategoriesManager\Partial::class, [
+                    'uid' => $parent->getDataRaw('uid'),
+                    'className' => \Frootbox\Ext\Core\HelpAndSupport\Persistence\Category::class,
+                    'skipFrame' => true,
+                    'plugin' => $plugin,
+                ]),
+            ],
+        ]);
+    }
+
+    /**
      * 
      */
     public function ajaxDelete (

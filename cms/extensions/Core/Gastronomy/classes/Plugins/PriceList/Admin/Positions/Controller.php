@@ -18,7 +18,14 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     }
 
     /**
-     *
+     * @param \Frootbox\Http\Get $get
+     * @param \Frootbox\Http\Post $post
+     * @param \Frootbox\Ext\Core\Gastronomy\Plugins\PriceList\Persistence\Repositories\ListEntries $listEntriesRepository
+     * @param \Frootbox\Ext\Core\Gastronomy\Plugins\PriceList\Persistence\Repositories\Categories $categoriesRepository
+     * @param \Frootbox\Admin\Viewhelper\GeneralPurpose $gp
+     * @return \Frootbox\Admin\Controller\Response
+     * @throws \Frootbox\Exceptions\InputMissing
+     * @throws \Frootbox\Exceptions\NotFound
      */
     public function ajaxCreateAction(
         \Frootbox\Http\Get $get,
@@ -28,21 +35,34 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         \Frootbox\Admin\Viewhelper\GeneralPurpose $gp
     ): Response
     {
+        if (empty($post->get('title')) and empty($post->get('EntryId'))) {
+            throw new \Frootbox\Exceptions\InputMissing('Bitte mindestens ein Feld ausfüllen.');
+        }
+
         // Fetch category
         $category = $categoriesRepository->fetchById($get->get('categoryId'));
 
-        $listEntry = new \Frootbox\Ext\Core\Gastronomy\Plugins\PriceList\Persistence\ListEntry([
-            'title' => $post->get('title'),
-            'pageId' => $this->plugin->getPageId(),
-            'pluginId' => $this->plugin->getId(),
-            'config' => [
-                'price' => $post->get('price'),
-                'unit' => $post->get('unit')
-            ]
-        ]);
+        if (!empty($post->get('EntryId'))) {
 
-        // Insert new list entry
-        $listEntry = $listEntriesRepository->insert($listEntry);
+            // Fetch list entry
+            $listEntry = $listEntriesRepository->fetchById($post->get('EntryId'));
+        }
+        else {
+
+            // Compose list entry
+            $listEntry = new \Frootbox\Ext\Core\Gastronomy\Plugins\PriceList\Persistence\ListEntry([
+                'title' => $post->get('title'),
+                'pageId' => $this->plugin->getPageId(),
+                'pluginId' => $this->plugin->getId(),
+                'config' => [
+                    'price' => $post->get('price'),
+                    'unit' => $post->get('unit')
+                ]
+            ]);
+
+            // Insert new list entry
+            $listEntry = $listEntriesRepository->insert($listEntry);
+        }
 
         // Connect list entry to category
         $category->connectItem($listEntry);
@@ -95,11 +115,24 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     }
 
     /**
-     *
+     * @param \Frootbox\Ext\Core\Gastronomy\Plugins\PriceList\Persistence\Repositories\ListEntries $listEntriesRepository
+     * @return \Frootbox\Admin\Controller\Response
      */
-    public function ajaxModalComposeAction(): Response
+    public function ajaxModalComposeAction(
+        \Frootbox\Ext\Core\Gastronomy\Plugins\PriceList\Persistence\Repositories\ListEntries $listEntriesRepository,
+    ): Response
     {
-        return self::getResponse('plain');
+        // Fetch available entries
+        $entries = $listEntriesRepository->fetch([
+            'where' => [
+                'pluginId' => $this->plugin->getId(),
+            ],
+            'order' => [ 'title ASC' ],
+        ]);
+
+        return self::getResponse('plain', 200, [
+            'Entries' => $entries,
+        ]);
     }
 
     /**
