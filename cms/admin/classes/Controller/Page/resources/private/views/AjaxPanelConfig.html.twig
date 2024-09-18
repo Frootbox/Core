@@ -270,6 +270,11 @@
                                 <input type="checkbox" class="form-check-input" id="inheritVariables" name="inheritVariables">
                                 <label class="form-check-label" for="inheritVariables">auch für alle Unterseiten übernehmen</label>
                             </div>
+                            <div class="form-group">
+                                <label for="Css">Extra CSS</label>
+                                <textarea class="form-control" id="Css" name="Css" rows="3">{{ page.getConfig('ExtraCss') }}</textarea>
+                            </div>
+
 
                             <button type="submit" class="btn btn-primary">Speichern</button>
 

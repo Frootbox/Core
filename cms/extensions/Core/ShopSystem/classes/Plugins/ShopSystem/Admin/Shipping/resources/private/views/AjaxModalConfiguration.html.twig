@@ -4,7 +4,6 @@
     'frame' : false,
 }) }}
 
-
 <form method="post" class="ajax" action="{{ plugin.getAdminUri('Shipping', 'ajaxUpdateConfiguration') }}">
 
     <div class="modal-body">
@@ -24,6 +23,10 @@
         <div class="form-group">
             <label for="skipNextWorkdays">Werktage Vorlauf für Lieferung</label>
             <input type="text" class="form-control" id="skipNextWorkdays" name="shipping[skipNextWorkdays]" placeholder="Werktage Vorlauf für Lieferung" value="{{ plugin.getConfig('shipping.skipNextWorkdays') }}">
+        </div>
+        <div class="form-group">
+            <label for="skipNextHours">Stunden Vorlauf für Lieferung</label>
+            <input type="text" class="form-control" id="skipNextHours" name="shipping[skipNextHours]" placeholder="Stunden Vorlauf für Lieferung" value="{{ plugin.getConfig('shipping.skipNextHours') }}">
         </div>
 
     </div>

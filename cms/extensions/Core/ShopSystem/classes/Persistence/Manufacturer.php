@@ -19,6 +19,7 @@ class Manufacturer extends \Frootbox\Persistence\AbstractAsset
             'virtualDirectory' => [
                 $this->getTitle(),
             ],
+            'uid' => $this->getUid('alias'),
             'payload' => $this->generateAliasPayload([
                 'action' => 'showManufacturer',
                 'manufacturerId' => $this->getId(),

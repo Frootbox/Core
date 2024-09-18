@@ -16,6 +16,12 @@ variables:
     skipAddress:
         type: bool
         label: ohne Anschrift
+    skipMap:
+        type: bool
+        label: Ohne Google-Maps Karte
+    skipHeadline:
+        type: bool
+        label: Ohne Überschrift
 
 /config #}
 
@@ -59,17 +65,21 @@ variables:
 
 <div class="plugin Core Addresses AddressDatabase Index02">
 
-    <div class="headline-wrapper">
-        {% if variables.withLayoutContainer %}<div class="container">{% endif %}
-            <div class="row">
-                <div class="col-12">
-                    <h2 class="main-title first" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+    {% if not variables.skipHeadline %}
+        <div class="headline-wrapper">
+            {% if variables.withLayoutContainer %}<div class="container">{% endif %}
+                <div class="row">
+                    <div class="col-12">
+                        <h2 class="main-title first" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+                    </div>
                 </div>
-            </div>
-        {% if variables.withLayoutContainer %}</div>{% endif %}
-    </div>
+            {% if variables.withLayoutContainer %}</div>{% endif %}
+        </div>
+    {% endif %}
 
-    <div id="map"></div>
+    {% if not variables.skipMap %}
+        <div id="map"></div>
+    {% endif %}
 
     {% if variables.withLayoutContainer %}<div class="container">{% endif %}
 
@@ -110,7 +120,7 @@ variables:
 
                                 <h4>Öffnungszeiten</h4>
 
-                                <table class="table">
+                                <table class="table opening-times">
                                     <tbody>
                                         {% for openingTime in openingTimes %}
                                             <tr>
@@ -119,7 +129,13 @@ variables:
                                                         {{ ("Core.Addresses.Plugins.AddressDatabase.WeekdayShort" ~ day) | translate }}.
                                                     {% endfor %}
                                                 </td>
-                                                <td>{{ openingTime.getConfig('timeFrom') }}–{{ openingTime.getConfig('timeTo') }} Uhr</td>
+                                                <td>
+                                                    {% if openingTime.isClosed() %}
+                                                        geschlossen
+                                                    {% else %}
+                                                        {{ openingTime.getConfig('timeFrom') }}–{{ openingTime.getConfig('timeTo') }} Uhr
+                                                    {% endif %}
+                                                </td>
                                             </tr>
                                         {% endfor %}
                                     </tbody>

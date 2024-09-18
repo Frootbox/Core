@@ -173,7 +173,7 @@ variables:
 
                         {% if not plugin.getConfig('skipShipping') %}
                             <tr>
-                                <td class="text-right" colspan="3">{{ "Core.ShopSystem.TableFootShippingAndFees" | translate }}</td>
+                                <td class="text-right" colspan="3">{{ "Core.ShopSystem.TableFootShippingAndFees" | translate | raw }}</td>
                                 <td width="160" class="text-right">{{ booking.getShipping() | number_format(2, ",") }} {{ currencySign }}</td>
                             </tr>
                         {% endif %}

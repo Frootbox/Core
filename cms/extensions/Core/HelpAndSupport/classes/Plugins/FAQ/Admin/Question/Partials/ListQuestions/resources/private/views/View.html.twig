@@ -20,7 +20,7 @@
 					<td>{{ question.getTitle() }}</td>
 					<td class="handle"><i class="fa fa-grip-lines"></i></td>
 					<td class="text-right">
-						<a class="ajax" data-confirm="Soll diese Frage wirklich gelöscht werden?" href="{{ data.plugin.getAdminUri('Question', 'ajaxDelete', { questionId: question.getId() }) }}"><i class="fa fa-times"></i></a>
+						<a class="ajax" data-confirm="Soll diese Frage wirklich gelöscht werden?" href="{{ data.plugin.getAdminUri('Question', 'ajaxDelete', { questionId: question.getId() }) }}"><i class="far fa-trash"></i></a>
 					</td>
 				</tr>
 

@@ -145,10 +145,17 @@ class Page extends \Frootbox\AbstractStaticPage
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
             $body = curl_exec($curl);
 
-            $response = json_decode($body, true);
+            if (curl_errno($curl)) {
 
-            if (!empty($response['error-codes']) or $response['score'] < 0.5) {
-                throw new \Exception('Das Formular konnte leider nicht gesendet werden.');
+                throw new \Exception(curl_error($curl));
+            }
+            else {
+
+                $response = json_decode($body, true);
+
+                if (!empty($response['error-codes']) or $response['score'] < 0.5) {
+                    throw new \Exception('Das Formular konnte leider nicht gesendet werden.');
+                }
             }
         }
 

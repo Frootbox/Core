@@ -159,10 +159,13 @@ class Partials extends AbstractViewhelper
         $partial->setAttributes($attributes);
 
         if (method_exists($partial, 'onBeforeRendering')) {
-            $this->container->call([ $partial, 'onBeforeRendering']);
+            $payload = $this->container->call([ $partial, 'onBeforeRendering']);
         }
 
-        $html = $this->container->call([ $partial, 'render']);
+        // Render html
+        $html = $this->container->call([ $partial, 'render' ], [
+            'payload' => $payload ?? [],
+        ]);
 
         return $html;
     }

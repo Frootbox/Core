@@ -17,7 +17,14 @@ use Frootbox\Db\Db;
 class Controller extends \Frootbox\Admin\Controller\AbstractController
 {
     /**
-     *
+     * @param \Frootbox\Http\Get $get
+     * @param \Frootbox\Http\Post $post
+     * @param \Frootbox\Admin\Viewhelper\GeneralPurpose $gp
+     * @param \Frootbox\Persistence\Repositories\Pages $pages
+     * @param \Frootbox\CloningMachine $cloningMachine
+     * @param \Frootbox\Admin\Logger $logger
+     * @return \Frootbox\Admin\Controller\Response
+     * @throws \Frootbox\Exceptions\NotFound
      */
     public function ajaxContentClone(
         \Frootbox\Http\Get $get,
@@ -498,7 +505,13 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
     }
 
     /**
-     *
+     * @param \Frootbox\Http\Post $post
+     * @param \Frootbox\Http\Get $get
+     * @param \Frootbox\CacheControl $cacheControl
+     * @param \Frootbox\Persistence\Repositories\Pages $pages
+     * @return \Frootbox\Admin\Controller\Response
+     * @throws \Frootbox\Exceptions\NotFound
+     * @throws \Frootbox\Exceptions\RuntimeError
      */
     public function ajaxUpdateAdditionalConfig(
         \Frootbox\Http\Post $post,
@@ -513,6 +526,7 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
         $page->unsetConfig('variables');
         $page->addConfig([
             'variables' => $post->get('variables'),
+            'ExtraCss' => $post->get('Css'),
         ]);
 
         $page->save();

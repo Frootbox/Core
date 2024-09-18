@@ -92,6 +92,31 @@ variables:
                 <br /><br />
             {% endif %}
 
+            <div class="xicons">
+                <div class="row">
+
+                    {% if job.getType() %}
+                        <div class="col-md-3">
+                            {{ icons.render('clock') | raw }}
+                            {{ t.translate("Type" ~ job.getType()) }}
+                        </div>
+                    {% endif %}
+
+                    {% if job.getConfig('asSoonAsPossible') or job.getDateStart() %}
+                        <div class="col-md-3">
+                            {{ icons.render('calendar') | raw }}
+
+                            {% if job.getConfig('asSoonAsPossible') %}
+                                Ab sofort
+                            {% elseif job.getDateStart() %}
+                                {{ job.getDateStart() | date('d.m.Y') }}
+                            {% endif %}
+                        </div>
+                    {% endif %}
+
+                </div>
+            </div>
+
 
             {% if variables.withTextAboveColumns %}
                 <div data-editable data-uid="{{ job.getUid('text-above-columns') }}"></div>

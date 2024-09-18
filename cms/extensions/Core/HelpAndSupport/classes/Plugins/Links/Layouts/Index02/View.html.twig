@@ -49,7 +49,7 @@ variables:
 
             <div data-editable data-uid="{{ plugin.getUid('teaser-text') }}"></div>
 
-            <div class="row justify-content-md-center {% if variables.withTextBlock %}text-blocks{% endif %}">
+            <div class="row justify-content-md-center align-items-center {% if variables.withTextBlock %}text-blocks{% endif %}">
                 {% for link in i.getLinks() %}
                     <div class="{{ colClass }}">
                         <div class="link data-href">

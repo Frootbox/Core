@@ -218,6 +218,7 @@
                                     </optgroup>
                                     <optgroup label="Gewicht">
                                         <option value="Gram" {% if product.getPackagingUnit() == "Gram" %}selected{% endif %}>Gramm</option>
+                                        <option value="Kilogram" {% if product.getPackagingUnit() == "Kilogram" %}selected{% endif %}>Kilogramm</option>
                                     </optgroup>
                                     <optgroup label="Fläche">
                                         <option value="SquareMeters" {% if product.getPackagingUnit() == "SquareMeters" %}selected{% endif %}>Quadratmeter</option>

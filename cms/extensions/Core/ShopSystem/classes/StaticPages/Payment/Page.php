@@ -49,6 +49,7 @@ class Page extends \Frootbox\AbstractStaticPage
         \Frootbox\View\Viewhelper\Delegator $delegator,
     )
     {
+        d("PJJJLKLJK");
         // Get payment method
         $paymentMethod = $shopCart->getPaymentMethod();
 

@@ -109,13 +109,21 @@ class Booking extends \Frootbox\Persistence\AbstractAsset
     }
 
     /**
-     *
+     * @return \Frootbox\Ext\Core\ShopSystem\PaymentMethods\PaymentMethod
      */
     public function getPaymentMethod(): \Frootbox\Ext\Core\ShopSystem\PaymentMethods\PaymentMethod
     {
+        // Generate method class
         $className = $this->getConfig('payment.methodClass');
 
-        return new $className;
+        // Create payment method
+        $paymentMethod = new $className;
+
+        if (!empty($this->getConfig('payment'))) {
+            $paymentMethod->setPaymentData($this->getConfig('payment'));
+        }
+
+        return $paymentMethod;
     }
 
     /**

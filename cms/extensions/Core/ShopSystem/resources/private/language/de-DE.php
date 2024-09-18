@@ -13,6 +13,7 @@ return [
     'H3PersonalData' => 'Persönliche Daten',
     'H3DeliveryAddress' => 'Lieferadresse',
     'H3Payment' => 'Zahlungsdaten',
+    'H3PayNow' => 'Jetzt bezahlen',
     'H4ProductDetails' => 'Produktbeschreibung',
     'H5ItemAddedToCart' => 'Artikel in den Warenkorb gelegt',
 

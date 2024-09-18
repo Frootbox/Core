@@ -58,16 +58,18 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
     }
 
     /**
-     *
+     * @param \Frootbox\Ext\Core\HelpAndSupport\Plugins\Links\Persistence\Repositories\Links $links
+     * @return \Frootbox\Db\Result
      */
     public function getLinks(
         \Frootbox\Ext\Core\HelpAndSupport\Plugins\Links\Persistence\Repositories\Links $links
-    )
+    ): \Frootbox\Db\Result
     {
         // Fetch links
         $result = $links->fetch([
             'where' => [
-                'pluginId' => $this->getId()
+                'pluginId' => $this->getId(),
+                new \Frootbox\Db\Conditions\GreaterOrEqual('visibility',(IS_EDITOR ? 1 : 2)),
             ],
             'order' => $this->getSorting(),
         ]);

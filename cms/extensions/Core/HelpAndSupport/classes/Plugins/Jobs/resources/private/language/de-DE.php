@@ -23,4 +23,5 @@ return [
     'TypeApprentice' => 'Ausbildung',
     'TypeDualStudy' => 'Duales Studium',
 
+    'GoogleEmploymentTypeFulltime' => 'FULL_TIME',
 ];

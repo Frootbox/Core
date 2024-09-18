@@ -359,6 +359,12 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
         ]);
     }
 
+    /**
+     * @param \Frootbox\Http\Get $get
+     * @param \Frootbox\Ext\Core\ContactForms\Persistence\Repositories\Forms $formRepository
+     * @param \Frootbox\Ext\Core\ContactForms\Persistence\Repositories\Logs $logsRepository
+     * @return \Frootbox\Admin\Controller\Response
+     */
     public function ajaxExportAction(
         \Frootbox\Http\Get $get,
         \Frootbox\Ext\Core\ContactForms\Persistence\Repositories\Forms $formRepository,
@@ -404,11 +410,15 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
             $row = [];
 
 
-            foreach ($logData['formData'] as $group) {
-                foreach ($group['fields'] as $field) {
-                    $row[] = $field['valueDisplay'];
+            if (!empty($logData['formData'])) {
+
+                foreach ($logData['formData'] as $group) {
+                    foreach ($group['fields'] as $field) {
+                        $row[] = $field['valueDisplay'];
+                    }
                 }
             }
+
 
             fputcsv($f, $row, ';');
 

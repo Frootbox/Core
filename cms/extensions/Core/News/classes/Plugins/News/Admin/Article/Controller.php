@@ -112,7 +112,8 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
             }
 
             // Insert new article
-            $article = $articles->insert($article);
+            $articles->persist($article);
+            $article->save();
 
             $date->modify('+1 second');
         }

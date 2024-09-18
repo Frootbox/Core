@@ -27,6 +27,24 @@ abstract class AbstractPlugin extends AbstractRow
     protected $icon = 'fas fa-puzzle-piece';
 
     /**
+     * @param $configPath
+     * @return array|mixed|null
+     */
+    public function getGlobalConfig($configPath = null): mixed
+    {
+        $config = new \Frootbox\Config\Config(CORE_DIR . 'localconfig.php');
+        $extSections = $this->parseClassName();
+
+        $path = 'Ext.' . $extSections['vendor'] . '.' . $extSections['extension'] . '.' . $extSections['plugin'];
+
+        if ($configPath !== null) {
+            $path .= '.' . $configPath;
+        }
+
+        return $config->get($path);
+    }
+
+    /**
      * Parse classname and extract vendor, extension and plugin names
      *
      * @return array
@@ -248,6 +266,38 @@ abstract class AbstractPlugin extends AbstractRow
     public function getPublicActions(): array
     {
         return $this->publicActions ?? [ 'index' ];
+    }
+
+    /**
+     * @param string $path
+     * @return string
+     * @throws \Exception
+     */
+    public function getResourcePathFromBaseExtension(string $path): string
+    {
+        $extensionRepository = $this->db->getRepository(\Frootbox\Persistence\Repositories\Extensions::class);
+        $extensions = $extensionRepository->fetch([
+            'where' => [
+                'isactive' => 1,
+            ],
+        ]);
+
+        foreach ($extensions as $extension) {
+
+            $controller = $extension->getExtensionController();
+
+            if ($controller->getType() == 'Generic') {
+                continue;
+            }
+
+            $filePath = $controller->getPath() . 'resources/' . $path;
+
+            if (file_exists($filePath)) {
+                return $filePath;
+            }
+        }
+
+        throw new \Exception(sprintf('File not found: %s', $path));
     }
 
     /**

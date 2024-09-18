@@ -115,6 +115,10 @@ class File extends AbstractRow
             return $this->getConfig('alt');
         }
 
+        if (!empty($this->getTitle())) {
+            return $this->getTitle();
+        }
+
         if (!empty($this->getConfig('caption'))) {
             return strip_tags($this->getConfig('caption'));
         }

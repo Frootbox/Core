@@ -8,6 +8,7 @@ namespace Frootbox\Ext\Core\Gastronomy\Plugins\Recipes\Persistence;
 class CategoryConnection extends \Frootbox\Persistence\CategoryConnection
 {
     use \Frootbox\Persistence\Traits\Alias;
+    use \Frootbox\Persistence\Traits\Uid;
 
     protected $model = Repositories\CategoriesConnections::class;
 
@@ -39,6 +40,7 @@ class CategoryConnection extends \Frootbox\Persistence\CategoryConnection
         return new \Frootbox\Persistence\Alias([
             'pageId' => $product->getPageId(),
             'virtualDirectory' => $virtualDirectory,
+            'uid' => $this->getUid('alias'),
             'payload' => $this->generateAliasPayload([
                 'action' => 'showRecipe',
                 'recipeId' => $product->getId(),

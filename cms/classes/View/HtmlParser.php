@@ -238,6 +238,7 @@ class HtmlParser
 
         $this->html = str_replace('---', '&shy;', $this->html);
 
+
         return $this->html;
     }
 

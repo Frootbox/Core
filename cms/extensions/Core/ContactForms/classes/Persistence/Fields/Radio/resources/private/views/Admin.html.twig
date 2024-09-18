@@ -1,0 +1,7 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<div class="form-group">
+    <label for="Options">Optionen</label>
+    <textarea rows="15" class="form-control" id="Options" name="Options" aria-describedby="OptionsHelp">{{ field.getConfig('Options') }}</textarea>
+    <small id="OptionsHelp" class="form-text text-muted">Die möglichen Optionen des Radio-Feldes.</small>
+</div>

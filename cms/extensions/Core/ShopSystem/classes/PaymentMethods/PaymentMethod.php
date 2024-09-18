@@ -12,6 +12,7 @@ abstract class PaymentMethod
     protected bool $forcesPaymentExtraStep = false;
     protected bool $isForcingNewPaymentFlow = false;
     protected bool $hasCheckoutControl = false;
+    protected array $paymentData = [];
 
     /**
      *
@@ -31,11 +32,21 @@ abstract class PaymentMethod
     }
 
     /**
-     *
+     * @return string
      */
     public function getClass(): string
     {
         return get_class($this);
+    }
+
+    /**
+     * @return string
+     */
+    public function getId(): string
+    {
+        preg_match('#\\\\([a-z0-9]+)\\\\Method$#i', get_class($this), $match);
+
+        return $match[1];
     }
 
     /**
@@ -258,6 +269,15 @@ abstract class PaymentMethod
     public function setActive(): void
     {
         $this->isActive = true;
+    }
+
+    /**
+     * @param array $paymentData
+     * @return void
+     */
+    public function setPaymentData(array $paymentData): void
+    {
+        $this->paymentData = $paymentData;
     }
 
     /**

@@ -61,6 +61,7 @@ class Page extends \Frootbox\AbstractStaticPage
         $forcePrice = null;
         $selectedOptions = $post->get('options');
 
+
         if (!empty($post->get('stockId'))) {
 
             $stock = $stockRepository->fetchById($post->get('stockId'));
@@ -114,7 +115,6 @@ class Page extends \Frootbox\AbstractStaticPage
                 $forcePrice = round($forcePriceGross - $tax, 2);
             }
         }
-
 
         // Initialize
         if (empty($_SESSION['cart']['products'][$key]['productId'])) {

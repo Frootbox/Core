@@ -100,7 +100,7 @@ variables:
 
                 <div class="order-md-2 col-md-6 panel-right">
 
-                    {% if basketPlugin %}
+                    {% if basketPlugin and not skipForm %}
                         <form method="post" class="shopsystem-product-add-to-cart" action="{{ sp.getUri('Core/ShopSystem/Basket', 'addProduct', { productId: product.getId() }) }}">
                     {% endif %}
 
@@ -271,7 +271,7 @@ variables:
 
                     {% endif %}
 
-                    {% if basketPlugin %}
+                    {% if basketPlugin and not skipForm %}
                         </form>
                     {% endif %}
 

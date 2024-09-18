@@ -37,13 +37,15 @@
 
     <div class="text-right">
         <button class="mt-3 btn btn-primary" id="submit">
-            <span id="button-text">Jetzt kostenpflichtig bestellen</span>
+            <span id="button-text">{{ "Core.ShopSystem.ButtonOrderNow" | translate }}</span>
         </button>
     </div>
 
 </form>
 
 <script>
+    var isFormSubmitted = false;
+
     const stripe = Stripe('{{ PublicKey }}');
     const clientSecret = "{{ ClientSecret }}";
 
@@ -76,6 +78,13 @@
             return;
         }
 
+        if (isFormSubmitted) {
+            alert("Die Daten wurden bereits gesendet.");
+            return;
+        }
+
+        isFormSubmitted = true;
+
         $.ajax({
             url: $('#checkOutPreForm').attr('action'),
             dataType: "json",
@@ -91,6 +100,8 @@
                 }
             },
             error: function(xhr) {
+
+                isFormSubmitted = false;
 
                 if (xhr.responseText.charAt(0) == '{') {
                     var response = JSON.parse(xhr.responseText);
@@ -116,6 +127,9 @@
         });
 
         if (error) {
+
+            isFormSubmitted = false;
+
             $('#error-messages').removeClass('d-none');
             $('#error-messages').text(error.message);
         }

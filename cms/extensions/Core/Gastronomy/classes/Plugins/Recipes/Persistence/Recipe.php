@@ -25,6 +25,7 @@ class Recipe extends \Frootbox\Persistence\AbstractRow
             'virtualDirectory' => [
                 $this->getTitle()
             ],
+            'uid' => $this->getUid('alias'),
             'payload' => $this->generateAliasPayload([
                 'action' => 'showRecipe',
                 'recipeId' => $this->getId()

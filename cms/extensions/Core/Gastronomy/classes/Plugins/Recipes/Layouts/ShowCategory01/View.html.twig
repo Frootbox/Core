@@ -13,17 +13,17 @@ variables:
 
 {{ b.addSection(category.getTitle(), category.getUri()) }}
 
+{{ view.set('hideGlobalBlocks', true) }}
+
 <div class="plugin Core Gastronomy Recipes Index01">
+
     {% if variables.withContainer %}<div class="container">{% endif %}
 
     <div class="row">
         <div class="col-12">
 
-            {% if plugin.isFirst %}
-                <h1 data-editable data-uid="{{ category.getUid('title') }}">{{ category.getTitle }}</h1>
-            {% else %}
-                <h2 data-editable data-uid="{{ category.getUid('title') }}">{{ category.getTitle }}</h2>
-            {% endif %}
+            <h2 class="first main-title" data-editable data-uid="{{ category.getUid('title') }}">{{ category.getTitle }}</h2>
+
 
             <div data-editable data-uid="{{ plugin.getUid('teaser') }}"></div>
 

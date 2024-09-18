@@ -3,11 +3,10 @@
 <h2>
     Rezept-Datenbank
 
-    {#
     <span class="headoptions">
-		<a data-toggle="tooltip" data-modal data-title="neue Formulargruppe hinzufügen" href="{{ plugin.getAdminUri('Group', 'ajaxModalCompose') }}"><i class="fa fa-plus-circle"></i></a>
+		<a data-toggle="tooltip" data-title="Daten exportieren" target="_blank" href="{{ plugin.getAdminUri('Index', 'export') }}"><i class="far fa-download"></i></a>
+        <a data-toggle="tooltip" data-modal data-title="Daten importieren" target="_blank" href="{{ plugin.getAdminUri('Index', 'ajaxModalImport') }}"><i class="far fa-file-import"></i></a>
 	</span>
-    #}
 </h2>
 
 <p><a class="ajax" href="{{ v.getUri('Page', 'ajaxPanelContent', { pageId: plugin.getPageId() }) }}"><i class="fa fa-chevron-circle-left"></i> zurück</a></p>

@@ -108,7 +108,7 @@ class Method extends \Frootbox\Ext\Core\ShopSystem\PaymentMethods\PaymentMethod
             ]
         ]);
 
-        $redirectUrl = $checkOutPlugin->getAjaxUri('checkout', [ 'preChecked' => true ], [
+        $redirectUrl = $checkOutPlugin->getAjaxUri('PaymentValidate', [ 'uniqueId' => $shopCart->getUniqueId() ], [
             'absolute' => true,
         ]);
 
@@ -196,6 +196,32 @@ class Method extends \Frootbox\Ext\Core\ShopSystem\PaymentMethods\PaymentMethod
         ]);
     }
 
+    public function onValidatePaymentAfterCheckout(
+        \Frootbox\Config\Config $configuration,
+    ): array
+    {
+        // Init stripe client
+        $stripe = new \Stripe\StripeClient([
+            'api_key' => $configuration->get('Stripe.Api.Secret'),
+        ]);
+
+        // Retrieve payment intent
+        $paymentIntent = $stripe->paymentIntents->retrieve(
+            $this->paymentData['stripe']['paymentIntentId'],
+            []
+        );
+
+        return [
+            'isPaid' => $paymentIntent->status == 'succeeded',
+        ];
+    }
+
+    /**
+     * @param \Frootbox\Config\Config $configuration
+     * @param \Frootbox\Ext\Core\ShopSystem\Plugins\Checkout\Shopcart $shopCart
+     * @return array
+     * @throws \Stripe\Exception\ApiErrorException
+     */
     public function onValidatePaymentAfterPreCheckout(
         \Frootbox\Config\Config $configuration,
         \Frootbox\Ext\Core\ShopSystem\Plugins\Checkout\Shopcart $shopCart,

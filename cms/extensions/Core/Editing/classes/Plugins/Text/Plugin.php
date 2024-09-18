@@ -19,8 +19,9 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
      *
      */
     public function indexAction(
-        \Frootbox\View\Engines\Interfaces\Engine $view
-    ) {
 
+    )
+    {
+        // d($this->getConfig());
     }
 }

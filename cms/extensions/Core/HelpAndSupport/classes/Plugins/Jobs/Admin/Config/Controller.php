@@ -18,7 +18,8 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     }
 
     /**
-     *
+     * @param \Frootbox\Ext\Core\ContactForms\Persistence\Repositories\Forms $formsRepository
+     * @return \Frootbox\Db\Result
      */
     public function getForms(
         \Frootbox\Ext\Core\ContactForms\Persistence\Repositories\Forms $formsRepository
@@ -33,7 +34,10 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     }
 
     /**
-     *
+     * @param \Frootbox\Http\Post $post
+     * @param \Frootbox\Ext\Core\HelpAndSupport\Plugins\Jobs\Persistence\Repositories\Jobs $jobsRepository
+     * @return \Frootbox\Admin\Controller\Response
+     * @throws \Frootbox\Exceptions\RuntimeError
      */
     public function ajaxUpdateAction(
         \Frootbox\Http\Post $post,
@@ -48,6 +52,7 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
             'noJobsDetailPage' => $post->get('noJobsDetailPage'),
             'urlPrefixId' => $post->get('urlPrefixId'),
             'urlSuffixSubtitle' => $post->get('urlSuffixSubtitle'),
+            'urlSkipLocation' => $post->get('urlSkipLocation'),
             'ignoreForeignTitles' => !empty($post->get('ignoreForeignTitles')),
         ]);
 
@@ -65,6 +70,7 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
             $job->addConfig([
                 'noJobsDetailPage' => $post->get('noJobsDetailPage'),
                 'urlSuffixSubtitle' => $post->get('urlSuffixSubtitle'),
+                'urlSkipLocation' => $post->get('urlSkipLocation'),
                 'urlPrefixId' => $post->get('urlPrefixId'),
             ]);
 

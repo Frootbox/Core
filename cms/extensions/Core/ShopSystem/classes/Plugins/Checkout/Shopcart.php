@@ -15,6 +15,7 @@ class Shopcart
     protected $data = [];
     protected $coupons = [];
     protected ?string $orderNumber = null;
+    protected ?string $uniqueId = null;
 
     protected $db;
     protected $config;
@@ -753,6 +754,24 @@ class Shopcart
         }
 
         return $total;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUniqueId(): string
+    {
+        if (!empty($this->uniqueId)) {
+            return $this->uniqueId;
+        }
+
+        if (empty($_SESSION['cart']['uniqueId'])) {
+            $_SESSION['cart']['uniqueId'] = md5(microtime(true));
+        }
+
+        $this->uniqueId = $_SESSION['cart']['uniqueId'];
+
+        return $this->uniqueId;
     }
 
     /**

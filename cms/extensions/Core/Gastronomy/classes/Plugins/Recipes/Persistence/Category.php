@@ -44,6 +44,10 @@ class Category extends \Frootbox\Persistence\Category
      */
     protected function getNewAlias(): ?\Frootbox\Persistence\Alias
     {
+        if (empty($this->getParentId())) {
+            return null;
+        }
+
         $trace = $this->getTrace();
         $trace->shift();
 
@@ -56,6 +60,7 @@ class Category extends \Frootbox\Persistence\Category
         return new \Frootbox\Persistence\Alias([
             'pageId' => $this->getPageId(),
             'virtualDirectory' => $vd,
+            'uid' => $this->getUid('alias'),
             'payload' => $this->generateAliasPayload([
                 'action' => 'showCategory',
                 'categoryId' => $this->getId()

@@ -104,6 +104,42 @@ class Block extends \Frootbox\Persistence\AbstractConfigurableRow
         return $viewFile;
     }
 
+    /**
+     * @param string $path
+     * @return string
+     * @throws \Exception
+     */
+    public function getResourcePathFromBaseExtension(string $path): string
+    {
+        $extensionRepository = $this->db->getRepository(\Frootbox\Persistence\Repositories\Extensions::class);
+        $extensions = $extensionRepository->fetch([
+            'where' => [
+                'isactive' => 1,
+            ],
+        ]);
+
+        foreach ($extensions as $extension) {
+
+            $controller = $extension->getExtensionController();
+
+            if ($controller->getType() == 'Generic') {
+                continue;
+            }
+
+            $filePath = $controller->getPath() . 'resources/' . $path;
+
+            if (file_exists($filePath)) {
+                return $filePath;
+            }
+        }
+
+        throw new \Exception(sprintf('File not found: %s', $path));
+    }
+
+    /**
+     * @param \Frootbox\Config\Config $config
+     * @return array
+     */
     public function getSettings(\Frootbox\Config\Config $config): array
     {
         $template = new \Frootbox\View\HtmlTemplate($this->viewFile, [

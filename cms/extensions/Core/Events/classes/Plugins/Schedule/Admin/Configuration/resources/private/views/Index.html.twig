@@ -17,7 +17,10 @@
         <a class="nav-link active" id="config-tab" data-toggle="tab" href="#config" role="tab" aria-controls="config" aria-selected="true">Konfiguration</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" id="maintenance-tab" data-toggle="tab" href="#maintenance" role="tab" aria-controls="layout" aria-selected="false">Wartung</a>
+        <a class="nav-link" id="maintenance-tab" data-toggle="tab" href="#maintenance" role="tab" aria-controls="maintenance" aria-selected="false">Wartung</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="export-tab" data-toggle="tab" href="#export" role="tab" aria-controls="export" aria-selected="false">Export/Import</a>
     </li>
 </ul>
 
@@ -118,6 +121,32 @@
 
                     </div>
                 </div>
+
+            </div>
+        </div>
+
+    </div>
+    <div class="tab-pane" id="export" role="tabpanel" aria-labelledby="export-tab">
+
+        <div class="card">
+            <div class="card-body">
+
+                <h3>Export</h3>
+
+                <a href="{{ plugin.getAdminUri('Configuration', 'export') }}" class="btn btn-primary">Export</a>
+
+                <h3>Import</h3>
+
+                <form method="post" action="{{ plugin.getAdminUri('Configuration', 'import') }}">
+
+                    <div class="form-group">
+                        <label for="Json">Export-JSON</label>
+                        <textarea class="form-control" id="Json" name="Json" rows="3"></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Speichern</button>
+
+                </form>
 
             </div>
         </div>

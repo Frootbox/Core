@@ -20,7 +20,13 @@ class FormRenderer extends \Frootbox\View\Viewhelper\AbstractViewhelper
     ];
 
     /**
-     * 
+     * @param array $parameters
+     * @param \Frootbox\View\Engines\Interfaces\Engine $view
+     * @param \Frootbox\Config\Config $config
+     * @param \DI\Container $container
+     * @return string
+     * @throws \DI\DependencyException
+     * @throws \DI\NotFoundException
      */
     public function renderAction(
         array $parameters,
@@ -62,8 +68,18 @@ class FormRenderer extends \Frootbox\View\Viewhelper\AbstractViewhelper
             $this->options = $parameters['options'];
         }
 
-        $extController = new \Frootbox\Ext\Core\ContactForms\ExtensionController;
-        $viewFile = $extController->getPath() . 'resources/private/views/Form.html.twig';
+        // Obtain extension controller
+        if (!empty($parameters['viewFile'])) {
+
+            $viewFile = $parameters['viewFile'];
+        }
+        else {
+
+            $extController = new \Frootbox\Ext\Core\ContactForms\ExtensionController;
+            $viewFile = $extController->getPath() . 'resources/private/views/Form.html.twig';
+        }
+
+        // Render html source
         $source = $view->render($viewFile);
 
         return $source;

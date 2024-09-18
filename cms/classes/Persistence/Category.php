@@ -74,11 +74,11 @@ class Category extends \Frootbox\Persistence\RowModels\ConfigurableNestedSet
             'itemClass' => get_class($item)
         ];
 
-        // Get conenction class
+        // Get connection class
         $connectionClass = ($this->connectionClass === null) ? \Frootbox\Db\Row::class : $this->connectionClass;
 
         // Create new connection
-        $row = $model->insert(new $connectionClass($connectionData));
+        $row = $model->persist(new $connectionClass($connectionData));
 
         if ($this->connectionClass !== null) {
             $row->save();

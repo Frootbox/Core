@@ -142,7 +142,8 @@ class Address extends \Frootbox\Persistence\AbstractRow
     }
 
     /**
-     *
+     * @return \Frootbox\Db\Result
+     * @throws \Frootbox\Exceptions\RuntimeError
      */
     public function getOpeningTimes(): \Frootbox\Db\Result
     {

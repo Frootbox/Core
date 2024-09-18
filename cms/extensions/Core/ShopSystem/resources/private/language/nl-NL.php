@@ -13,6 +13,7 @@ return [
     'H3PersonalData' => 'Persoonlijke gegevens',
     'H3DeliveryAddress' => 'Bezorgadres',
     'H3Payment' => 'Betalingsdetails',
+    'H3PayNow' => 'Betaal nu',
     'H4ProductDetails' => 'Product Details',
     'H5ItemAddedToCart' => 'Artikel toegevoegd aan winkelmand',
 

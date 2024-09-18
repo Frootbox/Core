@@ -23,7 +23,9 @@ class Job extends \Frootbox\Persistence\AbstractAsset implements \Frootbox\Persi
     }
 
     /**
-     *
+     * @return \Frootbox\Ext\Core\Addresses\Persistence\Address|null
+     * @throws \Frootbox\Exceptions\NotFound
+     * @throws \Frootbox\Exceptions\RuntimeError
      */
     public function getLocation(): ?\Frootbox\Ext\Core\Addresses\Persistence\Address
     {
@@ -72,7 +74,7 @@ class Job extends \Frootbox\Persistence\AbstractAsset implements \Frootbox\Persi
             $virtualDirectory[] = $this->getId();
         }
 
-        if (!empty($this->getLocationId())) {
+        if (!empty($this->getLocationId()) and empty($this->getConfig('urlSkipLocation'))) {
             $location = $this->getLocation();
             $virtualDirectory[] = $location->getTitle();
         }

@@ -17,7 +17,9 @@ class Links extends \Frootbox\View\Viewhelper\AbstractViewhelper
     ];
 
     /**
-     *
+     * @param array|null $parameters
+     * @param \Frootbox\Ext\Core\HelpAndSupport\Plugins\Links\Persistence\Repositories\Links $linkRepository
+     * @return \Frootbox\Db\Result
      */
     public function getLinksAction(
         array $parameters = null,
@@ -35,6 +37,7 @@ class Links extends \Frootbox\View\Viewhelper\AbstractViewhelper
         // Fetch links
         $result = $linkRepository->fetch([
             'where' => $where,
+            'order' => [ 'orderId ASC' ],
         ]);
 
         return $result;

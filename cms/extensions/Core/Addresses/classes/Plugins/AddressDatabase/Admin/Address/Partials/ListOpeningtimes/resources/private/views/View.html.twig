@@ -29,7 +29,7 @@
 					<td class="handle"><i class="fa fa-grip-lines"></i></td>
 					<td class="text-right">
 						<a class="ajax" href="{{ v.getUri('Assets', 'ajaxSwitchVisibility', { assetId: openingTime.getId() }) }}"><i data-asset="{{ openingTime.getId() }}" class="fa fa-lightbulb visibility {{ openingTime.getVisibilityString() }} icon"></i></a>
-						<a class="ajax" data-confirm="Soll diese Öffnungszeit wirklich gelöscht werden?" href="{{ data.plugin.getAdminUri('Address', 'ajaxOpeningTimeDelete', { addressId: data.address.getId(), openingTimeId: openingTime.getId() }) }}"><i class="fa fa-times icon"></i></a>
+						<a class="ajax" data-confirm="Soll diese Öffnungszeit wirklich gelöscht werden?" href="{{ data.plugin.getAdminUri('Address', 'ajaxOpeningTimeDelete', { addressId: data.address.getId(), openingTimeId: openingTime.getId() }) }}"><i class="far fa-trash icon"></i></a>
 					</td>
 				</tr>
 			{% endfor %}

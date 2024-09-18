@@ -109,6 +109,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         \Frootbox\Persistence\Content\Repositories\ContentElements $contentElementsRepository
     ): ?\Frootbox\Ext\Core\ShopSystem\PaymentMethods\PaymentMethod
     {
+
         if (empty($_SESSION['cart']['paymentmethod'])) {
             $paymentmethods = $this->getPaymentMethods($container);
 
@@ -118,11 +119,11 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
 
             $paymentMethod = $paymentmethods[0];
 
+
             $_SESSION['cart']['paymentmethod']['methodClass'] = get_class($paymentMethod);
 
             return $paymentMethod;
         }
-
         return new $_SESSION['cart']['paymentmethod']['methodClass'];
     }
 
@@ -188,11 +189,15 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
     }
 
     /**
-     *
+     * @param \DI\Container $container
+     * @return array
+     * @throws \DI\DependencyException
+     * @throws \DI\NotFoundException
      */
     public function getPaymentMethods(
         Container $container,
-    ): array {
+    ): array
+    {
         $factory = $container->get(\Frootbox\TranslatorFactory::class);
         $contentElementsRepository = $container->get(\Frootbox\Persistence\Content\Repositories\ContentElements::class);
 
@@ -210,14 +215,28 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
             return [];
         }
 
+        $configuration = $container->get(\Frootbox\Config\Config::class);
+
         $paymentmethods = [];
+        $loop = 0;
 
         foreach ($plugin->getConfig('paymentmethods') as $paymentMethodClass) {
+
+            ++$loop;
+
+            // Obtain payment method
             $paymentMethod = new $paymentMethodClass;
 
             // Load language file
             $scope = str_replace('\\', '.', substr(substr(get_class($paymentMethod), 0, -7), 13));
             $translator->setScope($scope);
+
+            $paymentConfig = $configuration->get('Ext.Core.ShopSystem.PaymentMethods.' . $paymentMethod->getId());
+            $config = !empty($paymentConfig) ? $paymentConfig->getData() : [];
+            $priority = $config['Priority'] ?? 1;
+
+            $priority *= 100;
+            $priority += $loop;
 
 
             $path = $paymentMethod->getPath() . 'resources/private/language/' . GLOBAL_LANGUAGE . '.php';
@@ -228,18 +247,18 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
 
             $translator->addResource($path, $scope, false);
 
-
-
             $paymentMethod->setTitle($translator->translate('Method.Title'));
 
             if (!empty($_SESSION['cart']['paymentmethod']['methodClass']) and $paymentMethodClass == '\\' . $_SESSION['cart']['paymentmethod']['methodClass']) {
                 $paymentMethod->setActive();
             }
 
-            $paymentmethods[] = $paymentMethod;
+            $paymentmethods[$priority] = $paymentMethod;
         }
 
-        return $paymentmethods;
+        krsort($paymentmethods);
+
+        return array_values($paymentmethods);
     }
 
     /**
@@ -859,6 +878,270 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
     }
 
     /**
+     * @param \Frootbox\Ext\Core\ShopSystem\Plugins\Checkout\Shopcart $shopcart
+     * @param \DI\Container $container
+     * @param \Frootbox\Db\Db $dbms
+     * @param \Frootbox\Http\Post $post
+     * @param \Frootbox\Session $session
+     * @param \Frootbox\Builder $builder
+     * @param \Frootbox\Config\Config $config
+     * @param \Frootbox\View\Engines\Interfaces\Engine $view
+     * @param \Frootbox\TranslatorFactory $translationFactory
+     * @param \Frootbox\Persistence\Repositories\Files $fileRepository
+     * @param \Frootbox\Persistence\Repositories\Users $usersRepository
+     * @param \Frootbox\Ext\Core\ShopSystem\Integrations\Delegator $delegator
+     * @param \Frootbox\Mail\Transports\Interfaces\TransportInterface $mailTransport
+     * @param \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Bookings $bookingsRepository
+     * @return \Frootbox\View\ResponseJson
+     * @throws \Frootbox\Exceptions\InputInvalid
+     * @throws \Frootbox\Exceptions\RuntimeError
+     * @throws \Spipu\Html2Pdf\Exception\Html2PdfException
+     */
+    public function ajaxCheckoutPreAction(
+        Shopcart $shopcart,
+        Container $container,
+        \Frootbox\Db\Db $dbms,
+        \Frootbox\Http\Post $post,
+        \Frootbox\Session $session,
+        \Frootbox\Builder $builder,
+        \Frootbox\Config\Config $config,
+        \Frootbox\View\Engines\Interfaces\Engine $view,
+        \Frootbox\TranslatorFactory $translationFactory,
+        \Frootbox\Persistence\Repositories\Files $fileRepository,
+        \Frootbox\Persistence\Repositories\Users $usersRepository,
+        \Frootbox\Ext\Core\ShopSystem\Integrations\Delegator $delegator,
+        \Frootbox\Mail\Transports\Interfaces\TransportInterface $mailTransport,
+        \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Bookings $bookingsRepository,
+    ): ResponseJson
+    {
+        // Set note
+        $shopcart->setNote($post->get('Note'));
+
+        // Start database transaction
+        $dbms->transactionStart();
+
+        // Fetch shop-system plugin
+        $shopPlugin = $this->getShopPlugin();
+
+        // Obtain translator
+        $translator = $this->getTranslator($translationFactory);
+
+        // Update newsletter consent
+        if (!empty($newsletterConnector = $this->getNewsletterConnector($container))) {
+            $newsletterConnector->execute($post, $shopcart);
+        }
+
+        // Compose booking
+        $booking = new \Frootbox\Ext\Core\ShopSystem\Persistence\Booking([
+            'pluginId' => $this->getId(),
+            'pageId' => $this->getPageId(),
+            'state' => 'Booked',
+            'title' => $shopcart->getPersonal('firstname') . ' ' . $shopcart->getPersonal('lastname'),
+            'uid' => $shopcart->getUniqueId(),
+            'config' => [
+                'note' => $shopcart->getNote(),
+                'personal' => $shopcart->getPersonalData(),
+                'shipping' => $shopcart->getShippingData(),
+                'billing' => $shopcart->getBillingData(),
+                'payment' => $shopcart->getPaymentInfo(),
+                'products' => $shopcart->getItemsRaw(),
+                'additionalinput' => $post->get('additionalinput'),
+                'coupons' => $couponData ?? [],
+                'persistedData' => [
+                    'shippingCosts' => $shopcart->getShippingCosts(),
+                    'taxSections' => $shopcart->getTaxSections(),
+                ],
+                'ownOrderNumber' => $post->get('ownOrderNumber'),
+            ],
+        ]);
+
+        if ($session->isLoggedIn()) {
+            $booking->setUserId($session->getUser()->getId());
+        }
+
+        if (!IS_LOGGED_IN and !empty($post->get('password'))) {
+            $user = $usersRepository->insert(
+                new \Frootbox\Persistence\User([
+                    'email' => $shopcart->getPersonal('email'),
+                    'type' => 'User',
+                ])
+            );
+
+            $user->setPassword($post->get('password'));
+            $user->save();
+
+            $booking->setUserId($user->getId());
+        }
+
+        // Insert booking
+        $booking = $bookingsRepository->insert($booking);
+
+        // Generate order number
+        $orderNumber = $shopPlugin->getConfig('orderNumberTemplate') ? $shopPlugin->getConfig('orderNumberTemplate') : '{R:100-999}-{R:A-Z}-{ID}';
+        $orderNumber = str_replace('{ID}', '{NR}', $orderNumber);
+
+        $orderNumber = preg_replace_callback('#\{R:([0-9]+)-([0-9]+)\}#', function ($match) {
+            return rand($match[1], $match[2]);
+        }, $orderNumber);
+
+        $orderNumber = preg_replace_callback('#\{R:A-Z(:([0-9]+))?\}#', function ($match) {
+            $length = !empty($match[2]) ? $match[2] : 1;
+
+            $range = strtoupper(md5(microtime(true)));
+
+            return substr($range, 0, $length);
+        }, $orderNumber);
+
+        $orderNumber = preg_replace_callback('#\{R:a-z(:([0-9]+))?\}#', function ($match) {
+            $length = !empty($match[2]) ? $match[2] : 1;
+
+            $range = md5(microtime(true));
+
+            return substr($range, 0, $length);
+        }, $orderNumber);
+
+        $orderNumber = str_replace('{NR}', $booking->getId(), $orderNumber);
+
+        $booking->addConfig([
+            'orderNumber' => $orderNumber,
+        ]);
+
+        $booking->save();
+
+        // Set order number to shopping-cart for later use in payment methods
+        $shopcart->setOrderNumber($orderNumber);
+
+        // Commit database transaction
+        $dbms->transactionCommit();
+
+        // Check if bookings needs to be handed over to integrations
+        if ($delegator->canTransferBooking()) {
+            $delegator->transferBooking($booking);
+        }
+
+        // Compose mails
+        $view->set('translator', $translator);
+        $view->set('shopcart', $shopcart);
+        $view->set('booking', $booking);
+        $view->set('orderNumber', $orderNumber);
+        $view->set('serverpath', SERVER_PATH_PROTOCOL);
+
+        if (!empty($shopPlugin->getConfig('textAbove'))) {
+            $text = $shopPlugin->getConfig('textAbove');
+            $text = str_replace(
+                '{name}',
+                $shopcart->getPersonal('firstname') . ' ' . $shopcart->getPersonal('lastname'),
+                $text
+            );
+
+            $view->set('textAbove', $text);
+        }
+
+        $view->set('textBelow', $shopPlugin->getConfig('textBelow'));
+
+        preg_match('#\/([a-zA-Z0-9]+)\/([a-zA-Z0-9]+)\/pages\/$#', $config->get('pageRootFolder'), $match);
+
+        $view->set('baseVendor', $match[1]);
+        $view->set('baseExtension', $match[2]);
+
+        $paymentMethod = $shopcart->getPaymentMethod();
+        $paymentInfoSave = $paymentMethod->renderSummarySave($view, $shopcart->getPaymentData());
+
+        $view->set('paymentInfo', $paymentInfoSave);
+        $view->set('netPrices', $this->getConfig('showNetPrices'));
+        $view->set('currencySign', $shopPlugin->getCurrencySign());
+
+
+        $builder->setPlugin($this)->setTemplate('Mail');
+        $sourceSave = $builder->render('Mail.html.twig');
+
+        $paymentInfo = $paymentMethod->renderSummary($view, $shopcart->getPaymentData());
+        $view->set('paymentInfo', $paymentInfo);
+
+        $source = $builder->render('Mail.html.twig');
+
+        // Generate confirmation of order
+        if (!empty($shopPlugin->getConfig('confirmationOfOrder.createOnCheckout'))) {
+
+            // Render source
+            $builder->setPlugin($this)->setTemplate('ConfirmationOfOrder');
+            // $builder->setBaseFile($this->getPath() . 'resources/private/builder/ConfirmationOfOrder.html.twig');
+
+            // Fetch background file
+            $file = $fileRepository->fetchByUid($shopPlugin->getUid('confirmationOfOrder-background'));
+
+
+            $pdfSource = $builder->render('ConfirmationOfOrder.html.twig', [
+                'paymentInfoSave' => $paymentInfoSave,
+                'plugin' => $this,
+                'shopPlugin' => $shopPlugin,
+                'booking' => $booking,
+                'background' => ($file ? FILES_DIR . $file->getPath() : null),
+                'currencySign' => $shopPlugin->getCurrencySign(),
+            ]);
+
+            $tmpConfirmationOfOrderFile = FILES_DIR . 'tmp/shop-confirmationoforder-' . $booking->getId() . '.pdf';
+
+            $html2pdf = new \Spipu\Html2Pdf\Html2Pdf(
+                lang: 'de',
+                margins: array(20, 30, 0, 25),
+            );
+
+            $html2pdf->writeHTML($pdfSource);
+
+            // Write pdf
+            $html2pdf->output(
+                name: $tmpConfirmationOfOrderFile,
+                dest: 'F'
+            );
+        }
+
+
+        // Compose mails
+        $subject = !empty($shopPlugin->getConfig('subject')) ? $shopPlugin->getConfig('subject') : 'Shop-Bestellung';
+        $mail = new \Frootbox\Mail\Envelope;
+        $mail->setSubject($subject);
+        $mail->setBodyHtml($sourceSave);
+        $mail->setReplyTo($config->get('mail.defaults.from.address'));
+
+        if (!empty($tmpInvoiceFile)) {
+            $attachment = new \Frootbox\Mail\Attachment($tmpInvoiceFile, 'Rechnung-' . $booking->getConfig('invoice.number'). '.pdf');
+            $mail->addAttachment($attachment);
+        }
+
+        if (!empty($tmpConfirmationOfOrderFile)) {
+            $attachment = new \Frootbox\Mail\Attachment($tmpConfirmationOfOrderFile, 'Bestellung-' . $booking->getConfig('orderNumber'). '.pdf');
+            $mail->addAttachment($attachment);
+        }
+
+        $recipient = $shopcart->getBilling('email') ? $shopcart->getBilling('email') : $shopcart->getPersonal('email');
+
+        $mail->clearTo();
+        $mail->addTo($recipient);
+
+        try {
+
+            // Send customer
+            $mailTransport->send($mail);
+        } // Ignore exceptions from mail sending because it’s very likely a mistyped email
+        catch (\PHPMailer\PHPMailer\Exception $e) {
+
+        }
+
+        // Backup order
+        $cacheFile = FILES_DIR . 'orders/' . date('Y-m-d') . '/' . date('H-i') . '-' . rand(10000, 99999) . '.json';
+        $file = new \Frootbox\Filesystem\File($cacheFile);
+        $file->setSource(json_encode($_SESSION['cart']));
+        $file->write();
+
+        unset($_SESSION['cart']);
+
+        return new ResponseJson([
+            'isCartValid' => true,
+        ]);
+    }
+
+    /**
      * @param Shopcart $shopcart
      * @param \Frootbox\Http\Get $get
      * @param \Frootbox\View\Viewhelper\Partials $partialsViewhelper
@@ -958,30 +1241,69 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
     }
 
     /**
-     * @param \Frootbox\Ext\Core\ShopSystem\Plugins\Checkout\Shopcart $shopcart
-     * @param \Frootbox\Http\Post $post
-     * @return \Frootbox\View\ResponseJson
+     * @param \DI\Container $container
+     * @param \Frootbox\Http\Get $get
+     * @param \Frootbox\Ext\Core\ShopSystem\Integrations\Delegator $delegator
+     * @param \Frootbox\Persistence\Content\Repositories\ContentElements $contentElements
+     * @param \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Bookings $bookingsRepository
+     * @return \Frootbox\View\ResponseRedirect
+     * @throws \Frootbox\Exceptions\NotFound
      */
-    public function ajaxCheckoutPreAction(
-        Shopcart $shopcart,
-        \Frootbox\Http\Post $post,
-    ): ResponseJson
+    public function ajaxPaymentValidateAction(
+        Container $container,
+        \Frootbox\Http\Get $get,
+        \Frootbox\Ext\Core\ShopSystem\Integrations\Delegator $delegator,
+        \Frootbox\Persistence\Content\Repositories\ContentElements $contentElements,
+        \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Bookings $bookingsRepository,
+    ): ResponseRedirect
     {
-        // Set note
-        $shopcart->setNote($post->get('Note'));
-
-
-
-
-        // Backup order
-        $cacheFile = FILES_DIR . 'orders/' . date('Y-m-d') . '/' . date('H-i') . '-' . rand(10000, 99999) . '.json';
-        $file = new \Frootbox\Filesystem\File($cacheFile);
-        $file->setSource(json_encode($_SESSION['cart']));
-        $file->write();
-
-        return new ResponseJson([
-            'isCartValid' => true,
+        /**
+         * Fetch booking
+         * @var \Frootbox\Ext\Core\ShopSystem\Persistence\Booking $booking
+         */
+        $booking = $bookingsRepository->fetchOne([
+            'where' => [
+                'uid' => $get->get('uniqueId'),
+            ],
         ]);
+
+        // Get payment method
+        $paymentMethod = $booking->getPaymentMethod();
+
+        $result = $container->call([ $paymentMethod, 'onValidatePaymentAfterCheckout' ]);
+
+        if (!empty($result['isPaid'])) {
+
+            // Update booking
+            $booking->addConfig([
+                'payment' => [
+                    'state' => 'Paid',
+                ],
+            ]);
+
+            $booking->save();
+
+            // Check if bookings needs to be handed over to integrations
+            if ($delegator->canTransferBooking()) {
+                $delegator->updateBookingsPaymentState($booking);
+            }
+        }
+
+        // Look for "booking completed" page
+        $pluginCompleted = $contentElements->fetchOne([
+            'where' => [
+                'className' => \Frootbox\Ext\Core\ShopSystem\Plugins\CheckoutCompleted\Plugin::class,
+            ],
+        ]);
+
+        if ($pluginCompleted) {
+            $uri = $pluginCompleted->getActionUri('index');
+        }
+        else {
+            $uri = $this->getActionUri('complete', ['bookingId' => $booking->getId(), 'mailSent' => true, ]);
+        }
+
+        return new \Frootbox\View\ResponseRedirect($uri);
     }
 
     /**
@@ -1730,6 +2052,14 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
 
             $firstRegularDay->modify('+' . $addedDays . ' days');
         }
+
+        if (!empty($shopPlugin->getConfig('shipping.skipNextHours'))) {
+
+            $addedHours = $shopPlugin->getConfig('shipping.skipNextHours');
+
+            $firstRegularDay->modify('+' . $addedHours . ' hours');
+        }
+
 
         $lastDate = new \DateTime($date->format('Y-m-d'));
         $lastDate->modify('+ ' . (($date->format('t') - $date->format('d')) + 1) . ' days');

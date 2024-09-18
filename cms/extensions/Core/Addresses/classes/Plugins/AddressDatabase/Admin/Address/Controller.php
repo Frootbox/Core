@@ -153,7 +153,12 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     }
 
     /**
-     *
+     * @param \Frootbox\Http\Get $get
+     * @param \Frootbox\Http\Post $post
+     * @param \Frootbox\Ext\Core\Addresses\Persistence\Repositories\Addresses $addressesRepository
+     * @param \Frootbox\Ext\Core\Addresses\Persistence\Repositories\OpeningTimes $openingTimesRepository
+     * @param \Frootbox\Admin\Viewhelper\GeneralPurpose $gp
+     * @return \Frootbox\Admin\Controller\Response
      */
     public function ajaxOpeningTimeCreateAction(
         \Frootbox\Http\Get $get,
@@ -174,6 +179,7 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
                 'timeFrom' => $post->get('timeFrom'),
                 'timeTo' => $post->get('timeTo'),
                 'days' => $post->get('days'),
+                'isClosed' => !empty($post->get('IsClosed')),
             ],
         ]);
 

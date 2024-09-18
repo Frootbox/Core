@@ -537,14 +537,18 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
     }
 
     /**
-     * @param Persistence\Repositories\Jobs $jobRepository
-     * @return Response
+     * @param \Frootbox\Ext\Core\HelpAndSupport\Plugins\Jobs\Persistence\Repositories\Jobs $jobRepository
+     * @return \Frootbox\View\Response
+     * @throws \Frootbox\Exceptions\NotFound
      */
     public function showJobAction(
         Persistence\Repositories\Jobs $jobRepository,
     ): Response
     {
-        // Fetch job
+        /**
+         * Fetch job
+         * @var \Frootbox\Ext\Core\HelpAndSupport\Plugins\Jobs\Persistence\Job $job
+         */
         $job = $jobRepository->fetchById($this->getAttribute('jobId'));
 
         if (!$job->isVisible()) {

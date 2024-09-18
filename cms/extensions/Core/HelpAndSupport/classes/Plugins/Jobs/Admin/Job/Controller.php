@@ -74,6 +74,9 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
             'visibility' => (DEVMODE ? 2 : 1),
         ]));
 
+        // Trigger save to create alias
+        $job->save();
+
         return self::getResponse('json', 200, [
             'modalDismiss' => true,
             'replace' => [

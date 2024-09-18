@@ -48,8 +48,6 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
         // Validate required input
         $post->require([ 'block' ]);
 
-   //     $db->transactionStart();
-
         // Fetch page
         $page = $pageRepository->fetchById($get->get('pageId'));
 
@@ -83,6 +81,7 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
         if ($post->get('block') != 'fromClipboard') {
 
             $data = explode('-', $post->get('block'));
+
 
             // Compose new block
             $block = new \Frootbox\Persistence\Content\Blocks\Block([

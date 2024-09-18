@@ -75,10 +75,21 @@ class Item extends \Frootbox\Ext\Core\Navigation\Navigations\Items\AbstractItem
 
         foreach ($result as $page) {
 
-            $items->push(new \Frootbox\Ext\Core\Navigation\Navigations\Items\Dummy([
+            // Compose navigation dummy
+            $dummy = new \Frootbox\Ext\Core\Navigation\Navigations\Items\Dummy([
                 'href' => $page->getUri(),
                 'title' => $page->getTitle(GLOBAL_LANGUAGE),
-            ]));
+            ]);
+
+            if ($page->getConfig('pageType') == 'Frame' and $page->getConfig('frame.forceBlankWindow')) {
+                $dummy->setTarget('_blank');
+            }
+
+            if (!empty($page->getConfig('variables'))) {
+                $dummy->addConfig($page->getConfig('variables'));
+            }
+
+            $items->push($dummy);
         }
 
         return $items;
