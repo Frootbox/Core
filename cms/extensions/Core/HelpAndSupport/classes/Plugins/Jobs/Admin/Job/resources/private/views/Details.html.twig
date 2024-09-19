@@ -82,7 +82,7 @@
 
                     <div class="form-group">
                         <label for="dateStart">Beginn-Datum</label>
-                        <input type="date" class="form-control" name="dateStart" id="dateStart" placeholder="Beginn-Datum" value="{{ job.getDateStart() | date('Y-m-d') }}">
+                        <input type="date" class="form-control" name="dateStart" id="dateStart" placeholder="Beginn-Datum" value="{% if job.getDateStart() %}{{ job.getDateStart() | date('Y-m-d') }}{% endif %}">
                     </div>
                     <div class="form-group">
                         <label for="start">Beginn (freier Text)</label>
@@ -109,7 +109,6 @@
                 <label for="link">Link</label>
                 <input type="text" class="form-control" id="link" name="link" placeholder="Link" value="{{ job.getConfig('link') }}">
             </div>
-
 
             {% if job.getConfig('noJobsDetailPage') %}
                 <div class="form-group form-check">

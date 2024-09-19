@@ -43,6 +43,8 @@ class Job extends \Frootbox\Persistence\AbstractAsset implements \Frootbox\Persi
      * Generate jobs alias
      *
      * @return \Frootbox\Persistence\Alias|null
+     * @throws \Frootbox\Exceptions\NotFound
+     * @throws \Frootbox\Exceptions\RuntimeError
      */
     protected function getNewAlias(): ?\Frootbox\Persistence\Alias
     {
@@ -50,6 +52,9 @@ class Job extends \Frootbox\Persistence\AbstractAsset implements \Frootbox\Persi
             return null;
         }
 
+        if (!empty($this->getConfig('link'))) {
+            return null;
+        }
 
         $title = $this->getTitle();
 

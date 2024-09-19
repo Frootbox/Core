@@ -118,7 +118,7 @@ variables:
 
                             {% if openingTimes | length %}
 
-                                <h4>Öffnungszeiten</h4>
+                                <h4 data-editable data-uid="{{ address.getUid('title-openingtimes') }}">Öffnungszeiten</h4>
 
                                 <table class="table opening-times">
                                     <tbody>
