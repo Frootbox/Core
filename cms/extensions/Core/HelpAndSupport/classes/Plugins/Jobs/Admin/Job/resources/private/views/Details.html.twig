@@ -27,6 +27,8 @@
             <div class="row">
                 <div class="col-md-6">
 
+                    <h3>Details</h3>
+
                     {% if not configuration.get('i18n.multiAliasMode') %}
                         <div class="form-group">
                             <label for="title">Titel</label>
@@ -47,6 +49,21 @@
                         {% endfor %}
                     {% endif %}
 
+                    {% if v.isExtensionInstalled('Core', 'Addresses') %}
+                        <div class="form-group">
+                            <label for="city">Ort</label>
+                            <select size="1" class="form-control" name="locationId" id="locationId">
+                                <option value="">bitte wählen ...</option>
+                                {% for address in i.getAddresses() %}
+                                    <option {% if address.getId() == job.getLocationId() %}selected{% endif %} value="{{ address.getId() }}">{{ address.getTitle() }}</option>
+                                {% endfor %}
+                            </select>
+
+                        </div>
+                    {% endif %}
+
+                    <h3>Anstellungs-Art</h3>
+
                     <div class="form-group">
                         <label for="typeText">Art (freier Text)</label>
                         <input type="text" class="form-control" name="typeText" id="typeText" placeholder="Art" value="{{ job.getConfig('type') }}">
@@ -63,22 +80,36 @@
                         </select>
                     </div>
 
+                    <div class="form-group form-check">
+                        <input {% if job.getConfig('Types.Permanent') %}checked{% endif %} type="checkbox" class="form-check-input" id="TypesPermanent" name="Types[Permanent]">
+                        <label class="form-check-label" for="TypesPermanent">Festanstellung</label>
+                    </div>
+                    <div class="form-group form-check">
+                        <input {% if job.getConfig('Types.Fulltime') %}checked{% endif %} type="checkbox" class="form-check-input" id="TypesFulltime" name="Types[Fulltime]">
+                        <label class="form-check-label" for="TypesFulltime">Vollzeit</label>
+                    </div>
+                    <div class="form-group form-check">
+                        <input {% if job.getConfig('Types.Parttime') %}checked{% endif %} type="checkbox" class="form-check-input" id="TypesParttime" name="Types[Parttime]">
+                        <label class="form-check-label" for="TypesParttime">Teilzeit</label>
+                    </div>
+                    <div class="form-group form-check">
+                        <input {% if job.getConfig('Types.Apprentice') %}checked{% endif %} type="checkbox" class="form-check-input" id="TypesApprentice" name="Types[Apprentice]">
+                        <label class="form-check-label" for="TypesApprentice">Ausbildung</label>
+                    </div>
+                    <div class="form-group form-check">
+                        <input {% if job.getConfig('Types.DualStudy') %}checked{% endif %} type="checkbox" class="form-check-input" id="TypesDualStudy" name="Types[DualStudy]">
+                        <label class="form-check-label" for="TypesDualStudy">Duales Studium</label>
+                    </div>
 
-                    {% if v.isExtensionInstalled('Core', 'Addresses') %}
-                        <div class="form-group">
-                            <label for="city">Ort</label>
-                            <select size="1" class="form-control" name="locationId" id="locationId">
-                                <option value="">bitte wählen ...</option>
-                                {% for address in i.getAddresses() %}
-                                    <option {% if address.getId() == job.getLocationId() %}selected{% endif %} value="{{ address.getId() }}">{{ address.getTitle() }}</option>
-                                {% endfor %}
-                            </select>
-
-                        </div>
-                    {% endif %}
+                    {{ v.injectPartial('\\Frootbox\\Admin\\View\\Partials\\Input\\Tags', {
+                        object: job,
+                        presetFromConfig: 'Ext.Core.HelpAndSupport.Jobs.TagsForced'
+                    }) | raw }}
 
                 </div>
                 <div class="col-md-6">
+
+                    <h3>Datum</h3>
 
                     <div class="form-group">
                         <label for="dateStart">Beginn-Datum</label>
@@ -97,37 +128,48 @@
                         <input type="text" class="form-control" name="limitation" id="limitation" placeholder="Befristung" value="{{ job.getConfig('limitation') }}">
                     </div>
 
+                    <h3>Gehalt</h3>
+
+                    <div class="form-group">
+                        <label for="SalaryFrom">Jahresgehalt von</label>
+                        <input type="text" class="form-control" name="SalaryFrom" id="SalaryFrom" placeholder="von" value="{{ job.getConfig('SalaryFrom') }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="SalaryTo">Jahresgehalt bis</label>
+                        <input type="text" class="form-control" name="SalaryTo" id="SalaryTo" placeholder="bis" value="{{ job.getConfig('SalaryTo') }}">
+                    </div>
+
+                    {% if v.isExtensionInstalled('Core', 'ContactForms') %}
+
+                        <h3>Bewerbung</h3>
+
+                        <div class="form-group">
+                            <label for="formId">Bewerbungsformular</label>
+                            <select class="form-control" id="formId" name="formId">
+                                <option value="">Standardeinstellung</option>
+                                {% for form in i.getForms() %}
+                                    <option {% if job.getConfig('formId') == form.getId %}selected{% endif %} value="{{ form.getId }}">{{ form.getTitle() }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    {% endif %}
+
+                    <h3>Verlinkung</h3>
+
+                    <div class="form-group">
+                        <label for="link">Link</label>
+                        <input type="text" class="form-control" id="link" name="link" placeholder="Link" value="{{ job.getConfig('link') }}">
+                    </div>
+
+                    {% if job.getConfig('noJobsDetailPage') %}
+                        <div class="form-group form-check">
+                            <input {% if job.getConfig('forceJobsDetailPage') %}checked{% endif %} type="checkbox" class="form-check-input" id="forceJobsDetailPage" name="forceJobsDetailPage">
+                            <label class="form-check-label" for="forceJobsDetailPage">Detailseite für diesen Job dennoch anzeigen</label>
+                        </div>
+                    {% endif %}
+
                 </div>
             </div>
-
-            {{ v.injectPartial('\\Frootbox\\Admin\\View\\Partials\\Input\\Tags', {
-                object: job,
-                presetFromConfig: 'Ext.Core.HelpAndSupport.Jobs.TagsForced'
-            }) | raw }}
-
-            <div class="form-group">
-                <label for="link">Link</label>
-                <input type="text" class="form-control" id="link" name="link" placeholder="Link" value="{{ job.getConfig('link') }}">
-            </div>
-
-            {% if job.getConfig('noJobsDetailPage') %}
-                <div class="form-group form-check">
-                    <input {% if job.getConfig('forceJobsDetailPage') %}checked{% endif %} type="checkbox" class="form-check-input" id="forceJobsDetailPage" name="forceJobsDetailPage">
-                    <label class="form-check-label" for="forceJobsDetailPage">Detailseite für diesen Job dennoch anzeigen</label>
-                </div>
-            {% endif %}
-
-            {% if v.isExtensionInstalled('Core', 'ContactForms') %}
-                <div class="form-group">
-                    <label for="formId">Bewerbungsformular</label>
-                    <select class="form-control" id="formId" name="formId">
-                        <option value="">Standardeinstellung</option>
-                        {% for form in i.getForms() %}
-                            <option {% if job.getConfig('formId') == form.getId %}selected{% endif %} value="{{ form.getId }}">{{ form.getTitle() }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-            {% endif %}
 
             <button type="submit" class="btn btn-primary">Speichern</button>
 

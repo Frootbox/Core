@@ -17,6 +17,7 @@ return [
 
     'AsSoonAsPossible' => 'zu sofort',
 
+    'TypePermanent' => 'Festanstellung',
     'TypeFulltime' => 'Vollzeit',
     'TypeParttime' => 'Teilzeit',
     'TypeFulltimeOrParttime' => 'Vollzeit oder Teilzeit',

@@ -18,7 +18,8 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     }
 
     /**
-     *
+     * @param \Frootbox\Ext\Core\ContactForms\Persistence\Repositories\Forms $formsRepository
+     * @return \Frootbox\Db\Result
      */
     public function getForms(
         \Frootbox\Ext\Core\ContactForms\Persistence\Repositories\Forms $formsRepository
@@ -160,7 +161,10 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         \Frootbox\Ext\Core\HelpAndSupport\Plugins\Jobs\Persistence\Repositories\Jobs $jobsRepository
     ): Response
     {
-        // Fetch job
+        /**
+         * Fetch job
+         * @var \Frootbox\Ext\Core\HelpAndSupport\Plugins\Jobs\Persistence\Job $job
+         */
         $job = $jobsRepository->fetchById($get->get('jobId'));
 
         $title = $post->get('titles')[DEFAULT_LANGUAGE] ?? $post->get('title');
@@ -175,6 +179,8 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         $job->setLocationId(!empty($post->get('locationId')) ? $post->get('locationId') : null);
 
         $job->unsetConfig('titles');
+        $job->unsetConfig('Types');
+
         $job->addConfig([
             'titles' => $post->get('titles'),
             'asSoonAsPossible' => $post->get('asSoonAsPossible'),
@@ -185,6 +191,9 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
             'typeId' => $post->get('typeId'),
             'link' => $post->get('link'),
             'formId' => $post->get('formId'),
+            'SalaryFrom' => $post->get('SalaryFrom'),
+            'SalaryTo' => $post->get('SalaryTo'),
+            'Types' => $post->get('Types'),
         ]);
 
         $job->save();

@@ -194,6 +194,18 @@ class Job extends \Frootbox\Persistence\AbstractAsset implements \Frootbox\Persi
     }
 
     /**
+     * @return array
+     */
+    public function getTypes(): array
+    {
+        if (empty($this->getConfig('Types'))) {
+            return [];
+        }
+
+        return array_keys($this->getConfig('Types'));
+    }
+
+    /**
      *
      */
     public function getUri(array $options = null): string

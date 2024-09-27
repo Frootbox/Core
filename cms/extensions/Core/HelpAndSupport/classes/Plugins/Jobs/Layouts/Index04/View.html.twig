@@ -47,8 +47,6 @@ variables:
                     <div class="{{ colClass }}">
                         <div class="xcard" data-equalheight="{{ plugin.getUid('xcards-height') }}" data-href>
 
-
-
                             {% if variables.withThumbnail %}
                                 <picture class="fluid" data-editable data-uid="{{ job.getUid('image')}}">
                                     <img width="600" height="400" src="{{ i.getDummyImage({ width: 600, height: 400 }) }}" alt="" />
@@ -57,6 +55,14 @@ variables:
 
                             <div class="content-wrapper">
                                 <h4>{{ job.getTitle() }}</h4>
+
+                                {% if job.getTypes() | length %}
+                                    {% for TypeId in job.getTypes() %}
+                                        <span class="badge bg-light">{{ t.translate('Type' ~ TypeId) }}</span>
+                                    {% endfor %}
+                                {% endif %}
+
+
 
                                 <p>
                                     {% if job.getConfig('typeId') %}
@@ -79,7 +85,17 @@ variables:
                                     {% elseif job.getDateStart() %}
                                         ab {{ job.getDateStart() | date('d.m.Y') }}
                                     {% endif %}
+
+
+                                    {% if job.getConfig('SalaryFrom') and not job.getConfig('SalaryTo') %}
+                                        <br />ab {{ job.getConfig('SalaryFrom') | number_format(0, ",", ".") }} €
+                                    {% elseif job.getConfig('SalaryTo') and not job.getConfig('SalaryFrom') %}
+                                        <br />bis {{ job.getConfig('SalaryTo') | number_format(0, ",", ".") }} €
+                                    {% elseif job.getConfig('SalaryTo') and job.getConfig('SalaryFrom') %}
+                                        <br />{{ job.getConfig('SalaryFrom') | number_format(0, ",", ".") }} bis {{ job.getConfig('SalaryTo') | number_format(0, ",", ".") }} €
+                                    {% endif %}
                                 </p>
+
 
 
                                 {% set uid = variables.withOwnTeaser ? job.getUid('teaser-own') : job.getUid('teaser') %}
