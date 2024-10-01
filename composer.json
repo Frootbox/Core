@@ -42,7 +42,7 @@
         "frootbox/db":"0.2.1",
         "frootbox/debug":"dev-master",
         "frootbox/exceptions":"dev-master",
-        "frootbox/config":"0.0.7",
+        "frootbox/config":"^1",
         "frootbox/http":"dev-master",
         "frootbox/filesystem":"dev-master",
         "frootbox/mail":"@dev",
@@ -67,7 +67,7 @@
 	"config": {
         "vendor-dir": "lib",
         "platform": {
-            "php": "8.0.8"
+            "php": "8.2"
         }
     },
     "minimum-stability":"stable"

@@ -1,3 +1,5 @@
+{% set texts = view.getViewhelper('Text', { object: plugin }) %}
+
 <style>
 
     .sidebar {
@@ -83,7 +85,7 @@
 
     <div class="sidebar">
         <p>
-            {{ "Core.ShopSystem.Plugins.Checkout.Field.OrderNumber" | translate }}.: {{ booking.getConfig('orderNumber') }}<br />
+            {{ "Core.ShopSystem.Plugins.Checkout.Field.OrderNumber" | translate }}: {{ booking.getConfig('orderNumber') }}<br />
             Datum: {{ booking.getDate() | date('d.m.Y') }}
 
             {% if booking.getConfig('ownOrderNumber') %}
@@ -233,9 +235,19 @@
 
         <b>{{ "Core.ShopSystem.Plugins.Checkout.H4PaymentMethod" | translate }}</b>
 
-        <p>{{ shopcart.getPaymentMethod().getTitle() }}</p>
+        <p>{{ ("Core.ShopSystem.PaymentMethods." ~ shopcart.getPaymentMethod().getId() ~ ".Method.Title") | translate }}</p>
 
         {{ paymentInfoSave | raw }}
+
+        {% if booking.getConfig('shipping.type') == "selfPickup" %}
+
+            {% set text = texts.getTextByUid(plugin.getUid('text-shipping-below-selfpickup')) %}
+
+            {% if text %}
+                {{ text.getText() | raw }}
+            {% endif %}
+
+        {% endif %}
     </div>
 
 </page>

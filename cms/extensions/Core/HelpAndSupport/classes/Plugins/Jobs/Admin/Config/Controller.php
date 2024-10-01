@@ -54,6 +54,7 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
             'urlSuffixSubtitle' => $post->get('urlSuffixSubtitle'),
             'urlSkipLocation' => $post->get('urlSkipLocation'),
             'ignoreForeignTitles' => !empty($post->get('ignoreForeignTitles')),
+            'UseAllAddresses' => !empty($post->get('UseAllAddresses')),
         ]);
 
         $this->plugin->save();

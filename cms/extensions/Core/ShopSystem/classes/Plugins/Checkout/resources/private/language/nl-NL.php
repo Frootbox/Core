@@ -53,7 +53,7 @@ return [
     'OrderConfirmation' => 'Order bevestiging',
 
     'Field.VAT' => 'BTW-identificatienummer',
-    'Field.OrderNumber' => 'Bestellingsnummer',
+    'Field.OrderNumber' => 'Ordernr.',
     'Field.SelfPickup' => 'Zelf ophalen',
 
     'VatIncludedOn' => 'incl. %s %% BTW op %s EUR',

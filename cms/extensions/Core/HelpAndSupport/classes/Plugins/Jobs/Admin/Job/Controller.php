@@ -41,14 +41,30 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         \Frootbox\Ext\Core\Addresses\Persistence\Repositories\Addresses $addressesRepository
     ): \Frootbox\Db\Result
     {
-        // Fetch addresses
-        $result = $addressesRepository->fetch([
-            'where' => [
-                'pluginId' => $this->plugin->getId(),
-            ],
-        ]);
+        if (!empty($this->plugin->getConfig('UseAllAddresses'))) {
 
-        return $result;
+            // Fetch addresses
+            $result = $addressesRepository->fetch([
+                'where' => [
+
+                ],
+                'order' => [ 'title ASC' ],
+            ]);
+
+            return $result;
+        }
+        else {
+
+            // Fetch addresses
+            $result = $addressesRepository->fetch([
+                'where' => [
+                    'pluginId' => $this->plugin->getId(),
+                ],
+                'order' => [ 'title ASC' ],
+            ]);
+
+            return $result;
+        }
     }
 
     /**

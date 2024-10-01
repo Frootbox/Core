@@ -423,6 +423,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         \Frootbox\Persistence\Repositories\Files $fileRepository,
         \Frootbox\Persistence\Repositories\Users $usersRepository,
         \Frootbox\Ext\Core\ShopSystem\Integrations\Delegator $delegator,
+        \Frootbox\Persistence\Content\Repositories\Texts $testRepository,
         \Frootbox\Mail\Transports\Interfaces\TransportInterface $mailTransport,
         \Frootbox\Persistence\Content\Repositories\ContentElements $contentElements,
         \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Bookings $bookingsRepository,
@@ -768,6 +769,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
             // Fetch background file
             $file = $fileRepository->fetchByUid($shopPlugin->getUid('confirmationOfOrder-background'));
 
+            // $testRepository->fetchByUid($shopPlugin->getUid('confirmationOfOrder-background'));;
 
             $pdfSource = $builder->render('ConfirmationOfOrder.html.twig', [
                 'paymentInfoSave' => $paymentInfoSave,
@@ -779,6 +781,10 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
             ]);
 
             $tmpConfirmationOfOrderFile = FILES_DIR . 'tmp/shop-confirmationoforder-' . $booking->getId() . '.pdf';
+
+            if (!file_exists(dirname($tmpConfirmationOfOrderFile))) {
+                mkdir(dirname($tmpConfirmationOfOrderFile), 0777, true);
+            }
 
             $html2pdf = new \Spipu\Html2Pdf\Html2Pdf(
                 lang: 'de',
@@ -1266,6 +1272,12 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
                 'uid' => $get->get('uniqueId'),
             ],
         ]);
+
+        if ($get->get('redirect_status') == 'failed') {
+
+        }
+
+        d($booking);
 
         // Get payment method
         $paymentMethod = $booking->getPaymentMethod();
