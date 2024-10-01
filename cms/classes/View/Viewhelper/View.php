@@ -61,7 +61,7 @@ class View extends AbstractViewhelper
         $attributes = (string) null;
 
         if ($untouched) {
-            $attributes .= ' data-untouched="1" ';
+            $attributes .= ' data-nocache="1" data-untouched="1" ';
         }
 
         switch ( $type ) {
