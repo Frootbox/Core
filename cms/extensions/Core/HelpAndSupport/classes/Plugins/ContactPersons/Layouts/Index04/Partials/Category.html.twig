@@ -11,7 +11,7 @@
         <h3>{{ data.category.getTitle() }}</h3>
     {% endif %}
 
-    <div class="row justify-content-center">
+    <div class="row">
         {% for contact in contacts %}
             <div class="{{ data.colClass }} vcard" {% if variables.withDetailsPage %}data-href="{{ contact.getUri() }}"{% endif %}>
 

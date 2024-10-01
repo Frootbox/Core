@@ -54,6 +54,7 @@ class Video extends \Frootbox\Persistence\AbstractAsset
             'virtualDirectory' => [
                 $this->getTitle()
             ],
+            'uid' => $this->getUid('alias'),
             'payload' => $this->generateAliasPayload([
                 'action' => 'showVideo',
                 'videoId' => $this->getId()

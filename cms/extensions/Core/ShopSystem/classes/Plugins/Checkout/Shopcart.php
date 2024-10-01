@@ -14,6 +14,8 @@ class Shopcart
     protected $items = [];
     protected $data = [];
     protected $coupons = [];
+    protected ?string $orderNumber = null;
+    protected ?string $uniqueId = null;
 
     protected $db;
     protected $config;
@@ -97,6 +99,8 @@ class Shopcart
                 $price = round($priceGross / (1 + ($product->getTaxrate() / 100)), 2);
             }
 
+            $uri = !empty($options['uri']) ? $options['uri'] : $product->getUri();
+
 
             $item = [
                 'key' => $key,
@@ -108,7 +112,7 @@ class Shopcart
                 'price' => $price,
                 'priceGross' => $priceGross,
                 'taxRate' => $product->getTaxrate(),
-                'uri' => $product->getUri(),
+                'uri' => $uri,
                 'shippingId' => (array_key_exists('shippingId', $options) ? $options['shippingId'] : $product->getShippingId()),
                 'type' => (empty($options['type']) ? 'Product' : $options['type']),
                 'customNote' => $options['customNote'] ?? null,
@@ -356,6 +360,19 @@ class Shopcart
         return $this->data['newsletter']['content'] ?? false;
     }
 
+    public function getNote(): ?string
+    {
+        return $this->personal['note'] ?? null;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getOrderNumber(): ?string
+    {
+        return $this->orderNumber;
+    }
+
     /**
      *
      */
@@ -374,6 +391,29 @@ class Shopcart
         }
 
         return new $_SESSION['cart']['paymentmethod']['methodClass'];
+    }
+
+    /**
+     * @param string $paymentMethodClass
+     * @return void
+     */
+    public function getPaymentMethodClass(): ?string
+    {
+        return $_SESSION['cart']['paymentmethod']['methodClass'] ?? null;
+    }
+
+    /**
+     *
+     */
+    public function getPaymentMethodId(): ?string
+    {
+        if (empty($_SESSION['cart']['paymentmethod']['methodClass'])) {
+            return null;
+        }
+
+        preg_match('#\\\\PaymentMethods\\\\([a-z]+)\\\\Method$#i', $_SESSION['cart']['paymentmethod']['methodClass'], $match);
+
+        return $match[1];
     }
 
     /**
@@ -717,6 +757,24 @@ class Shopcart
     }
 
     /**
+     * @return string
+     */
+    public function getUniqueId(): string
+    {
+        if (!empty($this->uniqueId)) {
+            return $this->uniqueId;
+        }
+
+        if (empty($_SESSION['cart']['uniqueId'])) {
+            $_SESSION['cart']['uniqueId'] = md5(microtime(true));
+        }
+
+        $this->uniqueId = $_SESSION['cart']['uniqueId'];
+
+        return $this->uniqueId;
+    }
+
+    /**
      *
      */
     public function hasProduct(int $productId): bool
@@ -805,12 +863,38 @@ class Shopcart
     }
 
     /**
-     *
+     * @param string|null $note
+     * @return void
+     */
+    public function setNote(?string $note): void
+    {
+        $this->personal['note'] = $note;
+    }
+
+    /**
+     * @param string $orderNumber
+     * @return void
+     */
+    public function setOrderNumber(string $orderNumber): void
+    {
+        $this->orderNumber = $orderNumber;
+    }
+
+    /**
+     * @return void
+     */
+    public function setPaid(): void
+    {
+        $this->payment['state'] = 'Paid';
+        $this->payment['paidAt'] = date('Y-m-d H:i:s');
+    }
+
+    /**
+     * @deprecated
      */
     public function setPayed(): void
     {
-        $this->payment['state'] = 'Payed';
-        $this->payment['payedAd'] = date('Y-m-d H:i:s');
+        $this->setPaid();
     }
 
     /**
@@ -822,7 +906,8 @@ class Shopcart
     }
 
     /**
-     *
+     * @param string $paymentMethodClass
+     * @return void
      */
     public function setPaymentMethodClass(string $paymentMethodClass): void
     {

@@ -131,7 +131,7 @@
 
 <div class="form-group">
     <label for="fileInput{{ random }}">{{ data.label | default("Datei hinzufügen") }}</label>
-    <input aria-describedby="uploadHelp" data-upload="{{ serverpath }}static/Ext/Core/FileManager/Editor/upload?uid={{ data.uid }}&multiple={% if data.multiple %}1{% endif %}" {% if data.multiple %}multiple{% endif %} type="file" id="fileInput{{ random }}" class="form-control" />
+    <input aria-describedby="uploadHelp" data-upload="{{ serverpath }}static/Ext/Core/FileManager/Editor/upload?uid={{ data.uid }}&multiple={% if data.multiple %}1{% endif %}&setFirst={% if data.setFirst %}1{% endif %}" {% if data.multiple %}multiple{% endif %} type="file" id="fileInput{{ random }}" class="form-control" />
 
     <small id="uploadHelp" class="form-text text-muted">
         {% if data.helpText %}
@@ -143,3 +143,15 @@
 </div>
 
 <div style="border: 1px solid red; color: red; padding: 10px 15px; margin: 20px 0;" id="uploadErrorMessage" class="d-none"></div>
+
+{% if not data.multiple and File %}
+    <div class="row mb-4">
+        <div class="col-2">
+            <img width="50" height="50" src="{{ File.getUri({ width: 50, height: 50 }) }}" alt="" />
+        </div>
+        <div class="col-10" style="line-height: 22px; font-size: 16px;">
+            {{ File.getName() }}<br />
+            <a href="{{ File.getUriDownload() }}">Download</a>&nbsp;&nbsp;|&nbsp;&nbsp;{{ (File.getSize() / 1024  /1024) | round(2) }} MB&nbsp;&nbsp;|&nbsp;&nbsp;<a href="#"><i class="far fa-trash"></i></a>
+        </div>
+    </div>
+{% endif %}

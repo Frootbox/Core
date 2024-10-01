@@ -12,8 +12,9 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
 {
     protected $publicActions = [
         'index',
-        'showReference',
         'request',
+        'showCategory',
+        'showReference',
     ];
 
     protected $isContainerPlugin = true;
@@ -159,6 +160,37 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
     }
 
     /**
+     * @return \Frootbox\Db\Result|null
+     * @throws \Frootbox\Exceptions\RuntimeError
+     */
+    public function getCategoriesTop(): ?\Frootbox\Db\Result
+    {
+        // Fetch root category
+        $categoryRepository = $this->getDb()->getRepository(\Frootbox\Ext\Core\Images\Plugins\References\Persistence\Repositories\Categories::class);
+
+        $root = $categoryRepository->fetchOne([
+            'where' => [
+                'pluginId' => $this->getId(),
+                'parentId' => 0,
+            ],
+        ]);
+
+        if (empty($root)) {
+            return null;
+        }
+
+        $categories = $categoryRepository->fetch([
+            'where' => [
+                'rootId' => $root->getId(),
+                'parentId' => $root->getId(),
+            ],
+            'order' => [ 'lft ASC' ],
+        ]);
+
+        return $categories;
+    }
+
+    /**
      *
      */
     public function getFields(
@@ -176,14 +208,18 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
     }
 
     /**
-     *
+     * @param int $limit
+     * @param array|null $parameters
+     * @return \Frootbox\Db\Result
+     * @throws \Frootbox\Exceptions\RuntimeError
      */
     public function getReferences(
-        \Frootbox\Ext\Core\Images\Plugins\References\Persistence\Repositories\References $referencesRepository,
         int $limit = 1024,
         array $parameters = null,
     ): \Frootbox\Db\Result
     {
+        $referencesRepository = $this->getDb()->getRepository(\Frootbox\Ext\Core\Images\Plugins\References\Persistence\Repositories\References::class);
+
         if (!empty($parameters['order'])) {
             $order = $parameters['order'];
         }
@@ -314,6 +350,26 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
 
         return new Response([
             'reference' => $reference,
+        ]);
+    }
+
+    /**
+     * @param Persistence\Repositories\Categories $categoryRepository
+     * @return Response
+     * @throws \Frootbox\Exceptions\NotFound
+     */
+    public function showCategoryAction(
+        \Frootbox\Ext\Core\Images\Plugins\References\Persistence\Repositories\Categories $categoryRepository,
+    ): Response
+    {
+        /**
+         * Fetch category
+         * @var \Frootbox\Ext\Core\Images\Plugins\References\Persistence\Category $category
+         */
+        $category = $categoryRepository->fetchById($this->getAttribute('categoryId'));
+
+        return new Response([
+            'Category' => $category,
         ]);
     }
 

@@ -34,8 +34,10 @@ abstract class AbstractPartial implements PartialInterface
      *
      */
     public function render (
-        \Frootbox\View\Engines\Interfaces\Engine $view
-    ) {
+        \Frootbox\View\Engines\Interfaces\Engine $view,
+        array $payload = [],
+    ): string
+    {
         // Get view file
         $files = [];
         $files[] = $this->getPath() . 'resources/private/views/View.html.twig';
@@ -55,7 +57,7 @@ abstract class AbstractPartial implements PartialInterface
             $view->set($key, $value);
         }
 
-        $html = $view->render($viewFile);
+        $html = $view->render($viewFile, $payload);
 
         // Auto inject scss
         $scssfile = $this->getPath() . '/resources/public/css/standards.less';

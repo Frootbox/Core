@@ -9,26 +9,44 @@ namespace Frootbox\View\Viewhelper;
 class Files extends AbstractViewhelper
 {
     protected $arguments = [
+        'getFileById' => [
+            'fileId',
+        ],
         'getFilesByUid' => [
-            'uid'
+            'uid',
+            [ 'name' => 'sort', 'default' => 'orderId DESC' ],
         ],
         'getFileByUid' => [
             'uid',
             [ 'name' => 'parameters', 'default' => [] ],
         ],
         'getFolder' => [
-            'folderId'
+            'folderId',
         ],
         'getImageUriByUid' => [
-            'uid'
+            'uid',
         ],
         'getThumbnail' => [
-            'file'
+            'file',
         ],
         'parseFileSize' => [
-            'size'
+            'size',
         ]
     ];
+
+    /**
+     * @param string $fileId
+     * @param \Frootbox\Persistence\Repositories\Files $fileRepository
+     * @return \Frootbox\Persistence\File
+     * @throws \Frootbox\Exceptions\NotFound
+     */
+    public function getFileByIdAction(
+        string $fileId,
+        \Frootbox\Persistence\Repositories\Files $fileRepository,
+    ): \Frootbox\Persistence\File
+    {
+        return $fileRepository->fetchById($fileId);
+    }
 
     /**
      * @param string $uid
@@ -58,25 +76,30 @@ class Files extends AbstractViewhelper
     }
 
     /**
-     *
+     * @param string $uid
+     * @param string $sort
+     * @param \Frootbox\Persistence\Repositories\Files $fileRepository
+     * @return \Frootbox\Db\Result
      */
     public function getFilesByUidAction(
         string $uid,
-        \Frootbox\Persistence\Repositories\Files $files
-    )
+        string $sort,
+        \Frootbox\Persistence\Repositories\Files $fileRepository,
+    ): \Frootbox\Db\Result
     {
-        $result = $files->fetch([
-            'where' => [
-                'uid' => $uid,
-            ],
-            'order' => [ 'orderId DESC' ],
+        $files = $fileRepository->fetchResultByUid($uid, [
+            'fallbackLanguageDefault' => true,
+            'order' => $sort,
         ]);
 
-        return $result;
+        return $files;
     }
 
     /**
-     *
+     * @param $folderId
+     * @param \Frootbox\Persistence\Repositories\Folders $folders
+     * @return \Frootbox\Persistence\Folder
+     * @throws \Frootbox\Exceptions\NotFound
      */
     public function getFolderAction(
         $folderId,
@@ -88,7 +111,9 @@ class Files extends AbstractViewhelper
     }
 
     /**
-     *
+     * @param string $uid
+     * @param \Frootbox\Persistence\Repositories\Files $files
+     * @return string|null
      */
     public function getImageUriByUidAction(
         string $uid,
@@ -105,7 +130,7 @@ class Files extends AbstractViewhelper
     }
 
     /**
-     *
+     * @return float
      */
     public function getUploadMaxSizeAction(): float
     {
@@ -113,7 +138,8 @@ class Files extends AbstractViewhelper
     }
 
     /**
-     *
+     * @param $size
+     * @return string
      */
     public function parseFileSizeAction(
         $size

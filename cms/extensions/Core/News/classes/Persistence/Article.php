@@ -86,11 +86,19 @@ class Article extends \Frootbox\Persistence\AbstractAsset implements \Frootbox\P
             return null;
         }
 
+        $virtualDirectory = [];
+
+        if (!empty($this->getConfig('urlPrefixFullDate'))) {
+
+            $date = new \DateTime($this->getDateStart());
+            $virtualDirectory[] = $date->format('Y-m-d');
+        }
+
+        $virtualDirectory[] = $this->getTitle();
+
         return new \Frootbox\Persistence\Alias([
             'pageId' => $this->getPageId(),
-            'virtualDirectory' => [
-                $this->getTitle()
-            ],
+            'virtualDirectory' => $virtualDirectory,
             'uid' => $this->getUid('alias'),
             'payload' => $this->generateAliasPayload([
                 'action' => 'showArticle',
@@ -104,6 +112,7 @@ class Article extends \Frootbox\Persistence\AbstractAsset implements \Frootbox\P
      */
     public function getNewAliases(): array
     {
+
         if (!empty($this->getConfig('noIndividualDetailPage')) or !empty($this->getConfig('noArticleDetailPage'))) {
             return [];
         }
@@ -143,6 +152,7 @@ class Article extends \Frootbox\Persistence\AbstractAsset implements \Frootbox\P
                     'virtualDirectory' => [
                         $this->getTitle()
                     ],
+                    'uid' => $this->getUid('alias'),
                     'payload' => $this->generateAliasPayload([
                         'action' => 'showArticle',
                         'articleId' => $this->getId()
@@ -197,13 +207,26 @@ class Article extends \Frootbox\Persistence\AbstractAsset implements \Frootbox\P
             return false;
         }
 
+        if (defined('EDITING')) {
+            return true;
+        }
+
         if (!empty($this->getTextByUid('text', [ 'ignoreLanguage' => true ]))) {
             return true;
         }
 
-        if (defined('EDITING')) {
+        // Check blocks
+        $repository = $this->getDb()->getRepository(\Frootbox\Persistence\Content\Blocks\Repositories\Blocks::class);
+        $checkBlock = $repository->fetchOne([
+            'where' => [
+                'uid' => $this->getUid('block-content'),
+            ]
+        ]);
+
+        if ($checkBlock) {
             return true;
         }
+
 
         return false;
     }

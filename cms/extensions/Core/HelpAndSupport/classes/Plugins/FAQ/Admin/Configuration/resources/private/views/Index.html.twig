@@ -2,11 +2,13 @@
 
 <h2>
     Konfiguration
-    {#
+
     <span class="headoptions">
-		<a data-toggle="tooltip" data-modal data-title="neue Ansprechperson hinzufügen" href="{{ plugin.getAdminUri('Contact', 'ajaxModalCompose') }}"><i class="fa fa-plus-circle"></i></a>
+		<a data-toggle="tooltip" data-title="Daten exportieren" href="{{ plugin.getAdminUri('Configuration', 'export') }}"><i class="far fa-download"></i></a>
+        <a data-toggle="tooltip" data-modal data-title="Daten importieren" href="{{ plugin.getAdminUri('Configuration', 'ajaxModalImport') }}"><i class="far fa-file-import"></i></a>
+        <a data-toggle="tooltip" data-modal data-title="'Siehe auch' reparieren" href="{{ plugin.getAdminUri('Configuration', 'repair') }}"><i class="far fa-wrench"></i></a>
 	</span>
-    #}
+
 </h2>
 
 <p><a class="ajax" href="{{ plugin.getAdminUri('Index', 'index') }}"><i class="fa fa-chevron-circle-left"></i> zurück</a></p>

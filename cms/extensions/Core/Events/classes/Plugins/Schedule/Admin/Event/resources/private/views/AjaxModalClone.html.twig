@@ -23,16 +23,19 @@
     </table>
 
     <div class="modal-body">
+
         <div class="form-group">
             <label for="cloneToDay">klonen für Tag ...</label>
             <input type="date" class="form-control" id="cloneToDay" name="cloneToDay" aria-describedby="emailHelp" value="{{ xevent.getDateStart() | date('Y-m-d') }}">
-            <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
         </div>
-    </div>
+        <div class="form-group form-check">
+            <input type="checkbox" class="form-check-input" id="KeepOpen" name="KeepOpen">
+            <label class="form-check-label" for="KeepOpen">Anschließend für weiteren Tag klonen</label>
+        </div>
 
+    </div>
     <div class="modal-footer">
         <button type="submit" class="btn btn-primary">Veranstaltungen klonen</button>
     </div>
 
 </form>
-

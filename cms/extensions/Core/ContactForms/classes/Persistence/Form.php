@@ -10,7 +10,7 @@ class Form extends \Frootbox\Persistence\AbstractAsset
     protected $model = Repositories\Forms::class;
 
     /**
-     *
+     * @return void
      */
     public function delete()
     {

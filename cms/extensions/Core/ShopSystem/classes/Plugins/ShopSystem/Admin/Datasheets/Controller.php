@@ -11,7 +11,7 @@ use Frootbox\Http\Interfaces\ResponseInterface;
 class Controller extends \Frootbox\Admin\AbstractPluginController
 {
     /**
-     *
+     * @return string
      */
     public function getPath(): string
     {
@@ -19,7 +19,7 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     }
 
     /**
-     *
+     * @return Response
      */
     public function ajaxModalComposeAction(): Response
     {
@@ -27,7 +27,7 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     }
 
     /**
-     *
+     * @return Response
      */
     public function ajaxModalFieldComposeAction(): Response
     {
@@ -35,7 +35,10 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     }
 
     /**
-     *
+     * @param \Frootbox\Http\Get $get
+     * @param \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\DatasheetFields $datasheetsFields
+     * @param \Frootbox\Admin\View $view
+     * @return Response
      */
     public function ajaxModalFieldDetailsAction(
         \Frootbox\Http\Get $get,
@@ -51,7 +54,7 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     }
 
     /**
-     *
+     * @return Response
      */
     public function ajaxModalGroupComposeAction(
 
@@ -242,12 +245,24 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         \Frootbox\Admin\Viewhelper\GeneralPurpose $gp,
     ): Response
     {
-        // Fetch fields
+        // Validate required input
+        $post->requireOne([ 'title', 'titles' ]);
+
+        // Fetch field
         $field = $datasheetsFields->fetchById($get->get('fieldId'));
 
-        $field->setTitle($post->get('title'));
+        $title = $post->get('titles')[DEFAULT_LANGUAGE] ?? $post->get('title');
+
+        $field->setTitle($title);
         $field->setType($post->get('type'));
         $field->setSection($post->get('section'));
+
+        if (!empty($post->get('titles'))) {
+            $field->unsetConfig('titles');
+            $field->addConfig([
+                'titles' => array_filter($post->get('titles')),
+            ]);
+        }
 
         $field->save();
 

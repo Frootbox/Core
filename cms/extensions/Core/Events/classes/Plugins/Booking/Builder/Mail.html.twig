@@ -57,6 +57,13 @@
                     <td>{{ event.getDateStart() | date('d.m.Y') }} {{ event.getDateStart() | date('H:i') }}–{{ event.getDateEnd() | date('H:i') }} Uhr</td>
                 </tr>
 
+                {% if event.getVenue() %}
+                    <tr>
+                        <td>Veranstaltungsort</td>
+                        <td>{{ event.getVenue().getTitle() }}</td>
+                    </tr>
+                {% endif %}
+
                 {% if not plugin.getConfig('alwaysBookCompleteEvent') %}
                     <tr>
                         <td>Plätze</td>

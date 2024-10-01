@@ -49,13 +49,12 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
     /**
      *
      */
-    public function parse (
+    public function parse(
         $html,
         \Frootbox\Config\Config $config,
         \DI\Container $container,
     ): string
     {
-
         // Parse blocks
         $crawler = \Wa72\HtmlPageDom\HtmlPageCrawler::create($html);
         $blocks = $container->get(\Frootbox\Persistence\Content\Repositories\Blocks::class);
@@ -71,7 +70,7 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
             $result = $blocks->fetch([
                 'where' => [
                     'uid' => $uid,
-                    new \Frootbox\Db\Conditions\GreaterOrEqual('visibility',(IS_EDITOR ? 1 : 2)),
+                    new \Frootbox\Db\Conditions\GreaterOrEqual('visibility',(IS_EDITOR ? 0 : 2)),
                 ],
                 'order' => [ 'orderId DESC' ]
             ]);
@@ -119,7 +118,7 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
                 $wasCalledFirst = $block->getWasCalledFirst();
 
                 if (defined('EDITING')) {
-                    $html .= '<p style="margin: 15px 0; text-align: center;"><a data-predecessor="' . $block->getId() . '" data-uid="' . $uid . '" class="block-compose" style="display: inline-block; padding: 2px 7px; color: #FFF; background: #CCC; border-radius: 4px; font-size: 12px;" href=""><i class="far fa-plus"></i> Block hier hinzufügen</a></p>';
+                    $html .= '<p style="position: relative; z-index: 500; margin: 15px 0; text-align: center;"><a data-predecessor="' . $block->getId() . '" data-uid="' . $uid . '" class="block-compose" style="display: inline-block; padding: 2px 7px; color: #FFF; background: #CCC; border-radius: 4px; font-size: 12px;" href=""><i class="far fa-plus"></i> Block hier hinzufügen</a></p>';
                 }
             }
 

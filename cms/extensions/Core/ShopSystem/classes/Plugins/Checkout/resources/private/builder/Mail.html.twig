@@ -61,11 +61,16 @@
                                     <p>{{ textAbove | nl2br }}</p>
                                 {% else %}
                                     <p>
+                                        {{ "Core.ShopSystem.Plugins.Checkout.Mail.Greeting" | translate(shopcart.getPersonal('firstname') ~ " " ~ shopcart.getPersonal('lastname')) | raw }}
+                                    </p>
+                                    {#
+                                    <p>
                                         <b>Hallo {{ shopcart.getPersonal('firstname') }} {{ shopcart.getPersonal('lastname') }},</b>
                                     </p>
                                     <p>
                                         vielen Dank für Ihre Bestellung bei uns. Anbei finden Sie eine Übersicht über Ihre Bestellung.
                                     </p>
+                                    #}
                                 {% endif %}
 
 
@@ -73,7 +78,7 @@
                                 <br />
 
                                 <p>
-                                    Bestellnummer: {{ booking.getConfig('orderNumber') }}<br />
+                                    {{ "Core.ShopSystem.Plugins.Checkout.Field.OrderNumber" | translate }}: {{ booking.getConfig('orderNumber') }}<br />
                                     Datum: {{ booking.getDate() | date('d.m.Y H:i') }} Uhr
                                 </p>
 
@@ -83,7 +88,7 @@
                                     <tr>
                                         <td width="50" valign="top">
 
-                                            <h4>persönliche Daten</h4>
+                                            <h4>{{ "Core.ShopSystem.Plugins.Checkout.H4PersonalData" | translate }}</h4>
 
                                             {% if shopcart.getPersonal('company') %}
                                                 <p>{{ shopcart.getPersonal('company') }}</p>
@@ -132,14 +137,29 @@
                                         <td width="50" valign="top">
 
                                             {% if booking.getConfig('shipping.type') == 'shipToBillingAddress' %}
-                                                <h4>Lieferadresse</h4>
-                                                <p>Rechnungsadresse ist Lieferadresse.</p>
+                                                <h4>{{ "Core.ShopSystem.Plugins.Checkout.H4DeliveryAddress" | translate }}</h4>
+                                                <p>{{ "Core.ShopSystem.Plugins.Checkout.BillingAddressIsDeliveryAddress" | translate }}</p>
                                             {% elseif booking.getConfig('shipping.type') == 'selfPickup' %}
 
                                                 {% block TextSelfPickup %}
-                                                    <h4>Lieferadresse</h4>
-                                                    <p>Selbstabholung</p>
+                                                    <h4>{{ "Core.ShopSystem.Plugins.Checkout.H4DeliveryAddress" | translate }}</h4>
+                                                    <p>{{ "Core.ShopSystem.Plugins.Checkout.Field.SelfPickup" | translate }}</p>
                                                 {% endblock %}
+
+                                                {% if booking.getConfig('shipping.pickupDay') %}
+                                                    <p>
+                                                        <b>{{ "Core.ShopSystem.Plugins.Checkout.LabelPreferredPickupDate" | translate }}</b><br />
+                                                        {{ booking.getConfig('shipping.pickupDay') | date('d.m.Y') }}
+                                                    </p>
+                                                {% endif %}
+
+                                                {% if booking.getConfig('shipping.pickupTime') %}
+                                                    <p>
+                                                        <b>{{ "Core.ShopSystem.Plugins.Checkout.LabelPreferredPickupTime" | translate }}</b><br />
+                                                        {{ booking.getConfig('shipping.pickupTime') }}
+                                                    </p>
+                                                {% endif %}
+
 
                                                 {% if booking.getConfig('shipping.selfpickupAddressId') %}
 
@@ -158,7 +178,7 @@
                                                 {% endif %}
 
                                             {% elseif booking.getConfig('shipping.street') %}
-                                                <h4>Lieferadresse</h4>
+                                                <h4>{{ "Core.ShopSystem.Plugins.Checkout.H4DeliveryAddress" | translate }}</h4>
                                                 <p>
                                                     {{ booking.getConfig('shipping.firstname') }} {{ booking.getConfig('shipping.lastname') }}<br />
                                                     {% if booking.getConfig('shipping.addition') %}{{ booking.getConfig('shipping.addition') }}<br />{% endif %}
@@ -168,7 +188,7 @@
                                             {% endif %}
 
                                             {% if booking.getConfig('shipping.deliveryDay') %}
-                                                <h4>gewünschter Liefertermin</h4>
+                                                <h4>{{ "Core.ShopSystem.LabelDesiredDeliveryDate" | translate }}</h4>
                                                 <p>
                                                     {{ booking.getConfig('shipping.deliveryDay') | date('d.m.Y') }}
                                                 </p>
@@ -190,9 +210,9 @@
 
                                 <br />
 
-                                <h4>Zahlungart</h4>
+                                <h4>{{ "Core.ShopSystem.Plugins.Checkout.H4PaymentMethod" | translate }}</h4>
 
-                                <p>{{ booking.getPaymentMethod().getTitle() }}</p>
+                                <p>{{ booking.getPaymentMethod().getTitleFinalForBooking(booking) | translate }}</p>
 
                                 {{ paymentInfo | raw }}
 
@@ -217,15 +237,15 @@
                                     <br />
                                 {% endif %}
 
-                                <h4>gekaufte Artikel</h4>
+                                <h4>{{ "Core.ShopSystem.Plugins.Checkout.H3Articles" | translate }}</h4>
 
                                 <table width="100%" class="items" cellpadding="0" cellspacing="0">
                                     <thead>
                                         <tr>
-                                            <th>Artikel</th>
-                                            <th class="text-right">Menge</th>
-                                            <th class="text-right">Einzelpreis</th>
-                                            <th class="text-right">Summe</th>
+                                            <th>{{ "Core.ShopSystem.TableHeadItems" | translate }}</th>
+                                            <th class="text-right">{{ "Core.ShopSystem.TableHeadNumber" | translate }}</th>
+                                            <th class="text-right">{{ "Core.ShopSystem.TableHeadPrice" | translate }}</th>
+                                            <th class="text-right">{{ "Core.ShopSystem.TableHeadTotal" | translate }}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -286,7 +306,7 @@
                                         {% endfor %}
 
                                         <tr>
-                                            <td class="text-right" colspan="3">Versand &amp; Bearbeitung</td>
+                                            <td class="text-right" colspan="3">{{ "Core.ShopSystem.TableFootShippingAndFees" | translate | raw }}</td>
                                             <td class="text-right">{{ booking.getShipping() | number_format(2,',','.') }} {{ currencySign }}</td>
                                         </tr>
 
@@ -305,7 +325,7 @@
                                                     {% if netPrices %}
                                                         zzgl. {{ section.taxrate }} % USt. auf {{ section.net | number_format(2,',','.') }} {{ currencySign }}
                                                     {% else %}
-                                                        inkl. {{ section.taxrate }} % MwSt. auf {{ section.total | number_format(2,',','.') }} {{ currencySign }}
+                                                        {{ "Core.ShopSystem.Plugins.Checkout.VatIncludedOn" | translate(section.taxrate, (section.total | number_format(2,',','.')) ) }}
                                                     {% endif %}
                                                 </td>
                                                 <td class="text-right tax">{{ section.tax | number_format(2,',','.') }} {{ currencySign }}</td>
@@ -315,7 +335,7 @@
                                         {% endfor %}
 
                                         <tr>
-                                            <td class="text-right" colspan="3"><b>Gesamtsumme</b></td>
+                                            <td class="text-right" colspan="3"><b>{{ "Core.ShopSystem.TableFootTotal" | translate }}</b></td>
                                             <td class="text-right"><b>{{ booking.getTotal() | number_format(2,',','.') }} {{ currencySign }}</b></td>
                                         </tr>
                                     </tfoot>

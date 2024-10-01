@@ -6,14 +6,16 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Artikel in den Warenkorb gelegt</h5>
+                <h5 class="modal-title" id="exampleModalLabel">
+                    {{ "Core.ShopSystem.H5ItemAddedToCart" | translate }}
+                </h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
 
-                <p style="margin: 0; padding: 0;">Der Artikel wurde Ihrem Warenkorb hinzugefügt.</p>
+                <p style="margin: 0; padding: 0;">{{ "Core.ShopSystem.ItemHasBeenAddedToShopCart" | translate }}</p>
 
             </div>
 
@@ -35,8 +37,8 @@
             {% endif %}
 
             <div class="modal-footer">
-                <a href="#" class="btn btn-secondary" data-dismiss="modal">weiter einkaufen</a>
-                <a href="{{ proceedUrl }}" class="btn btn-primary">zum Warenkorb</a>
+                <a href="#" class="btn btn-secondary" data-dismiss="modal">{{ "Core.ShopSystem.ButtonContinueShopping" | translate }}</a>
+                <a href="{{ proceedUrl }}" class="btn btn-primary">{{ "Core.ShopSystem.ButtonToShoppingCart" | translate }}</a>
             </div>
         </div>
     </div>

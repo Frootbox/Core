@@ -1,0 +1,119 @@
+{# config
+
+title: Standard
+variables:
+    withContainer:
+        label: mit Container
+        type: bool
+        default: false
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set icons = view.getViewhelper('Ext/HerrUndFrauPixelExt/Icons/Icons', { createDummyOnFail: true  }) %}
+
+
+<div class="plugin Core ShopSystem Checkout ChoiceOfSelfPickup01">
+
+    {% if variables.withContainer %}<div class="container">{% endif %}
+
+        <div class="row">
+            <div class="col-12">
+
+                <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('titleSelfPickupDay') }}">{{ "Core.ShopSystem.Plugins.Checkout.H3ChoosePickupDay" | translate }}</h2>
+
+                <div class="row">
+                    <div class="col-md-6">
+
+                        {#
+                        <form action="{{ plugin.getActionUri('choiceOfSelfPickup') }}" method="post">
+
+                            <div class="form-group">
+                                <label for="month">{{ "Core.ShopSystem.Plugins.Checkout.LabelChoosePickupMonth" | translate }}</label>
+                                <select class="form-control" id="month" name="month">
+                                    {% for month in monthList %}
+                                        <option {% if selectedMonthString == month.format('Y-m') %}selected{% endif %} value="{{ month.format('Y-m-d') }}">{{ ("Core.ShopSystem.Month" ~ month.format('m')) | translate }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                        </form>
+                        #}
+
+                        {#
+                        <form action="{{ plugin.getAjaxUri('UpdatePickupDay') }}" method="post">
+
+                            <div class="form-group">
+                                <label for="pickupDay">{{ "Core.ShopSystem.Plugins.Checkout.LabelChoosePickupDay" | translate }}</label>
+                                <select class="form-control" id="pickupDay" name="pickupDay">
+
+                                    {% for date in dayList %}
+                                        <option {% if selectedDayString == date.format('Y-m-d') %}selected{% endif %} value="{{ date.format('Y-m-d') }}">{{ date.format('d.m.Y') }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">Abholtag wählen</button>
+
+                        </form>
+                        #}
+
+                    </div>
+                </div>
+
+                {% set ActMonth = selectedMonth ? selectedMonth : ("now" | date('Y-m-d')) %}
+
+                <div class="row align-items-center">
+                    <div class="col-3">
+                        <a class="btn btn-block btn-outline-primary" href="{{ plugin.getActionUri('choiceOfSelfPickup', { Month: ActMonth, Shift: 'Prev'}) }}">{{ icons.render('arrow-left') | raw }}</a>
+                    </div>
+                    <div class="col-6 text-center">
+                        <span class="btn btn-block no-hover btn-outline-primary">{{ ("Core.ShopSystem.Month" ~ (ActMonth | date('m'))) | translate }}</span>
+                    </div>
+                    <div class="col-3 text-right">
+                        <a class="btn btn-block btn-outline-primary" href="{{ plugin.getActionUri('choiceOfSelfPickup', { Month: ActMonth, Shift: 'Next'}) }}">{{ icons.render('arrow-right') | raw }}</a>
+                    </div>
+                </div>
+
+                <table class="calendar">
+                    <thead>
+                    <tr>
+                        {% for i in 1..7 %}
+                            <th>
+                                <span class="content">{{ ("Core.ShopSystem.Plugins.Checkout.DayShort" ~ i) | translate }}</span>
+                            </th>
+                        {% endfor %}
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for week in weeks %}
+                        <tr>
+                            {% for day in week.days %}
+                                <td>
+                                    {% if day.isActive %}
+                                        <a href="{{ plugin.getAjaxUri('UpdatePickupDay', { pickupDay: (day.date | date('Y-m-d')) }) }}" class="day">
+                                                <span class="content">
+                                                    {{ day.date | date('d.m.') }}
+                                                </span>
+                                        </a>
+                                    {% else %}
+                                        <span class="day">
+                                                <span class="content">
+                                                    {{ day.date | date('d.m.') }}
+                                                </span>
+                                            </span>
+                                    {% endif %}
+                                </td>
+                            {% endfor %}
+                        </tr>
+
+                    {% endfor %}
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+
+    {% if variables.withContainer %}</div>{% endif %}
+
+</div>

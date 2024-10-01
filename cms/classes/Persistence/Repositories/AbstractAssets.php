@@ -25,7 +25,7 @@ abstract class AbstractAssets extends AbstractRepository
     /**
      *
      */
-    public function insert(
+    public function persist(
         Row $row
     ): Row
     {
@@ -33,6 +33,16 @@ abstract class AbstractAssets extends AbstractRepository
             $row->setClassName(get_class($row));
         }
 
-        return parent::insert($row);
+        return parent::persist($row);
+    }
+
+    /**
+     *
+     */
+    public function insert(
+        Row $row
+    ): Row
+    {
+        return self::persist($row);
     }
 }

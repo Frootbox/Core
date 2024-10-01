@@ -1,20 +1,21 @@
 {% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
 
 <h2>
-    Adresse #{{ address.getId() }} bearbeiten
+    Adresse „{{ address.getTitle() }}“ bearbeiten
 
     <span class="headoptions">
-        {#
+
         <span class="dropdown">
             <i class="far fa-bars dropdown-toggle" data-toggle="dropdown"></i>
 
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                <a class="dropdown-item ajax" href="{{ plugin.getAdminUri('Job', 'ajaxDuplicate', { jobId: job.getId() }) }}"><i class="far fa-copy"></i>duplizieren</a>
+                <a class="dropdown-item ajax" href="{{ plugin.getAdminUri('Address', 'ajaxDuplicate', { addressId: address.getId() }) }}"><i class="far fa-copy"></i>duplizieren</a>
             </div>
         </span>
-        #}
+
 
         <a data-toggle="tooltip" data-title="Adresse bearbeiten" target="edit-address-{{ address.getId() }}" href="{{ plugin.getAdminUri('Address', 'jumpToEdit', { addressId: address.getId() }) }}"><i class="fa fa-pencil"></i></a>
+
     </span>
 </h2>
 
@@ -23,6 +24,7 @@
 <nav>
     <div class="nav nav-tabs" id="nav-tab" role="tablist">
         <a class="nav-item nav-link active" id="nav-basedata-tab" data-toggle="tab" href="#nav-basedata" role="tab" aria-controls="nav-basedata" aria-selected="true">Stammdaten</a>
+        <a class="nav-item nav-link" id="nav-linkage-tab" data-toggle="tab" href="#nav-linkage" role="tab" aria-controls="nav-linkage" aria-selected="true">Verlinkung</a>
         <a class="nav-item nav-link" id="nav-openingtimes-tab" data-toggle="tab" href="#nav-openingtimes" role="tab" aria-controls="nav-openingtimes">Öffnungszeiten</a>
         <a class="nav-item nav-link" id="nav-location-tab" data-toggle="tab" href="#nav-location" role="tab" aria-controls="nav-location">Geo-Koordinaten</a>
         <a class="nav-item nav-link" id="nav-user-tab" data-toggle="tab" href="#nav-user" role="tab" aria-controls="nav-user">Benutzer</a>
@@ -92,38 +94,61 @@
                         </div>
                     </div>
 
+                    <div class="row">
+                        <div class="col-md-6">
+
+                            <h3>Kontakt</h3>
+
+                            <div class="form-group">
+                                <label for="phone">Telefon</label>
+                                <input type="text" class="form-control" id="phone" name="phone" placeholder="Telefon" value="{{ address.getPhone() }}">
+                            </div>
+                            <div class="form-group">
+                                <label for="mobile">Mobil</label>
+                                <input type="text" class="form-control" id="mobile" name="mobile" placeholder="Mobil" value="{{ address.getMobile() }}">
+                            </div>
+                            <div class="form-group">
+                                <label for="fax">Fax</label>
+                                <input type="text" class="form-control" id="fax" name="fax" placeholder="Fax" value="{{ address.getFax() }}">
+                            </div>
+                            <div class="form-group">
+                                <label for="email">E-Mail</label>
+                                <input type="email" class="form-control" id="email" name="email" placeholder="E-Mail" value="{{ address.getEmail() }}">
+                            </div>
+
+                        </div>
+                        <div class="col-md-6">
+
+                            <h3>Profile</h3>
+
+                            <div class="form-group">
+                                <label for="url">URL</label>
+                                <input type="text" class="form-control" id="url" name="url" placeholder="URL" value="{{ address.getUrl() }}">
+                            </div>
+                            <div class="form-group">
+                                <label for="url">Instagram</label>
+                                <input type="text" class="form-control" id="instagram" name="instagram" placeholder="Instagram" value="{{ address.getInstagram() }}">
+                            </div>
+                            <div class="form-group">
+                                <label for="facebook">Facebook</label>
+                                <input type="text" class="form-control" id="facebook" name="facebook" placeholder="Facebook" value="{{ address.getFacebook() }}">
+                            </div>
+                            <div class="form-group">
+                                <label for="Youtube">Youtube</label>
+                                <input type="text" class="form-control" id="Youtube" name="Youtube" placeholder="Youtube" value="{{ address.getYoutube() }}">
+                            </div>
+                            <div class="form-group">
+                                <label for="Matterport">Matterport</label>
+                                <input type="text" class="form-control" id="Matterport" name="Matterport" placeholder="Matterport" value="{{ address.getMatterport() }}">
+                            </div>
+
+                        </div>
+                    </div>
 
 
 
-                    <div class="form-group">
-                        <label for="phone">Telefon</label>
-                        <input type="text" class="form-control" id="phone" name="phone" placeholder="Telefon" value="{{ address.getPhone() }}">
-                    </div>
-                    <div class="form-group">
-                        <label for="mobile">Mobil</label>
-                        <input type="text" class="form-control" id="mobile" name="mobile" placeholder="Mobil" value="{{ address.getMobile() }}">
-                    </div>
-                    <div class="form-group">
-                        <label for="fax">Fax</label>
-                        <input type="text" class="form-control" id="fax" name="fax" placeholder="Fax" value="{{ address.getFax() }}">
-                    </div>
 
-                    <div class="form-group">
-                        <label for="email">E-Mail</label>
-                        <input type="email" class="form-control" id="email" name="email" placeholder="E-Mail" value="{{ address.getEmail() }}">
-                    </div>
-                    <div class="form-group">
-                        <label for="url">URL</label>
-                        <input type="text" class="form-control" id="url" name="url" placeholder="URL" value="{{ address.getUrl() }}">
-                    </div>
-                    <div class="form-group">
-                        <label for="url">Instagram</label>
-                        <input type="text" class="form-control" id="instagram" name="instagram" placeholder="Instagram" value="{{ address.getInstagram() }}">
-                    </div>
-                    <div class="form-group">
-                        <label for="facebook">Facebook</label>
-                        <input type="text" class="form-control" id="facebook" name="facebook" placeholder="Facebook" value="{{ address.getFacebook() }}">
-                    </div>
+
 
                     <button type="submit" class="btn btn-primary">Speichern</button>
 
@@ -133,6 +158,41 @@
         </div>
 
     </div>
+
+
+    <div class="tab-pane fade" id="nav-linkage" role="tabpanel" aria-labelledby="nav-linkage-tab">
+        <div class="card">
+            <div class="card-body">
+
+                <h3>
+                    Verlinkung
+                </h3>
+
+                <form method="post" class="ajax" action="{{ plugin.getAdminUri('Address', 'ajaxUpdateLinkage', { addressId: address.getId() }) }}">
+
+                    {{ v.injectPartial('\\Frootbox\\Admin\\Controller\\Search\\Partials\\Input\\Link', {
+                        label : 'interne Seite',
+                        value : address.getConfig('redirect.pageId')
+                    }) | raw }}
+
+                    <div class="form-group">
+                        <label for="internalUrl">interne URL</label>
+                        <input type="text" class="form-control" id="internalUrl" name="internalUrl" placeholder="interne URL" value="{{ address.getConfig('redirect.internalUrl') }}">
+                    </div>
+
+                    <div class="form-group form-check">
+                        <input type="checkbox" class="form-check-input" id="exampleCheck1">
+                        <label class="form-check-label" for="exampleCheck1">Keine Verlinkung</label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Speichern</button>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+
 
     <div class="tab-pane fade" id="nav-openingtimes" role="tabpanel" aria-labelledby="nav-openingtimes-tab">
         <div class="card">
@@ -169,11 +229,12 @@
                                 $.ajax({
                                     url: "https://maps.googleapis.com/maps/api/geocode/json",
                                     data: {
-                                        address: $('#zipcode').val() + " " + $('#city').val() + ", " + $('#street').val() + " " + $('#streetNumber').val(),
+                                        address: $('#street').val() + " " + $('#streetNumber').val() + ", " + $('#zipcode').val() + " " + $('#city').val(),
                                         key: "{{ plugin.getConfig('googleMapsApiKey') | default(config.get('addresses.google.geolocation.apiKey')) | raw }}"
                                     },
                                     success: function (response) {
 
+                                        console.log(response);
                                         $('#lat').val(response.results[0].geometry.location.lat);
                                         $('#lng').val(response.results[0].geometry.location.lng);
                                     }

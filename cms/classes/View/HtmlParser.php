@@ -238,6 +238,7 @@ class HtmlParser
 
         $this->html = str_replace('---', '&shy;', $this->html);
 
+
         return $this->html;
     }
 
@@ -498,6 +499,7 @@ class HtmlParser
                     $extController = new $class;
 
                     $localPath = $extController->getAssetPath($extMatch[3]);
+
                     $xpath = 'cache/public/' . $cacheRevision . '/ext/' . $extMatch[1] . '/' . $extMatch[2] . '/' . $extMatch[3];
                 }
                 else {
@@ -539,6 +541,7 @@ class HtmlParser
         });
 
         // $html = $crawler->saveHTML();
+
 
 
 

@@ -112,7 +112,7 @@
 
     {% if config.get('recaptcha.v3.key') %}
         <div style="border: 3px solid red; padding: 20px; margin-bottom: 40px;" class="cookie-consent-message">
-            Um das Formular nutzen zu können, müssen Sie unseren <a class="pxf-raise-cookieconsentmanager" href="#">Cookie-Richtlinien</a> zustimmen.
+            {{ t.translate('CookieConsentNotice') | raw }}
         </div>
     {% endif %}
 

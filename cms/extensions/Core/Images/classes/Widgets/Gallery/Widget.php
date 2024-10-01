@@ -17,29 +17,27 @@ class Widget extends \Frootbox\Persistence\Content\AbstractWidget
 
     /**
      * Get images of gallery
+     *
+     * @param \Frootbox\Persistence\Repositories\Files $files
+     * @return \Frootbox\Db\Result
      */
     public function getImages(
         \Frootbox\Persistence\Repositories\Files $files
     ): \Frootbox\Db\Result
     {
+        $order = $this->getSorting() == 'Default' ? 'orderId DESC' : 'RAND()';
+
         // Fetch files
         $result = $files->fetch([
             'where' => [
                 'uid' => $this->getUid('images')
             ],
-            'order' => [ 'orderId DESC' ]
+            'order' => [ $order ]
         ]);
 
         return $result;
     }
 
-    /**
-     * Get widgets root path
-     */
-    public function getPath(): string
-    {
-        return __DIR__ . DIRECTORY_SEPARATOR;
-    }
 
     /**
      *
@@ -59,6 +57,19 @@ class Widget extends \Frootbox\Persistence\Content\AbstractWidget
         }
 
         return (int) ($this->config['imageWidth'] ?? null);
+    }
+
+    /**
+     * Get widgets root path
+     */
+    public function getPath(): string
+    {
+        return __DIR__ . DIRECTORY_SEPARATOR;
+    }
+
+    public function getSorting(): string
+    {
+        return !empty($this->getConfig('Sorting')) ? $this->getConfig('Sorting') : 'Default';
     }
 
     /**

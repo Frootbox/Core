@@ -29,230 +29,241 @@ variables:
     <div class="row">
         <div class="col-12">
 
-            <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title-review') }}">Bestellung abschließen</h2>
+            <div class="inner-wrapper">
 
-            <form action="{{ i.getUriAjax({ action: 'checkout' }) }}" method="post" class="ajax-checkout-form">
+                <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title-review') }}">{{ "Core.ShopSystem.H1CompleteOrder" | translate }}</h2>
 
-                <div class="row">
-                    <div class="col-md-6">
+                <form action="{{ i.getUriAjax({ action: 'checkout' }) }}" method="post" class="ajax-checkout-form">
 
-                        <h3>Persönliche Daten</h3>
+                    <div class="row">
+                        <div class="col-md-6">
 
-                        {% if shopcart.getPersonal('company') %}
-                            <p>{{ shopcart.getPersonal('company') }}</p>
-                        {% endif %}
+                            <h3>{{ "Core.ShopSystem.H3PersonalData" | translate }}</h3>
 
-                        <p>{{ shopcart.getPersonal('firstname') }} {{ shopcart.getPersonal('lastname') }}</p>
-                        <p>
-                            {{ shopcart.getPersonal('street') }} {{ shopcart.getPersonal('streetNumber') }}<br />
-                            {{ shopcart.getPersonal('postalCode') }} {{ shopcart.getPersonal('city') }}
-
-
-                            {% if shopcart.getPersonal('country') %}
-                                <br />{{ t.translate('Country.' ~ shopcart.getPersonal('country')) }}
-                            {% endif %}
-                        </p>
-
-                        {% if mailcheck %}
-                            <p>{{ shopcart.getPersonal('email') }}</p>
-                        {% else %}
-                            <p style="color: red;">{{ shopcart.getPersonal('email') }} <a href="{{ plugin.getActionUri('checkout') }}"><i class="fa fa-pencil"></i></a></p>
-                            <p style="margin-top: -10px; color: red; font-size: 14px; line-height: 18px;">
-                                <i class="fa fa-exclamation-triangle"></i> Wir haben ein mögliches Problem mit der E-Mail festgestellt, bitte überprüfen Sie noch einmal die Schreibweise!
-                            </p>
-                        {% endif %}
-
-                        {% if shopcart.getPersonal('phone') %}
-                            <p>Telefon {{ shopcart.getPersonal('phone') }}</p>
-                        {% endif %}
-
-
-                        {% if offerAccount %}
-
-                            <h3>Benutzeraccount</h3>
-
-                            <p>Sie können sich für spätere Einkäufe ein Benutzerprofil anlegen. Setzen Sie dafür einfach ein Passwort, Ihr Benutzername ist dann die E-Mail Adresse.</p>
-
-                            <div class="form-group">
-                                <label for="password">Passwort</label>
-                                <input class="form-control" type="password" id="password" name="password" />
-                            </div>
-                        {% endif %}
-
-                    </div>
-                    <div class="col-md-6">
-
-                        {% if shopcart.getBilling('differentBillingRecipient') %}
-                            <h3>Rechnungsadresse</h3>
-
-                            {% if shopcart.getBilling('company') %}
-                                <p>{{ shopcart.getBilling('company') }}</p>
+                            {% if shopcart.getPersonal('company') %}
+                                <p>{{ shopcart.getPersonal('company') }}</p>
                             {% endif %}
 
-                            <p>{{ shopcart.getBilling('firstname') }} {{ shopcart.getBilling('lastname') }}</p>
+                            <p>{{ shopcart.getPersonal('firstname') }} {{ shopcart.getPersonal('lastname') }}</p>
                             <p>
-                                {{ shopcart.getBilling('street') }} {{ shopcart.getBilling('streetNumber') }}<br />
-                                {{ shopcart.getBilling('postalCode') }} {{ shopcart.getBilling('city') }}
+                                {{ shopcart.getPersonal('street') }} {{ shopcart.getPersonal('streetNumber') }}<br />
+                                {{ shopcart.getPersonal('postalCode') }} {{ shopcart.getPersonal('city') }}
 
-                                {% if shopcart.getBilling('country') %}
-                                    <br />{{ t.translate('Country.' ~ shopcart.getBilling('country')) }}
+
+                                {% if shopcart.getPersonal('country') %}
+                                    <br />{{ t.translate('Country.' ~ shopcart.getPersonal('country')) }}
                                 {% endif %}
                             </p>
 
-
-                            {% if shopcart.getBilling('email') %}
-                                <p>{{ shopcart.getBilling('email') }}</p>
+                            {% if mailcheck %}
+                                <p>{{ shopcart.getPersonal('email') }}</p>
+                            {% else %}
+                                <p style="color: red;">{{ shopcart.getPersonal('email') }} <a href="{{ plugin.getActionUri('checkout') }}"><i class="fa fa-pencil"></i></a></p>
+                                <p style="margin-top: -10px; color: red; font-size: 14px; line-height: 18px;">
+                                    <i class="fa fa-exclamation-triangle"></i> Wir haben ein mögliches Problem mit der E-Mail festgestellt, bitte überprüfen Sie noch einmal die Schreibweise!
+                                </p>
                             {% endif %}
 
-                            {% if shopcart.getBilling('phone') %}
-                                <p>Telefon {{ shopcart.getBilling('phone') }}</p>
+                            {% if shopcart.getPersonal('phone') %}
+                                <p>Telefon {{ shopcart.getPersonal('phone') }}</p>
                             {% endif %}
-                        {% endif %}
 
-                        {% if not plugin.getConfig('skipShipping') %}
-                            <h3>Lieferadresse</h3>
 
-                            {% if shopcart.getShipping('type') == 'shipToBillingAddress' %}
-                                <p>Rechnungsadresse ist Lieferadresse.</p>
-                            {% elseif shopcart.getShipping('type') == 'shipToAddress' %}
-                                <p>Lieferung an folgende Adresse:</p>
-                                <p>{{ shopcart.getShipping('firstname') }} {{ shopcart.getShipping('lastname') }}</p>
+                            {% if offerAccount %}
+
+                                <h3>Benutzeraccount</h3>
+
+                                <p>Sie können sich für spätere Einkäufe ein Benutzerprofil anlegen. Setzen Sie dafür einfach ein Passwort, Ihr Benutzername ist dann die E-Mail Adresse.</p>
+
+                                <div class="form-group">
+                                    <label for="password">Passwort</label>
+                                    <input class="form-control" type="password" id="password" name="password" />
+                                </div>
+                            {% endif %}
+
+                        </div>
+                        <div class="col-md-6">
+
+                            {% if shopcart.getBilling('differentBillingRecipient') %}
+                                <h3>Rechnungsadresse</h3>
+
+                                {% if shopcart.getBilling('company') %}
+                                    <p>{{ shopcart.getBilling('company') }}</p>
+                                {% endif %}
+
+                                <p>{{ shopcart.getBilling('firstname') }} {{ shopcart.getBilling('lastname') }}</p>
                                 <p>
-                                    {{ shopcart.getShipping('street') }} {{ shopcart.getShipping('streetNumber') }}<br />
+                                    {{ shopcart.getBilling('street') }} {{ shopcart.getBilling('streetNumber') }}<br />
+                                    {{ shopcart.getBilling('postalCode') }} {{ shopcart.getBilling('city') }}
 
-                                    {% if shopcart.getShipping('addition') %}
-                                        {{ shopcart.getShipping('addition') }}<br />
+                                    {% if shopcart.getBilling('country') %}
+                                        <br />{{ t.translate('Country.' ~ shopcart.getBilling('country')) }}
                                     {% endif %}
-
-                                    {{ shopcart.getShipping('postalCode') }} {{ shopcart.getShipping('city') }}
                                 </p>
 
-                            {% elseif shopcart.getShipping('type') == 'selfPickup' %}
-                                <p>Selbstabholung</p>
 
-                                {% if shopcart.getShipping('selfpickupAddressId') %}
+                                {% if shopcart.getBilling('email') %}
+                                    <p>{{ shopcart.getBilling('email') }}</p>
+                                {% endif %}
 
-                                    {% set address = shopcart.getSelfpickupAddress() %}
+                                {% if shopcart.getBilling('phone') %}
+                                    <p>Telefon {{ shopcart.getBilling('phone') }}</p>
+                                {% endif %}
+                            {% endif %}
 
+                            {% if not plugin.getConfig('skipShipping') %}
+                                <h3>{{ "Core.ShopSystem.H3DeliveryAddress" | translate }}</h3>
+
+                                {% if shopcart.getShipping('type') == 'shipToBillingAddress' %}
+                                    <p>Rechnungsadresse ist Lieferadresse.</p>
+                                {% elseif shopcart.getShipping('type') == 'shipToAddress' %}
+                                    <p>{{ "Core.ShopSystem.Plugins.Checkout.DeliveryToTheFollowingAddress" | translate }}</p>
+                                    <p>{{ shopcart.getShipping('firstname') }} {{ shopcart.getShipping('lastname') }}</p>
                                     <p>
-                                        <b>{{ address.getTitle() }}</b><br />
-                                        {{ address.getStreet() }} {{ address.getStreetNumber() }}<br />
-                                        {{ address.getZipcode() }} {{ address.getCity() }}
+                                        {{ shopcart.getShipping('street') }} {{ shopcart.getShipping('streetNumber') }}<br />
+
+                                        {% if shopcart.getShipping('addition') %}
+                                            {{ shopcart.getShipping('addition') }}<br />
+                                        {% endif %}
+
+                                        {{ shopcart.getShipping('postalCode') }} {{ shopcart.getShipping('city') }}
                                     </p>
 
-                                    <div data-editable data-nowidgets data-uid="{{ address.getUid('text-shipping') }}"></div>
+                                {% elseif shopcart.getShipping('type') == 'selfPickup' %}
+                                    <p>{{ "Core.ShopSystem.OptionSelfPickup" | translate }}</p>
 
-                                {% endif %}
-                            {% endif %}
+                                    {% if shopcart.getShipping('selfpickupAddressId') %}
 
-                            {% if shopcart.getShipping('deliveryDay') %}
-                                <p>
+                                        {% set address = shopcart.getSelfpickupAddress() %}
 
-                                    {% if shopcart.getShipping('type') == "selfPickup" %}
-                                        <b>gewünschtes Abholdatum:</b><br />
-                                    {% else %}
-                                        <b>gewünschtes Lieferdatum:</b><br />
+                                        <p>
+                                            <b>{{ address.getTitle() }}</b><br />
+                                            {{ address.getStreet() }} {{ address.getStreetNumber() }}<br />
+                                            {{ address.getZipcode() }} {{ address.getCity() }}
+                                        </p>
+
+                                        <div data-editable data-nowidgets data-uid="{{ address.getUid('text-shipping') }}"></div>
+
                                     {% endif %}
 
-                                    {{ shopcart.getShipping('deliveryDay') | date('d.m.Y') }} <a class="edit-pencil after" href="{{ plugin.getActionUri('choiceOfDelivery') }}">{{ icons.render('pencil') | raw }}</a>
-                                </p>
+                                    {% if shopcart.getShipping('pickupDay') %}
+                                        <p>
+                                            <b>{{ "Core.ShopSystem.LabelDesiredPickupDate" | translate }}:</b><br />
+                                            {{ shopcart.getShipping('pickupDay') | date('d.m.Y') }}
+                                        </p>
+                                    {% endif %}
+
+                                    {% if shopcart.getShipping('pickupTime') %}
+                                        <p>
+                                            <b>{{ "Core.ShopSystem.Plugins.Checkout.LabelPreferredPickupTime" | translate }}</b><br />
+                                            {{ shopcart.getShipping('pickupTime') }}
+                                        </p>
+                                    {% endif %}
+                                {% endif %}
+
+                                {% if shopcart.getShipping('deliveryDay') %}
+                                    <p>
+                                        <b>{{ "Core.ShopSystem.LabelDesiredDeliveryDate" | translate }}:</b><br />
+                                        {{ shopcart.getShipping('deliveryDay') | date('d.m.Y') }} <a class="edit-pencil after" href="{{ plugin.getActionUri('choiceOfDelivery') }}">{{ icons.render('pencil') | raw }}</a>
+                                    </p>
+                                {% endif %}
+
                             {% endif %}
 
-                        {% endif %}
+                            <h3>{{ "Core.ShopSystem.H3Payment" | translate }}</h3>
 
-                        <h3>Zahlungsart</h3>
+                            <p>{{ ("Core.ShopSystem.PaymentMethods." ~ shopcart.getPaymentMethodId() ~ ".Method.Title") | translate }}</p>
+                            <p>{{ paymentSummary | raw }}</p>
 
-                        <p>{{ shopcart.getPaymentMethod().getTitle() }}</p>
-                        <p>{{ paymentSummary | raw }}</p>
+                            {% set newsletterConnector = i.getNewsletterConnector() %}
 
-                        {% set newsletterConnector = i.getNewsletterConnector() %}
+                            {% if newsletterConnector %}
+                                {{ newsletterConnector.getInputHtml() | raw }}
+                            {% endif %}
 
-                        {% if newsletterConnector %}
-                            {{ newsletterConnector.getInputHtml() | raw }}
-                        {% endif %}
-
-                    </div>
-                </div>
-
-                <hr />
-
-                <div class="row">
-                    <div class="col-md-6">
-
-                        <div class="form-group">
-                            <label for="note">Bemerkung</label>
-                            <textarea class="form-control" id="note" name="note" rows="3"></textarea>
                         </div>
-
                     </div>
-                    <div class="col-md-6">
 
-                        {% if plugin.getConfig('ownOrderNumber') %}
+                    <hr />
+
+                    <div class="row">
+                        <div class="col-md-6">
+
                             <div class="form-group">
-                                <label for="ownOrderNumber">eigene Bestellnummer</label>
-                                <input class="form-control" type="text" id="ownOrderNumber" name="ownOrderNumber" />
+                                <label for="note">{{ "Core.ShopSystem.LabelRemark" | translate }}</label>
+                                <textarea class="form-control" id="note" name="note" rows="3"></textarea>
                             </div>
-                        {% endif %}
+
+                        </div>
+                        <div class="col-md-6">
+
+                            {% if plugin.getConfig('ownOrderNumber') %}
+                                <div class="form-group">
+                                    <label for="ownOrderNumber">eigene Bestellnummer</label>
+                                    <input class="form-control" type="text" id="ownOrderNumber" name="ownOrderNumber" />
+                                </div>
+                            {% endif %}
 
 
 
-                        {#
-                        {% if not config.get('shop.coupons.disabled') %}
-                            <div class="form-group">
-                                <label for="couponCode">Coupon einlösen</label>
-                                <div class="input-group mb-2">
-                                    <input type="text" class="form-control" name="couponCode" id="couponCode" placeholder="Coupon-Code">
-                                    <div class="input-group-append">
-                                        <div class="input-group-text">
-                                            <a class="submit-coupon" href="{{ i.getUriAjax({ action: 'redeemCoupon' }) }}"><i class="fal fa-check"></i></a>
+                            {#
+                            {% if not config.get('shop.coupons.disabled') %}
+                                <div class="form-group">
+                                    <label for="couponCode">Coupon einlösen</label>
+                                    <div class="input-group mb-2">
+                                        <input type="text" class="form-control" name="couponCode" id="couponCode" placeholder="Coupon-Code">
+                                        <div class="input-group-append">
+                                            <div class="input-group-text">
+                                                <a class="submit-coupon" href="{{ i.getUriAjax({ action: 'redeemCoupon' }) }}"><i class="fal fa-check"></i></a>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        {% endif %}
-                        #}
+                            {% endif %}
+                            #}
 
+                        </div>
                     </div>
-                </div>
 
-                {% block afterNote %}{% endblock %}
+                    {% block afterNote %}{% endblock %}
 
-                <br />
+                    <br />
 
-                <div id="itemsTableReceiver">
-                    {{ p.renderPartial('ItemsTable', { plugin: plugin, shopcart: shopcart, editable: false }) | raw }}
-                </div>
+                    <div id="itemsTableReceiver">
+                        {{ p.renderPartial('ItemsTable', { plugin: plugin, shopcart: shopcart, editable: false }) | raw }}
+                    </div>
 
-                {% if plugin.getShopConfig('generalTermsLink') %}
+                    {% if plugin.getShopConfig('generalTermsLink') %}
+                        <div class="form-group form-check">
+                            <input type="checkbox" required="" class="form-check-input" id="generalTerms" name="generalTerms">
+                            <label class="form-check-label" for="generalTerms">{{ t.translate('AcceptGeneralTerms', [ plugin.getShopConfig('generalTermsLink') ]) | raw }}</label>
+                        </div>
+                    {% endif %}
+
                     <div class="form-group form-check">
-                        <input type="checkbox" required="" class="form-check-input" id="generalTerms" name="generalTerms">
-                        <label class="form-check-label" for="generalTerms">{{ t.translate('AcceptGeneralTerms', [ plugin.getShopConfig('generalTermsLink') ]) | raw }}</label>
+                        <input type="checkbox" required="" class="form-check-input" id="privacyPolicy" name="privacyPolicy">
+                        <label class="form-check-label" for="privacyPolicy">{{ t.translate('AcceptPrivacyPolicy', [ i.getPrivacyPolicyLink() ]) | raw }}</label>
                     </div>
-                {% endif %}
 
-                <div class="form-group form-check">
-                    <input type="checkbox" required="" class="form-check-input" id="privacyPolicy" name="privacyPolicy">
-                    <label class="form-check-label" for="privacyPolicy">{{ t.translate('AcceptPrivacyPolicy', [ i.getPrivacyPolicyLink() ]) | raw }}</label>
-                </div>
-
-                <div class="form-group form-check">
-                    <input type="checkbox" required="" class="form-check-input" id="rightOfWithdrawal" name="rightOfWithdrawal">
-                    <label class="form-check-label" for="rightOfWithdrawal">{{ t.translate('AcceptRightOfWithdrawal', [ i.getRightOfWithdrawalLink() ]) | raw }}</label>
-                </div>
-
-                <div class="row justify-content-between align-items-center footer-nav-buttons">
-                    <div class="col-md-6 text-right order-md-2">
-                        <button type="submit" class="btn btn-primary">jetzt kostenpflichtig bestellen</button>
+                    <div class="form-group form-check">
+                        <input type="checkbox" required="" class="form-check-input" id="rightOfWithdrawal" name="rightOfWithdrawal">
+                        <label class="form-check-label" for="rightOfWithdrawal">{{ t.translate('AcceptRightOfWithdrawal', [ i.getRightOfWithdrawalLink() ]) | raw }}</label>
                     </div>
-                    <div class="col-md-6 order-md-1">
-                        <a href="{{ plugin.getActionUri('checkout') }}" class="btn btn-secondary">zurück</a>
+
+                    <div class="row justify-content-between align-items-center footer-nav-buttons">
+                        <div class="col-md-6 text-right order-md-2">
+                            <button type="submit" class="btn btn-primary">{{ "Core.ShopSystem.ButtonOrderNow" | translate }}</button>
+                        </div>
+                        <div class="col-md-6 order-md-1">
+                            <a href="{{ plugin.getActionUri('checkout') }}" class="btn btn-secondary">{{ "Core.ShopSystem.ButtonGoBack" | translate }}</a>
+                        </div>
                     </div>
-                </div>
 
-            </form>
+                </form>
 
-            {{ p.renderPartial('BasketFooter', { shopcart: shopcart, plugin: plugin }) | raw }}
+                {{ p.renderPartial('BasketFooter', { shopcart: shopcart, plugin: plugin }) | raw }}
 
+            </div>
         </div>
     </div>
 

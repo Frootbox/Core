@@ -1,3 +1,5 @@
+{% set texts = view.getViewhelper('Text', { object: plugin }) %}
+
 <style>
 
     .sidebar {
@@ -75,7 +77,7 @@
 <page backimg="{{ background }}">
 
     <page_footer>
-        <div style="font-size: 8pt">Bestellbestätigung Nr. {{ booking.getConfig('orderNumber') }}, Seite [[page_cu]] von [[page_nb]]</div>
+        <div style="font-size: 8pt">{{ 'Core.ShopSystem.Plugins.Checkout.OrderConfirmation' | translate }} Nr. {{ booking.getConfig('orderNumber') }}, [[page_cu]] / [[page_nb]]</div>
     </page_footer>
 
     <div id="background"></div>
@@ -83,7 +85,7 @@
 
     <div class="sidebar">
         <p>
-            Bestellnr.: {{ booking.getConfig('orderNumber') }}<br />
+            {{ "Core.ShopSystem.Plugins.Checkout.Field.OrderNumber" | translate }}: {{ booking.getConfig('orderNumber') }}<br />
             Datum: {{ booking.getDate() | date('d.m.Y') }}
 
             {% if booking.getConfig('ownOrderNumber') %}
@@ -134,7 +136,7 @@
 
     <div class="content">
 
-        <h1>Bestellbestätigung Nr. {{ booking.getConfig('orderNumber') }}</h1>
+        <h1>{{ 'Core.ShopSystem.Plugins.Checkout.OrderConfirmation' | translate }} Nr. {{ booking.getConfig('orderNumber') }}</h1>
 
         {% if booking.getConfig('shipping.deliveryDay') %}
             {% if booking.getConfig('shipping.type') == "selfPickup" %}
@@ -155,10 +157,10 @@
         <thead>
         <tr>
             <th style="font-size: 8pt;">Pos.</th>
-            <th style="font-size: 8pt;">Anzahl</th>
-            <th style="font-size: 8pt;">Beschreibung</th>
-            <th style="font-size: 8pt; text-align: right;">Betrag</th>
-            <th style="font-size: 8pt; text-align: right;">Summe</th>
+            <th style="font-size: 8pt;">{{ "Core.ShopSystem.TableHeadNumber" | translate }}</th>
+            <th style="font-size: 8pt;">{{ "Core.ShopSystem.TableHeadItems" | translate }}</th>
+            <th style="font-size: 8pt; text-align: right;">{{ "Core.ShopSystem.TableHeadPrice" | translate }}</th>
+            <th style="font-size: 8pt; text-align: right;">{{ "Core.ShopSystem.TableHeadTotal" | translate }}</th>
         </tr>
         </thead>
         <tbody>
@@ -203,7 +205,7 @@
             <tr>
                 <td></td>
                 <td colspan="3" style="font-size: 8pt; text-align: right">
-                    inkl. {{ section.taxrate }} % USt. auf {{ section.total | number_format(2, ",") }} {{ currencySign }}
+                    {{ "Core.ShopSystem.Plugins.Checkout.VatIncludedOn" | translate(section.taxrate, (section.total | number_format(2,',','.')) ) }}
                 </td>
                 <td style="font-size: 8pt; text-align: right">
                     {{ section.tax | number_format(2, ",") }} {{ currencySign }}
@@ -218,7 +220,7 @@
             <td></td>
             <td></td>
             <td style="font-size: 8pt; text-align: right">
-                <b>Total</b>
+                <b>{{ "Core.ShopSystem.TableFootTotal" | translate }}</b>
             </td>
             <td style="font-size: 8pt; text-align: right">
                 <b>{{ booking.getTotal() | number_format(2, ',', '.')}} {{ currencySign }}</b>
@@ -231,11 +233,21 @@
 
     <div style="width: 150mm; font-size: 8pt;">
 
-        <b>Zahlungsart</b>
+        <b>{{ "Core.ShopSystem.Plugins.Checkout.H4PaymentMethod" | translate }}</b>
 
-        <p>{{ shopcart.getPaymentMethod().getTitle() }}</p>
+        <p>{{ ("Core.ShopSystem.PaymentMethods." ~ shopcart.getPaymentMethod().getId() ~ ".Method.Title") | translate }}</p>
 
         {{ paymentInfoSave | raw }}
+
+        {% if booking.getConfig('shipping.type') == "selfPickup" %}
+
+            {% set text = texts.getTextByUid(plugin.getUid('text-shipping-below-selfpickup')) %}
+
+            {% if text %}
+                {{ text.getText() | raw }}
+            {% endif %}
+
+        {% endif %}
     </div>
 
 </page>

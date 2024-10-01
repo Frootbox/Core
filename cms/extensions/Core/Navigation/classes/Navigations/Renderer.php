@@ -40,6 +40,9 @@ class Renderer
 
             $items = $this->container->call([$item, 'getAutoItems']);
 
+            if (is_array($items)) {
+                d($item);
+            }
             return $items;
         }
         else {
@@ -192,6 +195,7 @@ class Renderer
             }
         }
 
+
         return null;
     }
 
@@ -200,7 +204,7 @@ class Renderer
      */
     public function render(): string
     {
-        // Obtain viewfile
+        // Obtain view file
         if (($viewFile = $this->getViewFile()) === null) {
             return $this->generateDefaultHtml();
         }

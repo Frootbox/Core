@@ -6,6 +6,10 @@
          */
         $(document).on('mouseenter', '[data-type="Images/Background"][data-uid]', function (event) {
 
+            if (!$(this).is(':visible')) {
+                return;
+            }
+
             event.preventDefault();
             event.stopImmediatePropagation();
 

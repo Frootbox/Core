@@ -49,6 +49,7 @@ variables:
 
 <div class="plugin Core HelpAndSupport Jobs ShowJob01">
 
+
     {% if variables.withContainer %}<div class="container">{% endif %}
 
     <div class="row">
@@ -56,7 +57,6 @@ variables:
 
 
             <h2 class="first main-title" data-editable data-uid="{{ job.getUid('title') }}">{{ job.getTitle(globalLanguage) }}</h2>
-
 
             <div class="content-teaser">
                 <div data-editable data-uid="{{ job.getUid('teaser') }}"></div>
@@ -69,7 +69,7 @@ variables:
                 <nav class="social-sharing">
 
                     <a data-toggle="tooltip" data-placement="bottom" title="Jobangebot teilen auf Facebook" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u={{ articleUrl | url_encode }}">{{ icons.render('facebook') | raw }}</a>
-                    <a data-toggle="tooltip" data-placement="bottom" title="Jobangebot teilen auf Twitter" target="_blank" href="https://twitter.com/home?status={{ articleUrl | url_encode }}">{{ icons.render('twitter') | raw }}</a>
+                    <a data-toggle="tooltip" data-placement="bottom" title="Jobangebot teilen auf X" target="_blank" href="https://twitter.com/home?status={{ articleUrl | url_encode }}">{{ icons.render('x') | raw }}</a>
                     <a data-toggle="tooltip" data-placement="bottom" title="Jobangebot teilen auf Xing" target="_blank" href="https://www.xing.com/spi/shares/new?url={{ articleUrl | url_encode }}">{{ icons.render('xing') | raw }}</a>
                     <a data-toggle="tooltip" data-placement="bottom" title="Jobangebot teilen auf LinkedIn" target="_blank" href="https://www.linkedin.com/share?id={{ articleUrl | url_encode }}">{{ icons.render('linkedin') | raw }}</a>
 
@@ -91,6 +91,31 @@ variables:
 
                 <br /><br />
             {% endif %}
+
+            <div class="xicons">
+                <div class="row">
+
+                    {% if job.getType() %}
+                        <div class="col-md-3">
+                            {{ icons.render('clock') | raw }}
+                            {{ t.translate("Type" ~ job.getType()) }}
+                        </div>
+                    {% endif %}
+
+                    {% if job.getConfig('asSoonAsPossible') or job.getDateStart() %}
+                        <div class="col-md-3">
+                            {{ icons.render('calendar') | raw }}
+
+                            {% if job.getConfig('asSoonAsPossible') %}
+                                Ab sofort
+                            {% elseif job.getDateStart() %}
+                                {{ job.getDateStart() | date('d.m.Y') }}
+                            {% endif %}
+                        </div>
+                    {% endif %}
+
+                </div>
+            </div>
 
 
             {% if variables.withTextAboveColumns %}
@@ -131,19 +156,22 @@ variables:
 
                     <div class="sticky-top">
 
-                        {% if plugin.getConfig('formId') %}
+                        {% if job.getConfig('formId') or plugin.getConfig('formId') %}
 
                             <h3 data-editable data-uid="{{ plugin.getUid('apply-now') }}">Jetzt bewerben!</h3>
 
                             {% set formRenderer = view.getViewhelper('Ext/Core/ContactForms/FormRenderer', {   }) %}
 
+
+
                             {{ formRenderer.render({
-                                formId: plugin.getConfig('formId'),
+                                formId: (job.getConfig('formId') ? job.getConfig('formId') : plugin.getConfig('formId')),
                                 options: {
                                     editable: true,
                                 },
                                 payload: {
-                                    'Job': job.getTitle()
+                                    'Job': job.getTitle(),
+                                    'Standort': location.getTitle()
                                 }
                             }) | raw }}
 

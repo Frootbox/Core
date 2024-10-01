@@ -1,0 +1,43 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    'frame' : false,
+}) }}
+
+<form method="post" class="ajax" action="{{ plugin.getAdminUri('SelfPickup', 'ajaxTimeCreate') }}">
+
+    <div class="modal-body">
+
+        <div class="row">
+            <div class="col-md-3">
+
+                <div class="form-group">
+                    <label for="PickUpTimeStart">Von *</label>
+                    <input required type="time" class="form-control" id="PickUpTimeStart" name="PickUpTimeStart" value="">
+                </div>
+
+            </div>
+            <div class="col-md-3">
+
+                <div class="form-group">
+                    <label for="PickUpTimeEnd">Bis *</label>
+                    <input required type="time" class="form-control" id="PickUpTimeEnd" name="PickUpTimeEnd" value="">
+                </div>
+
+            </div>
+            <div class="col-md-6">
+
+                <div class="form-group">
+                    <label for="LeadTime">min. Vorlaufzeit in Stunden</label>
+                    <input type="number" class="form-control" id="LeadTime" name="LeadTime" placeholder="min. Vorlaufzeit in Stunden" value="">
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Speichern</button>
+    </div>
+
+</form>

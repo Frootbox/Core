@@ -16,7 +16,9 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     }
 
     /**
-     *
+     * @param \Frootbox\Http\Post $post
+     * @return \Frootbox\Admin\Controller\Response
+     * @throws \Frootbox\Exceptions\RuntimeError
      */
     public function ajaxUpdateAction(
         \Frootbox\Http\Post $post
@@ -34,6 +36,8 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
                 'from' => $post->get('dateFrom'),
                 'to' => $post->get('dateTo'),
             ],
+            'SelfPickupTimes' => $post->get('SelfPickupTimes'),
+            'PaymentExtraStep' => !empty($post->get('PaymentExtraStep')),
         ]);
         $this->plugin->save();
 
@@ -41,7 +45,7 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     }
 
     /**
-     *
+     * @return \Frootbox\Admin\Controller\Response
      */
     public function indexAction(
 

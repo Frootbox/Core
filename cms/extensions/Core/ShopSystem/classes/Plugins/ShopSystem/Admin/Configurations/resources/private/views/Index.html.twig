@@ -104,7 +104,7 @@
                     {% for paymentMethod in paymentMethods %}
                         <div class="form-group form-check">
                             <input {% if paymentMethod.class in plugin.getConfig('paymentmethods') %}checked{% endif %} type="checkbox" class="form-check-input" name="paymentmethods[{{ paymentMethod.class }}]" id="method_{{ paymentMethod.id }}">
-                            <label class="form-check-label" for="method_{{ paymentMethod.id }}">{{ paymentMethod.title }}</label>
+                            <label class="form-check-label" for="method_{{ paymentMethod.id }}">{{ paymentMethod.titleIntern }}</label>
                         </div>
                     {% endfor %}
 
@@ -158,6 +158,10 @@
                     <div class="form-group form-check">
                         <input {% if plugin.getConfig('skipSelfpickup') %}checked{% endif %} type="checkbox" class="form-check-input" id="skipSelfpickup" name="config[skipSelfpickup]">
                         <label class="form-check-label" for="skipSelfpickup">keine Selbstabholung</label>
+                    </div>
+                    <div class="form-group form-check">
+                        <input {% if plugin.getConfig('choiceSelfPickupDay') %}checked{% endif %} type="checkbox" class="form-check-input" id="choiceSelfPickupDay" name="config[choiceSelfPickupDay]">
+                        <label class="form-check-label" for="choiceSelfPickupDay">Abholtag wählen</label>
                     </div>
 
                     <h3>E-Mail</h3>

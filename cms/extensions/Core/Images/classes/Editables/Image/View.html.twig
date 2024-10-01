@@ -101,6 +101,7 @@
             var uid = $(this).attr('href').substr(1);
 
             var img = $('picture[data-uid="' + uid + '"] img');
+            let picture = $('picture[data-uid="' + uid + '"]');
 
             fbxEditorOpenGenericModal();
 
@@ -112,7 +113,8 @@
                     editable: 'Frootbox/Ext/Core/Images/Editables/Image',
                     uid: uid,
                     width: img.attr('width'),
-                    height: img.attr('height')
+                    height: img.attr('height'),
+                    topImage: picture.data('topimage')
                 },
                 success: function ( html ) {
 

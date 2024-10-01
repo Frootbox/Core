@@ -58,16 +58,18 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
     }
 
     /**
-     *
+     * @param \Frootbox\Ext\Core\HelpAndSupport\Plugins\Links\Persistence\Repositories\Links $links
+     * @return \Frootbox\Db\Result
      */
     public function getLinks(
         \Frootbox\Ext\Core\HelpAndSupport\Plugins\Links\Persistence\Repositories\Links $links
-    )
+    ): \Frootbox\Db\Result
     {
         // Fetch links
         $result = $links->fetch([
             'where' => [
-                'pluginId' => $this->getId()
+                'pluginId' => $this->getId(),
+                new \Frootbox\Db\Conditions\GreaterOrEqual('visibility',(IS_EDITOR ? 1 : 2)),
             ],
             'order' => $this->getSorting(),
         ]);
@@ -76,7 +78,10 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
     }
 
     /**
-     *
+     * @param string $tag
+     * @param array|null $parameters
+     * @param \Frootbox\Ext\Core\HelpAndSupport\Plugins\Links\Persistence\Repositories\Links $linksRepository
+     * @return \Frootbox\Db\Result
      */
     public function getLinksByTag(
         string $tag,
@@ -84,6 +89,8 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         \Frootbox\Ext\Core\HelpAndSupport\Plugins\Links\Persistence\Repositories\Links $linksRepository,
     ): \Frootbox\Db\Result
     {
+        $parameters['complyVisibility'] = true;
+
         // Fetch links
         $references = $linksRepository->fetchByTag($tag, $parameters);
 

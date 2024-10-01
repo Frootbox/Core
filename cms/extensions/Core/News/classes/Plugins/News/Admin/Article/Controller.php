@@ -10,7 +10,7 @@ use Frootbox\Admin\Controller\Response;
 class Controller extends \Frootbox\Admin\AbstractPluginController
 {
     /**
-     *
+     * @return string
      */
     public function getPath(): string
     {
@@ -56,7 +56,11 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     }
 
     /**
-     *
+     * @param \Frootbox\Http\Post $post
+     * @param \Frootbox\Ext\Core\News\Persistence\Repositories\Articles $articles
+     * @param \Frootbox\Admin\Viewhelper\GeneralPurpose $gp
+     * @return Response
+     * @throws \Frootbox\Exceptions\InputMissing
      */
     public function ajaxCreateAction(
         \Frootbox\Http\Post $post,
@@ -86,14 +90,30 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
                 $dateStart = $match[3] . '-' . $match[2] . '-' . $match[1] . ' 00:00:00';
             }
 
-            // Insert new article
-            $article = $articles->insert(new \Frootbox\Ext\Core\News\Persistence\Article([
+            // Compose new article
+            $article = new \Frootbox\Ext\Core\News\Persistence\Article([
                 'pageId' => $this->plugin->getPageId(),
                 'pluginId' => $this->plugin->getId(),
                 'title' => $title,
                 'dateStart' => $dateStart,
                 'visibility' => (DEVMODE ? 2 : 1),
-            ]));
+            ]);
+
+            if (!empty($this->plugin->getConfig('noArticleDetailPage'))) {
+                $article->addConfig([
+                    'noArticleDetailPage' => true,
+                ]);
+            }
+
+            if (!empty($this->plugin->getConfig('urlPrefixFullDate'))) {
+                $article->addConfig([
+                    'urlPrefixFullDate' => true,
+                ]);
+            }
+
+            // Insert new article
+            $articles->persist($article);
+            $article->save();
 
             $date->modify('+1 second');
         }

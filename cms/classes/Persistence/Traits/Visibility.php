@@ -7,6 +7,19 @@ namespace Frootbox\Persistence\Traits;
 
 trait Visibility
 {
+    public function getVisibilityIcon(): string
+    {
+        $icons = [
+            'fa-traffic-light-stop',
+            'fa-traffic-light-slow',
+            'fa-traffic-light-go',
+        ];
+
+        $icon = $icons[$this->getVisibility()];
+
+        return '<i class="fal ' . $icon . ' xicon visibility visibility-' . $this->getVisibility() . '"></i>';
+    }
+
     /**
      *
      */

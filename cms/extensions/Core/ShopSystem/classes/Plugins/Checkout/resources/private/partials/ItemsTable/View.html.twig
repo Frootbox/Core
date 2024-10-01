@@ -3,20 +3,20 @@
 <div class="Partial ShopSystem Checkout ItemsTable">
 
     {% if items | length == 0 %}
-        <div class="xmessage">Sie haben aktuell keine Artikel im Warenkorb.</div>
+        <div class="xmessage">{{ "Core.ShopSystem.Message.NoItems" | translate }}</div>
     {% else %}
 
-        <h3>Artikel im Warenkorb</h3>
+        <h3>{{ "Core.ShopSystem.H3ArticlesInShoppingCart" | translate }}</h3>
 
         <div class="table-responsive-sm">
 
             <table class="table checkout-items-table">
                 <thead>
                     <tr>
-                        <th class="d-none d-md-table-cell">Artikel</th>
-                        <th width="200" class="text-right">Anzahl</th>
-                        <th class="text-right">Preis</th>
-                        <th class="text-right">Gesamt</th>
+                        <th class="d-none d-md-table-cell">{{ "Core.ShopSystem.TableHeadItems" | translate }}</th>
+                        <th width="200" class="text-right">{{ "Core.ShopSystem.TableHeadNumber" | translate }}</th>
+                        <th class="text-right">{{ "Core.ShopSystem.TableHeadPrice" | translate }}</th>
+                        <th class="text-right">{{ "Core.ShopSystem.TableHeadTotal" | translate }}</th>
                         {% if data.editable %}<th width="75"></th>{% endif %}
                     </tr>
                 </thead>
@@ -173,14 +173,14 @@
                         </tr>
                     {% endfor %}
 
-                    {% if not plugin.getConfig('skipShipping') %}
+                    {% if not plugin.getConfig('skipShipping') and data.shopcart.getShipping('type') != "selfPickup" %}
                         <tr>
                             <td class="d-none d-md-table-cell"></td>
                             <td class="text-right" colspan="2">
                                 {% if data.shopcart.getShippingCosts() is same as (null) %}
                                     zzgl. Versand
                                 {% elseif data.shopcart.getShippingCosts() == 0 %}
-                                    Versand kostenlos
+                                    {{ "Core.ShopSystem.FreeShipping" | translate }}
                                 {% else %}
                                     Versand
                                 {% endif %}
@@ -204,7 +204,7 @@
                                     {% if plugin.getConfig('showNetPrices') %}
                                         zzgl. {{ section.taxrate }} % USt. auf {{ section.net | number_format(2,',','.') }} {{ currencySign }}
                                     {% else %}
-                                        inkl. {{ section.taxrate }} % MwSt. auf {{ section.total | number_format(2,',','.') }} {{ currencySign }}
+                                       {{ "Core.ShopSystem.Plugins.Checkout.VatIncludedOn" | translate(section.taxrate, (section.total | number_format(2,',','.')) ) }}
                                     {% endif %}
                                 </td>
                                 <td class="text-right tax">{{ section.tax | number_format(2,',','.') }} {{ currencySign }}</td>
@@ -224,7 +224,7 @@
 
                     <tr>
                         <td class="d-none d-md-table-cell"></td>
-                        <td class="total" colspan="2">Summe</td>
+                        <td class="total" colspan="2">{{ "Core.ShopSystem.TableFootTotal" | translate }}</td>
                         <td class="total" nowrap>{{ data.shopcart.getTotal() | number_format(2,',','.') }} {{ currencySign }}</td>
                         {% if data.editable %}<td></td>{% endif %}
                     </tr>

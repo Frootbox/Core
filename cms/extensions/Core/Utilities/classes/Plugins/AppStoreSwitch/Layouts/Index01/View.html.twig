@@ -26,6 +26,7 @@ title: Standard
                                 </p>
                             </div>
 
+
                             <div class="store-panel">
                                 <div class="row align-items-center justify-content-between">
                                     <div class="col-6 col-md-6">
@@ -34,7 +35,7 @@ title: Standard
                                         </a>
                                     </div>
                                     <div class="col-6 col-md-3">
-                                        <img class="img-fluid" src="https://api.qrserver.com/v1/create-qr-code/?format=svg&size=600x600&data={{ "https://www.google.com" | url_encode }}">
+                                        <img class="img-fluid" src="https://api.qrserver.com/v1/create-qr-code/?format=svg&size=600x600&data={{ plugin.getConfig('urlAppStore') | url_encode }}">
                                     </div>
                                 </div>
                             </div>
@@ -56,7 +57,7 @@ title: Standard
                                         </a>
                                     </div>
                                     <div class="col-6 col-md-3">
-                                        <img class="img-fluid" src="https://api.qrserver.com/v1/create-qr-code/?format=svg&size=600x600&data={{ "https://www.google.com" | url_encode }}">
+                                        <img class="img-fluid" src="https://api.qrserver.com/v1/create-qr-code/?format=svg&size=600x600&data={{ plugin.getConfig('urlPlayStore') | url_encode }}">
                                     </div>
                                 </div>
                             </div>

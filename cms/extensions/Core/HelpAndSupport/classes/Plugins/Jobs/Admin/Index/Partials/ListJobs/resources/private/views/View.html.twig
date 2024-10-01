@@ -1,4 +1,5 @@
 {% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+{% set t = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\Translator') %}
 
 {% if jobs.getCount == 0 %}
 	<div class="message warning">Es wurden noch keine Jobangebote erstellt.</div>
@@ -8,6 +9,7 @@
 		<thead>
 			<tr>
 				<th>Jobangebot</th>
+				<th>Standort</th>
 				<th>Anstellung</th>
 				<th></th>
 				<th></th>
@@ -31,7 +33,12 @@
 							<span class="badge badge-info">{{ tag.getTag() }}</span>
 						{% endfor %}
 					</td>
-					<td>{{ ("Type" ~ job.getType()) }}</td>
+					<td>{{ job.getLocation().getTitle() }}</td>
+					<td>
+						{% if job.getType() %}
+							{{ t.translate("Core.HelpAndSupport.Plugins.Jobs.Type" ~ job.getType()) }}
+						{% endif %}
+					</td>
 					<td class="handle"><i class="fa fa-grip-lines"></i></td>
 					<td nowrap class="text-right">
 						<a data-toggle="tooltip" data-title="Sichtbarkeit umschalten" class="ajax" href="{{ v.getUri('Assets', 'ajaxSwitchVisibility', { assetId: job.getId() } ) }}"><i data-asset="{{ job.getId() }}" class="fa fa-lightbulb visibility {{ job.getVisibilityString() }} icon"></i></a>

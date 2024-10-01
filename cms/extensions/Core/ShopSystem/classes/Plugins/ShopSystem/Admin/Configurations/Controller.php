@@ -13,7 +13,7 @@ use Frootbox\Ext\Core\ShopSystem\NewsletterConnectors\Connector;
 class Controller extends \Frootbox\Admin\AbstractPluginController
 {
     /**
-     *
+     * @return string
      */
     public function getPath(): string
     {
@@ -88,6 +88,7 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     {
         // Set new config
         $this->plugin->unsetConfig('skipSelfpickup');
+        $this->plugin->unsetConfig('choiceSelfPickupDay');
         $this->plugin->unsetConfig('fields');
         $this->plugin->unsetConfig('fieldsMandatory');
         $this->plugin->unsetConfig('invoice');

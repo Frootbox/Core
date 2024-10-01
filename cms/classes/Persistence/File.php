@@ -115,6 +115,10 @@ class File extends AbstractRow
             return $this->getConfig('alt');
         }
 
+        if (!empty($this->getTitle())) {
+            return $this->getTitle();
+        }
+
         if (!empty($this->getConfig('caption'))) {
             return strip_tags($this->getConfig('caption'));
         }
@@ -172,6 +176,21 @@ class File extends AbstractRow
         $name = $this->getStringUrlSanitized($name) . '.' . $ext;
 
         return $name;
+    }
+
+    public function getOrientation(): string
+    {
+        list($width, $height) = getimagesize(FILES_DIR . $this->getPath());
+
+        if ($width > $height) {
+            return 'Landscape';
+        }
+        elseif ($width < $height) {
+            return 'Portrait';
+        }
+        else {
+            return 'Square';
+        }
     }
 
     /**

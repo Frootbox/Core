@@ -16,10 +16,16 @@ class Item extends \Frootbox\Ext\Core\Navigation\Navigations\Items\AbstractItem
             return '#unconfigured-navigation-item';
         }
 
-        $categoriesRepository = $this->getDb()->getRepository(\Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Categories::class);
-        $category = $categoriesRepository->fetchById($this->getConfig('categoryId'));
+        try {
 
-        return $category->getUri();
+            $categoriesRepository = $this->getDb()->getRepository(\Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Categories::class);
+            $category = $categoriesRepository->fetchById($this->getConfig('categoryId'));
+
+            return $category->getUri();
+        }
+        catch (\Frootbox\Exceptions\NotFound $e) {
+            return '#missing-category-' . $this->getConfig('categoryId');
+        }
 
         $url = 'fbx://page:' . $this->getConfig('categoryId');
 

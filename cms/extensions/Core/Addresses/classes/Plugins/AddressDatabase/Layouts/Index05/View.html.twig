@@ -1,0 +1,120 @@
+{# config
+
+title: Standard
+variables:
+    skipHeadline:
+        type: bool
+        label: ohne Überschrift
+    imageWidth:
+        type: int
+        label: Bildbreite
+        default: 800
+    imageHeight:
+        type: int
+        label: Bildhöhe
+        default: 450
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set t = i.getTranslator() %}
+
+{% set icons = view.getViewhelper('Ext/HerrUndFrauPixelExt/Icons/Icons', { createDummyOnFail: true  }) %}
+
+<div class="plugin Core Addresses AddressDatabase Index05">
+
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+
+                {% if not variables.skipHeadline %}
+                    <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+                {% endif %}
+
+                <div data-editable data-uid="{{ plugin.getUid('teaser') }}"></div>
+
+                {% set Adresses = i.getAddresses() %}
+
+                <div class="teasers">
+                    {% for address in Adresses %}
+                        <div class="teaser">
+                            <div class="row">
+                                <div class="col-md-7">
+
+                                    <picture class="fluid" data-editable data-uid="{{ address.getUid('image') }}">
+                                        <img width="{{ variables.imageWidth }}" height="{{ variables.imageHeight }}" src="{{ i.getDummyImage({ width: variables.imageWidth, height: variables.imageHeight }) }}" alt="" />
+                                    </picture>
+
+                                    <a class="mt-3 btn btn-primary" href="#">Mehr Informationen</a>
+
+                                </div>
+                                <div class="col-md-5">
+
+                                    <h3 class="first">{{ address.getTitle() }}</h3>
+
+                                    <div class="row align-items-center">
+                                        <div class="col-md-6">
+
+                                            <p class="mb-0">
+                                                {{ address.getStreet() }} {{ address.getStreetNumber() }}<br />
+                                                {{ address.getPostalCode() }} {{ address.getCity() }}<br />
+                                            </p>
+
+                                        </div>
+                                        <div class="col-md-6">
+
+                                            <nav class="contact-icons">
+
+                                                {% if address.getPhone() %}
+                                                    <a href="tel:{{ address.getPhone() }}">{{ icons.render('phone') | raw }}</a>
+                                                {% endif %}
+
+                                                {% if address.getPostalCode() %}
+                                                    <a href="#">{{ icons.render('location-dot') | raw }}</a>
+                                                {% endif %}
+
+                                            </nav>
+
+                                        </div>
+                                    </div>
+
+
+                                    {% set openingTimes = address.getOpeningTimes() %}
+
+                                    {% if openingTimes | length %}
+
+                                        <h4>Öffnungszeiten</h4>
+
+                                        <table class="table opening-times">
+                                            {% for openingTime in openingTimes %}
+                                                <tr>
+                                                    <td>
+                                                        {% for day,state in openingTime.getConfig('days') %}
+                                                            {{ t.translate("WeekdayShort" ~ day) }}{% if not loop.last %},{% endif %}
+                                                        {% endfor %}
+                                                    </td>
+                                                    <td>
+                                                        {% if openingTime.getConfig('isClosed') %}
+                                                            geschlossen
+                                                        {% else %}
+                                                            {{ icons.render('clock') | raw }} {{ openingTime.getConfig('timeFrom') }}–{{ openingTime.getConfig('timeTo') }} Uhr
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        </table>
+
+                                    {% endif %}
+
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+</div>

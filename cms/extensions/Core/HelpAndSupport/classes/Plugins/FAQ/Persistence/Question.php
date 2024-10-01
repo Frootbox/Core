@@ -61,7 +61,12 @@ class Question extends \Frootbox\Persistence\AbstractAsset
         $questionsRepository = $this->getModel();
 
         foreach ($this->getConfig('seeAlso') as $questionId) {
-            $list[] = $questionsRepository->fetchById($questionId);
+            try {
+                $list[] = $questionsRepository->fetchById($questionId);
+            }
+            catch ( \Exception $e) {
+
+            }
         }
 
         return $list;

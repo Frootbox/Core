@@ -197,6 +197,190 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     }
 
     /**
+     * @param \Frootbox\Ext\Core\Events\Persistence\Repositories\Events $eventsRepository
+     * @param \Frootbox\Ext\Core\Events\Persistence\Repositories\Categories $categoriesRepository
+     * @return \Frootbox\Admin\Controller\Response
+     */
+    public function exportAction(
+        \Frootbox\Ext\Core\Events\Persistence\Repositories\Venues $venuesRepository,
+        \Frootbox\Ext\Core\Events\Persistence\Repositories\Events $eventsRepository,
+        \Frootbox\Ext\Core\Events\Persistence\Repositories\Categories $categoriesRepository,
+    ): Response
+    {
+        $exportData = [
+            'events' => [],
+            'categories' => [],
+            'bookings' => [],
+            'venues' => [],
+        ];
+
+        // Fetch events
+        $result = $eventsRepository->fetch([
+            'where' => [
+                'pluginId' => $this->plugin->getId(),
+            ],
+        ]);
+
+        foreach ($result as $event) {
+            $eventData = $event->getData();
+            $eventData['categories'] = [];
+
+            foreach ($event->getCategories() as $category) {
+                $eventData['categories'][] = $category->getId();
+            }
+
+            $exportData['events'][] = $eventData;
+        }
+
+        // Fetch categories
+        $result = $categoriesRepository->fetch([
+            'where' => [
+                'pluginId' => $this->plugin->getId(),
+            ],
+        ]);
+
+        foreach ($result as $category) {
+            $exportData['categories'][] = $category->getData();
+        }
+
+        // Fetch venues
+        $result = $venuesRepository->fetch([
+            'where' => [
+                'pluginId' => $this->plugin->getId(),
+            ],
+        ]);
+
+        foreach ($result as $venue) {
+            $exportData['venues'][] = $venue->getData();
+        }
+
+        die(json_encode($exportData));
+    }
+
+    public function importAction(
+        \Frootbox\Http\Post $post,
+        \Frootbox\Ext\Core\Events\Persistence\Repositories\Venues $venuesRepository,
+        \Frootbox\Ext\Core\Events\Persistence\Repositories\Events $eventsRepository,
+        \Frootbox\Ext\Core\Events\Persistence\Repositories\Categories $categoriesRepository,
+    ): Response
+    {
+        // Clear events
+        $result = $eventsRepository->fetch([
+            'where' => [
+                'pluginId' => $this->plugin->getId(),
+            ],
+        ]);
+
+        $result->map('delete');
+
+        // Clear categories
+        $result = $categoriesRepository->fetch([
+            'where' => [
+                'pluginId' => $this->plugin->getId(),
+            ],
+            'order' => [ 'lft DESC' ],
+        ]);
+
+        $result->map('delete');
+
+        // Clear venues
+        $result = $venuesRepository->fetch([
+            'where' => [
+                'pluginId' => $this->plugin->getId(),
+            ],
+        ]);
+
+        $result->map('delete');
+
+        // Prepare imports
+        $data = json_decode($post->get('Json'), true);
+        $connections = [
+            'categories' => [],
+            'venues' => [],
+        ];
+
+        // Import categories
+        $root = new \Frootbox\Ext\Core\Events\Persistence\Category([
+            'pluginId' => $this->plugin->getId(),
+            'pageId' => $this->plugin->getPageId(),
+            'title' => 'Index',
+        ]);
+
+        $root = $categoriesRepository->insertRoot($root);
+
+        foreach ($data['categories'] as $categoryData) {
+
+            if ($categoryData['title'] == 'Index') {
+                continue;
+            }
+
+            $oldId = $categoryData['id'];
+
+            // Clear data
+            unset($categoryData['id'], $categoryData['lft'], $categoryData['rgt'], $categoryData['alias']);
+
+            $categoryData['pluginId'] = $this->plugin->getId();
+            $categoryData['pageId'] = $this->plugin->getPageId();
+            $categoryData['uid'] = $this->plugin->getUid('categories');
+
+            // Compose new category
+            $newCategory = new \Frootbox\Ext\Core\Events\Persistence\Category($categoryData);
+
+            $root->appendChild($newCategory);
+
+            $connections['categories'][$oldId] = $newCategory;
+        }
+
+        // Import venues
+        foreach ($data['venues'] as $venueData) {
+
+            $oldId = $venueData['id'];
+
+            // Clear data
+            unset($venueData['id']);
+
+            // Compose new venue
+            $newVenue = new \Frootbox\Ext\Core\Events\Persistence\Venue($venueData);
+            $venuesRepository->persist($newVenue);
+
+            $connections['venues'][$oldId] = $newVenue;
+
+        }
+
+
+        // Import events
+        foreach ($data['events'] as $eventData) {
+
+            $oldId = $eventData['id'];
+            $categories = $eventData['categories'];
+
+            // Clear data
+            unset($eventData['id'], $eventData['alias'], $eventData['categories']);
+
+            // Get venue
+            $newVenue = $connections['venues'][$eventData['parentId']];
+
+            $eventData['pluginId'] = $this->plugin->getId();
+            $eventData['pageId'] = $this->plugin->getPageId();
+            $eventData['parentId'] = $newVenue->getId();
+
+            // Compose new event
+            $newEvent = new \Frootbox\Ext\Core\Events\Persistence\Event($eventData);
+
+            $eventsRepository->persist($newEvent);
+
+            foreach ($categories as $oldId) {
+
+                $category = $connections['categories'][$oldId];
+
+                $category->connectItem($newEvent);
+            }
+        }
+
+        d($data);
+    }
+
+    /**
      *
      */
     public function indexAction(

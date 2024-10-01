@@ -123,6 +123,15 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         return self::getResponse('json');
     }
 
+    /**
+     * @param \Frootbox\Http\Post $post
+     * @param \Frootbox\CloningMachine $cloningMachine
+     * @param \Frootbox\Ext\Core\Events\Persistence\Repositories\Events $eventRepository
+     * @param \Frootbox\Admin\Viewhelper\GeneralPurpose $gp
+     * @return \Frootbox\Admin\Controller\Response
+     * @throws \DateMalformedStringException
+     * @throws \Frootbox\Exceptions\RuntimeError
+     */
     public function ajaxCloneMultiAction(
         \Frootbox\Http\Post $post,
         \Frootbox\CloningMachine $cloningMachine,
@@ -139,7 +148,7 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
             $cloneFrom = $eventRepository->fetchById($eventId);
 
             $dateStart = new \DateTime($cloneFrom->getDateStart());
-            $dateEnd = new \DateTime($cloneFrom->getDateEndt());
+            $dateEnd = new \DateTime($cloneFrom->getDateEnd());
 
 
             // Build up new event
@@ -180,15 +189,20 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
             }
         }
 
-        return self::getResponse('json', 200, [
-            'modalDismiss' => true,
+        $payload = [
             'replace' => [
                 'selector' => '#eventsReceiver',
                 'html' => $gp->injectPartial(\Frootbox\Ext\Core\Events\Plugins\Schedule\Admin\Archive\Partials\ListEvents\Partial::class, [
                     'plugin' => $this->plugin,
-                ])
-            ]
-        ]);
+                ]),
+            ],
+        ];
+
+        if (empty($post->get('KeepOpen'))) {
+            $payload['modalDismiss'] = true;
+        }
+
+        return self::getResponse('json', 200, $payload);
     }
 
     /**

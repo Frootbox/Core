@@ -1,0 +1,78 @@
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set p = view.getViewhelper('Partials', { plugin: plugin }) %}
+{% set t = i.getTranslator() %}
+
+{{ i.injectScript({ path: 'Checkout01/public/init.js'}) | raw }}
+
+{{ v.asset('EXT:Core/ShopSystem/icons/css/all.css') | raw }}
+
+<div class="plugin Core ShopSystem Checkout SelectPayment01">
+
+    <form action="{{ plugin.getAjaxUri('SubmitPayment') }}" method="post" class="ajax-checkout-form">
+
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+
+                    <div class="inner-wrapper">
+
+                        <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title-select-payment') }}">{{ "Core.ShopSystem.Plugins.Checkout.H1Payment" | translate }}</h2>
+
+                        <div class="row">
+                            <div class="col-md-6">
+
+                                <h3>{{ "Core.ShopSystem.Plugins.Checkout.H4PaymentMethod" | translate }}</h3>
+
+                                {% set PaymentMethods = i.getPaymentMethods() %}
+
+
+                                <div class="card payment-methods">
+                                    {% for PaymentMethod in PaymentMethods %}
+                                        <div class="card-body">
+                                            <div class="row align-items-center">
+                                                <div class="col-md-8">
+                                                    <div class="form-group form-check">
+                                                        <input {% if PaymentMethods | length == 1 or PaymentMethod.isActive() %}checked{% endif %} type="radio" class="form-check-input" id="Method{{ loop.index }}" value="{{ PaymentMethod.getClass() }}" name="PaymentMethod">
+                                                        <label class="form-check-label" for="Method{{ loop.index }}">
+                                                            <b>{{ PaymentMethod.getTitle() }}</b><br />
+                                                            <span class="info-text">{{ PaymentMethod.getDescription() }}</span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4 text-right">
+                                                    {% if PaymentMethod.hasLogo() %}
+                                                        <img height="24" src="{{ PaymentMethod.getImageDataUri() }}" />
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+
+
+                            </div>
+
+                        </div>
+
+
+                        <br /><br />
+
+                        <div class="row justify-content-between align-items-center">
+                            <div class="col-6 col-md-3 order-md-1">
+                                <a href="{{ plugin.getActionUri('login', { back: 1 }) }}" class="btn btn-block btn-secondary">{{ "Core.ShopSystem.ButtonGoBack" | translate }}</a>
+                            </div>
+                            <div class="col-6 col-md-3 order-md-2">
+                                <button tabindex="501" type="submit" class="btn btn-block btn-primary">{{ "Core.ShopSystem.ButtonGoFurther" | translate }}</button>
+                            </div>
+                        </div>
+
+                        {{ p.renderPartial('BasketFooter', { shopcart: shopcart, plugin: plugin }) | raw }}
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </form>
+</div>

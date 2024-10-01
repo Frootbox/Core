@@ -23,12 +23,12 @@ class EditingRoute extends \Frootbox\Routing\AbstractRoute
         \Frootbox\Http\Response $response,
         \Frootbox\Session $session,
         $alias,
-        \Frootbox\Persistence\Page $page,
+        ?\Frootbox\Persistence\Page $page,
         \Frootbox\View\Engines\Interfaces\Engine $view,
         \Frootbox\Config\Config $config
     ): void
     {
-        if (!IS_EDITOR) {
+        if (!IS_EDITOR or $page === null) {
             return;
         }
 

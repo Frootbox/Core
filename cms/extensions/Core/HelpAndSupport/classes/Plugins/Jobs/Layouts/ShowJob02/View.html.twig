@@ -16,6 +16,7 @@ variables:
 {% set v = view.getViewhelper('View') %}
 {% set a = view.getViewhelper('Assets', {   }) %}
 {% set h = view.getViewhelper('Hreflang', { singleton: true }) %}
+{% set p = view.getViewhelper('Partials', { plugin: plugin }) %}
 
 {% set icons = view.getViewhelper('Ext/HerrUndFrauPixelExt/Icons/Icons', { createDummyOnFail: true  }) %}
 
@@ -29,6 +30,12 @@ variables:
 {% for language, xalias in job.getLanguageAliases() %}
     {{ h.addItem(language, xalias) }}
 {% endfor %}
+
+{% if plugin.getGlobalConfig('Google.StructuredData') %}
+    {{ p.render('\\Frootbox\\Ext\\Core\\HelpAndSupport\\Plugins\\Jobs\\Partials\\GoogleJsonLd', { t: t, Job: job }) | raw }}
+{% endif %}
+
+
 
 <div class="plugin Core HelpAndSupport Jobs ShowJob02">
 

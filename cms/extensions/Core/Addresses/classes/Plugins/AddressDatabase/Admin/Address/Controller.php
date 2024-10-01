@@ -84,6 +84,36 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     }
 
     /**
+     * @param \Frootbox\Http\Get $get
+     * @param \Frootbox\CloningMachine $cloningMachine
+     * @param \Frootbox\Ext\Core\HelpAndSupport\Plugins\Jobs\Persistence\Repositories\Jobs $jobsRepository
+     * @return Response
+     * @throws \Frootbox\Exceptions\RuntimeError
+     */
+    public function ajaxDuplicateAction(
+        \Frootbox\Http\Get $get,
+        \Frootbox\CloningMachine $cloningMachine,
+        \Frootbox\Ext\Core\Addresses\Persistence\Repositories\Addresses $addressRepository,
+    ): Response
+    {
+        // Fetch address
+        $address = $addressRepository->fetchById($get->get('addressId'));
+
+
+        // Duplicate address
+        $newAddress = $address->duplicate();
+        $newAddress->setTitle($address->getTitle() . ' (Duplikat)');
+        $newAddress->setAlias(null);
+        $newAddress->save();
+
+        $cloningMachine->cloneContentsForElement($newAddress, $address->getUidBase());
+
+        return self::getResponse('json', 200, [
+            'triggerLink' => $this->plugin->getAdminUri('Address', 'details', [ 'addressId' => $newAddress->getId() ]),
+        ]);
+    }
+
+    /**
      *
      */
     public function ajaxModalComposeAction(): Response
@@ -123,7 +153,12 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     }
 
     /**
-     *
+     * @param \Frootbox\Http\Get $get
+     * @param \Frootbox\Http\Post $post
+     * @param \Frootbox\Ext\Core\Addresses\Persistence\Repositories\Addresses $addressesRepository
+     * @param \Frootbox\Ext\Core\Addresses\Persistence\Repositories\OpeningTimes $openingTimesRepository
+     * @param \Frootbox\Admin\Viewhelper\GeneralPurpose $gp
+     * @return \Frootbox\Admin\Controller\Response
      */
     public function ajaxOpeningTimeCreateAction(
         \Frootbox\Http\Get $get,
@@ -144,6 +179,7 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
                 'timeFrom' => $post->get('timeFrom'),
                 'timeTo' => $post->get('timeTo'),
                 'days' => $post->get('days'),
+                'isClosed' => !empty($post->get('IsClosed')),
             ],
         ]);
 
@@ -238,12 +274,17 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     }
 
     /**
-     *
+     * @param \Frootbox\Http\Get $get
+     * @param \Frootbox\Http\Post $post
+     * @param \Frootbox\Ext\Core\Addresses\Persistence\Repositories\Addresses $addressesRepository
+     * @return \Frootbox\Admin\Controller\Response
+     * @throws \Frootbox\Exceptions\InputMissing
+     * @throws \Frootbox\Exceptions\RuntimeError
      */
     public function ajaxUpdateAction(
         \Frootbox\Http\Get $get,
         \Frootbox\Http\Post $post,
-        \Frootbox\Ext\Core\Addresses\Persistence\Repositories\Addresses $addressesRepository
+        \Frootbox\Ext\Core\Addresses\Persistence\Repositories\Addresses $addressesRepository,
     ): Response
     {
         // Validate required input
@@ -268,6 +309,8 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         $address->setUrl($post->get('url'));
         $address->setInstagram($post->get('instagram'));
         $address->setFacebook($post->get('facebook'));
+        $address->setMatterport($post->get('Matterport'));
+        $address->setYoutube($post->get('Youtube'));
 
         // Set tags
         $address->setTags($post->get('tags'));
@@ -279,12 +322,43 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     }
 
     /**
-     *
+     * @param \Frootbox\Http\Get $get
+     * @param \Frootbox\Http\Post $post
+     * @param \Frootbox\Ext\Core\Addresses\Persistence\Repositories\Addresses $addressesRepository
+     * @return \Frootbox\Admin\Controller\Response
+     * @throws \Frootbox\Exceptions\RuntimeError
+     */
+    public function ajaxUpdateLinkageAction(
+        \Frootbox\Http\Get $get,
+        \Frootbox\Http\Post $post,
+        \Frootbox\Ext\Core\Addresses\Persistence\Repositories\Addresses $addressesRepository,
+    ): Response
+    {
+        // Fetch address
+        $address = $addressesRepository->fetchById($get->get('addressId'));
+
+        // Update address
+        $address->addConfig([
+            'redirect' => [
+                'internalUrl' => $post->get('internalUrl'),
+            ],
+        ]);
+        $address->save();
+
+        return self::getResponse('json');
+    }
+
+    /**
+     * @param \Frootbox\Http\Get $get
+     * @param \Frootbox\Http\Post $post
+     * @param \Frootbox\Ext\Core\Addresses\Persistence\Repositories\Addresses $addressesRepository
+     * @return \Frootbox\Admin\Controller\Response
+     * @throws \Frootbox\Exceptions\RuntimeError
      */
     public function ajaxUpdateLocationAction(
         \Frootbox\Http\Get $get,
         \Frootbox\Http\Post $post,
-        \Frootbox\Ext\Core\Addresses\Persistence\Repositories\Addresses $addressesRepository
+        \Frootbox\Ext\Core\Addresses\Persistence\Repositories\Addresses $addressesRepository,
     ): Response
     {
         // Fetch address

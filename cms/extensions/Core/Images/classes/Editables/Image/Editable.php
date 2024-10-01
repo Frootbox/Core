@@ -32,28 +32,31 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
 
             $uid = $element->getAttribute('data-uid');
 
+
             preg_match('#^\<(.*?) #', (string)$element, $match);
 
             if ($match[1] == 'picture') {
 
-                $result = $files->fetch([
-                    'where' => [ 'uid' => $uid ],
-                    'order' => [ 'orderId DESC' ],
-                    'limit' => 1,
+                // Fetch file
+                $file = $files->fetchByUid($uid, [
+                    'fallbackLanguageDefault' => true,
+                    'order' => 'orderId DESC',
                 ]);
 
-                if ($result->getCount() == 0 and $element->getAttribute('data-fallback-uid') !== null) {
 
-                    $result = $files->fetch([
-                        'where' => [ 'uid' => $element->getAttribute('data-fallback-uid') ],
-                        'limit' => 1
+                if (!$file and $element->getAttribute('data-fallback-uid') !== null) {
+                    /**
+                     * @var \Frootbox\Persistence\File $file
+                     */
+                    $file = $files->fetchByUid($element->getAttribute('data-fallback-uid'), [
+                        'fallbackLanguageDefault' => true,
+                        'order' => 'orderId DESC',
                     ]);
-
                 }
 
-                if ($result->getCount() == 0) {
+                if (!$file) {
 
-                    if (!empty($element->getAttribute('data-skipempty')) and !defined('EDITING')) {
+                    if ($element->getAttribute('data-skipempty') !== null and !defined('EDITING')) {
                         $element->remove();
                     }
                     elseif ($element->getAttribute('data-fallbacksrc') !== null) {
@@ -62,10 +65,6 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
 
                     return;
                 }
-
-                /* @var $file \Frootbox\Persistence\File */
-                $file = $result->current();
-
 
                 $innerHtml = trim($element->getInnerHtml());
 

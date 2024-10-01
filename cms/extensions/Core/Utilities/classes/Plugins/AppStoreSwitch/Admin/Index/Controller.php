@@ -40,7 +40,7 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         ]);
         $this->plugin->save();
 
-        d($post);
+        return self::getResponse('json');
     }
 
     /**

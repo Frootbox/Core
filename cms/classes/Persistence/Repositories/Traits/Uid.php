@@ -131,11 +131,26 @@ trait Uid
             $parameters['order'] = 'date DESC';
         }
 
+
         // Fetch text
         $result = $this->fetch([
-            'where' => [ 'uid' => $uid ],
+            'where' => [
+                'uid' => $uid,
+                'language' => $_SESSION['frontend']['language'],
+            ],
             'order' => [ $parameters['order'] ],
         ]);
+
+        if ($result->getCount() == 0 and $_SESSION['frontend']['language'] != DEFAULT_LANGUAGE) {
+
+            $result = $this->fetch([
+                'where' => [
+                    'uid' => $uid,
+                    'language' => DEFAULT_LANGUAGE,
+                ],
+                'order' => [ $parameters['order'] ],
+            ]);
+        }
 
         return $result;
     }

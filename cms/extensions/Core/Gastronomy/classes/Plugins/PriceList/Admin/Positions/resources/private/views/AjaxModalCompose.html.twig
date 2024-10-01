@@ -1,0 +1,31 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    'frame' : false,
+}) }}
+
+<form method="post" class="ajax" action="{{ plugin.getAdminUri('Positions', 'ajaxCreate', { categoryId: get.get('categoryId') }) }}">
+
+    <div class="modal-body">
+
+        <div class="form-group">
+            <label for="title">Titel</label>
+            <input type="text" class="form-control" name="title" id="title" placeholder="Titel">
+        </div>
+        <div class="form-group">
+            <label for="EntryId">vorhandene Position verknüpfen</label>
+            <select class="form-control" id="EntryId" name="EntryId">
+                <option value="">keine Auswahl</option>
+
+                {% for Entry in Entries %}
+                    <option value="{{ Entry.getId() }}">{{ Entry.getTitle() }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">neue Position erstellen</button>
+    </div>
+
+</form>

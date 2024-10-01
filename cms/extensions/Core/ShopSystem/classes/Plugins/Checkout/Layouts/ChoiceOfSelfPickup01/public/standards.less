@@ -1,0 +1,81 @@
+.plugin.Core.ShopSystem.Checkout.ChoiceOfSelfPickup01 {
+
+  table.calendar {
+    width: 100%;
+
+    margin: 40px 0 0 0;
+
+    border-spacing: 1px;
+
+    thead {
+      tr {
+        th {
+          width: 14.2857143%;
+
+
+          .content {
+            display: block;
+            margin: 0;
+            padding: 2px 0;
+
+            @media (min-width: 768px) {
+              margin: 2px;
+              padding: 4px 0;
+            }
+
+            background: #CCC;
+            text-align: center;
+          }
+        }
+      }
+    }
+
+    tbody {
+      tr {
+        td {
+          color: #CCC;
+
+          .day {
+            position: relative;
+            display: block;
+
+            margin: 0;
+            padding-top: 100%;
+
+            @media (min-width: 768px) {
+              margin: 2px;
+            }
+
+            background: #EEE;
+
+            .content {
+              position: absolute;
+              inset: 0;
+
+              padding: 5px;
+
+              color: #999;
+              font-size: 14px;
+              text-align: center;
+
+              @media (min-width: 768px) {
+                padding: 10px;
+                font-size: 16px;
+                text-align: left;
+              }
+            }
+          }
+
+          a.day {
+            background: $colorSpot1;
+
+            .content {
+              color: #FFF;
+              font-weight: bold;
+            }
+          }
+        }
+      }
+    }
+  }
+}

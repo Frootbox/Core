@@ -202,7 +202,10 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
     }
 
     /**
-     *
+     * @param \Frootbox\Http\Get $get
+     * @param \Frootbox\Admin\View $view
+     * @param \Frootbox\Ext\Core\Images\Persistence\Repositories\Images $files
+     * @return \Frootbox\Admin\Controller\Response
      */
     public function ajaxModalEdit(
         \Frootbox\Http\Get $get,

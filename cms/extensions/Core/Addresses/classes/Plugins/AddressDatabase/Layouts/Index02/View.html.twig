@@ -16,6 +16,12 @@ variables:
     skipAddress:
         type: bool
         label: ohne Anschrift
+    skipMap:
+        type: bool
+        label: Ohne Google-Maps Karte
+    skipHeadline:
+        type: bool
+        label: Ohne Überschrift
 
 /config #}
 
@@ -59,17 +65,21 @@ variables:
 
 <div class="plugin Core Addresses AddressDatabase Index02">
 
-    <div class="headline-wrapper">
-        {% if variables.withLayoutContainer %}<div class="container">{% endif %}
-            <div class="row">
-                <div class="col-12">
-                    <h2 class="main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+    {% if not variables.skipHeadline %}
+        <div class="headline-wrapper">
+            {% if variables.withLayoutContainer %}<div class="container">{% endif %}
+                <div class="row">
+                    <div class="col-12">
+                        <h2 class="main-title first" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+                    </div>
                 </div>
-            </div>
-        {% if variables.withLayoutContainer %}</div>{% endif %}
-    </div>
+            {% if variables.withLayoutContainer %}</div>{% endif %}
+        </div>
+    {% endif %}
 
-    <div id="map"></div>
+    {% if not variables.skipMap %}
+        <div id="map"></div>
+    {% endif %}
 
     {% if variables.withLayoutContainer %}<div class="container">{% endif %}
 
@@ -82,7 +92,7 @@ variables:
 
                         <h3 class="first" data-editable data-uid="{{ address.getUid('title') }}">{{ address.getTitle() }}</h3>
 
-                        <div data-editable data-uid="{{ plugin.getUid('teaser') }}"></div>
+                        <div data-editable data-uid="{{ address.getUid('teaser') }}"></div>
 
                         {% if not variables.skipAddress %}
                             <p class="address">
@@ -92,15 +102,15 @@ variables:
 
                             <p>
                                 {% if address.getPhone() %}
-                                    <a href="tel:{{ address.getPhone() }}">{{ icons.render('phone') | raw}}<span class="tel">{{ address.getPhone() }}</span></a><br />
+                                    <a href="tel:{{ address.getPhone() }}">{{ icons.render('phone', [ 'fa-fw' ]) | raw}}<span class="tel">{{ address.getPhone() }}</span></a><br />
                                 {% endif %}
 
                                 {% if address.getEmail() %}
-                                    <a href="mailto:{{ address.getEmail() }}">{{ icons.render('envelope') | raw}}{{ address.getEmail() }}</a><br />
+                                    <a href="mailto:{{ address.getEmail() }}">{{ icons.render('envelope', [ 'fa-fw' ]) | raw}}{{ address.getEmail() }}</a><br />
                                 {% endif %}
 
                                 {% if address.getUrlExtern() %}
-                                    <a href="{{ address.getUrlExtern() }}">{{ icons.render('link') | raw}}{{ address.getUrlDisplay() }}</a><br />
+                                    <a href="{{ address.getUrlExtern() }}">{{ icons.render('link', [ 'fa-fw' ]) | raw}}{{ address.getUrlDisplay() }}</a><br />
                                 {% endif %}
                             </p>
 
@@ -108,9 +118,9 @@ variables:
 
                             {% if openingTimes | length %}
 
-                                <h4>Öffnungszeiten</h4>
+                                <h4 data-editable data-uid="{{ address.getUid('title-openingtimes') }}">Öffnungszeiten</h4>
 
-                                <table class="table">
+                                <table class="table opening-times">
                                     <tbody>
                                         {% for openingTime in openingTimes %}
                                             <tr>
@@ -119,7 +129,13 @@ variables:
                                                         {{ ("Core.Addresses.Plugins.AddressDatabase.WeekdayShort" ~ day) | translate }}.
                                                     {% endfor %}
                                                 </td>
-                                                <td>{{ openingTime.getConfig('timeFrom') }}–{{ openingTime.getConfig('timeTo') }} Uhr</td>
+                                                <td>
+                                                    {% if openingTime.isClosed() %}
+                                                        geschlossen
+                                                    {% else %}
+                                                        {{ openingTime.getConfig('timeFrom') }}–{{ openingTime.getConfig('timeTo') }} Uhr
+                                                    {% endif %}
+                                                </td>
                                             </tr>
                                         {% endfor %}
                                     </tbody>
@@ -132,9 +148,21 @@ variables:
                     </div>
                     <div class="col-md-6 order-md-{{ (loop.index + 1) % 2 + 1 }}">
 
-                        <picture class="fluid" data-editable data-uid="{{ address.getUid('image') }}">
-                            <img width="{{ variables.imageWidth }}" height="{{ variables.imageHeight }}" src="{{ i.getDummyImage({ width: variables.imageWidth, height: variables.imageHeight | default(300) }) }}" alt="" />
-                        </picture>
+                        {% set Uri = address.getUri() %}
+
+                        <div class="image-wrapper" {% if Uri %}data-href{% endif %}>
+
+                            <picture class="fluid" data-editable data-uid="{{ address.getUid('image') }}">
+                                <img width="{{ variables.imageWidth }}" height="{{ variables.imageHeight }}" src="{{ i.getDummyImage({ width: variables.imageWidth, height: variables.imageHeight | default(300) }) }}" alt="" />
+                            </picture>
+
+                            {% if Uri %}
+                                <p class="read-more">
+                                    <a href="{{ Uri }}" class="btn btn-primary"><span data-uid="{{ address.getUid('teaser-link') }}" data-editable-element>Mehr erfahren</span></a>
+                                </p>
+                            {% endif %}
+
+                        </div>
 
                     </div>
                 </div>

@@ -27,6 +27,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         // Fetch manufacturers
         $result = $manufacturersRepository->fetch();
 
+     //   d($result);
         return new \Frootbox\View\Response([
             'manufacturers' => $result
         ]);

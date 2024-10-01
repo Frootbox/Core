@@ -201,6 +201,26 @@ class Page
             'language' => $_SESSION['frontend']['language'],
         ]));
 
+
+        if (!empty($get->get('setFirst'))) {
+
+            $where = [
+                'uid' => $get->get('uid'),
+            ];
+
+            if (!empty($config->get('i18n.multiAliasMode'))) {
+                $where['language'] = $_SESSION['frontend']['language'];
+            }
+
+            // Clean existing files
+            $result = $files->fetch([
+                'where' => $where,
+            ]);
+
+            $file->setOrderId($result->getCount() + 1);
+            $file->save();
+        }
+
         die(json_encode([ ]));
     }
 }

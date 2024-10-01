@@ -18,6 +18,22 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     }
 
     /**
+     * @param \Frootbox\Ext\Core\ContactForms\Persistence\Repositories\Forms $formsRepository
+     * @return \Frootbox\Db\Result
+     */
+    public function getForms(
+        \Frootbox\Ext\Core\ContactForms\Persistence\Repositories\Forms $formsRepository
+    ): \Frootbox\Db\Result
+    {
+        // Fetch addresses
+        $result = $formsRepository->fetch([
+
+        ]);
+
+        return $result;
+    }
+
+    /**
      * @param \Frootbox\Ext\Core\Addresses\Persistence\Repositories\Addresses $addressesRepository
      * @return \Frootbox\Db\Result
      */
@@ -25,14 +41,30 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         \Frootbox\Ext\Core\Addresses\Persistence\Repositories\Addresses $addressesRepository
     ): \Frootbox\Db\Result
     {
-        // Fetch addresses
-        $result = $addressesRepository->fetch([
-            'where' => [
-                'pluginId' => $this->plugin->getId(),
-            ],
-        ]);
+        if (!empty($this->plugin->getConfig('UseAllAddresses'))) {
 
-        return $result;
+            // Fetch addresses
+            $result = $addressesRepository->fetch([
+                'where' => [
+
+                ],
+                'order' => [ 'title ASC' ],
+            ]);
+
+            return $result;
+        }
+        else {
+
+            // Fetch addresses
+            $result = $addressesRepository->fetch([
+                'where' => [
+                    'pluginId' => $this->plugin->getId(),
+                ],
+                'order' => [ 'title ASC' ],
+            ]);
+
+            return $result;
+        }
     }
 
     /**
@@ -59,6 +91,9 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
             'visibility' => (DEVMODE ? 2 : 1),
         ]));
 
+        // Trigger save to create alias
+        $job->save();
+
         return self::getResponse('json', 200, [
             'modalDismiss' => true,
             'replace' => [
@@ -72,7 +107,11 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     }
 
     /**
-     *
+     * @param \Frootbox\Http\Get $get
+     * @param \Frootbox\CloningMachine $cloningMachine
+     * @param \Frootbox\Ext\Core\HelpAndSupport\Plugins\Jobs\Persistence\Repositories\Jobs $jobsRepository
+     * @return Response
+     * @throws \Frootbox\Exceptions\RuntimeError
      */
     public function ajaxDuplicateAction(
         \Frootbox\Http\Get $get,
@@ -126,7 +165,11 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     }
 
     /**
-     *
+     * @param \Frootbox\Http\Get $get
+     * @param \Frootbox\Http\Post $post
+     * @param \Frootbox\Ext\Core\HelpAndSupport\Plugins\Jobs\Persistence\Repositories\Jobs $jobsRepository
+     * @return \Frootbox\Admin\Controller\Response
+     * @throws \Frootbox\Exceptions\RuntimeError
      */
     public function ajaxUpdateAction(
         \Frootbox\Http\Get $get,
@@ -134,7 +177,10 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         \Frootbox\Ext\Core\HelpAndSupport\Plugins\Jobs\Persistence\Repositories\Jobs $jobsRepository
     ): Response
     {
-        // Fetch job
+        /**
+         * Fetch job
+         * @var \Frootbox\Ext\Core\HelpAndSupport\Plugins\Jobs\Persistence\Job $job
+         */
         $job = $jobsRepository->fetchById($get->get('jobId'));
 
         $title = $post->get('titles')[DEFAULT_LANGUAGE] ?? $post->get('title');
@@ -145,10 +191,12 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
 
         $job->setTitle($title);
         $job->setSubtitle($post->get('subtitle'));
-        $job->setDateStart($post->get('dateStart'));
+        $job->setDateStart(!empty($post->get('dateStart')) ? $post->get('dateStart') : null);
         $job->setLocationId(!empty($post->get('locationId')) ? $post->get('locationId') : null);
 
         $job->unsetConfig('titles');
+        $job->unsetConfig('Types');
+
         $job->addConfig([
             'titles' => $post->get('titles'),
             'asSoonAsPossible' => $post->get('asSoonAsPossible'),
@@ -158,6 +206,10 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
             'type' => $post->get('typeText'),
             'typeId' => $post->get('typeId'),
             'link' => $post->get('link'),
+            'formId' => $post->get('formId'),
+            'SalaryFrom' => $post->get('SalaryFrom'),
+            'SalaryTo' => $post->get('SalaryTo'),
+            'Types' => $post->get('Types'),
         ]);
 
         $job->save();

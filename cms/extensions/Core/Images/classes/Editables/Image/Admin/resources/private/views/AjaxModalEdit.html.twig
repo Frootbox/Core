@@ -48,9 +48,7 @@
     });
 </script>
 
-<form enctype="multipart/form-data" target="xxxxxxxx" id="pictureUpdateForm" action="{{ controller.getActionUri('ajaxUpdate', { fileId: file.getId(), uid: get.get('uid'), width: get.get('width'), height: get.get('height') }) }}" method="post" data-uid="{{ get.get('uid') }}">
-
-
+<form enctype="multipart/form-data" target="xxxxxxxx" id="pictureUpdateForm" action="{{ controller.getActionUri('ajaxUpdate', { fileId: file.getId(), uid: get.get('uid'), width: get.get('width'), height: get.get('height'), topImage: get.get('topImage') }) }}" method="post" data-uid="{{ get.get('uid') }}">
 
     <div class="modal-header">
         <h5 class="modal-title">Bild bearbeiten</h5>
@@ -114,10 +112,11 @@
             {% endif %}
 
             {{ v.injectPartial('Frootbox/Ext/Core/FileManager/Editor/Partials/FileUpload', {
-                multiple: false,
+                multiple: (get.get('topImage') ? true : false),
                 uid: get.get('uid'),
                 onComplete: 'refreshEditable',
-                helpText: helpText
+                helpText: helpText,
+                setFirst: (get.get('topImage') ? true : false),
             }) | raw }}
 
             <div class="form-group">

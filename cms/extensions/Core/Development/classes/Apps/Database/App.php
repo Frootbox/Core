@@ -70,8 +70,8 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
 
             $list[($timestamp * 1000) + ++$loop] = [
                 'date' => $timestamp,
-                'size' => filesize($dir->getPath() . $file),
-                'filename' => $file,
+                'size' => filesize($dir->getPath() . $file->getName()),
+                'filename' => $file->getName(),
             ];
         }
 
@@ -174,11 +174,10 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
 
         // End output buffering
         while (ob_get_level()) {
-            ob_end_clean();
+           ob_end_clean();
         }
 
         http_response_code(200);
-
         header('Content-type: application/octet-stream');
         header('Content-Disposition: attachment; filename=' . $get->get('file'));
 

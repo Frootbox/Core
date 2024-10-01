@@ -23,7 +23,9 @@ class Job extends \Frootbox\Persistence\AbstractAsset implements \Frootbox\Persi
     }
 
     /**
-     *
+     * @return \Frootbox\Ext\Core\Addresses\Persistence\Address|null
+     * @throws \Frootbox\Exceptions\NotFound
+     * @throws \Frootbox\Exceptions\RuntimeError
      */
     public function getLocation(): ?\Frootbox\Ext\Core\Addresses\Persistence\Address
     {
@@ -41,6 +43,8 @@ class Job extends \Frootbox\Persistence\AbstractAsset implements \Frootbox\Persi
      * Generate jobs alias
      *
      * @return \Frootbox\Persistence\Alias|null
+     * @throws \Frootbox\Exceptions\NotFound
+     * @throws \Frootbox\Exceptions\RuntimeError
      */
     protected function getNewAlias(): ?\Frootbox\Persistence\Alias
     {
@@ -48,7 +52,11 @@ class Job extends \Frootbox\Persistence\AbstractAsset implements \Frootbox\Persi
             return null;
         }
 
-        $title = trim($this->getTitle() . ' ' . $this->getSubtitle());
+        if (!empty($this->getConfig('link'))) {
+            return null;
+        }
+
+        $title = $this->getTitle();
 
         if (!empty($this->getConfig('urlSuffixSubtitle'))) {
 
@@ -58,13 +66,29 @@ class Job extends \Frootbox\Persistence\AbstractAsset implements \Frootbox\Persi
             if (!empty($text) and !empty($text->getConfig('subtitle'))) {
                 $title .= ' ' . $text->getConfig('subtitle');
             }
+            else {
+                $title .= ' ' . $this->getSubtitle();
+            }
+
+            $title = trim($title);
         }
+
+        $virtualDirectory = [];
+
+        if (!empty($this->getConfig('urlPrefixId'))) {
+            $virtualDirectory[] = $this->getId();
+        }
+
+        if (!empty($this->getLocationId()) and empty($this->getConfig('urlSkipLocation'))) {
+            $location = $this->getLocation();
+            $virtualDirectory[] = $location->getTitle();
+        }
+
+        $virtualDirectory[] = $title;
 
         return new \Frootbox\Persistence\Alias([
             'pageId' => $this->getPageId(),
-            'virtualDirectory' => [
-                $title,
-            ],
+            'virtualDirectory' => $virtualDirectory,
             'uid' => $this->getUid('alias'),
             'payload' => $this->generateAliasPayload([
                 'action' => 'showJob',
@@ -167,6 +191,18 @@ class Job extends \Frootbox\Persistence\AbstractAsset implements \Frootbox\Persi
         }
 
         return null;
+    }
+
+    /**
+     * @return array
+     */
+    public function getTypes(): array
+    {
+        if (empty($this->getConfig('Types'))) {
+            return [];
+        }
+
+        return array_keys($this->getConfig('Types'));
     }
 
     /**

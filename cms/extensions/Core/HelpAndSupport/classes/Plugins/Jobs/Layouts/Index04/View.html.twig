@@ -9,7 +9,9 @@ variables:
     withThumbnail:
         type: bool
         label: mit Thumbnail
-
+    withOwnTeaser:
+        type: bool
+        label: eigener Teaser-Text für Vorschau
 /config #}
 
 {% set i = view.getViewhelper('Delegator', { object: plugin }) %}
@@ -54,6 +56,14 @@ variables:
                             <div class="content-wrapper">
                                 <h4>{{ job.getTitle() }}</h4>
 
+                                {% if job.getTypes() | length %}
+                                    {% for TypeId in job.getTypes() %}
+                                        <span class="badge bg-light">{{ t.translate('Type' ~ TypeId) }}</span>
+                                    {% endfor %}
+                                {% endif %}
+
+
+
                                 <p>
                                     {% if job.getConfig('typeId') %}
                                         {{ t.translate('Type' ~ job.getConfig('typeId')) }} /
@@ -62,7 +72,7 @@ variables:
                                     {% endif %}
 
                                     {% if job.getLocation() %}
-                                        {{ job.getLocation().getCity() }} /
+                                        {{ job.getLocation().getTitle() }} /
                                         {% if variables.showCountry and job.getLocation().getCountry() %}
                                             / {{ job.getLocation().getCountry() }} /
                                         {% endif %}
@@ -75,9 +85,22 @@ variables:
                                     {% elseif job.getDateStart() %}
                                         ab {{ job.getDateStart() | date('d.m.Y') }}
                                     {% endif %}
+
+
+                                    {% if job.getConfig('SalaryFrom') and not job.getConfig('SalaryTo') %}
+                                        <br />ab {{ job.getConfig('SalaryFrom') | number_format(0, ",", ".") }} €
+                                    {% elseif job.getConfig('SalaryTo') and not job.getConfig('SalaryFrom') %}
+                                        <br />bis {{ job.getConfig('SalaryTo') | number_format(0, ",", ".") }} €
+                                    {% elseif job.getConfig('SalaryTo') and job.getConfig('SalaryFrom') %}
+                                        <br />{{ job.getConfig('SalaryFrom') | number_format(0, ",", ".") }} bis {{ job.getConfig('SalaryTo') | number_format(0, ",", ".") }} €
+                                    {% endif %}
                                 </p>
 
-                                <div data-editable data-nowidgets data-uid="{{ job.getUid('teaser') }}"></div>
+
+
+                                {% set uid = variables.withOwnTeaser ? job.getUid('teaser-own') : job.getUid('teaser') %}
+
+                                <div data-editable data-nowidgets data-uid="{{ uid }}"></div>
 
                                 {% if job.getUri() %}
                                     <p class="read-more"><a href="{{ job.getUri() }}"><span data-editable-element data-uid="{{ plugin.getUid('button-more-info') }}">mehr Infos</span></a></p>

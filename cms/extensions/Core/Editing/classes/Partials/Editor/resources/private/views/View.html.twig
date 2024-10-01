@@ -57,41 +57,7 @@
             url: 'https://cdnjs.cloudflare.com/ajax/libs/TableDnD/0.9.1/jquery.tablednd.js',
             dataType: "script"
         });
-
-        ContentTools.DEFAULT_TOOLS = [
-            [
-                'bold',
-                'italic',
-                'link',
-                'align-left',
-                'align-center',
-                'align-right'
-            ], [
-                'heading',
-                'subheading',
-                'subsubheading',
-                'paragraph',
-                'unordered-list',
-                'ordered-list',
-                'table',
-                'blockquote',
-                'indent',
-                'unindent',
-                'line-break'
-            ], [
-                'undo',
-                'redo',
-                'remove'
-            ]
-        ];
-
-        ContentTools.Tools.Heading.tagName = 'h2';
-        ContentTools.Tools.Subheading.tagName = 'h3';
-
-
     });
-
-
 
     var editorconfig = {
         urls: {
@@ -128,73 +94,109 @@
 
         $('body').addClass('editing');
 
-        ContentTools.StylePalette.add([
-            new ContentTools.Style('Author', 'author', ['p'])
-        ]);
+        window.setTimeout(function() {
 
-        editor = ContentTools.EditorApp.get();
-        editor.init('div[data-editable]', 'data-uid');
+            ContentTools.DEFAULT_TOOLS = [
+                [
+                    'bold',
+                    'italic',
+                    'link',
+                    'align-left',
+                    'align-center',
+                    'align-right'
+                ], [
+                    'heading',
+                    'subheading',
+                    'subsubheading',
+                    'paragraph',
+                    'unordered-list',
+                    'ordered-list',
+                    'table',
+                    'blockquote',
+                    'indent',
+                    'unindent',
+                    'line-break'
+                ], [
+                    'undo',
+                    'redo',
+                    'remove'
+                ]
+            ];
 
-        editor.addEventListener('start', (ev) => {
-            isEditingFreeText = true;
+            ContentTools.Tools.Heading.tagName = 'h2';
+            ContentTools.Tools.Subheading.tagName = 'h3';
 
-            $('#fbxConfigButton').hide();
-            $('.popover').popover('hide');
-        })
+            ContentTools.StylePalette.add([
+                new ContentTools.Style('Author', 'author', ['p'])
+            ]);
 
-        editor.addEventListener('stop', (ev) => {
-            isEditingFreeText = false;
-            $('#fbxConfigButton').show();
-        })
+            editor = ContentTools.EditorApp.get();
+            editor.init('div[data-editable]', 'data-uid');
 
-        editor.addEventListener('saved', function (ev) {
+            editor.addEventListener('start', (ev) => {
+                isEditingFreeText = true;
 
-            $('#fbxConfigButton').show();
-            isEditingFreeText = false;
+                $('#fbxConfigButton').hide();
+                $('.popover').popover('hide');
+            })
 
-            var name, payload, regions, xhr;
+            editor.addEventListener('stop', (ev) => {
+                isEditingFreeText = false;
+                $('#fbxConfigButton').show();
+            })
 
-            // Check that something changed
-            regions = ev.detail().regions;
-            if (Object.keys(regions).length == 0) {
-                return;
-            }
+            editor.addEventListener('saved', function (ev) {
 
-            // Set the editor as busy while we save our changes
-            this.busy(true);
+                $('#fbxConfigButton').show();
+                isEditingFreeText = false;
 
+                var name, payload, regions, xhr;
 
-            // Collect the contents of each region into a FormData instance
-            payload = new FormData();
-            for (name in regions) {
-                if (regions.hasOwnProperty(name)) {
-                    payload.append(name, regions[name]);
+                // Check that something changed
+                regions = ev.detail().regions;
+                if (Object.keys(regions).length == 0) {
+                    return;
                 }
-            }
+
+                // Set the editor as busy while we save our changes
+                this.busy(true);
 
 
-            // Send the update content to the server to be saved
-            function onStateChange(ev) {
-                // Check if the request is finished
-                if (ev.target.readyState == 4) {
-                    editor.busy(false);
-                    if (ev.target.status == '200') {
-                        // Save was successful, notify the user with a flash
-                        new ContentTools.FlashUI('ok');
-                    } else {
-                        // Save failed, notify the user with a flash
-                        new ContentTools.FlashUI('no');
+                // Collect the contents of each region into a FormData instance
+                payload = new FormData();
+                for (name in regions) {
+                    if (regions.hasOwnProperty(name)) {
+                        payload.append(name, regions[name]);
                     }
                 }
-            };
-
-            xhr = new XMLHttpRequest();
-            xhr.addEventListener('readystatechange', onStateChange);
-            xhr.open('POST', editorconfig.urls.texts.update);
-            xhr.send(payload);
-        });
 
 
+                // Send the update content to the server to be saved
+                function onStateChange(ev) {
+                    // Check if the request is finished
+                    if (ev.target.readyState == 4) {
+                        editor.busy(false);
+                        if (ev.target.status == '200') {
+                            // Save was successful, notify the user with a flash
+                            new ContentTools.FlashUI('ok');
+                        } else {
+                            // Save failed, notify the user with a flash
+                            new ContentTools.FlashUI('no');
+                        }
+                    }
+                };
+
+                xhr = new XMLHttpRequest();
+                xhr.addEventListener('readystatechange', onStateChange);
+                xhr.open('POST', editorconfig.urls.texts.update);
+                xhr.send(payload);
+            });
+
+        }, 1000);
+
+        /**
+         *
+         */
         $(document).on('mouseenter', '[data-mouseovertrigger]', function ( event ) {
 
             let uid = $(this).attr('data-mouseovertrigger');
@@ -202,10 +204,6 @@
 
             $('[data-mouseovertriggertarget="' + uid + '"]').trigger('mouseenter');
         });
-
-
-
-
 
         /**
          * Show "widget create" button
@@ -236,9 +234,7 @@
             });
 
             $(this).popover('show');
-
         });
-
 
         /**
          * Show "widget edit" buttons
@@ -283,7 +279,6 @@
             $(this).popover('show');
 
         });
-
 
         /**
          * Show "background edit" buttons

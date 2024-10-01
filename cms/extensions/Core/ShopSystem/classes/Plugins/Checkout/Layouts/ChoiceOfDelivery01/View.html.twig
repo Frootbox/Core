@@ -12,7 +12,7 @@ variables:
 {% set i = view.getViewhelper('Delegator', { object: plugin }) %}
 
 
-<div class="plugin Core ShopSystem Checkout Complete01">
+<div class="plugin Core ShopSystem Checkout ChoiceOfDelivery01">
 
     {% if variables.withContainer %}<div class="container">{% endif %}
 
@@ -22,7 +22,9 @@ variables:
                 {% if shopcart.getShipping('type') == "selfPickup" %}
                     <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('titleDeliveryDay') }}">Abholtag wählen</h2>
                 {% else %}
-                    <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('titleDeliveryDay') }}">Liefertag wählen</h2>
+                    <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('titleDeliveryDay') }}">
+                        {{ "Core.ShopSystem.H2SelectDeliveryDay" | translate }}
+                    </h2>
                 {% endif %}
 
 
@@ -32,7 +34,7 @@ variables:
                         <form action="{{ plugin.getActionUri('choiceOfDelivery') }}" method="post">
 
                             <div class="form-group">
-                                <label for="month">Monat wählen</label>
+                                <label for="month">{{ "Core.ShopSystem.LabelSelectMonth" | translate }}</label>
                                 <select class="form-control" id="month" name="month">
                                     {% for month in monthList %}
                                         <option {% if selectedMonthString == month.format('Y-m') %}selected{% endif %} value="{{ month.format('Y-m-d') }}">{{ ("Core.ShopSystem.Month" ~ month.format('m')) | translate }}</option>
@@ -42,10 +44,11 @@ variables:
 
                         </form>
 
+                        {#
                         <form action="{{ plugin.getAjaxUri('UpdateDeliveryDay') }}" method="post">
 
                             <div class="form-group">
-                                <label for="deliveryDay">Tag wählen</label>
+                                <label for="deliveryDay">{{ "Core.ShopSystem.LabelSelectDay" | translate }}</label>
                                 <select class="form-control" id="deliveryDay" name="deliveryDay">
 
                                     {% for date in dayList %}
@@ -54,12 +57,67 @@ variables:
                                 </select>
                             </div>
 
-                            <button type="submit" class="btn btn-primary">Liefertag wählen</button>
+                            <button type="submit" class="btn btn-primary">{{ "Core.ShopSystem.H2SelectDeliveryDay" | translate }}</button>
 
                         </form>
+                        #}
 
                     </div>
                 </div>
+
+                <h3>{{ "Core.ShopSystem.Plugins.Checkout.H3ChooseDeliveryDay" | translate }}</h3>
+
+                <table class="calendar">
+                    <thead>
+                        <tr>
+                            <th>
+                                <span class="content">Mo</span>
+                            </th>
+                            <th>
+                                <span class="content">Di</span>
+                            </th>
+                            <th>
+                                <span class="content">Mi</span>
+                            </th>
+                            <th>
+                                <span class="content">Do</span>
+                            </th>
+                            <th>
+                                <span class="content">Fr</span>
+                            </th>
+                            <th>
+                                <span class="content">Sa</span>
+                            </th>
+                            <th>
+                                <span class="content">So</span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for week in weeks %}
+                            <tr>
+                                {% for day in week.days %}
+                                    <td>
+                                        {% if day.isActive %}
+                                            <a href="{{ plugin.getAjaxUri('UpdateDeliveryDay', { deliveryDay: (day.date | date('Y-m-d')) }) }}" class="day">
+                                                <span class="content">
+                                                    {{ day.date | date('d.m.') }}
+                                                </span>
+                                            </a>
+                                        {% else %}
+                                            <span class="day">
+                                                <span class="content">
+                                                    {{ day.date | date('d.m.') }}
+                                                </span>
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                {% endfor %}
+                            </tr>
+
+                        {% endfor %}
+                    </tbody>
+                </table>
 
             </div>
         </div>

@@ -14,14 +14,23 @@ class Category extends \Frootbox\Persistence\Category
     protected $itemModel = Repositories\ListEntries::class;
 
     /**
-     *
+     * @return void
+     * @throws \Frootbox\Exceptions\PermissionDenied
+     * @throws \Frootbox\Exceptions\RuntimeError
      */
     public function delete()
     {
-        // Clean up list entries
-        $this->getItems()->map('delete');
+        $this->getDb()->transactionStart();
 
+        // Clean up list entries
+        foreach ($this->getItems() as $item) {
+            $this->disconnectItem($item);
+        }
+
+        // Delete record itself
         parent::delete();
+
+        $this->getDb()->transactionCommit();
     }
 
     /**
@@ -106,6 +115,7 @@ class Category extends \Frootbox\Persistence\Category
         $sql .= ' ORDER BY
             orderId DESC,
             id ASC';
+
 
         $model = new \Frootbox\Ext\Core\Gastronomy\Plugins\PriceList\Persistence\Repositories\ListEntries($this->db);
         $result = $model->fetchByQuery($sql);

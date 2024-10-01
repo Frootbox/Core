@@ -5,6 +5,8 @@
 
 namespace Frootbox\View\Viewhelper;
 
+use Frootbox\View\HtmlParser;
+
 class Partials extends AbstractViewhelper
 {
     protected $arguments = [
@@ -25,11 +27,9 @@ class Partials extends AbstractViewhelper
         $segment,
         $parameters,
         \Frootbox\View\Engines\Interfaces\Engine $view,
-        \Frootbox\Config\Config $config
+        \Frootbox\Config\Config $config,
     ): string
     {
-        $files = [];
-
         if ($segment[0] == '\\') {
 
             $partialClass = $segment . '\\Partial';
@@ -129,6 +129,13 @@ class Partials extends AbstractViewhelper
             }
         }
 
+        if (!empty($parameters['parseFinal'])) {
+
+            $parser = new \Frootbox\View\HtmlParser($html, $this->container);
+            $html = $this->container->call([ $parser, 'parse' ]);
+
+        }
+
         return $html;
     }
 
@@ -152,10 +159,13 @@ class Partials extends AbstractViewhelper
         $partial->setAttributes($attributes);
 
         if (method_exists($partial, 'onBeforeRendering')) {
-            $this->container->call([ $partial, 'onBeforeRendering']);
+            $payload = $this->container->call([ $partial, 'onBeforeRendering']);
         }
 
-        $html = $this->container->call([ $partial, 'render']);
+        // Render html
+        $html = $this->container->call([ $partial, 'render' ], [
+            'payload' => $payload ?? [],
+        ]);
 
         return $html;
     }

@@ -23,6 +23,7 @@ class Keyword extends \Frootbox\Persistence\AbstractAsset
             'virtualDirectory' => [
                 $this->getTitle()
             ],
+            'uid' => $this->getUid('alias'),
             'payload' => $this->generateAliasPayload([
                 'action' => 'showKeyword',
                 'keywordId' => $this->getId()

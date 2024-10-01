@@ -34,8 +34,6 @@ variables:
 
                 <form id="eventBookingForm" method="post" action="{{ plugin.getUriAjax('prepareBooking') }}">
 
-
-
                     <div class="row">
                         <div class="col-md-6">
 
@@ -65,6 +63,14 @@ variables:
                                         <td><b>Datum</b></td>
                                         <td>{{ event.getDateStart() | date('d.m.Y H:i') }} Uhr</td>
                                     </tr>
+
+                                    {% if event.getVenue() %}
+                                        <tr>
+                                            <td><b>Veranstaltungsort</b></td>
+                                            <td>{{ event.getVenue().getTitle() }}</td>
+                                        </tr>
+                                    {% endif %}
+
                                     </tbody>
                                 </table>
                             {% endif %}

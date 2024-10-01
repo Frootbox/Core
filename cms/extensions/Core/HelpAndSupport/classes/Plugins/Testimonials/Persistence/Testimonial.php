@@ -27,6 +27,7 @@ class Testimonial extends \Frootbox\Persistence\AbstractAsset
             'virtualDirectory' => [
                 $this->getTitle()
             ],
+            'uid' => $this->getUid('alias'),
             'payload' => $this->generateAliasPayload([
                 'action' => 'showTestimonial',
                 'testimonialId' => $this->getId()

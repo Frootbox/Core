@@ -1,0 +1,47 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ front.addTab('Alias-Verwaltung', app.getUri('index')) }}
+{{ front.addTab('Wartung', app.getUri('maintenance')) }}
+
+
+<h2>
+    Wartung
+</h2>
+
+<div class="row">
+    <div class="col-md-8">
+
+        <div class="card">
+            <div class="card-body">
+
+                ssdsd
+
+            </div>
+        </div>
+
+    </div>
+    <div class="col-md-4">
+
+        <div class="card">
+            <div class="card-body">
+
+                <h3>Sprache für alle setzen</h3>
+
+
+                <form class="ajax" method="post" action="{{ app.getUri('ajaxSetLanguage') }}">
+
+                    <div class="form-group">
+                        <label for="Language">Sprache</label>
+                        <input type="text" class="form-control" id="Language" name="Language" aria-describedby="emailHelp">
+                        {# <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small> #}
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Speichern</button>
+
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+</div>

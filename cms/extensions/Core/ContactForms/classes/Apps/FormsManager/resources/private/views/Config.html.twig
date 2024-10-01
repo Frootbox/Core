@@ -67,11 +67,25 @@
                                     <option value="">bitte wählen ...</option>
                                     <option {% if form.getConfig('feedback') == "Popup" or form.getConfig('feedback') == "" %}selected{% endif %} value="Popup">Popup</option>
                                     <option {% if form.getConfig('feedback') == "Callback" %}selected{% endif %} value="Callback">Callback</option>
+                                    <option {% if form.getConfig('feedback') == "Page" %}selected{% endif %} value="Page">Seite</option>
                                 </select>
                             </div>
+
                             <div class="feedback-option form-group" data-feedback="Callback">
                                 <label for="callback">Callback</label>
                                 <input type="text" class="form-control" name="callback" id="callback" placeholder="Callback" value="{{ form.getConfig('callback') }}">
+                            </div>
+
+                            <div class="feedback-option form-group" data-feedback="Page">
+                                <label for="feedbackPageId">Seite</label>
+                                <select class="form-control" name="feedbackPageId" id="feedbackPageId">
+                                    <option value="">bitte wählen ...</option>
+
+                                    {% for NPage in Pages %}
+                                        <option {% if form.getConfig('feedbackPageId') == NPage.getId() %}selected{% endif %} value="{{ NPage.getId() }}">{{ NPage.getTitle() }}</option>
+                                    {% endfor %}
+
+                                </select>
                             </div>
 
                             <h3>E-Mail an den Betreiber</h3>

@@ -32,6 +32,15 @@ class StaticPagesRoute extends \Frootbox\Routing\AbstractRoute
             define('MULTI_LANGUAGE', !empty($configuration->get('i18n.multiAliasMode')));
         }
 
+        $translationFactory = $container->get(\Frootbox\TranslatorFactory::class);
+        $translator = $translationFactory->get(GLOBAL_LANGUAGE);
+
+        // TODO move to re-usable twig extension later
+        $filter = new \Twig\TwigFilter('translate', function ($string) use ($translator) {
+            return $translator->translate($string);
+        });
+        $view->addFilter($filter);
+
         // Convert request to page class
         $class = explode('?', substr($this->request->getRequestTarget(), 7))[0];
 
@@ -216,10 +225,32 @@ class StaticPagesRoute extends \Frootbox\Routing\AbstractRoute
                 $html = str_replace('</head>', '<link rel="stylesheet/less" type="text/css" href="FILE:' . $stylepath . '" />' . PHP_EOL . '</head>', $html);
             }
 
-
             // Parse html
             $parser = new \Frootbox\View\HtmlParser($html, $container);
             $html = $container->call([ $parser, 'parse' ]);
+
+            // Initialize custom post routing
+            if (!empty($routes = $configuration->get('postroutes'))) {
+
+                $request = new \Frootbox\Http\ClientRequest;
+                $request->setRequestTarget('xxx');
+
+                $response = $container->get(\Frootbox\Http\Response::class);
+                $response->setBody($html);
+
+                // Setup router
+                $router = $container->make(\Frootbox\Routing\Router::class, [
+                    'routes' => $routes->getData()
+                ]);
+
+                $container->call([ $router, 'performRouting' ], [
+                    'request' => $request,
+                    'alias' => $alias ?? null,
+                    'page' => null
+                ]);
+            }
+
+            $html = $response->getBody();
 
             die($html);
         }

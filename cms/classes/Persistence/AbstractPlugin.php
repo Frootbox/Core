@@ -21,9 +21,28 @@ abstract class AbstractPlugin extends AbstractRow
     protected $page = null;
     protected $isFirst = false;
 
+    protected string $currentAction;
     protected $overrideTemplate;
     protected $isContainerPlugin = false;
     protected $icon = 'fas fa-puzzle-piece';
+
+    /**
+     * @param $configPath
+     * @return array|mixed|null
+     */
+    public function getGlobalConfig($configPath = null): mixed
+    {
+        $config = new \Frootbox\Config\Config(CORE_DIR . 'localconfig.php');
+        $extSections = $this->parseClassName();
+
+        $path = 'Ext.' . $extSections['vendor'] . '.' . $extSections['extension'] . '.' . $extSections['plugin'];
+
+        if ($configPath !== null) {
+            $path .= '.' . $configPath;
+        }
+
+        return $config->get($path);
+    }
 
     /**
      * Parse classname and extract vendor, extension and plugin names
@@ -47,6 +66,14 @@ abstract class AbstractPlugin extends AbstractRow
     }
 
     /**
+     * @return array|null
+     */
+    public function getAdditionalLanguageFiles(string $language): ?array
+    {
+        return null;
+    }
+
+    /**
      *
      */
     public function getAttribute ( $attribute, $default = null ) {
@@ -63,6 +90,15 @@ abstract class AbstractPlugin extends AbstractRow
     }
 
     /**
+     * @param string $layout
+     * @return string
+     */
+    public function getBaseActionView(string $layout): string
+    {
+        return $this->getPath() . 'Layouts/' . $layout . '/View.html.twig';
+    }
+
+    /**
      *
      */
     public function getBaseLayout($action)
@@ -72,6 +108,14 @@ abstract class AbstractPlugin extends AbstractRow
         $paths = $this->getPath() . 'Layouts' . DIRECTORY_SEPARATOR . $layout . DIRECTORY_SEPARATOR . 'View.html.twig';
 
         return $paths;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCurrentAction(): string
+    {
+        return $this->currentAction;
     }
 
     /**
@@ -217,11 +261,43 @@ abstract class AbstractPlugin extends AbstractRow
     }
 
     /**
-     * 
+     * @return string[]
      */
     public function getPublicActions(): array
     {
         return $this->publicActions ?? [ 'index' ];
+    }
+
+    /**
+     * @param string $path
+     * @return string
+     * @throws \Exception
+     */
+    public function getResourcePathFromBaseExtension(string $path): string
+    {
+        $extensionRepository = $this->db->getRepository(\Frootbox\Persistence\Repositories\Extensions::class);
+        $extensions = $extensionRepository->fetch([
+            'where' => [
+                'isactive' => 1,
+            ],
+        ]);
+
+        foreach ($extensions as $extension) {
+
+            $controller = $extension->getExtensionController();
+
+            if ($controller->getType() == 'Generic') {
+                continue;
+            }
+
+            $filePath = $controller->getPath() . 'resources/' . $path;
+
+            if (file_exists($filePath)) {
+                return $filePath;
+            }
+        }
+
+        throw new \Exception(sprintf('File not found: %s', $path));
     }
 
     /**
@@ -291,12 +367,16 @@ abstract class AbstractPlugin extends AbstractRow
     }
 
     /**
-     *
+     * @param string $action
+     * @param array|null $payloadData
+     * @param array|null $options
+     * @return string
+     * @throws \Frootbox\Exceptions\NotFound
      */
     public function getActionUri (
-        $action,
-        $payloadData = null,
-        $options = null
+        string $action,
+        array $payloadData = null,
+        array $options = null
     ): string
     {
         $payload = new \Frootbox\Payload;
@@ -645,9 +725,9 @@ abstract class AbstractPlugin extends AbstractRow
         return $html;
     }
 
-
     /**
-     *
+     * @param array $attributes
+     * @return $this
      */
     public function setAttributes ( array $attributes ) : AbstractPlugin {
 
@@ -656,6 +736,14 @@ abstract class AbstractPlugin extends AbstractRow
         return $this;
     }
 
+    /**
+     * @param string $action
+     * @return void
+     */
+    public function setCurrentAction(string $action): void
+    {
+        $this->currentAction = $action;
+    }
 
     /**
      * Mark element as first

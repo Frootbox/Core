@@ -104,11 +104,77 @@ class Block extends \Frootbox\Persistence\AbstractConfigurableRow
         return $viewFile;
     }
 
+    /**
+     * @param string $path
+     * @return string
+     * @throws \Exception
+     */
+    public function getResourcePathFromBaseExtension(string $path): string
+    {
+        $extensionRepository = $this->db->getRepository(\Frootbox\Persistence\Repositories\Extensions::class);
+        $extensions = $extensionRepository->fetch([
+            'where' => [
+                'isactive' => 1,
+            ],
+        ]);
+
+        foreach ($extensions as $extension) {
+
+            $controller = $extension->getExtensionController();
+
+            if ($controller->getType() == 'Generic') {
+                continue;
+            }
+
+            $filePath = $controller->getPath() . 'resources/' . $path;
+
+            if (file_exists($filePath)) {
+                return $filePath;
+            }
+        }
+
+        throw new \Exception(sprintf('File not found: %s', $path));
+    }
+
+    /**
+     * @param \Frootbox\Config\Config $config
+     * @return array
+     */
     public function getSettings(\Frootbox\Config\Config $config): array
     {
         $template = new \Frootbox\View\HtmlTemplate($this->viewFile, [
             'variables' => $this->getConfig('template.variables'),
         ]);
+    }
+
+    public function getThumbnailSrc(): string
+    {
+        $controller = $this->getExtensionController();
+        $path = $controller->getPath() . 'classes/Blocks/' . $this->getBlockId() . '/';
+
+        $files = [
+            $path . 'thumbnail.jpg',
+            $path . 'thumbnail.png',
+        ];
+
+        $thumbnail = null;
+
+        foreach ($files as $file) {
+            if (file_exists($file)) {
+                $thumbnail = $file;
+                break;
+            }
+        }
+
+        if ($thumbnail === null) {
+            $thumbnail = CORE_DIR . 'cms/admin/resources/public/images/no-thumbnail.png';
+        }
+
+        $key = md5($thumbnail);
+
+        $_SESSION['staticfilemap'][$key] = $thumbnail;
+
+        return SERVER_PATH . 'static/Ext/Core/System/ServeStatic/serve?t=' . $key;
     }
 
     /**
@@ -325,6 +391,10 @@ class Block extends \Frootbox\Persistence\AbstractConfigurableRow
             if (isset($margin['bottom']) and strlen($margin['bottom']) > 0) {
                 $customStyles .= 'margin-bottom: ' . $margin['bottom'] . 'px; ';
             }
+        }
+
+        if ($this->getVisibility() == 0) {
+            $customStyles .= ' display: none; ';
         }
 
         if (!empty($customStyles)) {

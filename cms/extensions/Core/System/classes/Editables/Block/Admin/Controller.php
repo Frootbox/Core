@@ -42,6 +42,7 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
         \Frootbox\Persistence\Content\Repositories\Blocks $blocksRepository,
         \Frootbox\Persistence\Repositories\Extensions $extensionsRepository,
         \Frootbox\View\Engines\Interfaces\Engine $view,
+        \Frootbox\Db\Db $db,
     ): Response
     {
         // Validate required input
@@ -50,17 +51,17 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
         // Fetch page
         $page = $pageRepository->fetchById($get->get('pageId'));
 
+        // Make space for new block
+        $siblings = $blocksRepository->fetch([
+            'where' => [
+                'uid' => $get->get('uid'),
+            ],
+            'order' => [ 'orderId DESC', 'id ASC' ],
+        ]);
+
+        $orderId = $siblings->getCount() * 10 + 10;
+
         if (!empty($get->get('predecessor'))) {
-
-            // Make space for new block
-            $siblings = $blocksRepository->fetch([
-                'where' => [
-                    'uid' => $get->get('uid'),
-                ],
-                'order' => [ 'orderId DESC', 'id ASC' ],
-            ]);
-
-            $orderId = $siblings->getCount() * 10 + 10;
 
             foreach ($siblings as $sibling) {
 
@@ -68,23 +69,19 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
                 $sibling->save();
 
                 if ($get->get('predecessor') == $sibling->getId()) {
-
                     $newOrderId = $orderId;
                 }
 
                 $orderId -= 10;
             }
 
-            $newOrderId--;
+            $orderId = $newOrderId--;
         }
-        else {
-            $newOrderId = 0;
-        }
-
 
         if ($post->get('block') != 'fromClipboard') {
 
             $data = explode('-', $post->get('block'));
+
 
             // Compose new block
             $block = new \Frootbox\Persistence\Content\Blocks\Block([
@@ -93,7 +90,7 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
                 'vendorId' => $data[0],
                 'extensionId' => $data[1],
                 'blockId' => $data[2],
-                'orderId' => $newOrderId,
+                'orderId' => $orderId,
             ]);
 
             $extensionController = $block->getExtensionController();
@@ -157,7 +154,7 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
             $newBlock->setOrderId(null);
             $newBlock->setUid($get->get('uid'));
             $newBlock->setPageId($page->getId());
-            $newBlock->setOrderId($newOrderId);
+            $newBlock->setOrderId($orderId);
 
             // Check if custom class needs to be updated
             if (empty($block->getClassName())) {
@@ -207,8 +204,6 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
             }
         }
 
-
-
         $blockHtml = '<div data-blocks data-uid="' . $block->getUidRaw() . '"></div>';
 
         define('EDITING', true);
@@ -231,6 +226,7 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
                 $scss .= PHP_EOL . file_get_contents($scssFile);
             }
         }
+
 
         $blockHtml = '<style type="text/less">' . $scss . PHP_EOL . '</style>' . PHP_EOL . $blockHtml;
 
@@ -341,6 +337,7 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
             'blockId' => $block->getId(),
             'uid' => $block->getUidRaw(),
             'visibility' => $block->getVisibilityString(),
+            'visibilityIcon' => $block->getVisibilityIcon(),
         ]);
     }
 
@@ -402,12 +399,19 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
 
             $extList = [
                 'extension' => $extension->getVendorId() . '/' . $extension->getExtensionId(),
-                'blocks' => [],
+                'blockCount' => 0,
+                'blocks' => [
+                    'Default' => [
+
+                    ],
+                ],
             ];
 
             foreach ($dir as $file) {
 
-                if ($file[0] == '_') {
+                $fileName = $file->getName();
+
+                if ($fileName[0] == '_') {
                     continue;
                 }
 
@@ -426,6 +430,20 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
                     }
                 }
 
+                $restrictions = $blockTemplate->getConfig('restricted');
+
+                if (!empty($restrictions)) {
+
+                    if (empty($restricted)) {
+                        continue;
+                    }
+
+                    if (empty($restrictions) or !in_array($restricted, $restrictions)) {
+                        continue;
+                    }
+                }
+
+                /*
                 if (!empty($ignore)) {
 
                     $restrictions = $blockTemplate->getConfig('restricted');
@@ -441,8 +459,9 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
                         }
                     }
                 }
+                */
 
-                $source = file_get_contents($dir->getPath() . $file . '/Block.html.twig');
+                $source = file_get_contents($dir->getPath() . $file . '/Block.html.twig') . "\n";
 
                 if (preg_match('#override:#', $source)) {
                     continue;
@@ -450,7 +469,7 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
 
                 $section = 'Default';
 
-                if (preg_match('#section: (.*?)\s#', $source, $match)) {
+                if (preg_match('#section: (.*?)\n#', $source, $match)) {
                     $section =  $match[1];
                 }
 
@@ -462,6 +481,7 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
                 ];
 
                 $extList['blocks'][$section][$blockTemplate->getTitle() . $blockTemplate->getSubTitle() . ++$loop] = $blockData;
+                ++$extList['blockCount'];
 
                 if ($thumbnailOverridePath) {
                     $blockTemplate->captureThumbnail($thumbnailOverridePath . $extension->getVendorId() . '/' . $extension->getExtensionId() . '/' . $file . '/');
@@ -472,7 +492,7 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
                 }
             }
 
-            if (!empty($extList['blocks'])) {
+            if (!empty($extList['blockCount'])) {
 
                 foreach ($extList['blocks'] as $section => $blocks) {
                     ksort($blocks);
@@ -503,6 +523,7 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
                 }
             }
         }
+
 
         krsort($list);
 
@@ -742,11 +763,11 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
      */
     public function ajaxModalList(
         \Frootbox\Http\Get $get,
-        \Frootbox\Persistence\Content\Repositories\Blocks $blocksRepository
+        \Frootbox\Persistence\Content\Repositories\Blocks $blockRepository,
     ): Response
     {
         // Fetch blocks
-        $result = $blocksRepository->fetch([
+        $result = $blockRepository->fetch([
             'where' => [
                 'uid' => $get->get('uid')
             ],

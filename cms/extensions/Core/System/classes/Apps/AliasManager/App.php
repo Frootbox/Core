@@ -175,7 +175,12 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
     }
 
     /**
-     *
+     * @param \Frootbox\Http\Get $get
+     * @param \Frootbox\Http\Post $post
+     * @param \Frootbox\Persistence\Repositories\Aliases $aliasesRepository
+     * @return Response
+     * @throws \Frootbox\Exceptions\NotFound
+     * @throws \Frootbox\Exceptions\RuntimeError
      */
     public function ajaxUpdateAction(
         \Frootbox\Http\Get $get,
@@ -199,6 +204,7 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
         // Update alias
         $alias->setAlias($newAlias);
         $alias->setStatus(301);
+
         $alias->addConfig([
             'target' => $target,
         ]);
@@ -211,7 +217,12 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
     }
 
     /**
-     *
+     * @param \Frootbox\Http\Get $get
+     * @param \Frootbox\Http\Post $post
+     * @param \Frootbox\Persistence\Repositories\Aliases $aliasesRepository
+     * @return Response
+     * @throws \Frootbox\Exceptions\NotFound
+     * @throws \Frootbox\Exceptions\RuntimeError
      */
     public function ajaxUpdateSeoAction(
         \Frootbox\Http\Get $get,
@@ -230,6 +241,7 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
             ],
         ]);
 
+        $alias->setLanguage($post->get('Language'));
         $alias->save();
 
         return self::getResponse('json', 200, [
@@ -279,6 +291,24 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
         $result->map('delete');
 
         return self::getResponse('json');
+    }
+
+    public function ajaxSetLanguageAction(
+        \Frootbox\Http\Post $post,
+        \Frootbox\Persistence\Repositories\Aliases $aliasesRepository
+    ): Response
+    {
+        // Fetch aliases
+        $aliases = $aliasesRepository->fetch();
+
+        foreach ($aliases as $alias) {
+            $alias->setLanguage($post->get('Language'));
+            $alias->save();
+        }
+
+        return self::getResponse('json', 200, [
+            'success' => 'Die Daten wurden gespeichert',
+        ]);
     }
 
     /**
@@ -427,6 +457,18 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
 
         return self::getResponse('html', 200, [
             'aliases' => $result
+        ]);
+    }
+
+    /**
+     *
+     */
+    public function maintenanceAction(
+
+    ): Response
+    {
+        return self::getResponse('html', 200, [
+
         ]);
     }
 

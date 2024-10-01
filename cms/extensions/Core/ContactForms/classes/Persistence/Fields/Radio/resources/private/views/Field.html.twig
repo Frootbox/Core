@@ -1,0 +1,8 @@
+{{ field }}
+<div class="form-group form-check">
+    <input {% if field.isRequired() %}required{% endif %} type="checkbox" class="form-check-input" name="fields[{{ field.getId() }}]" id="field-{{ field.getId() }}">
+    <label class="form-check-label" for="field-{{ field.getId() }}">
+        <span {% if renderer.options.editable %}data-editable-element data-uid="{{ field.getUid('title') }}"{% endif %}>{{ field.getConfig('checkboxText') | default(field.getTitle()) }}</span><!--
+        -->{% if field.getMandatory() %}<span class="mandatory">*</span>{% endif %}
+    </label>
+</div>

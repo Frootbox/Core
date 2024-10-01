@@ -17,6 +17,34 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         return __DIR__ . DIRECTORY_SEPARATOR;
     }
 
+    public function ajaxCreateAction(
+        \Frootbox\Http\Post $post,
+        \Frootbox\Ext\Core\Events\Plugins\Booking\Persistence\Repositories\Bookings $bookingRepository,
+    ): Response
+    {
+        $booking = new \Frootbox\Ext\Core\Events\Plugins\Booking\Persistence\Booking([
+
+        ]);
+
+        p($booking);
+        p($post);
+        exit;
+    }
+
+    public function ajaxModalComposeAction(
+        \Frootbox\Ext\Core\Events\Persistence\Repositories\Events $eventRepository,
+    ): Response
+    {
+        d($eventRepository->fetch([
+            'where' => [
+                'pluginId' => $this->plugin->getId(),
+            ]
+        ]));
+        return new \Frootbox\Admin\Controller\Response('plain', 200, [
+
+        ]);
+    }
+
     /**
      *
      */
@@ -34,7 +62,9 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
             e.pluginId = ' . $this->plugin->getId() . ' AND 
             a.parentId = e.id AND
             a.className = :bookingName AND
-            e.className = :eventClass';
+            e.className = :eventClass
+        ORDER BY
+            a.date DESC';
 
         // Fetch booking plugins
         $result = $bookingRepository->fetchByQuery($sql, [

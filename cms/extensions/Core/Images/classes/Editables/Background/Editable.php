@@ -147,10 +147,15 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
                     @media (min-width: 768px) {
                         .' . $customClass . ' {
                             background-image: url(' . $src . ') !important;
+                            background-repeat: no-repeat;
+                            background-size: cover;
+                            background-position: center;
                         }
                     }
                 </style>';
             }
+
+
         });
 
 

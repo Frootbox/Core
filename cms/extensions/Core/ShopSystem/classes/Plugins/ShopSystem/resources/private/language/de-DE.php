@@ -21,11 +21,16 @@ return [
     'Request.Message' => 'Nachricht',
     'Request.Send' => 'Anfrage senden',
 
+    'UnitPer' => 'pro',
     'UnitEach' => 'Stück',
     'UnitLiter' => 'Liter',
-    'UnitSquareMeters' => 'Quadratmeter',
+    'UnitKilogram' => 'Kilogramm',
 
     'UnitShortSquareMeters' => 'qm',
+
+    'UnitSquareMeters' => 'Quadratmeter',
+    'UnitShortEach' => 'Stk.',
+    'UnitShortKilogram' => 'kg',
 
     'ItemNumber' => 'Artikelnummer',
 ];

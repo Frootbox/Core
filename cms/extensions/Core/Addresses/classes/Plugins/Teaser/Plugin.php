@@ -49,7 +49,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         // Generate sql
         $sql = 'SELECT 
             l.*,
-            ANY_VALUE(t.text)
+            MAX(t.text)
         FROM
             locations l,
             content_texts t

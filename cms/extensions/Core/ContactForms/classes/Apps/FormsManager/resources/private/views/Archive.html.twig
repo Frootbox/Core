@@ -25,6 +25,16 @@
 
                 <h2>
                     Anfragen
+
+                    <span class="headoptions">
+                        <span class="dropdown">
+                            <i class="far fa-bars dropdown-toggle" data-toggle="dropdown"></i>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <a class="dropdown-item" href="{{ app.getUri('ajaxExport', { formId: form.getId() }) }}">Daten exportieren</a>
+                            </div>
+                        </span>
+                    </span>
+
                 </h2>
 
                 <table class="table">

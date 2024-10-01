@@ -16,7 +16,9 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     }
 
     /**
-     *
+     * @param \Frootbox\Http\Get $get
+     * @param \Frootbox\Ext\Core\Gastronomy\Plugins\PriceList\Persistence\Repositories\ListEntries $listEntriesRepository
+     * @return \Frootbox\Admin\Controller\Response
      */
     public function ajaxListEntryDeleteAction(
         \Frootbox\Http\Get $get,
@@ -26,7 +28,27 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         // Fetch list entry
         $listEntry = $listEntriesRepository->fetchById($get->get('listEntryId'));
 
+        // Delete list entry
         $listEntry->delete();
+
+        return self::getResponse('json', 200, [
+            'fadeOut' => 'tr[data-listentry="' . $listEntry->getId() . '"]'
+        ]);
+    }
+
+    public function ajaxListEntryDisconnectAction(
+        \Frootbox\Http\Get $get,
+        \Frootbox\Ext\Core\Gastronomy\Plugins\PriceList\Persistence\Repositories\Categories $categoriesRepository,
+        \Frootbox\Ext\Core\Gastronomy\Plugins\PriceList\Persistence\Repositories\ListEntries $listEntriesRepository
+    ): \Frootbox\Admin\Controller\Response
+    {
+        // Fetch list entry
+        $listEntry = $listEntriesRepository->fetchById($get->get('listEntryId'));
+
+        // Fetch category
+        $category = $categoriesRepository->fetchById($get->get('categoryId'));
+
+        $category->disconnectItem($listEntry);
 
         return self::getResponse('json', 200, [
             'fadeOut' => 'tr[data-listentry="' . $listEntry->getId() . '"]'
