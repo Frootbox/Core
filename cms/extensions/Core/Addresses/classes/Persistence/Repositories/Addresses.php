@@ -10,6 +10,8 @@ namespace Frootbox\Ext\Core\Addresses\Persistence\Repositories;
  */
 class Addresses extends \Frootbox\Persistence\Repositories\AbstractRepository
 {
+    use \Frootbox\Persistence\Repositories\Traits\Tags;
+
     protected $table = 'locations';
     protected $class = \Frootbox\Ext\Core\Addresses\Persistence\Address::class;
 
