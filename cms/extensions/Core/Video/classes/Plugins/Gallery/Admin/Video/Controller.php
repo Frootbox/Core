@@ -151,6 +151,7 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         $video->setDate($post->get('dateStart') . ' ' . $post->get('timeStart'));
         $video->addConfig([
             'url' => $post->get('url'),
+            'urlExternal' => $post->get('urlExternal'),
         ]);
 
         $video->save();

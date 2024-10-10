@@ -12,7 +12,7 @@ class Video extends \Frootbox\Persistence\AbstractAsset
     protected $model = Repositories\Videos::class;
 
     /**
-     *
+     * @return string
      */
     public function getEmbedUri(): string
     {
@@ -20,7 +20,7 @@ class Video extends \Frootbox\Persistence\AbstractAsset
     }
 
     /**
-     *
+     * @return string|null
      */
     public function getVideoId(): ?string
     {
@@ -49,6 +49,10 @@ class Video extends \Frootbox\Persistence\AbstractAsset
      */
     protected function getNewAlias(): ?\Frootbox\Persistence\Alias
     {
+        if (!empty($this->getConfig('urlExternal'))) {
+            return null;
+        }
+
         return new \Frootbox\Persistence\Alias([
             'pageId' => $this->getPageId(),
             'virtualDirectory' => [
@@ -63,10 +67,23 @@ class Video extends \Frootbox\Persistence\AbstractAsset
     }
 
     /**
-     *
+     * @return string
      */
     public function getThumbnail(): string
     {
         return 'https://img.youtube.com/vi/' . $this->getVideoId() . '/hqdefault.jpg';
+    }
+
+    /**
+     * @param array|null $options
+     * @return string|null
+     */
+    public function getUri(?array $options = null): ?string
+    {
+        if (!empty($this->getConfig('urlExternal'))) {
+            return $this->getConfig('urlExternal');
+        }
+
+        return parent::getUri();
     }
 }

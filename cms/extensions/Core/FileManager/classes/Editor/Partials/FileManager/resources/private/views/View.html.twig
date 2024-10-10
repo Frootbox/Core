@@ -96,4 +96,10 @@
         </tbody>
     </table>
 
+    {% if files | length %}
+        <div class="modal-body">
+            <a href="{{ serverpath }}static/Ext/Core/FileManager/Editor/serveZipByUid?uid={{ uid }}"><i class="far fa-download"></i> Alle herunterladen</a>
+        </div>
+    {% endif %}
+
 </div>

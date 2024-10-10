@@ -77,6 +77,40 @@ class Page
     }
 
     /**
+     * @param \Frootbox\Http\Get $get
+     * @param \Frootbox\Persistence\Repositories\Files $fileRepository
+     * @return never
+     */
+    public function serveZipByUid(
+        \Frootbox\Http\Get $get,
+        \Frootbox\Persistence\Repositories\Files $fileRepository,
+    ): never
+    {
+        $files = $fileRepository->fetch([
+            'where' => [
+                'uid' => $get->get('uid'),
+            ],
+        ]);
+
+        $tempFile = tempnam(sys_get_temp_dir(), 'FbxZip');
+
+        $zip = new \ZipArchive();
+        $zip->open($tempFile, \ZipArchive::OVERWRITE);
+
+        foreach ($files as $file) {
+            $zip->addFile(FILES_DIR . $file->getPath(), $file->getName());
+        }
+
+        $zip->close();
+
+        header('Content-Type: application/zip');
+        header('Content-Length: ' . filesize($tempFile));
+        header('Content-Disposition: attachment; filename="Dateien.zip"');
+        readfile($tempFile);
+        exit;
+    }
+
+    /**
      * Sort file from filemanager modal
      */
     public function sort (

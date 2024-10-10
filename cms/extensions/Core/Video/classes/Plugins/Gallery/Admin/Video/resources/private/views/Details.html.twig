@@ -36,6 +36,11 @@
                 object: article
             }) | raw }}
 
+            <div class="form-group">
+                <label for="urlExternal">externer Link</label>
+                <input type="text" class="form-control" id="urlExternal" name="urlExternal" placeholder="URL" value="{{ video.getConfig('urlExternal') }}">
+            </div>
+
             <button type="submit" class="btn btn-primary">Speichern</button>
 
         </form>
