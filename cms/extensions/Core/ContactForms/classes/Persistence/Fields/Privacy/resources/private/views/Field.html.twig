@@ -4,7 +4,7 @@
 {%  set privacyUrl = i.getPrivacyPolicyLink() %}
 
 <div class="form-group form-check small-text">
-    <input type="checkbox" required class="form-check-input" id="field-{{ field.getId() }}" name="fields[{{ field.getId() }}]" aria-describedby="field-help-{{ field.getId() }}">
+    <input type="checkbox" required class="privacy-consent form-check-input" id="field-{{ field.getId() }}" name="fields[{{ field.getId() }}]" aria-describedby="field-help-{{ field.getId() }}">
     <label class="form-check-label" for="field-{{ field.getId() }}">
 
         {% if field.getConfig('privacyText') %}

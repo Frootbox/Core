@@ -62,7 +62,8 @@
         "tijsverkoyen/css-to-inline-styles": "*",
         "frogbob/inky-php": "^0.0.2",
         "spipu/html2pdf": "^5.2",
-        "stripe/stripe-php": "^13.9"
+        "stripe/stripe-php": "^13.9",
+        "ext-curl": "*"
     },
 	"config": {
         "vendor-dir": "lib",
