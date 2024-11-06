@@ -49,10 +49,10 @@
         <div class="modal-body">
 
             <div class="row">
-                <div class="col-3">
+                <div class="col-2">
                     <img style="box-shadow: 0 0 10px rgba(0, 0, 0, .2); width: 100%; height: auto;" src="{{ copied.getThumbnailSrc() }}" alt="" />
                 </div>
-                <div class="col-9">
+                <div class="col-7">
 
                     <p>Einfügen aus der Zwischenablage:</p>
 
@@ -66,6 +66,9 @@
                         Block nach Einfügen in der Zwischenablage behalten
                     </label>
                 </div>
+                <div class="col-3">
+                    <button type="submit" class="btn btn-primary btn-block">Hinzufügen</button>
+                </div>
             </div>
 
             <hr />
@@ -73,11 +76,153 @@
         </div>
     {% endif %}
 
+    <style>
+        .btn-primary[data-category] {
+            color: #FFF !important;
+        }
+
+        div[data-block] {
+            .content-wrapper {
+                margin-top: -15px;
+                margin-bottom: 30px;
+                padding: 15px;
+
+                background: #f0f0f0;
+                border-radius: 4px;
+            }
+
+            .marker {
+                text-align: center;
+
+                span {
+                    display: inline-block;
+                    margin-bottom: -2px;
+                    width: 15px;
+                    height: 15px;
+                    transform: rotate(45deg);
+                    background: #f0f0f0;
+                }
+            }
+        }
+    </style>
+
+    <script>
+        $(function() {
+
+            $(document).on('click', '.btn[data-category]', function(event) {
+
+                event.stopImmediatePropagation();
+                event.preventDefault();
+
+                let category = $(this).data('category');
+
+                $('.btn[data-category]').removeClass('btn-primary');
+                $(this).addClass('btn-primary');
+
+                $('.category-wrapper').addClass('d-none');
+                $('.category-wrapper[data-category="' + category + '"]').removeClass('d-none');
+
+
+            });
+
+            $(document).on('change', 'input[name="block"]', function(event) {
+
+                event.stopImmediatePropagation();
+
+                $('div[data-block]').addClass('d-none');
+
+                if ($(this).is(':checked')) {
+
+                    let container = $('div[data-block="' + $(this).val() + '"]');
+
+                    container.removeClass('d-none');
+
+                    let loop = 0;
+
+                    container.parents('.row').find('input').each(function() {
+
+                        ++loop;
+
+                        if ($(this).val() == container.data('block')) {
+                            return false;
+                        }
+                    });
+
+
+                    let index = (Math.ceil(loop / 6) * 6) - 1;
+
+                    let position = loop % 6;
+
+                    if (position === 0) {
+                        position = 6;
+                    }
+
+                    container.find('.marker').addClass('offset-md-' + ((position - 1) * 2));
+
+
+                    if (container.parents('.row').find('[data-block]').length < (index - 1)) {
+                        index = container.parents('.row').find('[data-block]').length - 1;
+                    }
+
+                    $(container.parents('.row').find('[data-block]')[index]).after(container);
+                }
+            });
+        });
+    </script>
+
     <div class="modal-body">
 
         {% if blocksList | length == 0 %}
             <div class="message">Es sind keine Blöcke vorhanden.</div>
         {% else %}
+
+            <div class="btn-group" role="group" aria-label="Basic example">
+                {% for category in categories %}
+                    <button style="padding: 6px 15px;" type="button" class="btn btn-outline-primary" data-category="{{ category.category }}">{{ category.category }}</button>
+                {% endfor %}
+            </div>
+
+            {% for category in categories %}
+                <div class="category-wrapper" data-category="{{ category.category }}">
+
+                    <h3>{{ category.category }}</h3>
+
+                    <div class="row">
+                        {% for block in category.blocks %}
+                            <div class="col-2">
+                                <label style="font-size: 11px;">
+                                    <img style="box-shadow: 0 0 10px rgba(0, 0, 0, .2); width: 100%; height: auto;" src="{{ block.template.getThumbnailSrc() }}" alt="" />
+
+                                    <input style="float: left; margin-top: 9px;" name="block" value="{{ block.vendorId }}-{{ block.extensionId }}-{{ block.blockId }}" type="radio" />
+                                    <span style="display: block; float: left; margin: 5px 0 10px 8px; font-size: 16px; line-height: 20px;">
+                                        <b>{{ block.template.getTitle() }}</b>
+                                        <br />{{ block.template.getSubtitle() }}
+                                    </span>
+                                </label>
+                            </div>
+
+                            <div class="col-md-12 d-none" data-block="{{ block.vendorId }}-{{ block.extensionId }}-{{ block.blockId }}">
+                                <div class="row">
+                                    <div class="marker col-md-2"><span></span></div>
+                                </div>
+                                <div class="content-wrapper">
+                                    <div class="row">
+                                        <div class="col-md-8">
+
+                                        </div>
+                                        <div class="col-md-4">
+                                            <button type="submit" class="btn btn-primary btn-block">Block hinzufügen</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+
+
+            {#
 
             <div class="row">
                 <div class="col-md-10">
@@ -126,6 +271,7 @@
                     </div>
                 </div>
             </div>
+            #}
 
         {% endif %}
 

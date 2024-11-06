@@ -70,8 +70,7 @@
 									</tbody>
 								</table>
 							{% else %}
-								<a class="ajax visibility-{{ contentElement.getVisibility() }}" href="{{ contentElement.getAdminUri('Index', 'index', { pageId: data.pageId }) }}">
-
+								<a {% if contentElement.getConfig('isInActive') %}style="text-decoration: line-through;"{% endif %} class="ajax visibility-{{ contentElement.getVisibility() }}" href="{{ contentElement.getAdminUri('Index', 'index', { pageId: data.pageId }) }}">
 
 									{% if page.getId() != contentElement.getPageId() %}
 										<i data-toggle="tooltip" label="kmllö" class="fa fa-arrow-alt-down"></i>

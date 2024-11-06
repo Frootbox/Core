@@ -108,6 +108,9 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
             $listEntry->setDateEnd($post->get('dateEnd'));
         }
 
+        // Set tags
+        $listEntry->setTags($post->get('tags'));
+
         // Persist changes
         $listEntry->save();
 

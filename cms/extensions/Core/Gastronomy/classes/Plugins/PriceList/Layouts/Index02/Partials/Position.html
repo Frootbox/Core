@@ -1,0 +1,68 @@
+{% set positionInterface = view.getViewhelper('Delegator', { object: data.position }) %}
+
+{% if positionInterface.getPrices() | length == 1 %}
+
+    {% for price in positionInterface.getPrices() %}
+        <div class="position">
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="title">{{ data.position.getTitle()}}</div>
+
+                    <div class="description" data-editable data-nowidgets data-uid="{{ data.position.getUid('text') }}"></div>
+
+                    {% if price.getTitle() and price.getConfig('addition') %}
+                        <b>{{ price.getTitle() }}</b><br />
+                        {{ price.getConfig('addition') }}
+                    {% else %}
+                        <div class="description">{{ price.getTitle() }}</div>
+                    {% endif %}
+                </div>
+                <div class="col-md-4">
+                    <div class="price">
+                        {% if price.getConfig('priceFrom') %}ab {% endif %}
+                        {{ price.getConfig('price') | number_format(2, ',', '.') }} EUR
+                        {% if price.getConfig('unit') == 'Person' %} pro Person{% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+{% else %}
+
+    <div class="position">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="title">{{ data.position.getTitle()}}</div>
+
+                <div class="description" data-editable data-nowidgets data-uid="{{ data.position.getUid('text') }}"></div>
+
+            </div>
+        </div>
+
+        {% for price in positionInterface.getPrices() %}
+            <div class="subposition">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="description">
+                            {% if price.getTitle() and price.getConfig('addition') %}
+                                {{ price.getTitle() }}<br />
+                                {{ price.getConfig('addition') }}
+                            {% else %}
+                                {{ price.getTitle() }}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="price">
+                        {% if price.getConfig('priceFrom') %}ab {% endif %}
+                        {{ price.getConfig('price') | number_format(2, ',', '.') }} EUR
+                        {% if price.getConfig('unit') == 'Person' %} pro Person{% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+{% endif %}

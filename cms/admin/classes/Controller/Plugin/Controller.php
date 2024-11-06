@@ -47,8 +47,15 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
         \Frootbox\Config\Config $config
     ): Response
     {
-        // Fetch plugin
+        /**
+         * Fetch plugin
+         * @var \Frootbox\Persistence\ContentElement $plugin
+         */
         $plugin = $contentElements->fetchById($get->get('pluginId'));
+
+        if (!empty($plugin->getConfig('isInActive'))) {
+            throw new \Exception('Das Plugin wurde deaktiviert.');
+        }
 
         $plugin->importConfig($config);
 
@@ -121,8 +128,15 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
         \Frootbox\Config\Config $config,
     ): Response
     {
-        // Fetch plugin
+        /**
+         * Fetch plugin
+         * @var \Frootbox\Persistence\ContentElement $plugin
+         */
         $plugin = $contentElements->fetchById($get->get('pluginId'));
+
+        if (!empty($plugin->getConfig('isInActive'))) {
+            throw new \Exception('Das Plugin wurde deaktiviert.');
+        }
 
         // Obtain available sockets
         $sockets = $plugin->getPage()->getSockets($config);
@@ -252,6 +266,10 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
     ) {
         // Fetch plugin
         $plugin = $contentElements->fetchById($get->get('pluginId'));
+
+        if (!empty($plugin->getConfig('isInActive'))) {
+            throw new \Exception('Das Plugin wurde deaktiviert.');
+        }
 
         // Call plugins cleanup method
         if (method_exists($plugin, 'onBeforeDelete')) {
@@ -492,6 +510,7 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
 
         $plugin->addConfig([
             'skipLanguages' => $post->get('skipLanguages'),
+            'isInActive' => !empty($post->get('IsInActive')),
         ]);
 
         $plugin->save();
@@ -506,8 +525,6 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
             }
         }
 
-        d("FERTIG");
-        
         return self::getResponse('json', 200);
     }
 

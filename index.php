@@ -979,7 +979,7 @@ try {
 
         $scriptSrc = !empty($configuration->get('contentSecurityPolicy.domains')) ? implode(' ', $configuration->get('contentSecurityPolicy.domains')->getData()) : '';
 
-       // header("Content-Security-Policy: script-src * 'self' 'unsafe-inline' 'unsafe-eval' " . $scriptSrc . " www.google.com cookieconsent.herrundfraupixel.de 'nonce-" . SCRIPT_NONCE . "'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'");
+        // header("Content-Security-Policy: script-src * 'self' 'unsafe-inline' 'unsafe-eval' " . $scriptSrc . " www.google.com cookieconsent.herrundfraupixel.de 'nonce-" . SCRIPT_NONCE . "'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'");
         // header("Content-Security-Policy: script-src * 'self' 'unsafe-inline' 'unsafe-eval' " . $scriptSrc . " www.google.com cookieconsent.herrundfraupixel.de 'nonce-" . SCRIPT_NONCE . "'; base-uri 'self'; form-action 'self'; object-src 'none'");
         header('Strict-Transport-Security: max-age=31536000');
         header('X-Content-Type-Options: nosniff');

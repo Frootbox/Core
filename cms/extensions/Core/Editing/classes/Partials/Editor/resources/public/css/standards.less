@@ -130,14 +130,21 @@ body {
   color: green;
 }
 
-.editmode {
+.editmode, .editing {
 
-    &.editors-note {
-      margin: 30px 0;
+    &.editors-note, .editors-note {
+      max-width: 1110px;
+
+      margin: 30px auto;
       padding: 15px;
 
       border: 4px dashed #f2d7d4;
       color: #f2d7d4;
       text-align: center;
+
+      a {
+        color: #f2d7d4;
+        text-decoration: underline;
+      }
     }
 }

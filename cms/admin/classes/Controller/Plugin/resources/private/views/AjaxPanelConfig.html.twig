@@ -77,6 +77,14 @@
                                         key: 'id'
                                     }) | raw }}
 
+
+                                    {% if user.getType() == "SuperAdmin" %}
+                                        <div class="form-group form-check">
+                                            <input type="checkbox" class="form-check-input" id="IsInActive" name="IsInActive" {% if plugin.getConfig('isInActive') %}checked{% endif %}>
+                                            <label class="form-check-label" for="IsInActive">Plugin deaktiviert</label>
+                                        </div>
+                                    {% endif %}
+
                                     <button type="submit" class="btn btn-primary">Speichern</button>
 
 

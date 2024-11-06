@@ -49,6 +49,9 @@
                 </div>
             </div>
 
+            {{ v.injectPartial('\\Frootbox\\Admin\\View\\Partials\\Input\\Tags', {
+                object: listEntry
+            }) | raw }}
 
             <button type="submit" class="btn btn-primary">Speichern</button>
 

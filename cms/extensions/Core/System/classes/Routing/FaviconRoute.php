@@ -56,5 +56,7 @@ class FaviconRoute extends \Frootbox\Routing\AbstractRoute
                 exit;
             }
         }
+
+        d($filename);
     }
 }

@@ -83,6 +83,7 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
     public function ajaxBranchDuplicate(
         \Frootbox\Db\Db $db,
         \Frootbox\Http\Get $get,
+        \Frootbox\Http\Post $post,
         \Frootbox\CloningMachine $cloningMachine,
         \Frootbox\Persistence\Repositories\Categories $categories,
         \Frootbox\Persistence\Repositories\ContentElements $contentElements,
@@ -100,6 +101,8 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
         function copyNodeToParent($parent, $node, $cloningMachine) {
 
             $newNode = clone $node;
+            $newNode->setAlias(null);
+
             $newNode = $parent->appendChild($newNode);
 
             // Clone contents
@@ -113,6 +116,8 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
                 copyNodeToParent($newNode, $child, $cloningMachine);
             }
         }
+
+        $category->setTitle($post->get('title'));
 
         copyNodeToParent($parent, $category, $cloningMachine);
 
@@ -242,13 +247,26 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
         ]);
     }
 
+    public function ajaxModalBranchDuplicate(
+        \Frootbox\Http\Get $get,
+        \Frootbox\Persistence\Repositories\Categories $categories,
+    ): Response
+    {
+        // Fetch category
+        $category = $categories->fetchById($get->get('categoryId'));
+
+        return self::getResponse(body: [
+            'category' => $category,
+        ]);
+    }
+
     /**
      *
      */
     public function ajaxModalCompose (
         \Frootbox\Http\Get $get,
-        \Frootbox\Persistence\Repositories\Categories $categories
-    ) : Response
+        \Frootbox\Persistence\Repositories\Categories $categories,
+    ): Response
     {
         // Fetch category
         $category = $categories->fetchById($get->get('categoryId'));

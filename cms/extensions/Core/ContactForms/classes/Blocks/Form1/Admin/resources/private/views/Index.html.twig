@@ -1,0 +1,47 @@
+<script>
+    $(function ( ) {
+
+        /**
+         *
+         */
+        $('#updateForm').submit(function ( event ) {
+
+            event.preventDefault();
+
+            $.ajax({
+                url: $(this).attr('action'),
+                method: $(this).attr('method'),
+                data: $(this).serialize(),
+                success: function ( response ) {
+                    $('[data-editable-block][data-block="' + response.blockId + '"]').html(response.html);
+                }
+            });
+        });
+    });
+</script>
+
+<div class="modal-header">
+    <h5 class="modal-title">Formular-Teaser bearbeiten</h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body">
+
+    <form id="updateForm" method="post" action="{{ controller.getActionUri('ajaxModalEdit', { blockId: block.getId(), blockAction: 'ajaxUpdate' }) }}">
+
+        <div class="form-group">
+            <label for="formId">Formular</label>
+            <select class="form-control" id="formId" name="formId">
+                <option value="">bitte wählen ...</option>
+                {% for form in forms %}
+                    <option {% if block.getConfig('formId') == form.getId() %}selected{% endif %} value="{{ form.getId() }}">{{ form.getTitle() }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Speichern</button>
+
+    </form>
+
+</div>

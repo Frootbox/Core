@@ -360,6 +360,14 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
         $loop = 0;
         $extLoop = 0;
 
+        $categories = [
+            'Template' => [
+                'category' => 'Template',
+                'title' => 'Template',
+                'blocks' => [],
+            ],
+        ];
+
         // Fetch extensions
         $result = $extensionsRepository->fetch([
             'where' => [
@@ -421,6 +429,33 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
 
                 $blockTemplate = new \Frootbox\View\Blocks\BlockTemplate($dir->getPath() . $file);
 
+                $category = $blockTemplate->getConfig('category') ?? 'Unknown';
+
+                if (!empty($blockTemplate->getConfig('extension'))) {
+
+                    list($vendorId, $extensionId) = explode('/', $blockTemplate->getConfig('extension'));
+
+                    $check = $extensionsRepository->fetchOne([
+                        'where' => [
+                            'vendorId' => $vendorId,
+                            'extensionId' => $extensionId,
+                        ],
+                    ]);
+
+                    if (empty($check)) {
+                        continue;
+                    }
+                }
+
+                if (!isset($categories[$category])) {
+                    $categories[$category] = [
+                        'category' => $category,
+                        'title' => $category,
+                        'blocks' => [],
+                    ];
+                }
+
+
                 if (!empty($restricted)) {
 
                     $restrictions = $blockTemplate->getConfig('restricted');
@@ -480,6 +515,7 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
                     'template' => $blockTemplate,
                 ];
 
+                $categories[$category]['blocks'][$blockTemplate->getTitle() . $blockTemplate->getSubTitle() . ++$loop] = $blockData;
                 $extList['blocks'][$section][$blockTemplate->getTitle() . $blockTemplate->getSubTitle() . ++$loop] = $blockData;
                 ++$extList['blockCount'];
 
@@ -553,6 +589,7 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
             'uid' => $get->get('uid'),
             'blocksList' => $list,
             'copied' => $copiedTemplate ?? null,
+            'categories' => $categories,
         ]);
     }
 

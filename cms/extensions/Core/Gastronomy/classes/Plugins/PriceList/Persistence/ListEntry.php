@@ -7,6 +7,8 @@ namespace Frootbox\Ext\Core\Gastronomy\Plugins\PriceList\Persistence;
 
 class ListEntry extends \Frootbox\Persistence\AbstractAsset
 {
+    use \Frootbox\Persistence\Traits\Tags;
+
     protected $model = Repositories\ListEntries::class;
 
     /**

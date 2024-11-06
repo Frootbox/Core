@@ -90,6 +90,7 @@ class Partials extends AbstractViewhelper
             $files[] = dirname($this->parameters['file']) . DIRECTORY_SEPARATOR . 'Partials/' . ucfirst($segment) . '.html.twig';
         }
 
+
         $file = null;
 
         foreach ($files as $xfile) {
