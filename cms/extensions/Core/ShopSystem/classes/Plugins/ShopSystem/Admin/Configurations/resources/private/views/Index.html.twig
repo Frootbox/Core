@@ -211,6 +211,48 @@
                         <div class="col-md-6">
 
                             <div class="form-group form-check">
+                                <input type="checkbox" class="form-check-input" id="fieldGender" name="config[fields][SkipGender]" {% if plugin.getConfig('fields.SkipGender') %}checked{% endif %}>
+                                <label class="form-check-label" for="fieldGender"><b>keine</b> Anrede</label>
+                            </div>
+
+                        </div>
+                        <div class="col-md-6">
+
+                            <div class="form-group form-check">
+                                <input type="checkbox" class="form-check-input" id="fieldGenderMandatory" name="config[fieldsMandatory][Gender]" {% if plugin.getConfig('fieldsMandatory.Gender') %}checked{% endif %}>
+                                <label class="form-check-label" for="fieldGenderMandatory">Pflichtfeld</label>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <div class="row">
+                        <div class="col-md-6">
+
+                            <div class="form-group form-check">
+                                <input type="checkbox" class="form-check-input" id="fieldTitle" name="config[fields][SkipTitle]" {% if plugin.getConfig('fields.SkipTitle') %}checked{% endif %}>
+                                <label class="form-check-label" for="fieldTitle"><b>kein</b> Titel</label>
+                            </div>
+
+                        </div>
+                        <div class="col-md-6">
+
+                            <div class="form-group form-check">
+                                <input type="checkbox" class="form-check-input" id="fieldTitleMandatory" name="config[fieldsMandatory][Title]" {% if plugin.getConfig('fieldsMandatory.Title') %}checked{% endif %}>
+                                <label class="form-check-label" for="fieldTitleMandatory">Pflichtfeld</label>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <div class="row">
+                        <div class="col-md-6">
+
+                            <div class="form-group form-check">
                                 <input type="checkbox" class="form-check-input" id="fieldCompany" name="config[fields][Company]" {% if plugin.getConfig('fields.Company') %}checked{% endif %}>
                                 <label class="form-check-label" for="fieldCompany">Firmenname</label>
                             </div>

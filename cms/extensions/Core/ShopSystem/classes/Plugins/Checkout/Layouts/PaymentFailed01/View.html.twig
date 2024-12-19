@@ -1,0 +1,21 @@
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set p = view.getViewhelper('Partials', { plugin: plugin }) %}
+{% set t = i.getTranslator() %}
+
+<div class="plugin Core ShopSystem Checkout PaymentFailed01">
+
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+
+                <div class="inner-wrapper">
+
+                    <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title-payment-failed') }}">{{ "Core.ShopSystem.H1PaymentFailed" | translate }}</h2>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>

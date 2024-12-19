@@ -1,8 +1,77 @@
+@import "global.less";
+
 body {
-  background: #f1f1f1;
+  background: @colorBackgroundLight;
+  font-family: "Work Sans", sans-serif;
+  font-size: 14px;
+  color: @colorSpot3
 }
 
 h1 {
   text-align: center;
   font-size: 40px;
+}
+
+.background {
+  position: absolute;
+  inset: 0 50% 0 0;
+
+  animation: changeColor 40s infinite alternate;
+}
+
+@keyframes changeColor {
+  from {
+    background-color: @colorSpot1;
+  }
+  to {
+    background-color: @colorSpot2;
+  }
+}
+
+.content-wrapper {
+
+  padding: 200px 0 0 0;
+
+  img.logo {
+    display: block;
+    margin: 0 auto 100px 0;
+
+    max-width: 300px;
+  }
+
+  h2 {
+    margin: 20px 0;
+    font-weight: 600;
+    font-size: 30px;
+  }
+
+  form {
+
+    .form-control {
+      height: auto;
+      padding: 15px !important;
+
+      border-radius: 10px;
+      border: 1px solid rgba(0, 0, 0, .1);
+      background: rgba(255, 255, 255, .5);
+
+      font-size: 14px;
+    }
+
+    .form-check-input {
+      top: 4px;
+    }
+
+    .btn {
+      padding: 10px 30px;
+      border-radius: 10px;
+      font-size: 14px;
+    }
+
+    .btn-primary {
+      animation: changeColor 40s infinite alternate;
+      border-color: transparent;
+    }
+  }
+
 }

@@ -102,19 +102,25 @@ variables:
 
 
                             <div class="form-row">
-                                <div class="form-group col-6">
-                                    <label for="gender">{{ "Core.ShopSystem.LabelSalutation" | translate }} *</label>
-                                    <select tabindex="2" required class="form-control" id="gender" name="personal[gender]">
-                                        <option value="">{{ "Core.ShopSystem.OptionPleaseChoose" | translate }}</option>
-                                        <option {% if shopcart.getPersonal('gender') == 'Female' %}selected{% endif %} value="Female">{{ "Core.ShopSystem.OptionFemale" | translate }}</option>
-                                        <option {% if shopcart.getPersonal('gender') == 'Male' %}selected{% endif %} value="Male">{{ "Core.ShopSystem.OptionMale" | translate }}</option>
-                                        <option {% if shopcart.getPersonal('gender') == 'Diverse' %}selected{% endif %} value="Diverse">{{ "Core.ShopSystem.OptionVarious" | translate }}</option>
-                                    </select>
-                                </div>
-                                <div class="form-group col-6">
-                                    <label for="title">{{ "Core.ShopSystem.LabelTitle" | translate }}</label>
-                                    <input tabindex="3" type="text" class="form-control" id="title" name="personal[title]" placeholder="{{ "Core.ShopSystem.LabelTitle" | translate }}" value="{{ shopcart.getPersonal('title') }}">
-                                </div>
+                                {% if not plugin.getShopConfig('fields.SkipGender') %}
+                                    <div class="form-group col-6">
+                                        <label for="gender">{{ "Core.ShopSystem.LabelSalutation" | translate }} *</label>
+                                        <select tabindex="2" required class="form-control" id="gender" name="personal[gender]">
+                                            <option value="">{{ "Core.ShopSystem.OptionPleaseChoose" | translate }}</option>
+                                            <option {% if shopcart.getPersonal('gender') == 'Female' %}selected{% endif %} value="Female">{{ "Core.ShopSystem.OptionFemale" | translate }}</option>
+                                            <option {% if shopcart.getPersonal('gender') == 'Male' %}selected{% endif %} value="Male">{{ "Core.ShopSystem.OptionMale" | translate }}</option>
+                                            <option {% if shopcart.getPersonal('gender') == 'Diverse' %}selected{% endif %} value="Diverse">{{ "Core.ShopSystem.OptionVarious" | translate }}</option>
+                                        </select>
+                                    </div>
+                                {% endif %}
+
+                                {% if not plugin.getShopConfig('fields.SkipTitle') %}
+                                    <div class="form-group col-6">
+                                        <label for="title">{{ "Core.ShopSystem.LabelTitle" | translate }}</label>
+                                        <input tabindex="3" type="text" class="form-control" id="title" name="personal[title]" placeholder="{{ "Core.ShopSystem.LabelTitle" | translate }}" value="{{ shopcart.getPersonal('title') }}">
+                                    </div>
+                                {% endif %}
+
                             </div>
                             <div class="form-row">
                                 <div class="form-group col-6 col-md-6">
@@ -172,7 +178,7 @@ variables:
                                         <select tabindex="13" required class="form-control" id="country" name="personal[country]">
                                             <option value="">{{ "Core.ShopSystem.OptionPleaseChoose" | translate }}</option>
                                             {% for isocode in i.getCountries() %}
-                                                <option {% if shopcart.getPersonal('country') == isocode %}selected{% endif %} value="{{ isocode }}">{{ t.translate('Country.' ~ isocode) }}</option>
+                                                <option {% if shopcart.getPersonal('country') == isocode or (not shopcart.getPersonal('country') and config.get('Ext.Core.ShopSystem.CountryDefault') == isocode) %}selected{% endif %} value="{{ isocode }}">{{ t.translate('Country.' ~ isocode) }}</option>
                                             {% endfor %}
                                         </select>
                                     </div>
@@ -184,7 +190,7 @@ variables:
                             </div>
                             <div class="form-group">
                                 <label for="phone">{{ "Core.ShopSystem.LabelPhone" | translate }} {% if plugin.getShopConfig('fieldsMandatory.Phone') %}*{% endif %}</label>
-                                <input tabindex="15" type="tel" class="form-control" id="phone" name="personal[phone]" placeholder="Telefon" value="{{ shopcart.getPersonal('phone') }}" {% if plugin.getShopConfig('fieldsMandatory.Phone') %}required{% endif %}>
+                                <input tabindex="15" type="tel" class="form-control" id="phone" name="personal[phone]" placeholder="{{ "Core.ShopSystem.LabelPhone" | translate }}" value="{{ shopcart.getPersonal('phone') }}" {% if plugin.getShopConfig('fieldsMandatory.Phone') %}required{% endif %}>
                             </div>
                             <div class="form-group form-check">
                                 <input tabindex="16" type="checkbox" {% if shopcart.getBilling('differentBillingRecipient') %}checked{% endif %} class="form-check-input" id="differentBillingRecipient" name="billing[differentBillingRecipient]">
@@ -199,15 +205,19 @@ variables:
                                 <h3>{{ "Core.ShopSystem.Plugins.Checkout.H3BillingAddress" | translate }}</h3>
 
                                 <div class="form-row">
-                                    <div class="form-group col-6">
-                                        <label for="billing_gender">{{ "Core.ShopSystem.LabelSalutation" | translate }} *</label>
-                                        <select tabindex="201" required class="form-control" id="billing_gender" name="billing[gender]">
-                                            <option value="">{{ "Core.ShopSystem.OptionPleaseChoose" | translate }}</option>
-                                            <option {% if shopcart.getBilling('gender') == 'Female' %}selected{% endif %} value="Female">{{ "Core.ShopSystem.OptionFemale" | translate }}</option>
-                                            <option {% if shopcart.getBilling('gender') == 'Male' %}selected{% endif %} value="Male">{{ "Core.ShopSystem.OptionMale" | translate }}</option>
-                                            <option {% if shopcart.getBilling('gender') == 'Diverse' %}selected{% endif %} value="Diverse">{{ "Core.ShopSystem.OptionVarious" | translate }}</option>
-                                        </select>
-                                    </div>
+
+                                    {% if not plugin.getShopConfig('fields.SkipGender') %}
+                                        <div class="form-group col-6">
+                                            <label for="billing_gender">{{ "Core.ShopSystem.LabelSalutation" | translate }} *</label>
+                                            <select tabindex="201" required class="form-control" id="billing_gender" name="billing[gender]">
+                                                <option value="">{{ "Core.ShopSystem.OptionPleaseChoose" | translate }}</option>
+                                                <option {% if shopcart.getBilling('gender') == 'Female' %}selected{% endif %} value="Female">{{ "Core.ShopSystem.OptionFemale" | translate }}</option>
+                                                <option {% if shopcart.getBilling('gender') == 'Male' %}selected{% endif %} value="Male">{{ "Core.ShopSystem.OptionMale" | translate }}</option>
+                                                <option {% if shopcart.getBilling('gender') == 'Diverse' %}selected{% endif %} value="Diverse">{{ "Core.ShopSystem.OptionVarious" | translate }}</option>
+                                            </select>
+                                        </div>
+                                    {% endif %}
+
                                     <div class="form-group col-6">
                                         <label for="billing_title">{{ "Core.ShopSystem.LabelTitle" | translate }}</label>
                                         <input type="text" class="form-control" id="billing_title" name="billing[title]" placeholder="{{ "Core.ShopSystem.LabelTitle" | translate }}" value="{{ shopcart.getBilling('title') }}">

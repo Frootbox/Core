@@ -18,7 +18,7 @@ return [
     'H5ItemAddedToCart' => 'Artikel toegevoegd aan winkelmand',
 
     'TableHeadItems' => 'Artikel',
-    'TableHeadNumber' => 'Nummer',
+    'TableHeadNumber' => 'Hoeveelheid',
     'TableHeadPrice' => 'Prijs',
     'TableHeadTotal' => 'Totaal',
 

@@ -134,7 +134,7 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
          */
         $plugin = $contentElements->fetchById($get->get('pluginId'));
 
-        if (!empty($plugin->getConfig('isInActive'))) {
+        if (!empty($plugin->getConfig('isInActive')) and ACCESS_LEVEL != 'SuperAdmin') {
             throw new \Exception('Das Plugin wurde deaktiviert.');
         }
 

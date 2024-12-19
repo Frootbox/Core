@@ -195,6 +195,16 @@ class Teaser extends \Frootbox\Persistence\AbstractAsset implements \Frootbox\Pe
     }
 
     /**
+     * @return bool
+     */
+    public function hasUri(): bool
+    {
+        $uri = $this->getUri();
+
+        return !empty($uri) and $uri != '#';
+    }
+
+    /**
      *
      */
     public function isLinkDeactivated(): bool

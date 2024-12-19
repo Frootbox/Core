@@ -186,6 +186,8 @@ try {
             $user->save();
 
             $view->set('user', $user);
+
+            define('ACCESS_LEVEL', $user->getType());
         }
         catch ( \PDOException $e ) {
 
@@ -197,6 +199,10 @@ try {
             $session->logout();
         }
     }
+    else {
+        define('ACCESS_LEVEL', 'None');
+    }
+
 
     $db = $container->get(\Frootbox\Db\Db::class);
 

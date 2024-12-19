@@ -37,16 +37,7 @@
 	}
 </style>
 
-<div class="container">
-	<div class="row justify-content-center">
-        <div class="col-5">
-        
-        	
-        	<br /><br /><br /><br />
-        	
-        	<h1>frootbox::cms</h1>
-
-        	<br /><br />
+			<img class="logo" src="{{ serverpath }}cms/admin/resources/public/images/logo.svg" alt="Logo" />
 
 			<div class="message notice javascript-block">Bitte aktivieren Sie Javascript für Benutzung des CMS.</div>
 
@@ -56,32 +47,23 @@
 				</div>
 			</div>
 
-			<div class="card hidden" id="login">
+			<div id="login">
 
-				<div class="card-body">
+				<h2>Anmeldung</h2>
+
 
 					<div>
 
 						<form class="ajax" method="post" action="{{ controller.getUri('ajaxLogin', { 'redirect' : get.get('redirect') } ) }}">
 
 							<div class="form-group">
-								<label for="login">Benutzername</label>
-								<div class="input-group">
-									<div class="input-group-prepend">
-										<div class="input-group-text"><i class="far fa-envelope"></i></div>
-									</div>
-									<input type="email" class="form-control" id="login" name="login" placeholder="E-Mail">
-								</div>
+								<label for="login" class="sr-only">Benutzername</label>
+								<input type="email" class="form-control" id="login" name="login" placeholder="E-Mail">
 							</div>
 
 							<div class="form-group">
-								<label for="password">Passwort</label>
-								<div class="input-group">
-									<div class="input-group-prepend">
-										<div class="input-group-text"><i class="far fa-lock"></i></div>
-									</div>
-									<input type="password" class="form-control" id="password" name="password" placeholder="Passwort">
-								</div>
+								<label for="password" class="sr-only">Passwort</label>
+								<input type="password" class="form-control" id="password" name="password" placeholder="Passwort">
 							</div>
 
 							<div class="form-group form-check">
@@ -89,18 +71,18 @@
 								<label class="form-check-label" for="stayLoggedIn">angemeldet bleiben</label>
 							</div>
 
-							<button type="submit" class="btn btn-primary">Anmelden</button>
+							<div class="row mt-5">
+								<div class="col-md-6">
+									<button type="submit" class="btn btn-primary">Anmelden</button>
+								</div>
+								<div class="col-md-6 text-right">
+									<a href="{{ controller.getUri('passwordLost') }}" class="password-lost btn btn-outline-secondary btn-sm">Passwort vergessen</a>
+								</div>
+							</div>
 
-							<a href="{{ controller.getUri('passwordLost') }}" class="password-lost btn btn-outline-secondary btn-sm float-right">Passwort vergessen</a>
 
 						</form>
 
 					</div>
 
-				</div>
 			</div>
-        	
-        </div>
-    </div>
-</div>
-

@@ -220,7 +220,7 @@
 
                                 {% if booking.getConfig('note') %}
 
-                                    <h4>Bemerkung</h4>
+                                    <h4>{{ "Core.ShopSystem.Plugins.Checkout.H3Note" | translate }}</h4>
 
                                     <p>{{ booking.getConfig('note') | nl2br }}</p>
 
@@ -243,9 +243,9 @@
                                     <thead>
                                         <tr>
                                             <th>{{ "Core.ShopSystem.TableHeadItems" | translate }}</th>
-                                            <th class="text-right">{{ "Core.ShopSystem.TableHeadNumber" | translate }}</th>
-                                            <th class="text-right">{{ "Core.ShopSystem.TableHeadPrice" | translate }}</th>
-                                            <th class="text-right">{{ "Core.ShopSystem.TableHeadTotal" | translate }}</th>
+                                            <th style="text-align: right;" class="text-right">{{ "Core.ShopSystem.TableHeadNumber" | translate }}</th>
+                                            <th style="text-align: right;" class="text-right">{{ "Core.ShopSystem.TableHeadPrice" | translate }}</th>
+                                            <th style="text-align: right;" class="text-right">{{ "Core.ShopSystem.TableHeadTotal" | translate }}</th>
                                         </tr>
                                     </thead>
                                     <tbody>

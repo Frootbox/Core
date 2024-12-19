@@ -94,6 +94,7 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
         foreach ($files as $file) {
 
             $source = $view->render($path . $file);
+            $source = trim($source) . "\n";
 
             $file = new \Frootbox\Filesystem\File($realpath . substr($file, 0, -5));
             $file->setSource($source);
@@ -101,7 +102,9 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
             $file->write();
         }
 
-        d("FERtIG");
+        return self::getResponse('json', 200, [
+            'success' => 'Der neue Block wurde erstellt.',
+        ]);
     }
 
     /**

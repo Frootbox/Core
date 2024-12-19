@@ -47,8 +47,11 @@ variables:
     {{ h.addItem(language, xalias) }}
 {% endfor %}
 
-<div class="plugin Core HelpAndSupport Jobs ShowJob01">
+{% block config %}
 
+{% endblock %}
+
+<div class="plugin Core HelpAndSupport Jobs ShowJob01">
 
     {% if variables.withContainer %}<div class="container">{% endif %}
 

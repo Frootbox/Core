@@ -1,0 +1,10 @@
+<div class="generic-video-wrapper">
+
+    <video width="{{ width | default(800) }}" height="{{ height | default(400) }}" {% if autoplay or muted %}muted{% endif %} {% if autoplay %}autoplay="autoplay"{% endif %} {% if loop %}loop="true"{% endif %}>
+        {% for video in videos %}
+        <source src="{{ video.getUriStream() }}" type="video/mp4">
+        {% endfor %}
+    </video>
+
+</div>
+

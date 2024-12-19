@@ -69,7 +69,13 @@ variables:
                     {% set tags = plugin.getAvailableTags() %}
 
                     {% if tags.getCount() %}
-                        <div class="filter-bar btn-group" role="group" aria-label="Basic example">
+                        <div class="filter-bar btn-group d-none d-md-inline-flex" role="group" aria-label="Basic example">
+                            {% for tag in tags %}
+                                <button type="button" data-tag="{{ tag.getTag() }}" class="tag btn btn-primary">{{ tag.getTag() }}</button>
+                            {% endfor %}
+                        </div>
+
+                        <div class="filter-bar btn-group-vertical d-md-none" role="group" aria-label="Basic example">
                             {% for tag in tags %}
                                 <button type="button" data-tag="{{ tag.getTag() }}" class="tag btn btn-primary">{{ tag.getTag() }}</button>
                             {% endfor %}
@@ -80,9 +86,7 @@ variables:
                 <div class="references row">
                     {% for reference in i.getReferences() %}
                         <div class="{{ colClass }} reference-wrapper {{ reference.getTags().implode(' ', 'tag') }}">
-                            <div class="reference" {% if not variables.skipDetailsPage or reference.getUrlDomain() %}data-href{% endif %}>
-
-
+                            <div class="reference" {% if (reference.getUri() and reference.getUri() != "#") or reference.getUrlDomain() %}data-href{% endif %}>
 
                                 {% if not variables.noImage %}
 
@@ -102,7 +106,7 @@ variables:
                                         <div data-nowidgets data-editable data-uid="{{ reference.getUid('teaser') }}"></div>
                                     {% endif %}
 
-                                    {% if not variables.skipDetailsPage and reference.getUri() != "/" %}
+                                    {% if not variables.skipDetailsPage and reference.getUri() != "/" and reference.getUri() != "#" %}
                                         <p><a class="readmore" href="{{ reference.getUri() }}"><span>weiterlesen</span></a></p>
                                     {% elseif reference.getUrlDomain() %}
                                         <p><a class="readmore" href="{{ reference.getConfig('url') }}"><span>{{ reference.getUrlDomain() }}</span></a></p>

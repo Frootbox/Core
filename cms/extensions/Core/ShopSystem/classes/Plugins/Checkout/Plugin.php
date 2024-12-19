@@ -700,7 +700,6 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
 
         $source = $builder->render('Mail.html.twig');
 
-
         // Mark coupons redeemed
         foreach ($shopcart->getRedeemedCoupons() as $coupon) {
             if ($coupon->getValueLeft() > $coupon->getRedeemedValue()) {
@@ -805,6 +804,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
             $delegator->transferBooking($booking);
         }
 
+        d("FERTIG");
         $dbms->transactionCommit();
 
         // Compose mails
@@ -1275,9 +1275,11 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
 
         if ($get->get('redirect_status') == 'failed') {
 
+            $uri = $this->getActionUri('paymentFailed', [ 'bookingId' => $booking->getId() ]);
+
+            return new \Frootbox\View\ResponseRedirect($uri);
         }
 
-        d($booking);
 
         // Get payment method
         $paymentMethod = $booking->getPaymentMethod();
@@ -1569,8 +1571,11 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
             'personal.streetNumber',
             'personal.postalCode',
             'personal.city',
-            'personal.gender',
         ];
+
+        if (empty($this->getShopConfig('fields.SkipGender'))) {
+            $required[] = 'personal.gender';
+        }
 
         $shipping = $post->get('shipping');
 
@@ -1688,6 +1693,14 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         ]);
     }
 
+    /**
+     * @param Shopcart $shopcart
+     * @param Container $container
+     * @param \Frootbox\Http\Get $get
+     * @param Post $post
+     * @return ResponseJson
+     * @throws \Frootbox\Exceptions\NotFound
+     */
     public function ajaxSubmitPaymentAction(
         Shopcart $shopcart,
         Container $container,
@@ -1708,7 +1721,6 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
 
         if ($paymentMethod->isForcingNewPaymentFlow()) {
             $url = $this->getActionUri('reviewFlow');
-
         }
         else {
             $url = $this->getActionUri('review');
@@ -2519,6 +2531,17 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         return new Response([
             'shopcart' => $shopCart,
         ]);
+    }
+
+    public function paymentFailedAction(
+        \Frootbox\Http\Get $get,
+        \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Bookings $bookingsRepository,
+    ): Response
+    {
+        // Fetch booking
+        $booking = $bookingsRepository->fetchById($this->getAttribute('bookingId'));
+
+        d($booking);
     }
 
     /**

@@ -2,6 +2,7 @@
 
 title: {% endverbatim %}{{ title }}{% verbatim %}
 subtitle: {% endverbatim %}{{ subtitle }}{% verbatim %}
+category: Template
 _variables:
     imageHeight:
         label: Bildhöhe
@@ -28,7 +29,7 @@ _e_xtends: HerrUndFrauPixelExt/BlocksLibrary/Teaser
 
             <div data-editable data-uid="{{ block.getUid('text') }}"></div>
 
-            <div class="background" data-width="1600" data-type="Images/Background" data-uid="{{ block.getUid('background-6')}}"></div>
+            <div class="background" data-width="1600" data-type="Images/Background" data-uid="{{ block.getUid('background')}}"></div>
 
             <div class="teasers">
                 <div class="row">
@@ -56,4 +57,3 @@ _e_xtends: HerrUndFrauPixelExt/BlocksLibrary/Teaser
 </div>
 
 {% endverbatim %}
-

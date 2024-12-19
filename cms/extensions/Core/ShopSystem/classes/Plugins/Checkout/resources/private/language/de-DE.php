@@ -73,6 +73,7 @@ return [
     'H3BillingAddress' => 'Rechnungsadresse',
     'H3YourOrder' => 'Ihre Bestellung',
     'H3Articles' => 'Artikel',
+    'H3Note' => 'Bemerkung',
     'H3ChoosePickupDay' => 'Abholtag wählen',
     'H3ChooseDeliveryDay' => 'Liefertag wählen',
 

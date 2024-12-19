@@ -171,6 +171,9 @@ class Shopcart
             $_SESSION['cart']['products'][$key]['amount'] += $amount;
         }
 
+
+        $this->reloadItems();
+
         return $this->getItem($key);
     }
 

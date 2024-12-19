@@ -2,7 +2,12 @@
 {% set a = view.getViewhelper('Assets', {   }) %}
 
 {{ v.asset('EXT:Core/Editing/contenttools/content-tools.js', 'script', true) | raw }}
+
+<link href="https://cdn.jsdelivr.net/npm/ContentTools@1.6.16/build/content-tools.min.css" rel="stylesheet">
+{#
 {{ v.asset('EXT:Core/Editing/contenttools/content-tools.min.css', 'auto', true) | raw }}
+
+#}
 
 {{ v.asset('EXT:Core/Editing/fontawesome/css/all.min.css') | raw }}
 

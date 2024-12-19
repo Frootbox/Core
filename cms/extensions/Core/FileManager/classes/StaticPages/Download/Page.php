@@ -90,4 +90,37 @@ class Page
         readfile(FILES_DIR . $file->getPath());
         exit;
     }
+
+    /**
+     *
+     */
+    public function stream(
+        \Frootbox\Http\Get $get,
+        \Frootbox\Persistence\Repositories\Files $files
+    ): void
+    {
+        // Fetch file
+        $file = $files->fetchById($get->get('f'));
+
+        /*
+        header('Content-type: ' . $file->getType());
+        header('Content-Disposition: attachment; filename="' . $file->getNameClean() . '"');
+
+        readfile(FILES_DIR . $file->getPath());
+        exit;
+        */
+
+
+        header('Content-Description: File Transfer');
+        header('Content-Type: application/octet-stream');
+        header('Content-Disposition: attachment; filename=' . $file->getNameClean());
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate');
+        header('Pragma: public');
+        header('Content-Length: ' . filesize(FILES_DIR . $file->getPath()));
+        ob_clean();
+        flush();
+        readfile(FILES_DIR . $file->getPath());
+        exit;
+    }
 }

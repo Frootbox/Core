@@ -7,6 +7,7 @@ return [
     'ButtonAddToCart' => 'in den Warenkorb legen',
     'ButtonProductDetails' => 'Produkt-Details',
 
+    'H1PaymentFailed' => 'Zahlung fehlgeschlagen',
     'H1CompleteOrder' => 'Bestellung abschließen',
     'H2SelectDeliveryDay' => 'Liefertag wählen',
     'H3ArticlesInShoppingCart' => 'Artikel im Warenkorb',

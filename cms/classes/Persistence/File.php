@@ -279,6 +279,18 @@ class File extends AbstractRow
 
         return $url;
     }
+
+    /**
+     *
+     */
+    public function getUriStream(array $params = null): string
+    {
+        $url = 'static/Ext/Core/FileManager/Download/stream/qs/f/' . $this->getId() . '/n/' . $this->getNameClean();
+
+        $url = (!empty($params['absolute']) ? SERVER_PATH_PROTOCOL : SERVER_PATH) . $url;
+
+        return $url;
+    }
     
     /**
      * 

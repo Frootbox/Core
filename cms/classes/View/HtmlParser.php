@@ -170,7 +170,6 @@ class HtmlParser
 
         $this->html = str_replace('</head>', '<script nonce="' . SCRIPT_NONCE . '"> var settings = ' . json_encode($variables) . ';</script>' . PHP_EOL . '</head>', $this->html);
 
-
         // Set base href
         $this->html = str_replace('</head>', '<base href="' . SERVER_PATH . '">' . PHP_EOL . '</head>', $this->html);
 

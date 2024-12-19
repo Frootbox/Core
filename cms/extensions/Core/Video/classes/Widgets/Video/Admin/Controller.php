@@ -25,14 +25,14 @@ class Controller extends \Frootbox\Admin\AbstractWidgetController
         \DI\Container $container
     ): Response
     {
-        // Validate required input
-        $post->require([ 'url' ]);
-
-
         $this->widget->addConfig([
             'url' => $post->get('url'),
             'maxWidth' => $post->get('maxWidth'),
+            'maxWHeight' => $post->get('maxWHeight'),
             'privacyGuard' => $post->get('privacyGuard'),
+            'loop' => !empty($post->get('loop')),
+            'muted' => !empty($post->get('muted')),
+            'autoplay' => !empty($post->get('autoplay')),
             'source' => $post->get('source'),
         ]);
 

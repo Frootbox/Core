@@ -368,6 +368,8 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
             ],
         ];
 
+        $blockDataCache = [];
+
         // Fetch extensions
         $result = $extensionsRepository->fetch([
             'where' => [
@@ -509,7 +511,7 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
                 }
 
                 $blockData = [
-                    'blockId' => $file,
+                    'blockId' => (string) $file,
                     'vendorId' => $extension->getVendorId(),
                     'extensionId' => $extension->getExtensionId(),
                     'template' => $blockTemplate,
@@ -518,6 +520,8 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
                 $categories[$category]['blocks'][$blockTemplate->getTitle() . $blockTemplate->getSubTitle() . ++$loop] = $blockData;
                 $extList['blocks'][$section][$blockTemplate->getTitle() . $blockTemplate->getSubTitle() . ++$loop] = $blockData;
                 ++$extList['blockCount'];
+
+                $blockDataCache[$blockData['vendorId']][$blockData['extensionId']][$blockData['blockId']] = $blockData;
 
                 if ($thumbnailOverridePath) {
                     $blockTemplate->captureThumbnail($thumbnailOverridePath . $extension->getVendorId() . '/' . $extension->getExtensionId() . '/' . $file . '/');
@@ -560,8 +564,49 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
             }
         }
 
+        function isListedInTemplate(\Frootbox\Persistence\Content\Blocks\Block $block, array $list): bool
+        {
+            if (empty($list)) {
+                return false;
+            }
 
-        krsort($list);
+            foreach ($list as $index => $blockData) {
+
+                if ($block->getBlockId() == $blockData['blockId'] and $block->getVendorId() == $blockData['vendorId'] and $block->getExtensionId() == $blockData['extensionId']) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        $templateBlocks = $categories['Template']['blocks'] ?? [];
+
+        foreach ($blocksRepository->fetch() as $block) {
+
+            if (!isListedInTemplate($block, $templateBlocks)) {
+
+                if (empty($blockDataCache[$block->getVendorId()][$block->getExtensionId()][$block->getBlockId()])) {
+                    continue;
+                }
+
+                $blockData = $blockDataCache[$block->getVendorId()][$block->getExtensionId()][$block->getBlockId()];
+
+                $blockTemplate = $blockData['template'];
+                $keyTitle = $blockTemplate->getTitle() . $blockTemplate->getSubTitle() . rand(1000, 9999);
+
+                $templateBlocks[$keyTitle] = $blockData;
+            }
+        }
+
+        $categories['Template']['blocks'] = $templateBlocks;
+
+        // Sort blocks
+        foreach ($categories as $category => $categoryData) {
+
+            ksort($categoryData['blocks']);
+            $categories[$category]['blocks'] = $categoryData['blocks'];
+        }
 
         // Show blocks clipboard
         if (!empty($_SESSION['editmode']['editables']['block']['copy'])) {
@@ -582,6 +627,13 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
             catch ( \Exception $e ) {
                 // Ignore any errors and clear clipboard
                 unset($_SESSION['editmode']['editables']['block']['copy']);
+            }
+        }
+
+        foreach ($categories as $index => $categoryData) {
+
+            if (empty($categoryData['blocks'])) {
+                unset($categories[$index]);
             }
         }
 

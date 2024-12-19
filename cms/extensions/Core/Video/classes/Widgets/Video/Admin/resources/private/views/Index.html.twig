@@ -1,3 +1,4 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
 
 <script nonce="{{ settings.nonce }}">
     $(function ( ) {
@@ -42,16 +43,34 @@
 
         <div class="form-group">
             <label for="url">Video URL</label>
-            <input type="text" name="url" id="url" value="{{ widgetController.getWidget().getConfig('url') }}" required class="form-control" placeholder="Video URL" />
+            <input type="text" name="url" id="url" value="{{ widgetController.getWidget().getConfig('url') }}" class="form-control" placeholder="Video URL" />
         </div>
         <div class="form-group">
             <label for="maxWidth">maximale Breite</label>
-            <input type="number" name="maxWidth" id="maxWidth" value="{{ widget.getMaxWidth }}" required class="form-control" placeholder="maximale Breite" />
+            <input type="number" name="maxWidth" id="maxWidth" value="{{ widget.getMaxWidth }}" class="form-control" placeholder="maximale Breite" />
+        </div>
+        <div class="form-group">
+            <label for="maxHeight">maximale Höhe</label>
+            <input type="number" name="maxHeight" id="maxHeight" value="{{ widget.getMaxHeight }}" class="form-control" placeholder="maximale Höhe" />
         </div>
         <div class="form-group">
             <label for="source">Quelle</label>
             <input type="text" name="source" id="source" value="{{ widget.getConfig('source') }}" class="form-control" placeholder="Quelle" />
         </div>
+        <div class="form-group form-check">
+            <input type="checkbox" class="form-check-input" id="autoplay" name="autoplay" {% if widget.getConfig('autoplay') %}checked{% endif %}>
+            <label class="form-check-label" for="autoplay">Autoplay</label>
+        </div>
+        <div class="form-group form-check">
+            <input type="checkbox" class="form-check-input" id="loop" name="loop" {% if widget.getConfig('loop') %}checked{% endif %}>
+            <label class="form-check-label" for="loop">Loop</label>
+        </div>
+        <div class="form-group form-check">
+            <input type="checkbox" class="form-check-input" id="muted" name="muted" {% if widget.getConfig('muted') %}checked{% endif %}>
+            <label class="form-check-label" for="muted">Muted</label>
+        </div>
+
+
         <!--
         <div class="form-check">
             <input {% if widget.getConfig('privacyGuard') %}checked{% endif %} class="form-check-input" type="checkbox" value="1" id="privacyGuard" name="privacyGuard">
@@ -60,6 +79,12 @@
             </label>
         </div>
         -->
+
+        {{ v.injectPartial('Frootbox/Ext/Core/FileManager/Editor/Partials/FileUpload', {
+            multiple: false,
+            uid: widget.getUid('video'),
+            onComplete: 'refreshEditable',
+        }) | raw }}
 
     </div>
     <div class="modal-footer">

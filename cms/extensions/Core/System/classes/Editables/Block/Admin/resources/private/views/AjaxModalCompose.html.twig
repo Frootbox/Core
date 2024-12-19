@@ -133,7 +133,7 @@
 
                 if ($(this).is(':checked')) {
 
-                    let container = $('div[data-block="' + $(this).val() + '"]');
+                    let container = $(this).parents('.category-wrapper').find('div[data-block="' + $(this).val() + '"]');
 
                     container.removeClass('d-none');
 
@@ -176,11 +176,14 @@
             <div class="message">Es sind keine Blöcke vorhanden.</div>
         {% else %}
 
-            <div class="btn-group" role="group" aria-label="Basic example">
-                {% for category in categories %}
-                    <button style="padding: 6px 15px;" type="button" class="btn btn-outline-primary" data-category="{{ category.category }}">{{ category.category }}</button>
-                {% endfor %}
-            </div>
+            {% if categories | length > 1 %}
+
+                <div class="btn-group" role="group" aria-label="Basic example">
+                    {% for category in categories %}
+                        <button style="padding: 6px 15px;" type="button" class="btn btn-outline-primary" data-category="{{ category.category }}">{{ category.category }}</button>
+                    {% endfor %}
+                </div>
+            {% endif %}
 
             {% for category in categories %}
                 <div class="category-wrapper" data-category="{{ category.category }}">

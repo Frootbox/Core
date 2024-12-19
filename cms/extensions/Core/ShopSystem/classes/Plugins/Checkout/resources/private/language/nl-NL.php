@@ -67,8 +67,9 @@ return [
     'H3Articles' => 'Artikelen',
     'H3ChoosePickupDay' => 'Kies ophaaldag',
     'H3ChooseDeliveryDay' => 'Kies de bezorgdag',
+    'H3Note' => 'Opmerking',
 
-    'H4PersonalData' => 'persoonlijke daten',
+    'H4PersonalData' => 'persoonlijke gegevens',
     'H4DeliveryAddress' => 'Lieferadres',
     'H4PaymentMethod' => 'Betalingsmiddel',
 
