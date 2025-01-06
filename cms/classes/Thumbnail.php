@@ -221,16 +221,16 @@ class Thumbnail extends GenericObject
             }
             else {
 
-                $resize = ' -resize ' . $this->width . 'x' . $this->height . '^ -quality 80 ';
+                $resize = ' -resize ' . $this->width . 'x' . $this->height . '^ -quality 100 ';
                 $postcmd = ' -gravity center -crop ' . $this->width . 'x' . $this->height . '+0+0';
             }
 
         }
         elseif (!empty($this->width)) {
-            $resize = ' -resize ' . $this->width . ' -quality 80 ';
+            $resize = ' -resize ' . $this->width . ' -quality 100 ';
         }
         elseif (!empty($this->height)) {
-            $resize = ' -resize x' . $this->height . ' -quality 80 ';
+            $resize = ' -resize x' . $this->height . ' -quality 100 ';
         }
 
         if (!empty($this->crop) and $this->crop != 'none') {

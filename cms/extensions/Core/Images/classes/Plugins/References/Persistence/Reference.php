@@ -166,9 +166,36 @@ class Reference extends \Frootbox\Persistence\AbstractAsset implements \Frootbox
     }
 
     /**
-     *
+     * @return string|null
      */
-    public function getUrlDomain(): ?string
+    public function getUrl(): ?string
+    {
+        if (empty($this->getConfig('url'))) {
+            return null;
+        }
+
+        return $this->getConfig('url');
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getUrl2(): ?string
+    {
+        if (empty($this->getConfig('url2'))) {
+            return null;
+        }
+
+        return $this->getConfig('url2');
+    }
+
+    /**
+     * @param bool $skipSubdomain
+     * @return string|null
+     */
+    public function getUrlDomain(
+        bool $skipSubdomain = false,
+    ): ?string
     {
         if (empty($this->getConfig('url'))) {
             return null;
@@ -176,7 +203,36 @@ class Reference extends \Frootbox\Persistence\AbstractAsset implements \Frootbox
 
         $info = parse_url($this->getConfig('url'));
 
-        return $info['host'] ?? null;
+        $host = $info['host'] ?? null;
+
+        if ($skipSubdomain) {
+            $host = str_replace('www.', '', $host);
+        }
+
+        return $host;
+    }
+
+    /**
+     * @param bool $skipSubdomain
+     * @return string|null
+     */
+    public function getUrl2Domain(
+        bool $skipSubdomain = false,
+    ): ?string
+    {
+        if (empty($this->getConfig('url2'))) {
+            return null;
+        }
+
+        $info = parse_url($this->getConfig('url2'));
+
+        $host = $info['host'] ?? null;
+
+        if ($skipSubdomain) {
+            $host = str_replace('www.', '', $host);
+        }
+
+        return $host;
     }
 
     /**

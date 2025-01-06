@@ -306,7 +306,9 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
     }
 
     /**
-     *
+     * @param \Frootbox\Session $session
+     * @param Persistence\Repositories\References $referencesRepository
+     * @return Response
      */
     public function jumpNextAction(
         \Frootbox\Session $session,
@@ -328,6 +330,32 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
 
             $reference = $referencesRepository->fetchOne([
                 'order' => ['orderId DESC']
+            ]);
+        }
+
+        return new ResponseRedirect($reference->getUri());
+    }
+
+    public function jumpPreviousAction(
+        \Frootbox\Session $session,
+        \Frootbox\Ext\Core\Images\Plugins\References\Persistence\Repositories\References $referencesRepository
+    ): Response
+    {
+        $minVisibility = $session->isLoggedIn() ? 1 : 2;
+
+        // Fetch reference
+        $reference = $referencesRepository->fetchOne([
+            'where' => [
+                new \Frootbox\Db\Conditions\GreaterOrEqual('visibility', $minVisibility),
+                new \Frootbox\Db\Conditions\Greater('orderId', $this->getAttribute('orderId'))
+            ],
+            'order' => [ 'orderId ASC' ]
+        ]);
+
+        if (empty($reference)) {
+
+            $reference = $referencesRepository->fetchOne([
+                'order' => ['orderId ASC']
             ]);
         }
 
