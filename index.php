@@ -534,6 +534,21 @@ try {
     });
     $view->addFilter($filter);
 
+    $filter = new \Twig\TwigFilter('dump', function($input) {
+
+        ob_start();
+
+        p($input);
+
+        $output = ob_get_clean();
+
+        return $output;
+    }, [
+        'is_safe' => ['html'],
+    ]);
+
+    $view->addFilter($filter);
+
 
     // Perform security check
     if ($page->getVisibility() == 'Locked' or ($page->getVisibility() == 'Moderated' and !IS_EDITOR)) {
@@ -984,6 +999,8 @@ try {
         header('Strict-Transport-Security: max-age=31536000');
         header('X-Content-Type-Options: nosniff');
     }
+
+    header('X-Frame-Options: ALLOW-FROM *');
 
     echo $html;
 }

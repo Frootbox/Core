@@ -77,7 +77,12 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
     }
 
     /**
-     *
+     * @param \DI\Container $container
+     * @param \Frootbox\Admin\View $view
+     * @param \Frootbox\Config\Config $config
+     * @param \Frootbox\Admin\Persistence\Repositories\Panels $panelRepository
+     * @param \Frootbox\Persistence\Content\Repositories\ContentElements $contentElementsRepository
+     * @return Response
      */
     public function index(
         \DI\Container $container,
@@ -87,7 +92,6 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
         \Frootbox\Persistence\Content\Repositories\ContentElements $contentElementsRepository,
     ): Response
     {
-
         // Fetch panels
         $panels = $panelRepository->fetch();
 
@@ -100,6 +104,8 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
                 $gizmos[] = $gizmodata['gizmo'];
             }
         }
+
+        $gizmos = array_unique($gizmos);
 
         $gizmoHtml = [];
 

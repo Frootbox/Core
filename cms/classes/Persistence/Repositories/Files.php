@@ -126,6 +126,8 @@ class Files extends \Frootbox\Db\Model
             throw new \Exception('Extension missing.');
         }
 
+        $extension = strtolower($extension);
+
         switch ($extension) {
             case 'jpg':
             case 'jpeg':

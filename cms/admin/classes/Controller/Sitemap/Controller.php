@@ -19,6 +19,26 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
         return self::getResponse();
     }
 
+    public function meta(
+        \Frootbox\Persistence\Repositories\Pages $pageRepository,
+    ): \Frootbox\Admin\Controller\Response
+    {
+        // Fetch root page
+        $rootPage = $pageRepository->fetchOne([
+            'where' => [
+                'language' => 'de-DE',
+                new \Frootbox\Db\Conditions\MatchColumn('rootId', 'id')
+            ]
+        ]);
+
+        // Fetch pages tree
+        $tree = $pageRepository->getTree($rootPage->getId());
+
+        return self::getResponse('html', 200, [
+            'Tree' => $tree,
+        ]);
+    }
+
     /**
      *
      */

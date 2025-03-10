@@ -1,0 +1,138 @@
+{# config
+
+title: Formular
+extension: Core/ContactForms
+category: Contact
+extends: Core/ContactForms/Form1
+variables:
+    style:
+        label: Stil
+        type: list
+        options:
+            Default: Standard
+            LabelInside: Label im Eingabefeld
+        default: Default
+    skipHeadline:
+        label: keine Überschrift
+        type: bool
+    contentColumns:
+        label: Breite des Inhaltes
+        type: list
+        options:
+            1: 1
+            2: 2
+            3: 3
+            4: 4
+            5: 5
+            6: 6
+            7: 7
+            8: 8
+            9: 9
+            10: 10
+            11: 11
+            12: 12
+        default: 12
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: block }) %}
+
+{% set formRenderer = view.getViewhelper('Ext/Core/ContactForms/FormRenderer', {   }) %}
+{% set variables = block.getVariables() %}
+
+
+<script nonce="{{ settings.nonce }}">
+    $(function ( ) {
+
+        $(document).on('click', 'a[data-form]', function ( event ) {
+
+            event.preventDefault();
+
+            $('a[data-form]').removeClass('active');
+            $(this).addClass('active');
+
+            let url = window.location.href.split('#')[0];
+            url = url + '#' + $(this).data('form');
+
+            window.location.href = url;
+        });
+
+        /**
+         * Animate labels
+         */
+        $('.form-group input').focus(function(){
+            me = $(this) ;
+            $("label[for='" + me.attr('id')+"']").addClass("animate-label");
+        });
+
+        $('.form-group input').blur(function(){
+            me = $(this) ;
+            if ( me.val() == ""){
+                $("label[for='"+me.attr('id')+"']").removeClass("animate-label");
+            }
+        });
+
+        /**
+         * Init form view
+         */
+        let hash = window.location.hash;
+
+        if (hash.length > 0) {
+            $('a[data-form="' + hash.split('#')[1] + '"]').trigger('click');
+        }
+    });
+</script>
+
+
+<div class="container {{ variables.style }}">
+    <div class="row justify-content-center">
+        <div class="col-md-{{ variables.contentColumns }}">
+
+            {% if not variables.skipHeadline %}
+                <h2 class="first main-title" data-editable data-uid="{{ block.getUid('title') }}">Überschrift</h2>
+            {% endif %}
+
+            <div data-editable data-uid="{{ block.getUid('text') }}"></div>
+
+            <div class="inner-wrapper">
+
+                <div class="row">
+                    <div class="col-md-6">
+
+
+                        <div class="text-left" data-editable data-uid="{{ block.getUid('text-left') }}"></div>
+
+                    </div>
+                    <div class="col-md-6">
+
+                        <h3 class="first" data-editable data-uid="{{ block.getUid('title-form') }}">Anfrage</h3>
+
+                        {% if not form %}
+                            {% if editing %}
+                                <div class="editors-note">
+                                    <a class="block-edit" data-norewrite="1" href="#{{ block.getId() }}">Es wurden noch kein Formular verknüpft.</a>
+                                </div>
+                            {% endif %}
+                        {% else %}
+                            {{ formRenderer.render({
+                                formId: form.getId(),
+                                options: {
+                                    editable: variables.fieldLabelsEditable,
+                                },
+                                payload: {
+                                    Seite: page.getTitle()
+                                }
+                            }) | raw }}
+                        {% endif %}
+
+                    </div>
+                </div>
+
+
+
+
+            </div>
+
+        </div>
+    </div>
+</div>

@@ -1,0 +1,9 @@
+<div class="btn-group btn-block mb-5" role="group" aria-label="Basic example">
+
+    {% for Step in Steps %}
+        <a href="{% if not Step.Disabled %}{{ Step.Uri }}{% else %}#{% endif %}" class="{% if Step.Disabled %}disabled{% endif %} btn {% if Step.Active %}btn-secondary{% else %}btn-outline-secondary{% endif %}">
+                {{ ("Core.ShopSystem.Plugins.Checkout.Progress.Steps." ~ Step.Key) | translate }}
+        </a>
+    {% endfor %}
+
+</div>

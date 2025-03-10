@@ -563,7 +563,10 @@ class HtmlParser
             $compiler = new \ScssPhp\ScssPhp\Compiler();
 
             $cachefile = new \Frootbox\Filesystem\File($cachefilePathFull);
-            $cachefile->setSource($compiler->compile($scss));
+
+            $result = $compiler->compileString($scss);
+
+            $cachefile->setSource($result->getCss());
             $cachefile->write();
         }
 

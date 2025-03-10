@@ -105,8 +105,14 @@ class Response {
 
         if ($response instanceof \Frootbox\View\ResponseRedirect) {
 
+            $texts = [
+                'nl-NL' => 'Je wordt doorgestuurd.',
+            ];
+
+            $info = !empty($texts[GLOBAL_LANGUAGE])? $texts[GLOBAL_LANGUAGE] : 'Sie werden weitergeleitet.';
+
             $html .= '<meta http-equiv="refresh" content="0;url=' . $response->gettarget(). '"></meta>';
-            $html .= '<a href="' . $response->gettarget(). '">Sie werden weitergeleitet.</a>';
+            $html .= '<a href="' . $response->gettarget(). '">' . $info . '</a>';
         }
 
         $html .= '</div>

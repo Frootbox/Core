@@ -31,6 +31,10 @@ variables:
         label: mit Layout-Container
         type: bool
         default: false
+    skipPreTitle:
+        label: Ohne Pre-Titel
+        type: bool
+
 
 /config #}
 
@@ -76,7 +80,9 @@ variables:
 
                                     <div class="text-pillow">
 
-                                        <div class="pre-title" data-editable data-nowidgets data-uid="{{ article.getUid('pre-title') }}"></div>
+                                        {% if not variables.skipPreTitle %}
+                                            <div class="pre-title" data-editable data-nowidgets data-uid="{{ article.getUid('pre-title') }}"></div>
+                                        {% endif %}
 
                                         <h4 data-editable data-uid="{{ article.getUid('title') }}">{{ article.getTitle(globalLanguage) }}</h4>
 

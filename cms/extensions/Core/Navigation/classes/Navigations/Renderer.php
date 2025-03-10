@@ -7,28 +7,22 @@ namespace Frootbox\Ext\Core\Navigation\Navigations;
 
 class Renderer
 {
-    protected $navigation;
-    protected $parameters;
-    protected $container;
-
     protected $view = null;
     protected $icons = null;
 
     protected $loop;
 
     /**
-     *
+     * @param \Frootbox\Persistence\Navigation $navigation
+     * @param \DI\Container $container
+     * @param array $parameters
      */
     public function __construct(
-        \Frootbox\Persistence\Navigation $navigation,
-        \DI\Container $container,
-        array $parameters = [],
+        protected \Frootbox\Persistence\Navigation $navigation,
+        protected \DI\Container $container,
+        protected array $parameters = [],
     )
-    {
-        $this->navigation = $navigation;
-        $this->parameters = $parameters;
-        $this->container = $container;
-    }
+    { }
 
     /**
      * @param Items\AbstractItem $item
@@ -86,7 +80,13 @@ class Renderer
     {
         $itemIsActive = $item->isActive($this->parameters);
 
-        $html = '<a data-item="' . $item->getId() . '" data-parent="' . $item->getParentId() . '" data-loop="' . ++$this->loop . '" class="' . implode(' ', $item->getClasses()) . ' ' . ($itemIsActive ? 'active' : '') . '" href="' . $item->getHref() . '"><span>';
+        $html = (string) null;
+
+        if (!empty($this->parameters['wrapItems'])) {
+            $html .= '<div class="item">';
+        }
+
+        $html .= '<a data-item="' . $item->getId() . '" data-parent="' . $item->getParentId() . '" data-loop="' . ++$this->loop . '" class="' . implode(' ', $item->getClasses()) . ' ' . ($itemIsActive ? 'active' : '') . '" href="' . $item->getHref() . '"><span>';
 
         if (!empty($item->getConfig('icon'))) {
 
@@ -164,6 +164,10 @@ class Renderer
             $html .= $this->view->render($viewFile, [
                 'item' => $item,
             ]);
+        }
+
+        if (!empty($this->parameters['wrapItems'])) {
+            $html .= '</div>';
         }
 
         return $html;

@@ -37,52 +37,52 @@
 	}
 </style>
 
-			<img class="logo" src="{{ serverpath }}cms/admin/resources/public/images/logo.svg" alt="Logo" />
+<img class="logo" src="{{ serverpath }}cms/admin/resources/public/images/logo.svg" alt="Logo" />
 
-			<div class="message notice javascript-block">Bitte aktivieren Sie Javascript für Benutzung des CMS.</div>
+<div class="message notice javascript-block">Bitte aktivieren Sie Javascript für Benutzung des CMS.</div>
 
-			<div class="card hidden" id="ieBlock">
-				<div class="card-body">
-					<p>Bitte benutzen Sie Chrome oder Safari für das Backend des CMS.</p>
+<div class="card hidden" id="ieBlock">
+	<div class="card-body">
+		<p>Bitte benutzen Sie Chrome oder Safari für das Backend des CMS.</p>
+	</div>
+</div>
+
+<div id="login">
+
+	<h2>Anmeldung</h2>
+
+
+		<div>
+
+			<form class="ajax" method="post" action="{{ controller.getUri('ajaxLogin', { 'redirect' : get.get('redirect') } ) }}">
+
+				<div class="form-group">
+					<label for="login" class="sr-only">Benutzername</label>
+					<input type="email" class="form-control" id="login" name="login" placeholder="E-Mail">
 				</div>
-			</div>
 
-			<div id="login">
+				<div class="form-group">
+					<label for="password" class="sr-only">Passwort</label>
+					<input type="password" class="form-control" id="password" name="password" placeholder="Passwort">
+				</div>
 
-				<h2>Anmeldung</h2>
+				<div class="form-group form-check">
+					<input type="checkbox" class="form-check-input" id="stayLoggedIn" name="stayLoggedIn">
+					<label class="form-check-label" for="stayLoggedIn">angemeldet bleiben</label>
+				</div>
 
-
-					<div>
-
-						<form class="ajax" method="post" action="{{ controller.getUri('ajaxLogin', { 'redirect' : get.get('redirect') } ) }}">
-
-							<div class="form-group">
-								<label for="login" class="sr-only">Benutzername</label>
-								<input type="email" class="form-control" id="login" name="login" placeholder="E-Mail">
-							</div>
-
-							<div class="form-group">
-								<label for="password" class="sr-only">Passwort</label>
-								<input type="password" class="form-control" id="password" name="password" placeholder="Passwort">
-							</div>
-
-							<div class="form-group form-check">
-								<input type="checkbox" class="form-check-input" id="stayLoggedIn" name="stayLoggedIn">
-								<label class="form-check-label" for="stayLoggedIn">angemeldet bleiben</label>
-							</div>
-
-							<div class="row mt-5">
-								<div class="col-md-6">
-									<button type="submit" class="btn btn-primary">Anmelden</button>
-								</div>
-								<div class="col-md-6 text-right">
-									<a href="{{ controller.getUri('passwordLost') }}" class="password-lost btn btn-outline-secondary btn-sm">Passwort vergessen</a>
-								</div>
-							</div>
-
-
-						</form>
-
+				<div class="row mt-5">
+					<div class="col-md-6">
+						<button type="submit" class="btn btn-primary">Anmelden</button>
 					</div>
+					<div class="col-md-6 text-right">
+						<a href="{{ controller.getUri('passwordLost') }}" class="password-lost btn btn-outline-secondary btn-sm">Passwort vergessen</a>
+					</div>
+				</div>
 
-			</div>
+
+			</form>
+
+		</div>
+
+</div>

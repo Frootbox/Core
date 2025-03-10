@@ -165,8 +165,6 @@ variables:
 
                             {% set formRenderer = view.getViewhelper('Ext/Core/ContactForms/FormRenderer', {   }) %}
 
-
-
                             {{ formRenderer.render({
                                 formId: (job.getConfig('formId') ? job.getConfig('formId') : plugin.getConfig('formId')),
                                 options: {

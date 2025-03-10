@@ -1,0 +1,50 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    'title' : 'Sitemap',
+}) }}
+
+{{ front.addTab('Sitemap', front.getUri('Sitemap')) }}
+{{ front.addTab('Meta-Angaben', front.getUri('Sitemap', 'meta')) }}
+
+<div class="row">
+    <div class="col-12">
+
+        <h2>
+            Meta-Angaben
+        </h2>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th width="25%">Seite</th>
+                    <th width="25%">Titel</th>
+                    <th width="25%">Meta-Beschreibung</th>
+                    <th width="25%">Meta-Keywords</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                {% for Page in Tree %}
+
+                    {% set Alias = Page.getAliasObject() %}
+
+                    <tr>
+                        <td class="level-{{ Page.getLevel() }}">{{ Page.getTitle() }}</td>
+                        <td>
+                            {{ Alias.getConfig('seo.title') }}
+                        </td>
+                        <td>
+                            {{ Alias.getConfig('seo.description') }}
+                        </td>
+                        <td>
+                            {{ Alias.getConfig('seo.keywords') }}
+                        </td>
+                    </tr>
+                {% endfor %}
+
+            </tbody>
+        </table>
+
+    </div>
+</div>

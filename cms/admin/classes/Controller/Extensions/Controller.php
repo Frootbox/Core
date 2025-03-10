@@ -163,6 +163,8 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
         $paths = $paths->getData();
         $paths[] = CORE_DIR . 'cms/extensions/';
 
+        $statics = new \Frootbox\ConfigStatics($config);
+
         foreach ($dependencyTree as $extKey) {
 
             list($vendorId, $extensionId) = explode('/', $extKey);
@@ -195,7 +197,7 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
             if (empty($extension)) {
 
                 // Insert extension
-                $extension = $extensionsRepository->insert(new \Frootbox\Persistence\Extension([
+                $extension = $extensionsRepository->persist(new \Frootbox\Persistence\Extension([
                     'extensionId' => $extConfig['id'],
                     'vendorId' => $extConfig['vendor']['id'],
                     'version' => '0.0.0',
@@ -211,9 +213,12 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
             // Write autoloader
             $extensionsRepository->writeAutoloader($config);
 
+            sleep(1);
+
             require $config->get('filesRootFolder') . 'cache/system/autoload.php';
 
-            $container->call([ $extension, 'init' ]);
+            $newConfig = $container->call([ $extension, 'init' ]);
+            $statics->addConfig($newConfig);
 
             $migrations = $extension->getAvailableMigrations();
 
@@ -228,6 +233,7 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
             $extension->save();
         }
 
+        $statics->write();
 
         return self::getResponse('json', 200, [
             'success' => 'Die Erweiterung wurde installiert.',
@@ -364,18 +370,25 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
     }
 
     /**
-     *
+     * @param Container $container
+     * @param \Frootbox\Config\Config $config
+     * @param \Frootbox\Persistence\Repositories\Extensions $extensionsRepository
+     * @return Response
      */
     public function ajaxReload(
         \DI\Container $container,
         \Frootbox\Config\Config $config,
         \Frootbox\Persistence\Repositories\Extensions $extensionsRepository,
-        \Frootbox\Admin\Viewhelper\GeneralPurpose $gp,
     ): Response
     {
-        // Get statics configuration utility
-        $statics = new \Frootbox\ConfigStatics($config);
-        $statics->unsetConfig('editables');
+        /*
+        // Clear config cache
+        $file = FILES_DIR . 'config/general.php';
+        unlink($file);
+        */
+
+        // Write autoloader
+        $extensionsRepository->writeAutoloader($config);
 
         // Fetch extensions
         $result = $extensionsRepository->fetch([
@@ -384,6 +397,7 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
             ],
         ]);
 
+        /*
         $loop = 0;
         $editables = [];
 
@@ -409,8 +423,85 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
            ksort($editables);
         }
 
+
+        // Get statics configuration utility
+        $statics = new \Frootbox\ConfigStatics($config);
+        $statics->unsetConfig('editables');
+
         $statics->addConfig([
             'editables' => $editables,
+        ]);
+
+  */
+
+        $statics = new \Frootbox\ConfigStatics($config);
+
+        $editables = [];
+        $routes = [];
+        $postroutes = [];
+        $gizmos = [];
+
+        $loop = 0;
+
+        foreach ($result as $extension) {
+
+            $newConfig = $container->call([ $extension, 'init' ]);
+
+            if (!empty($newConfig['editables'])) {
+
+
+                foreach ($newConfig['editables'] as $index => $editable) {
+
+                    if ($index < 1000) {
+                        $index += 1000;
+                    }
+
+                    $index *= 100;
+
+                    $editables[($index + ++$loop)] = $editable;
+                }
+
+                ksort($editables);
+
+                unset($newConfig['editables']);
+            }
+
+            if (!empty($newConfig['routes'])) {
+                foreach ($newConfig['routes'] as $index => $route) {
+                    $routes[] = $route;
+                }
+
+                unset($newConfig['routes']);
+            }
+
+            if (!empty($newConfig['postroutes'])) {
+                foreach ($newConfig['postroutes'] as $index => $route) {
+                    $postroutes[] = $route;
+                }
+
+                unset($newConfig['postroutes']);
+            }
+
+            if (!empty($newConfig['gizmos'])) {
+                foreach ($newConfig['gizmos'] as $index => $gizmo) {
+                    $gizmos[] = $gizmo;
+                }
+
+                unset($newConfig['gizmos']);
+            }
+
+            $statics->addConfig($newConfig);
+        }
+
+        $statics->unsetConfig('editables');
+        $statics->unsetConfig('routes');
+        $statics->unsetConfig('postroutes');
+        $statics->unsetConfig('gizmos');
+        $statics->addConfig([
+            'editables' => $editables,
+            'routes' => $routes,
+            'postroutes' => $postroutes,
+            'gizmos' => $gizmos,
         ]);
 
         $statics->write();
@@ -513,10 +604,11 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
         // Write autoloader
         $extensions->writeAutoloader($config);
 
+
         require $config->get('filesRootFolder') . 'cache/system/autoload.php';
 
         if ($extension->getIsactive()) {
-            $container->call([ $extension, 'init' ]);
+           $container->call([ $extension, 'init' ]);
         }
 
         $db->transactionCommit();

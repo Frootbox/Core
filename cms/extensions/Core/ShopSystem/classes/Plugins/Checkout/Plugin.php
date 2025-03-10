@@ -468,7 +468,6 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         $translator = $this->getTranslator($translationFactory);
         // @TODO: Add payment methods to language files listing via config
 
-
         // Update newsletter consent
         if (!empty($newsletterConnector = $this->getNewsletterConnector($container))) {
             $newsletterConnector->execute($post, $shopcart);
@@ -565,6 +564,13 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
             $couponsRepository->insert($coupon);
         }
 
+        if (!empty($post->get('note'))) {
+            $note = $post->get('note');
+        }
+        else {
+            $note = $shopcart->getPersonal('note');
+        }
+
         // Compose booking
         $booking = new \Frootbox\Ext\Core\ShopSystem\Persistence\Booking([
             'pluginId' => $this->getId(),
@@ -572,7 +578,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
             'state' => 'Booked',
             'title' => $shopcart->getPersonal('firstname') . ' ' . $shopcart->getPersonal('lastname'),
             'config' => [
-                'note' => $post->get('note'),
+                'note' => $note,
                 'personal' => $shopcart->getPersonalData(),
                 'shipping' => $shopcart->getShippingData(),
                 'billing' => $shopcart->getBillingData(),
@@ -804,7 +810,6 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
             $delegator->transferBooking($booking);
         }
 
-        d("FERTIG");
         $dbms->transactionCommit();
 
         // Compose mails
@@ -1796,21 +1801,31 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\SelfPickupTime $selfPickUpTimeRepository,
     ): Response
     {
-        /**
-         * Fetch pickup-time
-         * @var \Frootbox\Ext\Core\ShopSystem\Persistence\SelfPickupTime $pickUpTime
-         */
-        $pickUpTime = $selfPickUpTimeRepository->fetchById($post->get('PickupTime'));
+        try {
 
-        // Obtain shipping data
-        $shipping = $shopcart->getShippingData();
+            if (empty($post->get('PickupTime'))) {
+                throw new \Exception('InputMissing.Fields');
+            }
 
-        $shipping['pickupTime'] = $pickUpTime->getTimeStart() . '–' . $pickUpTime->getTimeEnd();
-        $shipping['pickupTimeId'] = $pickUpTime->getId();
+            /**
+             * Fetch pickup-time
+             * @var \Frootbox\Ext\Core\ShopSystem\Persistence\SelfPickupTime $pickUpTime
+             */
+            $pickUpTime = $selfPickUpTimeRepository->fetchById($post->get('PickupTime'));
 
-        $shopcart->setShipping($shipping);
+            // Obtain shipping data
+            $shipping = $shopcart->getShippingData();
 
-        return new \Frootbox\View\ResponseRedirect($this->getActionUri('checkout'));
+            $shipping['pickupTime'] = $pickUpTime->getTimeStart() . '–' . $pickUpTime->getTimeEnd();
+            $shipping['pickupTimeId'] = $pickUpTime->getId();
+
+            $shopcart->setShipping($shipping);
+
+            return new \Frootbox\View\ResponseRedirect($this->getActionUri('checkout'));
+        }
+        catch (\Exception $e) {
+            return new \Frootbox\View\ResponseRedirect($this->getActionUri('ChoiceOfSelfPickupTime', [ 'error' => $e->getMessage() ]));
+        }
     }
 
     /**
@@ -2163,12 +2178,19 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
             // Check excluded delivery days
             if (!empty($shopPlugin->getConfig('postalExcludes'))) {
 
+                if ($postalCode < 10000) {
+                    $checkPostalCode = str_pad((int) $postalCode, 5, '0');
+                }
+                else {
+                    $checkPostalCode = $postalCode;
+                }
+
                 foreach ($shopPlugin->getConfig('postalExcludes') as $postalCodeRange) {
 
                     $from = str_pad((int) $postalCodeRange['from'], 5, '0');
                     $to = str_pad((int) $postalCodeRange['to'], 5, '0');
 
-                    if ($postalCode >= $from and $postalCode <= $to) {
+                    if ($checkPostalCode >= $from and $checkPostalCode <= $to) {
 
                         $weekDay = $actDate->format('w');
 
@@ -2437,7 +2459,10 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
     }
 
     /**
-     * @return \Frootbox\View\Response
+     * @param Shopcart $shopcart
+     * @param \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\SelfPickupTime $selfPickUpTimeRepository
+     * @return Response
+     * @throws \DateMalformedStringException
      */
     public function choiceOfSelfPickupTimeAction(
         Shopcart $shopcart,

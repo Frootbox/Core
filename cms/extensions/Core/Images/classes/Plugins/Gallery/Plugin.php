@@ -40,15 +40,17 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         return $result->current();
     }
 
-    
     /**
-     * 
+     * @param int|null $limit
+     * @return \Frootbox\Db\Result
+     * @throws \Frootbox\Exceptions\RuntimeError
      */
-    public function getTopCategories (
-        \Frootbox\Ext\Core\Images\Persistence\Repositories\Categories $categories
-    )
+    public function getTopCategories(
+        int $limit = null,
+    ): \Frootbox\Db\Result
     {
         // Fetch top categories
+        $categories = $this->getDb()->getRepository(\Frootbox\Ext\Core\Images\Persistence\Repositories\Categories::class);
         $result = $categories->fetch([
             'where' => [
                 'uid' => $this->getUid('categories'),
@@ -56,6 +58,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
                 new \Frootbox\Db\Conditions\GreaterOrEqual('visibility', 1)
             ],
             'order' => [ 'lft ASC' ],
+            'limit' => $limit ?? 1024,
         ]);
         
         return $result;

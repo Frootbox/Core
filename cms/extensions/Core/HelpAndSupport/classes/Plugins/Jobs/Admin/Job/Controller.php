@@ -196,6 +196,7 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
 
         $job->unsetConfig('titles');
         $job->unsetConfig('Types');
+        $job->unsetConfig('Remote');
 
         $job->addConfig([
             'titles' => $post->get('titles'),
@@ -210,6 +211,7 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
             'SalaryFrom' => $post->get('SalaryFrom'),
             'SalaryTo' => $post->get('SalaryTo'),
             'Types' => $post->get('Types'),
+            'Remote' => $post->get('Remote'),
         ]);
 
         $job->save();

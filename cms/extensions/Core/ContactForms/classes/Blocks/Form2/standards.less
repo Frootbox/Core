@@ -1,0 +1,86 @@
+$colorSpot1Mid: #CCC !default;
+
+.EditableBlock.ContactForms.Form2 {
+
+  div[data-editable]:not(:empty) {
+    margin-bottom: 50px;
+  }
+
+  .text-left {
+
+    > h2:first-child {
+      margin-top: 0;
+    }
+
+    > h3:first-child {
+      margin-top: 0;
+    }
+  }
+
+
+
+  div.LabelInside {
+
+    .form-group.form-check {
+      input[type="checkbox"] {
+        margin-top: 8px;
+      }
+    }
+
+
+    .form-group {
+      input {
+        padding-left: 0;
+        border-width: 0 0 2px 0;
+        border-radius: 0;
+        border-color: $colorSpot1Mid;
+
+        &:focus, &:active {
+          outline: none;
+          box-shadow: none;
+          border-color: inherit;
+        }
+      }
+
+      textarea {
+        border-radius: 0;
+        border-width: 2px;
+        border-color: $colorSpot1Mid;
+
+        &:focus, &:active {
+          outline: none;
+          box-shadow: none;
+          border-color: inherit;
+        }
+      }
+    }
+
+    .form-group.field-input {
+      position: relative;
+      margin-top: 30px;
+
+      label {
+        position: absolute;
+        top: -30px;
+        pointer-events: none;
+        transform-origin: 0 0; //scale keeps to the right
+        transform: scale(1) translateY(100%);
+        transition: transform 0.2s linear;
+
+        &.animate-label {
+          top: -17px;
+          transform: scale(0.6) translateY(0%);
+          transition: transform 0.2s linear;
+        }
+      }
+    }
+
+    .form-panel {
+      display: none;
+
+      &.active {
+        display: block;
+      }
+    }
+  }
+}

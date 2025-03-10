@@ -12,21 +12,26 @@ variables:
 {% set i = view.getViewhelper('Delegator', { object: plugin }) %}
 
 <script nonce="{{ settings.nonce }}">
+
+    var dataLayer = window.dataLayer || [];
+
     $(function ( ) {
         localStorage.setItem('fbxShopCartItemCount', null);
+
         $('.fbxShopCartItemCounter').hide();
 
+        {#
         gtag('event', 'conversion', {
             'send_to': 'AW-10924757133/Uou3CNyW15cYEI2hqtko',
             'value': {{ booking.getTotal() | number_format(2, ".") }},
             'currency': 'EUR',
             'transaction_id': '{{ booking.getId() }}'
         });
+        #}
     });
 
 
-
-    /*
+    {#
     gtag('event', 'purchase', {
         "transaction_id": "{{ booking.getConfig('orderNumber') }}",
         "value": {{ booking.getTotal() | number_format(2, ".") }},
@@ -45,7 +50,31 @@ variables:
             {% endfor %}
         ]
     });
-    */
+    #}
+
+    dataLayer.push({ ecommerce: null });
+    dataLayer.push({
+        event: "purchase",
+        ecommerce: {
+            transaction_id: "{{ booking.getConfig('orderNumber') }}",
+            // Sum of (price * quantity) for all items.
+            value: {{ booking.getTotal() | number_format(2, ".") }},
+            tax: {{ booking.getTax() }},
+            currency: "EUR",
+            items: [
+                {% for item in booking.getItems() %}
+                    {% if not loop.first %},{% endif %}{
+                    item_id: "{{ item.getItemNumber() | default(item.getProductId()) }}",
+                    item_name: "{{ item.getTitle() }}",
+                    index: {{ loop.index0 }},
+                    price: {{ item.priceGross() | number_format(2, ".") }},
+                    quantity: {{ item.getAmount() }}
+
+                }
+                {% endfor %}
+            ]
+        }
+    });
 </script>
 
 

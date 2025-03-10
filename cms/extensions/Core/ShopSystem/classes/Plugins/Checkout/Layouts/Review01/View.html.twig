@@ -26,6 +26,11 @@ variables:
 
     {% if variables.withContainer %}<div class="container">{% endif %}
 
+    {{ p.renderPartial('\\Frootbox\\Ext\\Core\\ShopSystem\\Plugins\\Checkout\\Partials\\CartProgress', {
+        plugin: plugin,
+        step: 'Review',
+    }) | raw }}
+
     <div class="row">
         <div class="col-12">
 
@@ -189,10 +194,12 @@ variables:
                     <div class="row">
                         <div class="col-md-6">
 
-                            <div class="form-group">
-                                <label for="note">{{ "Core.ShopSystem.LabelRemark" | translate }}</label>
-                                <textarea class="form-control" id="note" name="note" rows="3"></textarea>
-                            </div>
+                            {% if not plugin.getShopConfig('fields.EarlyNote') %}
+                                <div class="form-group">
+                                    <label for="note">{{ "Core.ShopSystem.LabelRemark" | translate }}</label>
+                                    <textarea class="form-control" id="note" name="note" rows="3"></textarea>
+                                </div>
+                            {% endif %}
 
                         </div>
                         <div class="col-md-6">

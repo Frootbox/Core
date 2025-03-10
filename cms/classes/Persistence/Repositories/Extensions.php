@@ -15,15 +15,16 @@ class Extensions extends \Frootbox\Db\Model {
     protected $table = 'extensions';
     protected $class = \Frootbox\Persistence\Extension::class;
 
-
     /**
-     *
+     * @param \Frootbox\Config\Config $config
+     * @return bool
+     * @throws \Frootbox\Exceptions\NotFound
      */
     public function writeAutoloader (
         \Frootbox\Config\Config $config
     ): bool
     {
-        // Generate cachefile name
+        // Generate cache-file name
         $cacheFile = $config->get('filesRootFolder') . 'cache' . DIRECTORY_SEPARATOR . 'system' . DIRECTORY_SEPARATOR . 'autoload.php';
 
         // Fetch active extensions
@@ -57,8 +58,7 @@ class Extensions extends \Frootbox\Db\Model {
             $source .= '});' . PHP_EOL . PHP_EOL . PHP_EOL;
         }
 
-
-        // Write cachefile
+        // Write cache-file
         $file = new \Frootbox\Filesystem\File($cacheFile);
         $file->setSource($source);
         $file->write();

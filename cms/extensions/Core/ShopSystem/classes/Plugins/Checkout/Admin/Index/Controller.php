@@ -38,6 +38,7 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
             ],
             'SelfPickupTimes' => $post->get('SelfPickupTimes'),
             'PaymentExtraStep' => !empty($post->get('PaymentExtraStep')),
+            'ShowProgressBar' => $post->getBoolean('ShowProgressBar'),
         ]);
         $this->plugin->save();
 

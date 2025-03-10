@@ -35,7 +35,7 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
 
         $files = [
             'App.php.twig',
-            'resources/private/views/Index.html.twig',
+            'resources/private/views/Index.html.twig.twig',
             'resources/private/language/de-DE.php.twig',
         ];
 
@@ -149,7 +149,7 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
             $files[] = 'resources/public/favicon/safari-pinned-tab.svg';
             $files[] = 'resources/public/favicon/site.webmanifest.twig';
             $files[] = 'resources/public/images/logo.svg';
-            $files[] = 'resources/public/images/logo-klima.svg';
+            $files[] = 'resources/public/images/logo-climate.svg';
         }
 
         $path = $this->getPath() . 'resources/private/templates/Extension/';

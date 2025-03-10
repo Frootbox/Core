@@ -31,7 +31,6 @@ class EditorPostRoute extends \Frootbox\Routing\AbstractRoute
 
             $pHtml = $gp->renderPartial(\Frootbox\Ext\Core\Editing\Partials\Editor\Partial::class);
 
-
             $parser = new \Frootbox\View\HtmlParser($pHtml, $container);
             $container->call([ $parser, 'rewriteTags' ]);
             $pHtml = $parser->getHtml();

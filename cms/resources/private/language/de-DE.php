@@ -5,6 +5,7 @@
 
 return [
     'Exceptions.InputMissing.Field' => 'Das Feld „%s“ muss gefüllt werden.',
+    'Exceptions.InputMissing.Fields' => 'Bitte alle notwendigen Felder ausfüllen.',
     'Exceptions.InputInvalid.DateStringExpected' => 'Die Eingabe „%s“ ist kein gültiges Datumsformat.',
     'Exceptions.ConfigurationMissing' => 'Der Konfigurationsparameter „%s“ fehlt.',
     'Exceptions.ClassMissing' => 'Die Klassen %s fehlt.',

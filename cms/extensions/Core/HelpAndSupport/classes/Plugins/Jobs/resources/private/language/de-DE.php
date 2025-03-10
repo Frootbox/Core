@@ -23,6 +23,7 @@ return [
     'TypeFulltimeOrParttime' => 'Vollzeit oder Teilzeit',
     'TypeApprentice' => 'Ausbildung',
     'TypeDualStudy' => 'Duales Studium',
+    'TypeMinijob' => 'Minijob',
 
     'GoogleEmploymentTypeFulltime' => 'FULL_TIME',
 ];

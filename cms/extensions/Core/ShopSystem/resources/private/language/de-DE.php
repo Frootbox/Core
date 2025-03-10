@@ -113,4 +113,12 @@ return [
     'MonthShort10' => 'Okt',
     'MonthShort11' => 'Nov',
     'MonthShort12' => 'Dez',
+
+    'NutritionCalorificValue' => 'Energie',
+    'NutritionCarbohydrates' => 'Kohlenhydrate',
+    'NutritionCarbohydratesOfWhichSugar' => 'davon Zucker',
+
+    'NutritionUnitKilocalories' => 'kcal',
+    'NutritionUnitKiloJoule' => 'kJ',
+    'NutritionUnitGramm' => 'g',
 ];

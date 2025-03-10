@@ -142,18 +142,20 @@ class Extension extends AbstractRow
     }
 
     /**
-     * 
+     * @param \Frootbox\Config\Config $config
+     * @param \Frootbox\Admin\Persistence\Repositories\Apps $appsRepository
+     * @return array
+     * @throws \Frootbox\Exceptions\NotFound
      */
     public function init(
         \Frootbox\Config\Config $config,
         \Frootbox\Admin\Persistence\Repositories\Apps $appsRepository,
-    ): void
+    ): array
     {
         // Get base config
         $baseConfig = $this->getBaseConfig($config);
 
-        // Get statics configuration utility
-        $statics = new \Frootbox\ConfigStatics($config);
+        $newConfig = [];
 
         // Add extensions config data to global configuration
         if (!empty($baseConfig['autoinstall']['config'])) {
@@ -169,8 +171,9 @@ class Extension extends AbstractRow
                 $baseConfig['autoinstall']['config']['injectPublics'] = $injectPublics;
             }
 
-            $statics->addConfig($baseConfig['autoinstall']['config']);
+            $newConfig = array_replace_recursive($newConfig, $baseConfig['autoinstall']['config']);
         }
+
 
         // Update content security policy
         if (!empty($baseConfig['autoinstall']['contentSecurityPolicy']['domains'])) {
@@ -185,7 +188,7 @@ class Extension extends AbstractRow
                 $domains[] = $domain;
             }
 
-            $statics->addConfig([
+            $newConfig = array_replace_recursive($newConfig, [
                 'contentSecurityPolicy' => [
                     'domains' => $domains,
                 ],
@@ -195,9 +198,9 @@ class Extension extends AbstractRow
         // Install extensions editables
         if (!empty($baseConfig['autoinstall']['editables'])) {
 
-            $editables = $config->get('editables') ? $config->get('editables')->getData() : [ ];
+            $editables = []; // $config->get('editables') ? $config->get('editables')->getData() : [ ];
 
-            foreach ($baseConfig['autoinstall']['editables'] as $editable) {
+            foreach ($baseConfig['autoinstall']['editables'] as $index => $editable) {
 
                 foreach ($editables as $check) {
                     if ($check['editable'] == $editable) {
@@ -205,10 +208,10 @@ class Extension extends AbstractRow
                     }
                 }
 
-                $editables[] = [ 'editable' => $editable ];
+                $editables[$index] = [ 'editable' => $editable ];
             }
 
-            $statics->addConfig([
+            $newConfig = array_replace_recursive($newConfig, [
                 'editables' => $editables
             ]);
         }
@@ -216,7 +219,7 @@ class Extension extends AbstractRow
         // Install extensions routers
         if (!empty($baseConfig['autoinstall']['routes'])) {
 
-            $routes = !empty($config->get('routes')) ? $config->get('routes')->getData() : [];
+            $routes = []; // !empty($config->get('routes')) ? $config->get('routes')->getData() : [];
 
             foreach ($baseConfig['autoinstall']['routes'] as $route) {
 
@@ -225,7 +228,7 @@ class Extension extends AbstractRow
                 ];
             }
 
-            $statics->addConfig([
+            $newConfig = array_replace_recursive($newConfig, [
                 'routes' => $routes,
             ]);
         }
@@ -233,7 +236,7 @@ class Extension extends AbstractRow
         // Install extensions gizmos
         if (!empty($baseConfig['autoinstall']['gizmos'])) {
 
-            $gizmos = !empty($config->get('gizmos')) ? $config->get('gizmos')->getData() : [];
+            $gizmos = []; // !empty($config->get('gizmos')) ? $config->get('gizmos')->getData() : [];
 
             foreach ($baseConfig['autoinstall']['gizmos'] as $route) {
 
@@ -242,7 +245,7 @@ class Extension extends AbstractRow
                 ];
             }
 
-            $statics->addConfig([
+            $newConfig = array_replace_recursive($newConfig, [
                 'gizmos' => $gizmos,
             ]);
         }
@@ -250,14 +253,14 @@ class Extension extends AbstractRow
         // Install blocks folders
         if (!empty($baseConfig['autoinstall']['blocksRootFolders'])) {
 
-            $blocksRootFolders = $config->get('blocksRootFolders') ? $config->get('blocksRootFolders')->getData() : [ ];
+            $blocksRootFolders = []; // $config->get('blocksRootFolders') ? $config->get('blocksRootFolders')->getData() : [ ];
 
             foreach ($baseConfig['autoinstall']['blocksRootFolders'] as $folder) {
 
                 $blocksRootFolders[] = $folder;
             }
 
-            $statics->addConfig([
+            $newConfig = array_replace_recursive($newConfig, [
                 'blocksRootFolders' => $blocksRootFolders
             ]);
         }
@@ -265,7 +268,7 @@ class Extension extends AbstractRow
         // Install extensions routers
         if (!empty($baseConfig['autoinstall']['postroutes'])) {
 
-            $postroutes = !empty($config->get('postroutes')) ? $config->get('postroutes')->getData() : [];
+            $postroutes = []; // !empty($config->get('postroutes')) ? $config->get('postroutes')->getData() : [];
 
             foreach ($baseConfig['autoinstall']['postroutes'] as $route) {
 
@@ -274,7 +277,7 @@ class Extension extends AbstractRow
                 ];
             }
 
-            $statics->addConfig([
+            $newConfig = array_replace_recursive($newConfig, [
                 'postroutes' => $postroutes,
             ]);
         }
@@ -282,7 +285,7 @@ class Extension extends AbstractRow
         // Install extensions fail routers
         if (!empty($baseConfig['autoinstall']['failroutes'])) {
 
-            $failroutes = !empty($config->get('failroutes')) ? $config->get('failroutes')->getData() : [];
+            $failroutes = []; // !empty($config->get('failroutes')) ? $config->get('failroutes')->getData() : [];
 
             foreach ($baseConfig['autoinstall']['failroutes'] as $route) {
 
@@ -291,13 +294,10 @@ class Extension extends AbstractRow
                 ];
             }
 
-            $statics->addConfig([
+            $newConfig = array_replace_recursive($newConfig, [
                 'failroutes' => $failroutes,
             ]);
         }
-
-        $statics->write();
-
 
         // Install extensions admin apps
         if (!empty($baseConfig['autoinstall']['apps'])) {
@@ -337,6 +337,8 @@ class Extension extends AbstractRow
                 }    
             }                        
         }
+
+        return $newConfig;
     }
     
     /**

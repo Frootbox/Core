@@ -40,7 +40,13 @@ variables:
 
 <div class="plugin Core ShopSystem Checkout Index01">
 
+
     {% if variables.withContainer %}<div class="container">{% endif %}
+
+    {{ p.renderPartial('\\Frootbox\\Ext\\Core\\ShopSystem\\Plugins\\Checkout\\Partials\\CartProgress', {
+        plugin: plugin,
+        step: 'Index'
+    }) | raw }}
 
     <div class="row">
         <div class="col-12">

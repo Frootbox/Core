@@ -16,6 +16,11 @@ variables:
 
     {% if variables.withContainer %}<div class="container">{% endif %}
 
+        {{ p.renderPartial('\\Frootbox\\Ext\\Core\\ShopSystem\\Plugins\\Checkout\\Partials\\CartProgress', {
+            plugin: plugin,
+            step: 'ChoiceOfDelivery'
+        }) | raw }}
+
         <div class="row">
             <div class="col-12">
 

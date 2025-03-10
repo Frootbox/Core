@@ -1,0 +1,62 @@
+{# config
+
+title: standard
+variables:
+
+#}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+{% set Events = i.getEvents() %}
+
+<div class="plugin Core Events Schedule Index08">
+
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+
+                <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+
+                <div data-editable data-uid="{{ plugin.getUid('teaser-text') }}"></div>
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Datum</th>
+                            <th>Kurs</th>
+                            <th>Ort</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for Event in Events %}
+                            <tr>
+                                <td>
+                                    {% if Event.getDateStart() | date('d.m.Y') == Event.getDateEnd() | date('d.m.Y') %}
+                                        {{ Event.getDateStart() | date('d.m.Y') }}
+                                    {% else %}
+                                        {{ Event.getDateStart() | date('d.m.') }}–{{ Event.getDateEnd() | date('d.m.Y') }}
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {{ Event.getTitle() }}
+
+                                    {% for Tag in Event.getTags() %}
+                                        <span class="badge">{{ Tag.getTag() }}</span>
+                                    {% endfor %}
+                                </td>
+                                <td>
+                                    {{ Event.getLocationTitle() }}
+                                </td>
+                                <td>
+                                    <a href="{{ Event.getUri() }}">Anfrage</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+
+</div>

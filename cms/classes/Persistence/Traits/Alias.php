@@ -79,6 +79,20 @@ trait Alias
         return $payload;
     }
 
+    public function getAliasObject(): ?\Frootbox\Persistence\Alias
+    {
+        $aliases = $this->getDb()->getRepository(\Frootbox\Persistence\Repositories\Aliases::class);
+        $row = $aliases->fetchOne([
+            'where' => [
+                'itemId' => $this->getId(),
+                'itemModel' => $this->getModelClass(),
+                'status' => 200,
+            ]
+        ]);
+
+        return $row;
+    }
+
     /**
      * Fetch all active and inactive aliases
      *
@@ -231,7 +245,7 @@ trait Alias
             $aliasDirectory = [];
 
             foreach ($trace as $page) {
-                $aliasDirectory[] = $this->getStringUrlSanitized($page->getTitle($alias->getLanguage()));
+                $aliasDirectory[] = $this->getStringUrlSanitized($page->getTitle($alias->getLanguage()), $alias->getLanguage());
             }
 
             foreach ($alias->getVirtualDirectory() as $folder) {

@@ -26,6 +26,11 @@ variables:
 
     {% if variables.withContainer %}<div class="container">{% endif %}
 
+    {{ p.renderPartial('\\Frootbox\\Ext\\Core\\ShopSystem\\Plugins\\Checkout\\Partials\\CartProgress', {
+        plugin: plugin,
+        step: 'Checkout',
+    }) | raw }}
+
     <div class="row">
         <div class="col-12">
 
@@ -157,10 +162,14 @@ variables:
                                     <input tabindex="10" required type="text" class="form-control" id="streetNumber" name="personal[streetNumber]" placeholder="{{ "Core.ShopSystem.LabelStreetNumber" | translate }}" value="{{ shopcart.getPersonal('streetNumber') }}">
                                 </div>
                             </div>
-                            <div class="form-group">
-                                <label for="addition">{{ "Core.ShopSystem.LabelAddressSupplement" | translate }}</label>
-                                <input tabindex="8" type="text" class="form-control" id="addition" name="personal[addition]" placeholder="{{ "Core.ShopSystem.LabelAddressSupplement" | translate }}" value="{{ shopcart.getPersonal('addition') }}">
-                            </div>
+
+                            {% if not plugin.getShopConfig('fields.SkipAddressSupplement') %}
+                                <div class="form-group">
+                                    <label for="addition">{{ "Core.ShopSystem.LabelAddressSupplement" | translate }}</label>
+                                    <input tabindex="8" type="text" class="form-control" id="addition" name="personal[addition]" placeholder="{{ "Core.ShopSystem.LabelAddressSupplement" | translate }}" value="{{ shopcart.getPersonal('addition') }}">
+                                </div>
+                            {% endif %}
+
                             <div class="form-row">
                                 <div class="form-group col-4">
                                     <label for="postalCode">{{ "Core.ShopSystem.LabelZipcode" | translate }} *</label>
@@ -432,6 +441,12 @@ variables:
 
                             {% endif %}
 
+                            {% if plugin.getShopConfig('fields.EarlyNote') %}
+                                <div class="form-group">
+                                    <label for="note">{{ "Core.ShopSystem.LabelRemark" | translate }}</label>
+                                    <textarea class="form-control" id="note" name="personal[note]" rows="3">{{ shopcart.getPersonal('note') }}</textarea>
+                                </div>
+                            {% endif %}
 
                             {% if not config.get('shop.coupons.disabled') %}
 

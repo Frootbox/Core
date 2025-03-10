@@ -768,6 +768,30 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         return self::getResponse('json', 200);
     }
 
+    public function ajaxUpdateNutritionAction(
+        Get $get,
+        Post $post,
+        Products $productsRepository,
+    ): Response
+    {
+        /**
+         * Fetch product
+         * @var \Frootbox\Ext\Core\ShopSystem\Persistence\Product $product
+         */
+        $product = $productsRepository->fetchById($get->get('ProductId'));
+        $nutrition = $product->getNutritionTable();
+
+        // Update nutrition
+        $nutrition->setCalorificValue($post->getWithDefault('CalorificValue'));
+        $nutrition->setCarbohydrates($post->getWithDefault('Carbohydrates'));
+        $nutrition->setCarbohydratesOfWhichSugar($post->getWithDefault('CarbohydratesOfWhichSugar'));
+        $nutrition->setProtein($post->getWithDefault('Protein'));
+        $nutrition->save();
+
+        return self::getResponse('json', 200);
+    }
+
+
     /**
      *
      */

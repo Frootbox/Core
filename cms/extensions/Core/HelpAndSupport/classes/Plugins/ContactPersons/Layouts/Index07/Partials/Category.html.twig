@@ -11,10 +11,12 @@
 
     {% if contacts.getCount() > 0 %}
 
-        <div class="row">
-            {% for contact in contacts %}
-                {{ sp.renderPartial('Contact', { fromfile: __FILE__, colClass: data.colClass, contact: contact }) | raw }}
-            {% endfor %}
+        <div class="teasers">
+            <div class="row">
+                {% for contact in contacts %}
+                    {{ sp.renderPartial('Contact', { fromfile: __FILE__, colClass: data.colClass, contact: contact }) | raw }}
+                {% endfor %}
+            </div>
         </div>
 
     {% endif %}

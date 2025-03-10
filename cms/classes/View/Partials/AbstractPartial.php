@@ -31,7 +31,9 @@ abstract class AbstractPartial implements PartialInterface
     }
 
     /**
-     *
+     * @param \Frootbox\View\Engines\Interfaces\Engine $view
+     * @param array $payload
+     * @return string
      */
     public function render (
         \Frootbox\View\Engines\Interfaces\Engine $view,

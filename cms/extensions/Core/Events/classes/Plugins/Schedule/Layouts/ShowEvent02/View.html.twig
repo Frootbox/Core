@@ -1,0 +1,95 @@
+
+
+<div class="plugin Core Events Schedule ShowEvent02">
+
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+
+                <h2 class="first main-title" data-editable data-uid="{{ event.getUid('title') }}">{{ event.getTitle }}</h2>
+
+                <div class="row">
+                    <div class="col-md-6">
+
+                        <div class="sticky-top">
+                            <div class="event-teaser">
+
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <th>Veranstaltung</th>
+                                            <td>{{ event.getTitle() }}</td>
+                                        </tr>
+
+                                        {% if event.getDateStart() | date('Y-m-d') == event.getDateEnd() | date('Y-m-d') %}
+                                            <tr>
+                                                <th>Datum</th>
+                                                <td>
+                                                    {{ event.getDateStart() | date('d.m.Y') }}
+
+                                                    {% if event.getDateStart() | date('H:i') != event.getDateEnd() | date('H:i') %}
+                                                        {{ event.getDateStart() | date('H:i') }}–{{ event.getDateEnd() | date('H:i') }} Uhr
+                                                    {% elseif event.getDateStart() | date('H:i') != "00:00" %}
+                                                        {{ event.getDateStart() | date('H:i') }} Uhr
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                        {% else %}
+                                            <tr>
+                                                <th>Beginn</th>
+                                                <td>
+                                                    {{ event.getDateStart() | date('d.m.Y') }}
+
+                                                    {% if event.getDateStart() | date('H:i') != "00:00" %}
+                                                        {{ event.getDateStart() | date('H:i') }} Uhr
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th>Ende</th>
+                                                <td>{{ event.getDateEnd() | date('d.m.Y') }}</td>
+                                            </tr>
+                                        {% endif %}
+
+                                        {% if event.getVenue() %}
+                                            <tr>
+                                                <th>Ort</th>
+                                                <td>{{ event.getVenue().getTitle() }}</td>
+                                            </tr>
+                                        {% endif %}
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-md-6">
+
+                        {% if plugin.getConfig('formId') %}
+
+                            <h3 class="first" data-editable data-uid="{{ plugin.getUid('apply-now') }}">Jetzt anfragen!</h3>
+
+                            {% set formRenderer = view.getViewhelper('Ext/Core/ContactForms/FormRenderer', {   }) %}
+
+                            {{ formRenderer.render({
+                                formId: plugin.getConfig('formId'),
+                                options: {
+                                    editable: true,
+                                },
+                                payload: {
+                                    'Event': event.getTitle(),
+                                    'Standort': event.getVenue().getTitle(),
+                                }
+                            }) | raw }}
+
+                        {% endif %}
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>

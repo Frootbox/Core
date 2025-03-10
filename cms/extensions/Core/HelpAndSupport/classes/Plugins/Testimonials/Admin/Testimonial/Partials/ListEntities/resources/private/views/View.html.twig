@@ -10,6 +10,7 @@
 				<th>Titel</th>
 				<th>Datum</th>
 				<th></th>
+				<th></th>
 			</tr>
 		</thead>
 		<tbody>
@@ -25,6 +26,13 @@
 						{% endfor %}
 					</td>
 					<td>{{ entity.getDateStart() | date("d.m.Y H:i") }} Uhr</td>
+					<td>
+						{% if entity.getConfig('stars') %}
+							{% for i in 1..(entity.getConfig('stars')) %}
+								<i class="far fa-star"></i>
+							{% endfor %}
+						{% endif %}
+					</td>
 					<td class="text-right">
 						<a class="ajax" href="{{ v.getUri('Assets', 'ajaxSwitchVisibility', { assetId: entity.getId() } ) }}"><i data-asset="{{ entity.getId() }}" class="fa fa-lightbulb visibility {{ entity.getVisibilityString() }} icon"></i></a>
 						<a class="ajax" data-confirm="Soll diese Bewertung wirklich gelöscht werden?" href="{{ data.plugin.getAdminUri('Testimonial', 'ajaxDelete', { entityId: entity.getId() }) }}"><i class="icon fa fa-times"></i></a>

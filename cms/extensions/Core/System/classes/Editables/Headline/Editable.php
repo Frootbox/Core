@@ -98,10 +98,10 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
             $template = '<header ' . $addedHtml . ' class="' . $classes . '" data-uid="' . $uid . '">';
 
             if (!empty($element->getAttribute('data-supertitle'))) {
-                $template .= '<p class="supertitle">' . $element->getAttribute('data-supertitle') . '</p>';
+                $template .= '<p class="supertitle super-title">' . $element->getAttribute('data-supertitle') . '</p>';
             }
             elseif ($text and !empty($text->getConfig('supertitle')) and empty($element->getAttribute('data-skipsupertitle'))) {
-                $template .= '<p class="supertitle">' . $text->getConfig('supertitle') . '</p>';
+                $template .= '<p class="supertitle super-title">' . $text->getConfig('supertitle') . '</p>';
             }
 
             $styles = (string) null;

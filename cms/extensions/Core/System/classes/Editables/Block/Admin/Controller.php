@@ -82,7 +82,6 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
 
             $data = explode('-', $post->get('block'));
 
-
             // Compose new block
             $block = new \Frootbox\Persistence\Content\Blocks\Block([
                 'pageId' => $page->getId(),
@@ -91,6 +90,7 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
                 'extensionId' => $data[1],
                 'blockId' => $data[2],
                 'orderId' => $orderId,
+                'config' => $config->get('Ext.' . $data[0] . '.' . $data[1] . '.Blocks.' . $data[2] . '.defaultConfig') ?? [],
             ]);
 
             $extensionController = $block->getExtensionController();
@@ -109,7 +109,7 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
 
                 $source = file_get_contents(dirname($classPath) . '/Block.html.twig');
 
-                if (preg_match('#extends: ([a-z]+)/([a-z]+)/([a-z]+)\s#i', $source, $match)) {
+                if (preg_match('#extends: ([a-z0-9]+)/([a-z0-9]+)/([a-z0-9]+)\s#i', $source, $match)) {
 
                     $className = '\\Frootbox\\Ext\\' . $match[1] .  '\\' . $match[2] . '\\ExtensionController';
 
@@ -203,6 +203,7 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
                 unset($_SESSION['editmode']['editables']['block']['copy']);
             }
         }
+
 
         $blockHtml = '<div data-blocks data-uid="' . $block->getUidRaw() . '"></div>';
 

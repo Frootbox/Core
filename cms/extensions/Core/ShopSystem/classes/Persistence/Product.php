@@ -532,6 +532,32 @@ class Product extends \Frootbox\Persistence\AbstractConfigurableRow implements \
     }
 
     /**
+     * @return ProductNutrition
+     * @throws \Frootbox\Exceptions\RuntimeError
+     */
+    public function getNutritionTable(): \Frootbox\Ext\Core\ShopSystem\Persistence\ProductNutrition
+    {
+        $repository = $this->getDb()->getRepository(\Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\ProductsNutrition::class);
+
+        $nutrition = $repository->fetchOne([
+            'where' => [
+                'productId' => $this->getId(),
+            ],
+        ]);
+
+        if ($nutrition === null) {
+
+            $nutrition = new \Frootbox\Ext\Core\ShopSystem\Persistence\ProductNutrition([
+                'productId' => $this->getId(),
+            ]);
+
+            $repository->persist($nutrition);
+        }
+
+        return $nutrition;
+    }
+
+    /**
      *
      */
     public function getOptionalFields(): ?array

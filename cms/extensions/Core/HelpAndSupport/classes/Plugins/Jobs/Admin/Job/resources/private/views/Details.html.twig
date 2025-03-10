@@ -49,9 +49,11 @@
                         {% endfor %}
                     {% endif %}
 
+                    <h3>Ort</h3>
+
                     {% if v.isExtensionInstalled('Core', 'Addresses') %}
                         <div class="form-group">
-                            <label for="city">Ort</label>
+                            <label for="locationId">Ort</label>
                             <select size="1" class="form-control" name="locationId" id="locationId">
                                 <option value="">bitte wählen ...</option>
                                 {% for address in i.getAddresses() %}
@@ -61,6 +63,11 @@
 
                         </div>
                     {% endif %}
+
+                    <div class="form-group form-check">
+                        <input {% if job.getConfig('Remote.Available') %}checked{% endif %} type="checkbox" class="form-check-input" id="RemoteAvailable" name="Remote[Available]">
+                        <label class="form-check-label" for="RemoteAvailable">Remote erlaubt</label>
+                    </div>
 
                     <h3>Anstellungs-Art</h3>
 
@@ -99,6 +106,10 @@
                     <div class="form-group form-check">
                         <input {% if job.getConfig('Types.DualStudy') %}checked{% endif %} type="checkbox" class="form-check-input" id="TypesDualStudy" name="Types[DualStudy]">
                         <label class="form-check-label" for="TypesDualStudy">Duales Studium</label>
+                    </div>
+                    <div class="form-group form-check">
+                        <input {% if job.getConfig('Types.Minijob') %}checked{% endif %} type="checkbox" class="form-check-input" id="TypesMinijob" name="Types[Minijob]">
+                        <label class="form-check-label" for="TypesMinijob">Minijob</label>
                     </div>
 
                     {{ v.injectPartial('\\Frootbox\\Admin\\View\\Partials\\Input\\Tags', {

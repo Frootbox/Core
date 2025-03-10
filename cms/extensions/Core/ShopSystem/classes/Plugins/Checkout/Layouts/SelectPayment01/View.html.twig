@@ -11,6 +11,12 @@
     <form action="{{ plugin.getAjaxUri('SubmitPayment') }}" method="post" class="ajax-checkout-form">
 
         <div class="container">
+
+            {{ p.renderPartial('\\Frootbox\\Ext\\Core\\ShopSystem\\Plugins\\Checkout\\Partials\\CartProgress', {
+                plugin: plugin,
+                step: 'SelectPayment',
+            }) | raw }}
+
             <div class="row">
                 <div class="col-12">
 

@@ -92,5 +92,13 @@ return [
 
     'Mail.Greeting' => 'Hallo %s,<br /><br />vielen Dank für Ihre Bestellung bei uns. Anbei finden Sie eine Übersicht über Ihre Bestellung.',
 
+    'Progress.Steps.Index' => 'Start',
+    'Progress.Steps.ChoiceOfDelivery' => 'Lieferdatum',
+    'Progress.Steps.ChoiceOfSelfPickup' => 'Abholdatum',
+    'Progress.Steps.ChoiceOfSelfPickupTime' => 'Abholzeit',
+    'Progress.Steps.Checkout' => 'Persönliche Daten',
+    'Progress.Steps.SelectPayment' => 'Zahlungsart',
+    'Progress.Steps.Review' => 'Abschluss',
+
     'Time' => 'Uhr',
 ];

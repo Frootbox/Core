@@ -113,6 +113,10 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         $entity->setTitle($post->get('title'));
         $entity->setDateStart($post->get('dateStart') . ' ' . $post->get('timeStart'));
 
+        $entity->addConfig([
+            'stars' => $post->get('stars'),
+        ]);
+
         $entity->save();
 
         // Set tags

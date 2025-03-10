@@ -28,6 +28,48 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
     }
 
     /**
+     * @param Persistence\Question $question
+     * @return Persistence\Question
+     * @throws \Frootbox\Exceptions\RuntimeError
+     */
+    public function getPredecessorOf(\Frootbox\Ext\Core\HelpAndSupport\Plugins\FAQ\Persistence\Question $question): \Frootbox\Ext\Core\HelpAndSupport\Plugins\FAQ\Persistence\Question
+    {
+        $repository = $this->getDb()->getRepository(\Frootbox\Ext\Core\HelpAndSupport\Plugins\FAQ\Persistence\Repositories\Questions::class);
+
+        $successor = $repository->fetchOne([
+            'where' => [
+                'pluginId' => $this->getId(),
+                new \Frootbox\Db\Conditions\GreaterOrEqual('orderId', $question->getOrderId()),
+                new \Frootbox\Db\Conditions\NotEqual('id', $question->getId()),
+            ],
+            'order' => [ 'orderId ASC', 'id DESC' ],
+        ]);
+
+        return $successor;
+    }
+
+    /**
+     * @param Persistence\Question $question
+     * @return Persistence\Question
+     * @throws \Frootbox\Exceptions\RuntimeError
+     */
+    public function getSuccessorOf(\Frootbox\Ext\Core\HelpAndSupport\Plugins\FAQ\Persistence\Question $question): \Frootbox\Ext\Core\HelpAndSupport\Plugins\FAQ\Persistence\Question
+    {
+        $repository = $this->getDb()->getRepository(\Frootbox\Ext\Core\HelpAndSupport\Plugins\FAQ\Persistence\Repositories\Questions::class);
+
+        $successor = $repository->fetchOne([
+            'where' => [
+                'pluginId' => $this->getId(),
+                new \Frootbox\Db\Conditions\LessOrEqual('orderId', $question->getOrderId()),
+                new \Frootbox\Db\Conditions\NotEqual('id', $question->getId()),
+            ],
+            'order' => [ 'orderId DESC', 'id ASC' ],
+        ]);
+
+        return $successor;
+    }
+
+    /**
      *
      */
     public function getQuestions(

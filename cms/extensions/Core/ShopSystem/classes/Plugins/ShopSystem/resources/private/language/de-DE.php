@@ -25,6 +25,7 @@ return [
     'UnitEach' => 'Stück',
     'UnitLiter' => 'Liter',
     'UnitKilogram' => 'Kilogramm',
+    'UnitGram' => 'Gramm',
 
     'UnitShortSquareMeters' => 'qm',
 

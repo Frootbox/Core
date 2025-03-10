@@ -84,5 +84,13 @@ return [
 
     'Mail.Greeting' => 'Hallo %s,<br /><br />Bedankt voor uw bestelling bij ons. Bijgevoegd vindt u een overzicht van uw bestelling.',
 
+    'Progress.Steps.Index' => 'Winkelmand',
+    'Progress.Steps.ChoiceOfDelivery' => 'Leverdatum',
+    'Progress.Steps.ChoiceOfSelfPickup' => 'Ophaaldag',
+    'Progress.Steps.ChoiceOfSelfPickupTime' => 'Aafhaaltijd',
+    'Progress.Steps.Checkout' => 'Persoonlijke gegevens',
+    'Progress.Steps.SelectPayment' => 'Betaalmethode',
+    'Progress.Steps.Review' => 'Bestelling afmaken',
+
     'Time' => 'uur',
 ];

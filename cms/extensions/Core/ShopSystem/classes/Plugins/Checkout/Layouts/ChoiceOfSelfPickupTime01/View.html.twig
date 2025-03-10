@@ -10,11 +10,21 @@ variables:
 /config #}
 
 {% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set p = view.getViewhelper('Partials', { plugin: plugin }) %}
 
 
 <div class="plugin Core ShopSystem Checkout ChoiceOfSelfPickupTime01">
 
     <div class="container">
+
+        {{ p.renderPartial('\\Frootbox\\Ext\\Core\\ShopSystem\\Plugins\\Checkout\\Partials\\CartProgress', {
+            plugin: plugin,
+            step: 'ChoiceOfSelfPickupTime',
+        }) | raw }}
+
+        {% if plugin.hasAttribute('error') %}
+            <div class="message danger">{{ ("Exceptions." ~ plugin.getAttribute('error')) | translate }}</div>
+        {% endif %}
 
         <div class="row">
             <div class="col-12">

@@ -10,12 +10,19 @@ variables:
 /config #}
 
 {% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set p = view.getViewhelper('Partials', { plugin: plugin }) %}
+
 {% set icons = view.getViewhelper('Ext/HerrUndFrauPixelExt/Icons/Icons', { createDummyOnFail: true  }) %}
 
 
 <div class="plugin Core ShopSystem Checkout ChoiceOfSelfPickup01">
 
     {% if variables.withContainer %}<div class="container">{% endif %}
+
+        {{ p.renderPartial('\\Frootbox\\Ext\\Core\\ShopSystem\\Plugins\\Checkout\\Partials\\CartProgress', {
+            plugin: plugin,
+            step: 'ChoiceOfSelfPickup'
+        }) | raw }}
 
         <div class="row">
             <div class="col-12">

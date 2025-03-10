@@ -2,9 +2,14 @@
 
 title: Standard
 variables:
+    withForwardAndBack:
+        type: bool
+        label: mit Vor- und Zurück-Button
     withContainer:
         type: bool
         label: mit Layout-Container
+
+
 
 /config #}
 
@@ -44,5 +49,26 @@ variables:
     {% if variables.withContainer %}</div>{% endif %}
 
     <div data-label="Blöcke unter der F.A.Q. Frage" data-blocks data-uid="{{ question.getUid('block-content') }}"></div>
+
+    {% if variables.withForwardAndBack %}
+
+        {% set Successor = plugin.getSuccessorOf(question) %}
+        {% set Predecessor = plugin.getPredecessorOf(question) %}
+
+        <div class="container mt-5">
+            <div class="row">
+                <div class="col-md-6 text-left">
+                    {% if Predecessor %}
+                        <a class="btn btn-primary" href="{{ Predecessor.getUri() }}">&laquo; {{ Predecessor.getTitle() }}</a>
+                    {% endif %}
+                </div>
+                <div class="col-md-6 text-right">
+                    {% if Successor %}
+                        <a class="btn btn-primary" href="{{ Successor.getUri() }}">{{ Successor.getTitle() }} &raquo;</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
 
 </div>

@@ -70,7 +70,7 @@ class View extends AbstractViewhelper
                 return '<link ' . $attributes .' rel="stylesheet" type="text/css" href="' . $source . '" />';
 
             case 'script':
-                return '<script ' . $attributes .' src="' . $source . '"></script>';
+                return '<script nonce="' . SCRIPT_NONCE . '" ' . $attributes .' src="' . $source . '"></script>';
 
             case 'scss':
                 return '<link ' . $attributes .' rel="stylesheet/less" type="text/css" href="' . $source . '" />';

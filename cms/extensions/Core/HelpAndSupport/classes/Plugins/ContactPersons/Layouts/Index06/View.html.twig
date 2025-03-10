@@ -87,6 +87,9 @@ variables:
                                                         {% if contact.getPhone() %}
                                                             <br /><a href="tel:{{ contact.getPhone() }}">{{ contact.getPhone() }}</a>
                                                         {% endif %}
+                                                        {% if contact.getPhone2() %}
+                                                            <br /><a href="tel:{{ contact.getPhone2() }}">{{ contact.getPhone2() }}</a>
+                                                        {% endif %}
                                                     </p>
 
 
