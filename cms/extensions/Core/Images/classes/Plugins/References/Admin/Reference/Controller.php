@@ -234,7 +234,12 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     }
 
     /**
-     *
+     * @param \Frootbox\Http\Get $get
+     * @param \Frootbox\Http\Post $post
+     * @param \Frootbox\Ext\Core\Images\Plugins\References\Persistence\Repositories\References $referencesRepository
+     * @return Response
+     * @throws \Frootbox\Exceptions\InputMissing
+     * @throws \Frootbox\Exceptions\RuntimeError
      */
     public function ajaxUpdateAction(
         \Frootbox\Http\Get $get,
@@ -259,6 +264,7 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         $reference->unsetConfig('titles');
         $reference->addConfig([
             'url' => $post->get('url'),
+            'url2' => $post->get('url2'),
             'titles' => $titles,
             'forceReferencesDetailPage' => $post->get('forceReferencesDetailPage'),
         ]);
