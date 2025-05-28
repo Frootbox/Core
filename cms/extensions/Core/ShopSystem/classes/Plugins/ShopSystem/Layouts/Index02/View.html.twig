@@ -10,11 +10,9 @@ title: Standard
 <div class="row">
     <div class="col-12 plugin Core ShopSystem ShopSystem Index02">
 
-        {% if plugin.isFirst %}
-            <h1 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h1>
-        {% else %}
-            <h2 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
-        {% endif %}
+
+        <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+
 
         <div class="row">
             <div class="col-md-4">
@@ -40,7 +38,7 @@ title: Standard
 
                 <div class="show-categories d-none d-md-block">
 
-                    <h3>Kategorien</h3>
+                    <h3 class="left">Kategorien</h3>
 
                     <ul class="categories">
                         {% for category in i.getTopCategories() %}

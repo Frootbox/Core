@@ -416,12 +416,7 @@ class Page extends \Frootbox\AbstractStaticPage
         }
         elseif (empty($form->getConfig('feedback')) or $form->getConfig('feedback') == 'Page') {
 
-            if (!empty($get->get('pluginId'))) {
-
-                $plugin = $contentElements->fetchById($get->get('pluginId'));
-                $payload['redirect'] = $plugin->getActionUri('complete');
-            }
-            elseif($form->getConfig('feedbackPageId')) {
+            if (!empty($form->getConfig('feedbackPageId'))) {
 
                 try {
 
@@ -434,6 +429,11 @@ class Page extends \Frootbox\AbstractStaticPage
                 catch (\Exception $e) {
                     // Ignore
                 }
+            }
+            elseif (!empty($get->get('pluginId'))) {
+
+                  $plugin = $contentElements->fetchById($get->get('pluginId'));
+                  $payload['redirect'] = $plugin->getActionUri('complete');
             }
         }
 

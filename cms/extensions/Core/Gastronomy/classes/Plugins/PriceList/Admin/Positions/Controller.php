@@ -160,11 +160,12 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
             ]);
         }
         else {
-
             $result = $additivesRepository->fetch([
                 'where' => [ 'pluginId' => $this->plugin->getId() ],
                 'order' => [ 'orderId ASC' ]
             ]);
+
+            d($result);
         }
 
         $view->set('additives', $result);

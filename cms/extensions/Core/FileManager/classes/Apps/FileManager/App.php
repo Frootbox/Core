@@ -325,4 +325,28 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
 
         die("OK");
     }
+
+    public function restoreFilesAction(
+        \Frootbox\Persistence\Repositories\Files $filesRepository
+    ): Response
+    {
+        // Fetch files
+        $files = $filesRepository->fetch();
+
+        $trashPath = FILES_DIR . 'trash/';
+
+        $loop = 0;
+
+        foreach ($files as $file) {
+
+            if (!file_exists(FILES_DIR . $file->getPath())) {
+                if (file_exists($trashPath . basename($file->getPath()))) {
+                    ++$loop;
+                    rename($trashPath . basename($file->getPath()), FILES_DIR . $file->getPath());
+                }
+            }
+        }
+
+        d("Es wurden $loop Dateien wiederhergestellt.");
+    }
 }

@@ -8,7 +8,7 @@ namespace Frootbox\Ext\Core\Events\Plugins\Schedule\Admin\Event;
 class Controller extends \Frootbox\Admin\AbstractPluginController
 {
     /**
-     *
+     * @return string
      */
     public function getPath(): string
     {
@@ -16,7 +16,8 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     }
 
     /**
-     *
+     * @param \Frootbox\Ext\Core\Events\Persistence\Repositories\Venues $venueRepository
+     * @return \Frootbox\Db\Result
      */
     public function getAddresses(
         \Frootbox\Ext\Core\Events\Persistence\Repositories\Venues $venueRepository,

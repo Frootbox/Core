@@ -1,3 +1,20 @@
+/**
+
+ Layers
+
+  100 =>
+  200 =>
+  300 =>
+  400 =>
+  500 => Content
+  600 =>
+  700 =>
+  800 => statische Navigationselemente
+  900 => Banner
+ 1000 => Offcanvas
+
+ */
+
 body.offcanvas-visible {
   #offcanvas {
     display: block;
@@ -5,27 +22,39 @@ body.offcanvas-visible {
 }
 
 #offcanvas {
-  z-index: 900;
-  display: none;
+  z-index: 1000;
   position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
+  inset: 0;
+
+  display: none;
 
   .outer-wrapper {
     position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
+    inset: 0;
 
     overflow-y: auto;
-    background: red;
+    background: $ColorSpot1;
+
+    a.logo {
+      img {
+        width: 100%;
+        height: auto;
+      }
+    }
   }
 }
 
 #banner {
+  position: fixed;
+  z-index: 900;
+  inset: 0 0 auto 0;
+
+  a.logo {
+    img {
+      width: 100%;
+      height: auto;
+    }
+  }
 
   .menu-col {
     text-align: right;

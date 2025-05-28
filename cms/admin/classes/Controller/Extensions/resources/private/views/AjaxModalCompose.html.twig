@@ -4,7 +4,13 @@
     'frame' : false,
 }) }}
 
-<form method="post" class="ajax" action="{{ v.getUri('Extensions', 'ajaxInstall') }}">
+<script>
+    $(function() {
+
+    });
+</script>
+
+<form method="post" class="ajax" action="{{ v.getUri('Extensions', 'ajaxPreInstall') }}">
 
     <div class="modal-body">
 
@@ -30,7 +36,7 @@
 
     </div>
     <div class="modal-footer">
-        <button type="submit" class="btn btn-primary">Erweiterung installieren</button>
+        <button type="submit" class="btn btn-primary">Installation vorbereiten</button>
     </div>
 
 </form>

@@ -112,17 +112,18 @@ class HtmlTemplate
     }
 
     /**
-     *
+     * @param string $section
+     * @return array
      */
-    public function getVariables ( )
+    public function getVariables(string $section = 'variables'): array
     {
-        if (empty($this->config['variables'])) {
+        if (empty($this->config[$section])) {
             return [ ];
         }
 
         $variables = [ ];
 
-        foreach ($this->config['variables'] as $variable => $parameters) {
+        foreach ($this->config[$section] as $variable => $parameters) {
 
             $parameters['name'] = $variable;
             $parameters['label'] = $parameters['label'] ?? $variable;

@@ -8,13 +8,14 @@ namespace Frootbox\Ext\Core\ContactForms\Persistence\Fields\Select;
 class Field extends \Frootbox\Ext\Core\ContactForms\Persistence\Fields\AbstractField
 {
     /**
-     *
+     * @return array
      */
     public function getOptions(): array
     {
         $options = $this->getConfig('options');
 
         $options = explode("\n", $options);
+        $options = array_map('trim', $options);
 
         return $options;
     }

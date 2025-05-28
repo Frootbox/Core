@@ -56,7 +56,7 @@ class Pages extends AbstractViewhelper
      */
     public function getTopPagesAction(
         \Frootbox\Persistence\Repositories\Pages $pages
-    )
+    ): \Frootbox\Db\Result
     {
         // Fetch top pages
         $result = $pages->fetch([
@@ -64,6 +64,7 @@ class Pages extends AbstractViewhelper
                 new \Frootbox\Db\Conditions\MatchColumn('rootId', 'parentId'),
                 'Visibility' => 'Public',
             ],
+            'order' => [ 'lft ASC' ],
         ]);
 
         return $result;

@@ -38,6 +38,7 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
         \Frootbox\Http\Post $post,
         \Frootbox\Config\Config $config,
         \Frootbox\CloningMachine $cloningMachine,
+        \Frootbox\View\Blocks\PreviewRenderer $previewRenderer,
         \Frootbox\Persistence\Repositories\Pages $pageRepository,
         \Frootbox\Persistence\Content\Repositories\Blocks $blocksRepository,
         \Frootbox\Persistence\Repositories\Extensions $extensionsRepository,
@@ -204,42 +205,12 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
             }
         }
 
-
-        $blockHtml = '<div data-blocks data-uid="' . $block->getUidRaw() . '"></div>';
-
-        define('EDITING', true);
-
-        // Inject scss variables
-        $result = $extensionsRepository->fetch([
-            'where' => [
-                'isactive' => 1,
-            ],
-        ]);
-        $scss = (string) null;
-
-        foreach ($result as $extension) {
-
-            $path = $extension->getExtensionController()->getPath();
-
-            $scssFile = $path . 'resources/public/css/styles-variables.less';
-
-            if (file_exists($scssFile)) {
-                $scss .= PHP_EOL . file_get_contents($scssFile);
-            }
-        }
-
-
-        $blockHtml = '<style type="text/less">' . $scss . PHP_EOL . '</style>' . PHP_EOL . $blockHtml;
-
-        $view->set('view', $view);
-        $view->set('page', $page);
-
-        $parser = new \Frootbox\View\HtmlParser($blockHtml, $container);
-        $html = $container->call([ $parser, 'parse']);
+        // Render blocks html
+        $blockHtml = $previewRenderer->render($block);
 
         return self::getResponse('json', 200, [
             'uid' => $get->get('uid'),
-            'html' => $html
+            'html' => $blockHtml,
         ]);
     }
 
@@ -272,6 +243,7 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
         \Frootbox\Http\Get $get,
         \DI\Container $container,
         \Frootbox\View\Engines\Interfaces\Engine $view,
+        \Frootbox\View\Blocks\PreviewRenderer $previewRenderer,
         \Frootbox\Persistence\Content\Repositories\Blocks $blocksRepository,
         \Frootbox\Persistence\Repositories\Extensions $extensionsRepository
     ): Response
@@ -282,39 +254,13 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
         // Delete block
         $block->delete();
 
-        $blockHtml = '<div data-blocks data-uid="' . $block->getUidRaw() . '"></div>';
-
-        define('EDITING', true);
-
-        // Inject scss variables
-        $result = $extensionsRepository->fetch([
-            'where' => [
-                'isactive' => 1,
-            ],
-        ]);
-        $scss = (string) null;
-
-        foreach ($result as $extension) {
-
-            $path = $extension->getExtensionController()->getPath();
-
-            $scssFile = $path . 'resources/public/css/styles-variables.less';
-
-            if (file_exists($scssFile)) {
-                $scss .= PHP_EOL . file_get_contents($scssFile);
-            }
-        }
-
-        $view->set('view', $view);
-        $blockHtml = '<style type="text/less">' . $scss . PHP_EOL . '</style>' . PHP_EOL . $blockHtml;
-
-        $parser = new \Frootbox\View\HtmlParser($blockHtml, $container);
-        $html = $container->call([ $parser, 'parse']);
+        // Render blocks html
+        $blockHtml = $previewRenderer->render($block);
 
         return self::getResponse('json', 200, [
             'blockId' => $block->getId(),
             'uid' => $block->getUidRaw(),
-            'html' => $html,
+            'html' => $blockHtml,
         ]);
     }
 
@@ -1004,19 +950,18 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
     }
 
     /**
-     * @param \Frootbox\Http\Post $post
      * @param Container $container
+     * @param \Frootbox\Http\Post $post
+     * @param \Frootbox\View\Blocks\PreviewRenderer $previewRenderer
      * @param \Frootbox\Persistence\Content\Repositories\Blocks $blocksRepository
-     * @param \Frootbox\Persistence\Repositories\Extensions $extensionsRepository
-     * @param \Frootbox\View\Engines\Interfaces\Engine $view
      * @return Response
      * @throws \Frootbox\Exceptions\NotFound
+     * @throws \Frootbox\Exceptions\RuntimeError
      */
     public function ajaxUpdateConfig(
         \DI\Container $container,
         \Frootbox\Http\Post $post,
         \Frootbox\View\Blocks\PreviewRenderer $previewRenderer,
-        \Frootbox\Persistence\Repositories\Extensions $extensionsRepository,
         \Frootbox\Persistence\Content\Repositories\Blocks $blocksRepository,
     ): Response
     {
@@ -1047,37 +992,8 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
 
         $block->save();
 
-
         // Render blocks html
         $blockHtml = $previewRenderer->render($block);
-
-
-        /*
-
-        $html = $container->call([ $block, 'renderHtml' ]);
-
-        define('EDITING', true);
-
-        // Inject scss variables
-        $result = $extensionsRepository->fetch();
-        $scss = (string) null;
-
-        foreach ($result as $extension) {
-
-            $path = $extension->getExtensionController()->getPath();
-
-            $scssFile = $path . 'resources/public/css/styles-variables.less';
-
-            if (file_exists($scssFile)) {
-                $scss .= PHP_EOL . file_get_contents($scssFile);
-            }
-        }
-
-        $html = '<style type="text/less">' . $scss . PHP_EOL . '</style>' . PHP_EOL . $html;
-
-        $parser = new \Frootbox\View\HtmlParser($html, $container);
-        $html = $container->call([ $parser, 'parse']);
-        */
 
         return self::getResponse('json', 200, [
             'uid' => $block->getUidRaw(),

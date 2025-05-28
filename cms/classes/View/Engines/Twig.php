@@ -39,7 +39,11 @@ class Twig extends \Frootbox\GenericObject implements Interfaces\Engine {
             $string = strtr($string, $trans);
             $string = preg_replace("/[^a-z0-9.]+/i", '-', $string);
 
-            return $string;
+            // Reduce multiple consecutive hyphens to a single one
+            $string = preg_replace('/-+/', '-', $string);
+
+            // Remove leading and trailing hyphens
+            return trim($string, '-');
         });
         $this->twig->addFilter($filter);
 

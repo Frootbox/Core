@@ -1,7 +1,11 @@
 {% set t = view.getViewhelper('Translator') %}
 
 {% if config.get('recaptcha.v3.key') %}
-    <script nonce="{{ settings.nonce }}" type="text/plain" onload="setRecaptcha();" data-consent="google-recaptcha" src="https://www.google.com/recaptcha/api.js?render={{ config.get('recaptcha.v3.key') }}"></script>
+    {% if not config.get('recaptcha.v3.SkipConsent') %}
+        <script nonce="{{ settings.nonce }}" type="text/plain" onload="setRecaptcha();" data-consent="google-recaptcha" src="https://www.google.com/recaptcha/api.js?render={{ config.get('recaptcha.v3.key') }}"></script>
+    {% else %}
+        <script nonce="{{ settings.nonce }}" onload="setRecaptcha();" src="https://www.google.com/recaptcha/api.js?render={{ config.get('recaptcha.v3.key') }}"></script>
+    {% endif %}
 
     <script nonce="{{ settings.nonce }}">
         var forceReCaptcha = false;
@@ -123,7 +127,7 @@
     {% set requiredFields = false %}
 
     {% for group in form.getGroups() %}
-        <div class="group-wrapper {{ group.getConfig('className') }}">
+        <div class="group-wrapper {{ group.getConfig('className') }}" data-group="{{ group.getId() }}">
             <div class="row {% if group.getConfig('alignItemsEnd') %}align-items-end{% endif %}">
 
                 {% if group.getTitle() %}
@@ -136,8 +140,6 @@
                     <div class="col-md-{{ column.columns }}">
 
                         <div class="group-details">
-
-
                             {% for field in column.fields %}
                                 {{ renderer.renderField(field) | raw }}
 

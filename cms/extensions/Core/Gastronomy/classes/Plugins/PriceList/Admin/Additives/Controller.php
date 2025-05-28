@@ -56,11 +56,29 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     public function ajaxDeleteAction(
         \Frootbox\Http\Get $get,
         \Frootbox\Admin\Viewhelper\GeneralPurpose $gp,
-        \Frootbox\Ext\Core\Gastronomy\Plugins\PriceList\Persistence\Repositories\Additives $additivesRepository
+        \Frootbox\Ext\Core\Gastronomy\Plugins\PriceList\Persistence\Repositories\Prices $priceRepository,
+        \Frootbox\Ext\Core\Gastronomy\Plugins\PriceList\Persistence\Repositories\Additives $additivesRepository,
     ): Response
     {
         // Fetch additive
         $additive = $additivesRepository->fetchById($get->get('additiveId'));
+
+        $prices = $priceRepository->fetch([
+            'where' => [
+                'pluginId' => $this->plugin->getId(),
+            ],
+        ]);
+
+        foreach ($prices as $price) {
+
+            if (empty($price->getConfig('additives'))) {
+                continue;
+            }
+
+            if (in_array($additive->getId(), $price->getConfig('additives'))) {
+                throw new \Exception('Zusatz wird verwendet in Preis ' . $price->getListEntry()->getTitle() . '/' . $price->getTitle());
+            }
+        }
 
         // Delete additive
         $additive->delete();

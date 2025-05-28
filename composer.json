@@ -1,17 +1,8 @@
 {
-    "repositories": [
-        {
-            "type": "path",
-            "url": "/Users/habbo/Sites/frootbox-repos/Http",
-            "options": {
-                "symlink": true
-            }
-        }
-    ],
     "_repositories": [
         {
             "type": "path",
-            "url": "/Users/habbo/Sites/localhost/frootbox-repos/MVC",
+            "url": "/Users/habbo/Sites/frootbox-repos/MVC",
             "options": {
                 "symlink": true
             }
@@ -43,7 +34,7 @@
         "frootbox/debug":"dev-master",
         "frootbox/exceptions":"dev-master",
         "frootbox/config":"^1",
-        "frootbox/http":"@dev",
+        "frootbox/http":"^0",
         "frootbox/filesystem":"dev-master",
         "frootbox/mail":"@dev",
         "frootbox/translation":"dev-master",

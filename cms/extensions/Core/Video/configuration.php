@@ -13,5 +13,16 @@ return [
     'version' => '0.0.1',
     'requires' => [
         'Core/FileManager' => '0.0.1'
-    ]
+    ],
+    'autoinstall' => [
+        'editables' => [
+            8000 => \Frootbox\Ext\Core\Video\Editables\Video::class,
+        ],
+        'postroutes' => [
+
+        ],
+        'gizmos' => [
+
+        ],
+    ],
 ];

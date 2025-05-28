@@ -34,6 +34,8 @@
 
     function refreshEditable ( ) {
 
+
+
         var element = $('[data-type="Images/Background"][data-uid="' + uid + '"]');
 
         var snippet = $('<div />').append(element.clone()).html();
@@ -52,6 +54,7 @@
 
                 element.replaceWith(response.snippet.html);
 
+                $(window).trigger('resize');
             }
         });
     }

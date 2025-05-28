@@ -202,6 +202,8 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
      * @return \Frootbox\Admin\Controller\Response
      */
     public function exportAction(
+        \Frootbox\Persistence\Repositories\Files $filesRepository,
+        \Frootbox\Persistence\Content\Repositories\Texts $textsRepository,
         \Frootbox\Ext\Core\Events\Persistence\Repositories\Venues $venuesRepository,
         \Frootbox\Ext\Core\Events\Persistence\Repositories\Events $eventsRepository,
         \Frootbox\Ext\Core\Events\Persistence\Repositories\Categories $categoriesRepository,
@@ -222,11 +224,30 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         ]);
 
         foreach ($result as $event) {
+
             $eventData = $event->getData();
+
+            if (!empty($eventData['config'])) {
+                $eventData['config'] = json_decode($eventData['config'], true);
+            }
+
             $eventData['categories'] = [];
 
             foreach ($event->getCategories() as $category) {
                 $eventData['categories'][] = $category->getId();
+            }
+
+            // Parse bookings
+            $bookings = $event->getBookings();
+            $eventData['bookings'] = [];
+
+            if ($bookings->getCount() > 0) {
+                foreach ($bookings as $booking) {
+
+                    $bookingData = $booking->getConfig();
+                    $bookingData['date'] = $booking->getDate();
+                    $eventData['bookings'][] = $bookingData;
+                }
             }
 
             $exportData['events'][] = $eventData;
@@ -240,7 +261,29 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         ]);
 
         foreach ($result as $category) {
-            $exportData['categories'][] = $category->getData();
+
+            $categoryData = $category->getData();
+
+            if (!empty($text = $textsRepository->fetchByUid($category->getUid('title')))) {
+
+                if (!empty($text->getConfig('headline'))) {
+                    $categoryData['title'] = $text->getConfig('headline');
+                }
+
+                if (!empty($text->getConfig('subtitle'))) {
+                    $categoryData['title2'] = $text->getConfig('subtitle');
+                }
+            }
+
+            if (!empty($file = $filesRepository->fetchByUid($category->getUid('image')))) {
+
+                $fileData = $file->getData();
+                $fileData['url'] = $file->getUriThumbnail();
+
+                $categoryData['image'] = $fileData;
+            }
+
+            $exportData['categories'][] = $categoryData;
         }
 
         // Fetch venues

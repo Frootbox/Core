@@ -188,13 +188,27 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
         \Frootbox\Ext\Core\Gastronomy\Plugins\PriceList\Persistence\Repositories\Additives $additivesRepository
     ): \Frootbox\Db\Result
     {
-        // Fetch additives
-        $result = $additivesRepository->fetch([
-            'where' => [ 'pluginId' => $this->getId() ],
-            'order' => [ 'orderId ASC' ]
-        ]);
+        if (empty($this->getConfig('shareAdditives'))) {
 
-        return $result;
+            // Fetch additives
+            $result = $additivesRepository->fetch([
+                'where' => [ 'pluginId' => $this->getId() ],
+                'order' => [ 'orderId ASC' ]
+            ]);
+
+            return $result;
+        }
+        else {
+
+            // Fetch additives
+            $result = $additivesRepository->fetch([
+                'where' => [ ],
+                'order' => [ 'orderId ASC' ]
+            ]);
+
+            return $result;
+        }
+
     }
 
     /**

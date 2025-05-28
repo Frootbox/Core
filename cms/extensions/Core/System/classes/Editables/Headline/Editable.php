@@ -74,6 +74,7 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
             }
 
             $headlineText = ($text and $text->getConfig('headline')) ? nl2br($text->getConfig('headline')) : $element->getInnerHtml();
+            $headlineText = preg_replace("/\r/", "", $headlineText);
 
 
             if (!$text) {
@@ -95,16 +96,8 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
                 $addedHtml = ' data-skipsupertitle ';
             }
 
-            $template = '<header ' . $addedHtml . ' class="' . $classes . '" data-uid="' . $uid . '">';
-
-            if (!empty($element->getAttribute('data-supertitle'))) {
-                $template .= '<p class="supertitle super-title">' . $element->getAttribute('data-supertitle') . '</p>';
-            }
-            elseif ($text and !empty($text->getConfig('supertitle')) and empty($element->getAttribute('data-skipsupertitle'))) {
-                $template .= '<p class="supertitle super-title">' . $text->getConfig('supertitle') . '</p>';
-            }
-
             $styles = (string) null;
+
 
 
             if ($text and !empty($text->getConfig('style.color'))) {
@@ -116,7 +109,17 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
             }
 
             if ($text and !empty($text->getConfig('style.textAlign'))) {
+                $classes .= ' ' . $text->getConfig('style.textAlign');
                 $styles .= 'text-align: ' . $text->getConfig('style.textAlign') . '; ';
+            }
+
+            $template = '<header ' . $addedHtml . ' class="' . $classes . '" data-uid="' . $uid . '">';
+
+            if (!empty($element->getAttribute('data-supertitle'))) {
+                $template .= '<p class="supertitle super-title">' . $element->getAttribute('data-supertitle') . '</p>';
+            }
+            elseif ($text and !empty($text->getConfig('supertitle')) and empty($element->getAttribute('data-skipsupertitle'))) {
+                $template .= '<p class="supertitle super-title">' . $text->getConfig('supertitle') . '</p>';
             }
 
             $subtitle = null;
@@ -139,6 +142,10 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
 
             if ($element->getAttribute('data-skip-id') !== null) {
                 $id = ' data-skip-id ';
+            }
+
+            if ($element->getAttribute('data-wrap')) {
+                $headlineText = '<span>' . $headlineText . '</span>';
             }
 
             $template .= '<' . $tagName . ' ' . $id . ' data-editable data-uid="' . $uid . '" style="' . $styles . '">' . $headlineText . '</' . $tagName . '>';

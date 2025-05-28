@@ -58,6 +58,17 @@
                                 <label class="form-check-label" for="ShowProgressBar">Fortschrittsleiste</label>
                             </div>
 
+                            <h3>Basis-Plugin</h3>
+
+                            <div class="form-group">
+                                <label for="BasePluginId">Shop-Plugin</label>
+                                <select class="form-control" id="BasePluginId" name="BasePluginId">
+                                    {% for ThisPlugin in plugins %}
+                                        <option {% if ThisPlugin.getId() == plugin.getCOnfig('BasePluginId') %}selected{% endif %} value="{{ ThisPlugin.getId() }}">{{ ThisPlugin.getPage().getTitle() }} &raquo; {{ ThisPlugin.getTitle() }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
                         </div>
                         <div class="col-md-6">
 

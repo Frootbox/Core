@@ -213,8 +213,6 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
             // Write autoloader
             $extensionsRepository->writeAutoloader($config);
 
-            sleep(1);
-
             require $config->get('filesRootFolder') . 'cache/system/autoload.php';
 
             $newConfig = $container->call([ $extension, 'init' ]);
@@ -366,6 +364,121 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
 
         return self::getResponse('html', 200, [
             'extensions' => $list,
+        ]);
+    }
+
+    public function ajaxPreInstall(
+        \Frootbox\Http\Post $post,
+        \Frootbox\Config\Config $config,
+        \Frootbox\Admin\Viewhelper\GeneralPurpose $gp,
+        \Frootbox\Persistence\Repositories\Extensions $extensionsRepository,
+    ): Response
+    {
+        // Obtain extension configuration
+        $extConf = require_once $post->get('extension') . DIRECTORY_SEPARATOR . 'configuration.php';
+
+        // Gather extensions
+        $dependencyTree = [];
+
+        function loopConfig($vendorId, $extensionId, $dependencyTree, $config) {
+
+            $extKey = $vendorId . '/' . $extensionId;
+
+            if (!in_array($extKey, $dependencyTree)) {
+                array_unshift($dependencyTree, $extKey);
+            }
+
+            $paths = $config->get('extensions.paths');
+            $paths = $paths->getData();
+            $paths[] = CORE_DIR . 'cms/extensions/';
+
+            foreach ($paths as $path) {
+
+                $xpath = $path . $extKey . DIRECTORY_SEPARATOR . 'configuration.php';
+
+                if (!file_exists($xpath)) {
+                    continue;
+                }
+
+                $extConfig = require $xpath;
+
+                break;
+            }
+
+            if (empty($extConfig['requires'])) {
+                return $dependencyTree;
+            }
+
+            foreach ($extConfig['requires'] as $reqExtKey => $minVersion) {
+                list($vendorId, $extensionId) = explode('/', $reqExtKey);
+                $dependencyTree = loopConfig($vendorId, $extensionId, $dependencyTree, $config);
+            }
+
+            return $dependencyTree;
+
+        }
+
+        $dependencyTree = loopConfig($extConf['vendor']['id'], $extConf['id'], $dependencyTree, $config);
+
+        // Loop dependencies
+        $paths = $config->get('extensions.paths');
+        $paths = $paths->getData();
+        $paths[] = CORE_DIR . 'cms/extensions/';
+
+        $statics = new \Frootbox\ConfigStatics($config);
+
+        foreach ($dependencyTree as $extKey) {
+
+            list($vendorId, $extensionId) = explode('/', $extKey);
+
+            $extConfigPath = null;
+
+            foreach ($paths as $path) {
+                $cExtPath = $path . $vendorId . '/' . $extensionId . DIRECTORY_SEPARATOR . 'configuration.php';
+
+                if (file_exists($cExtPath)) {
+                    $extConfigPath = $cExtPath;
+                    break;
+                }
+            }
+
+            if ($extConfigPath === null) {
+                d($cExtPath);
+                d("Config missing");
+            }
+
+            $extConfig = require($extConfigPath);
+
+            $extension = $extensionsRepository->fetchOne([
+                'where' => [
+                    'extensionId' => $extConfig['id'],
+                    'vendorId' => $extConfig['vendor']['id'],
+                ],
+            ]);
+
+            if (empty($extension)) {
+
+                // Insert extension
+                $extension = $extensionsRepository->persist(new \Frootbox\Persistence\Extension([
+                    'extensionId' => $extConfig['id'],
+                    'vendorId' => $extConfig['vendor']['id'],
+                    'version' => '0.0.0',
+                    'isactive' => 1
+                ]));
+            } else {
+
+                $extension->setVersion('0.0.0');
+                $extension->save();
+            }
+
+            // Write autoloader
+            $extensionsRepository->writeAutoloader($config);
+        }
+
+        sleep(1);
+
+        return self::getResponse('json', 200, [
+            'success' => 'Die Erweiterung wurde installiert.',
         ]);
     }
 

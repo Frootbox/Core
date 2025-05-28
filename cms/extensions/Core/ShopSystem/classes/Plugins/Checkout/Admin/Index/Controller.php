@@ -39,6 +39,7 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
             'SelfPickupTimes' => $post->get('SelfPickupTimes'),
             'PaymentExtraStep' => !empty($post->get('PaymentExtraStep')),
             'ShowProgressBar' => $post->getBoolean('ShowProgressBar'),
+            'BasePluginId' => $post->get('BasePluginId'),
         ]);
         $this->plugin->save();
 
@@ -49,9 +50,19 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
      * @return \Frootbox\Admin\Controller\Response
      */
     public function indexAction(
-
+        \Frootbox\Persistence\Content\Repositories\ContentElements $contentElements,
     ): \Frootbox\Admin\Controller\Response
     {
-        return self::getResponse();
+        $plugins = $contentElements->fetch([
+            'where' => [
+                'className' => \Frootbox\Ext\Core\ShopSystem\Plugins\ShopSystem\Plugin::class,
+            ],
+        ]);
+
+        return self::getResponse(
+            body: [
+                'plugins' => $plugins,
+            ],
+        );
     }
 }

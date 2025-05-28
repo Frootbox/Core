@@ -1,4 +1,5 @@
-<?php 
+<?php /** @noinspection SqlNoDataSourceInspection */
+
 /**
  * @author Jan Habbo Brüning <jan.habbo.bruening@gmail.com> 
  * @date 2018-06-15
@@ -84,6 +85,16 @@ try {
     // Instantiate view
     $view = $container->get(\Frootbox\View\Engines\Interfaces\Engine::class);
 
+    // Store custom config values
+    $cacheFilePath = FILES_DIR . 'cache/system/configValues.php';
+
+    if (file_exists($cacheFilePath)) {
+        $data = include $cacheFilePath;
+
+        foreach ($data as $key => $value) {
+            $view->set($key, $value);
+        }
+    }
 
     // Load extensions autoloader
     if (!file_exists($autoloadConfig = $configuration->get('filesRootFolder') . 'cache/system/autoload.php')) {
@@ -318,6 +329,8 @@ try {
         die($response->getBody());
     }
 
+    define('MULTI_LANGUAGE', !empty($configuration->get('i18n.multiAliasMode')));
+
     if (empty($request) or $request == '/') {
 
         // Fetch root alias
@@ -401,7 +414,7 @@ try {
                 ],
                 [
                     'route' => \Frootbox\Ext\Core\System\Routing\ApiRoute::class
-                ]
+                ],
             ];
 
 
@@ -457,8 +470,6 @@ try {
                     $pagesRepository = $container->get(\Frootbox\Persistence\Repositories\Pages::class);
                     $page = $pagesRepository->fetchById($match[1]);
 
-                    define('MULTI_LANGUAGE', !empty($configuration->get('i18n.multiAliasMode')));
-
                     $target = $page->getUri();
                 }
                 else {
@@ -485,7 +496,6 @@ try {
     $language = !empty($_GET['forceLanguage']) ? $_GET['forceLanguage'] : $language;
 
     define('GLOBAL_LANGUAGE', $language);
-    define('MULTI_LANGUAGE', !empty($configuration->get('i18n.multiAliasMode')));
     define('DEFAULT_LANGUAGE', $configuration->get('i18n.defaults')[0] ?? $configuration->get('i18n.languages')[0] ?? 'de-DE');
 
     $_SESSION['frontend']['language'] = GLOBAL_LANGUAGE;
@@ -548,7 +558,6 @@ try {
     ]);
 
     $view->addFilter($filter);
-
 
     // Perform security check
     if ($page->getVisibility() == 'Locked' or ($page->getVisibility() == 'Moderated' and !IS_EDITOR)) {

@@ -29,38 +29,37 @@ variables:
     {% set colClass = "col-lg-3 col-md-6" %}
 {% endif %}
 
-<div class="row">
-    <div class="col-12 plugin Core ShopSystem SubCategories Index01">
+<div class="plugin Core ShopSystem SubCategories Index01">
 
-        {% if plugin.isFirst %}
-            <h1 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h1>
-        {% else %}
-            <h2 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
-        {% endif %}
+    <div class="row">
+        <div class="col-12">
 
-        <div data-editable data-uid="{{ plugin.getUid('teaser') }}"></div>
+            <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
 
-        <div class="row justify-content-md-center">
+            <div data-editable data-uid="{{ plugin.getUid('teaser') }}"></div>
 
-            {% for child in category.getChildrenVisible() %}
+            <div class="row justify-content-md-center">
 
-                <div class="{{ colClass }} teaser" data-href>
+                {% for child in category.getChildrenVisible() %}
 
-                    <a href="{{ child.getUri() }}">
-                        <picture data-editable data-uid="{{ child.getUid('image')}}">
-                            <img class="teaser-image" width="{{ variables.img_width }}" height="{{ variables.img_height }}" src="{{ i.getDummyImage({ width: variables.img_width, height: variables.img_height }) }}" alt="" />
-                        </picture>
-                    </a>
+                    <div class="{{ colClass }} teaser" data-href>
 
-                    <h4 data-editable data-uid="{{ child.getUid('title')}}">{{ child.getTitle() }}</h4>
-                </div>
+                        <a href="{{ child.getUri() }}">
+                            <picture data-editable data-uid="{{ child.getUid('image')}}">
+                                <img class="teaser-image" width="{{ variables.img_width }}" height="{{ variables.img_height }}" src="{{ i.getDummyImage({ width: variables.img_width, height: variables.img_height }) }}" alt="" />
+                            </picture>
+                        </a>
 
-            {% endfor %}
+                        <h4 data-editable data-uid="{{ child.getUid('title')}}">{{ child.getTitle() }}</h4>
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+            <div data-editable data-uid="{{ plugin.getUid('text-bottom') }}"></div>
 
         </div>
-
-        <div data-editable data-uid="{{ plugin.getUid('text-bottom') }}"></div>
-
     </div>
-</div>
 
+</div>

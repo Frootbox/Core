@@ -7,18 +7,20 @@ namespace Frootbox\Routing;
 
 abstract class AbstractRoute
 {
-    protected $request;
-
     /**
-     *
+     * @param \Frootbox\Http\ClientRequest $request
+     * @param \Frootbox\Config\Config $configuration
      */
-    public function __construct(\Frootbox\Http\ClientRequest $request)
-    {
-        $this->request = $request;
-    }
+    public function __construct(
+        protected \Frootbox\Http\ClientRequest $request,
+        protected \Frootbox\Config\Config $configuration,
+    )
+    { }
 
     /**
      * Get extensions path
+     *
+     * @return string
      */
     public function getExtensionPath(): string
     {
@@ -36,7 +38,7 @@ abstract class AbstractRoute
     }
 
     /**
-     *
+     * @return string
      */
     abstract protected function getMatchingRegex(): string;
 

@@ -102,33 +102,6 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
     }
 
     /**
-     *
-     */
-    public function getPaymentMethod(
-        Container $container,
-        \Frootbox\Persistence\Content\Repositories\ContentElements $contentElementsRepository
-    ): ?\Frootbox\Ext\Core\ShopSystem\PaymentMethods\PaymentMethod
-    {
-
-        if (empty($_SESSION['cart']['paymentmethod'])) {
-            $paymentmethods = $this->getPaymentMethods($container);
-
-            if (empty($paymentmethods)) {
-                return null;
-            }
-
-            $paymentMethod = $paymentmethods[0];
-
-
-            $_SESSION['cart']['paymentmethod']['methodClass'] = get_class($paymentMethod);
-
-            return $paymentMethod;
-        }
-        return new $_SESSION['cart']['paymentmethod']['methodClass'];
-    }
-
-
-    /**
      * Get plugins root path
      */
     public function getPath(): string
@@ -179,7 +152,35 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
     /**
      *
      */
-    public function getPaymentXMethod(
+    public function getPaymentMethod(
+        Container $container,
+        \Frootbox\Persistence\Content\Repositories\ContentElements $contentElementsRepository
+    ): ?\Frootbox\Ext\Core\ShopSystem\PaymentMethods\PaymentMethod
+    {
+        if (empty($_SESSION['cart']['paymentmethod'])) {
+
+            $paymentmethods = $this->getPaymentMethods($container);
+
+
+            if (empty($paymentmethods)) {
+                return null;
+            }
+
+            $paymentMethod = $paymentmethods[0];
+
+
+            $_SESSION['cart']['paymentmethod']['methodClass'] = get_class($paymentMethod);
+
+            return $paymentMethod;
+        }
+
+        return new $_SESSION['cart']['paymentmethod']['methodClass'];
+    }
+
+    /**
+     *
+     */
+    public function getPaymentxMethod(
         Container $container,
         // \Frootbox\TranslatorFactory $factory,
         // \Frootbox\Persistence\Content\Repositories\ContentElements $contentElementsRepository
@@ -204,12 +205,20 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         // Generate translator
         $translator = $factory->get(GLOBAL_LANGUAGE);
 
-        // Fetch shop system plugin
-        $plugin = $contentElementsRepository->fetchOne([
-            'where' => [
-                'className' => 'Frootbox\\Ext\\Core\\ShopSystem\\Plugins\\ShopSystem\\Plugin'
-            ]
-        ]);
+        if (!empty($this->getConfig('BasePluginId'))) {
+
+            // Fetch shop system plugin
+            $plugin = $contentElementsRepository->fetchById($this->getConfig('BasePluginId'));
+        }
+        else {
+
+            // Fetch shop system plugin
+            $plugin = $contentElementsRepository->fetchOne([
+                'where' => [
+                    'className' => 'Frootbox\\Ext\\Core\\ShopSystem\\Plugins\\ShopSystem\\Plugin'
+                ],
+            ]);
+        }
 
         if (empty($plugin) or empty($plugin->getConfig('paymentmethods'))) {
             return [];
@@ -276,17 +285,25 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
      */
     public function getShopPlugin(): \Frootbox\Ext\Core\ShopSystem\Plugins\ShopSystem\Plugin
     {
-        // Fetch shopsystem plugin
-        $contentElementsRepository = $this->db->getModel(
-            \Frootbox\Persistence\Content\Repositories\ContentElements::class
-        );
-        $shopPlugin = $contentElementsRepository->fetchOne([
-            'where' => [
-                'className' => \Frootbox\Ext\Core\ShopSystem\Plugins\ShopSystem\Plugin::class,
-            ],
-        ]);
+        // Fetch shop-system plugin
+        $contentElementsRepository = $this->db->getRepository(\Frootbox\Persistence\Content\Repositories\ContentElements::class);
 
-        return $shopPlugin;
+        if (!empty($this->getConfig('BasePluginId'))) {
+
+            // Fetch shop system plugin
+            $plugin = $contentElementsRepository->fetchById($this->getConfig('BasePluginId'));
+        }
+        else {
+
+            $plugin = $contentElementsRepository->fetchOne([
+                'where' => [
+                    'className' => \Frootbox\Ext\Core\ShopSystem\Plugins\ShopSystem\Plugin::class,
+                ],
+            ]);
+        }
+
+
+        return $plugin;
     }
 
     public function hasPaymentExtraStep(
@@ -925,6 +942,15 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Bookings $bookingsRepository,
     ): ResponseJson
     {
+        if (!empty($post->get('bookingId'))) {
+
+            return new ResponseJson([
+                'isCartValid' => true,
+                'bookingId' => $post->get('bookingId'),
+                'bookingToken' => $post->get('bookingToken'),
+            ]);
+        }
+
         // Set note
         $shopcart->setNote($post->get('Note'));
 
@@ -1145,10 +1171,12 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         $file->setSource(json_encode($_SESSION['cart']));
         $file->write();
 
-        unset($_SESSION['cart']);
+        // unset($_SESSION['cart']);
 
         return new ResponseJson([
             'isCartValid' => true,
+            'bookingId' => $booking->getId(),
+            'bookingToken' => md5('#' . $booking->getId()),
         ]);
     }
 
@@ -1670,7 +1698,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         }
 
         if (empty($post->get('payment')['method'])) {
-            throw new \Exception('Die zahlungsart muss gewählt werden.');
+            throw new \Exception('Die Zahlungsart muss gewählt werden.');
         }
 
         // Update payment method

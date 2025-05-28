@@ -1,0 +1,49 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ front.addTab('Konfiguration', app.getUri('index')) }}
+
+<h2>
+	Konfiguration
+
+
+	<span class="headoptions">
+		<a data-modal href="{{ app.getUri('ajaxModalCompose') }}" data-title="Konfigurationswert hinzufügen"><i class="fa fa-plus-circle"></i></a>
+
+		{#
+		<span class="dropdown">
+			<i class="far fa-bars dropdown-toggle" data-toggle="dropdown"></i>
+
+			<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+				<a class="dropdown-item ajax" href="{{ app.getUri('ajaxAction') }}">Option</a>
+			</div>
+		</span>
+		#}
+	</span>
+
+</h2>
+
+<form action="{{ app.getUri('ajaxUpdate') }}" class="ajax" method="post">
+
+	<table class="table">
+		<tbody>
+
+			{% for ConfigValue in ConfigurationValues %}
+				<tr>
+					<td>
+						<label for="Value{{ ConfigValue.getId() }}">
+							{{ ConfigValue.getConfigKey() }}
+						</label>
+					</td>
+					<td>
+						<input type="text" class="form-control" id="Value{{ ConfigValue.getId() }}" name="Values[{{ ConfigValue.getId() }}]" value="{{ ConfigValue.getConfigValue() }}">
+					</td>
+				</tr>
+			{% endfor %}
+
+		</tbody>
+	</table>
+
+
+	<button type="submit" class="btn btn-primary">Speichern</button>
+
+</form>

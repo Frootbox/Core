@@ -9,7 +9,7 @@
 	{% for group in groups %}
 		<div class="form-group-container" id="{{ group.getId() }}">
 			<h4>
-				<span data-group="{{ group.getId() }}">{{ group.getTitle | default('kein Titel') }}</span>
+				<span data-group="{{ group.getId() }}">{{ group.getTitle | default('Gruppe #' ~ group.getId() ~ ' (kein Titel)') }}</span>
 
 				<span class="headoptions">
 

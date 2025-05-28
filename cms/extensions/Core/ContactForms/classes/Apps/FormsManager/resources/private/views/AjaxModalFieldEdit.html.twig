@@ -28,6 +28,17 @@
                 {% endif %}
 
                 <div class="form-group">
+                    <label for="GroupId">Formulargruppe *</label>
+                    <select size="1" name="GroupId" id="GroupId" class="form-control" required>
+                        <option value="">Option wählen</option>
+
+                        {% for group in groups %}
+                            <option {% if field.getParentId() == group.getId() %}selected{% endif %} value="{{ group.getId() }}">{{ group.getTitle() | default('Gruppe #' ~ group.getId()) }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
                     <label for="type">Typ</label>
                     <select size="1" name="type" id="type" class="form-control">
                         <option value="">bitte wählen ...</option>

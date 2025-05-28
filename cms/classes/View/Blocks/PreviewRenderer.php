@@ -38,7 +38,13 @@ class PreviewRenderer
 
         foreach ($result as $extension) {
 
-            $path = $extension->getExtensionController()->getPath();
+            $controller = $extension->getExtensionController();
+            $path = $controller->getPath();
+
+            if (method_exists($controller, 'injectScss')) {
+
+                $scss .= PHP_EOL . PHP_EOL . $this->container->call([$controller, 'injectScss']);
+            }
 
             $scssFile = $path . 'resources/public/css/styles-variables.less';
 

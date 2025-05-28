@@ -1,3 +1,4 @@
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
 
 <div id="error-messages" class="d-none message error"></div>
 
@@ -93,6 +94,10 @@
             success: function(response) {
 
                 if (response.isCartValid) {
+
+                    $('#checkOutPreForm').append('<input type="hidden" name="bookingId" value="' + response.bookingId + '" />');
+                    $('#checkOutPreForm').append('<input type="hidden" name="bookingToken" value="' + response.bookingToken + '" />');
+
                     confirmPayment();
                 }
                 else {
@@ -103,11 +108,13 @@
 
                 isFormSubmitted = false;
 
-                if (xhr.responseText.charAt(0) == '{') {
-                    var response = JSON.parse(xhr.responseText);
+                var response;
+
+                if (xhr.responseText.charAt(0) === '{') {
+                    response = JSON.parse(xhr.responseText);
                 }
                 else {
-                    var response = {
+                    response = {
                         'error': xhr.responseText
                     }
                 }

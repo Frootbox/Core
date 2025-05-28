@@ -29,8 +29,13 @@ class Block extends \Frootbox\Persistence\Content\Blocks\Block
             ];
         }
 
-        // Fetch form
-        $form = $formsRepository->fetchById($this->getConfig('formId'));
+        try {
+            // Fetch form
+            $form = $formsRepository->fetchById($this->getConfig('formId'));
+        }
+        catch (\Exception $e) {
+            $form = null;
+        }
 
         return [
             'form' => $form,

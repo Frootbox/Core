@@ -12,6 +12,8 @@
 <a class="btn btn-primary" href="{{ app.getUri('index', { folderId: folder.getId()}) }}"><i class="fa fa-table"></i></a>
 <a class="btn btn-primary" href="{{ app.getUri('gallery', { folderId: folder.getId()}) }}"><i class="fa fa-grip-horizontal"></i></a>
 
+<a class="btn btn-secondary" href="{{ app.getUri('restoreFiles') }}">gelöschte Datein wiederherstellen</a>
+
 <br clear="all" /><br />
 
 {% if folder.getChildren.getCount == 0 and folder.getFiles.getCount == 0 %}

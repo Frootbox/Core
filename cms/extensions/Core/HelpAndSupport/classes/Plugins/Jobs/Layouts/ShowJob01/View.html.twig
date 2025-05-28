@@ -22,6 +22,9 @@ variables:
     skipMapLocation:
         type: bool
         label: ohne Standort-Karte
+    withTopBlocks:
+        type: bool
+        label: Blöcke über jedem Artikel
 
 /config #}
 
@@ -52,6 +55,10 @@ variables:
 {% endblock %}
 
 <div class="plugin Core HelpAndSupport Jobs ShowJob01">
+
+    {% if variables.withTopBlocks %}
+        <div class="top-blocks" data-blocks data-label="Blöcke über jedem Artikel" data-uid="{{ plugin.getUid('job-details-top-blocks') }}"></div>
+    {% endif %}
 
     {% if variables.withContainer %}<div class="container">{% endif %}
 

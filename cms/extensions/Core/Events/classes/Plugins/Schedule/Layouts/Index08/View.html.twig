@@ -41,7 +41,7 @@ variables:
                                     {{ Event.getTitle() }}
 
                                     {% for Tag in Event.getTags() %}
-                                        <span class="badge">{{ Tag.getTag() }}</span>
+                                        <span class="badge {{ Tag.getTag() | cleanescape }}">{{ Tag.getTag() }}</span>
                                     {% endfor %}
                                 </td>
                                 <td>

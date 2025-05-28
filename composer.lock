@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2a902ef11af5302ee74136cbd8b245de",
+    "content-hash": "ddcd35ff77638341a78e86d30e478c4c",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -494,11 +494,17 @@
         },
         {
             "name": "frootbox/http",
-            "version": "dev-master",
+            "version": "0.2.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Frootbox/Http.git",
+                "reference": "606146959d73a6dd381ef470fb4e5b812e60bc6a"
+            },
             "dist": {
-                "type": "path",
-                "url": "/Users/habbo/Sites/frootbox-repos/Http",
-                "reference": "2b0f47d62fa80b5bdc50b1558f769bf84c6cf02d"
+                "type": "zip",
+                "url": "https://api.github.com/repos/Frootbox/Http/zipball/606146959d73a6dd381ef470fb4e5b812e60bc6a",
+                "reference": "606146959d73a6dd381ef470fb4e5b812e60bc6a",
+                "shasum": ""
             },
             "type": "library",
             "autoload": {
@@ -506,6 +512,7 @@
                     "Frootbox\\Http\\": "src/"
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "GPL-3.0-or-later"
             ],
@@ -518,12 +525,11 @@
             "description": "Frootbox Http Library",
             "support": {
                 "docs": "",
-                "email": "jan.habbo.bruening@gmail.com"
+                "email": "jan.habbo.bruening@gmail.com",
+                "issues": "https://github.com/Frootbox/Http/issues",
+                "source": "https://github.com/Frootbox/Http/tree/0.2.2"
             },
-            "transport-options": {
-                "symlink": true,
-                "relative": false
-            }
+            "time": "2025-03-10T14:01:14+00:00"
         },
         {
             "name": "frootbox/mail",
@@ -2892,7 +2898,6 @@
         "frootbox/debug": 20,
         "frootbox/exceptions": 20,
         "frootbox/filesystem": 20,
-        "frootbox/http": 20,
         "frootbox/mail": 20,
         "frootbox/translation": 20
     },

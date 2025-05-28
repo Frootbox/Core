@@ -3,7 +3,7 @@
  *
  */
 
-namespace Frootbox\Ext\Core\Forms\Admin\Gizmos\FormChecker;
+namespace Frootbox\Ext\Core\ContactForms\Admin\Gizmos\FormChecker;
 
 use Frootbox\Admin\Controller\Response;
 

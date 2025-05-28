@@ -30,6 +30,19 @@ class Price extends \Frootbox\Persistence\AbstractAsset
     }
 
     /**
+     * @return ListEntry
+     * @throws \Frootbox\Exceptions\NotFound
+     * @throws \Frootbox\Exceptions\RuntimeError
+     */
+    public function getListEntry(): \Frootbox\Ext\Core\Gastronomy\Plugins\PriceList\Persistence\ListEntry
+    {
+        $repository = $this->getDb()->getRepository(\Frootbox\Ext\Core\Gastronomy\Plugins\PriceList\Persistence\Repositories\ListEntries::class);
+        $entry = $repository->fetchById($this->getParentId());
+
+        return $entry;
+    }
+
+    /**
      *
      */
     public function getNewAlias(): ?\Frootbox\Persistence\Alias

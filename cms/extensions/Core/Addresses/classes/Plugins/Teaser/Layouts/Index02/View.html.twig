@@ -19,13 +19,17 @@ title: Kacheln
 
         {% set addresses = i.getAddresses({ order: 'RAND()' }) %}
 
-        <div class="row">
+        <br /><br />
+
+        <div class="row justify-content-around align-items-center">
 
             {% for address in addresses %}
                 <div class="address col-2">
-                    <picture class="fluid" data-editable data-skipempty="1" data-uid="{{ address.getUid('image')}}">
-                        <img width="{{ variables.image_width }}" height="{{ variables.image_height }}" src="{{ i.getDummyImage({ width: variables.image_width, height: variables.image_height | default(300) }) }}" alt="" />
-                    </picture>
+                    <a href="{{ address.getUri() }}">
+                        <picture class="fluid" data-editable data-skipempty="1" data-uid="{{ address.getUid('image')}}">
+                            <img class="img-fluid" width="{{ variables.image_width }}" height="{{ variables.image_height }}" src="{{ i.getDummyImage({ width: variables.image_width, height: variables.image_height | default(300) }) }}" alt="" />
+                        </picture>
+                    </a>
                 </div>
             {% endfor %}
 

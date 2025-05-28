@@ -239,9 +239,7 @@
                     blockId: blockId
                 },
                 success: function ( html ) {
-
                     $('[data-editable-block][data-block="' + blockId + '"]').fadeOut();
-
                 }
             });
 
@@ -314,6 +312,8 @@
                     if (typeof response.admin !== 'undefined') {
                         $('#fbxEditorGenericModal .modal-content').html(response.admin.html)
                     }
+
+                    $(window).trigger('resize');
                 }
             });
         });

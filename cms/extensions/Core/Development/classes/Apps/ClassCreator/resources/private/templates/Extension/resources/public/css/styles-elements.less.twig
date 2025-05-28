@@ -1,30 +1,48 @@
 html body {
-  font-family: $fontDefault;
-  color: $fontBaseColor;
-  font-size: $fontBaseSize;
-  line-height: $fontBaseLineHeight;
+  font-family: $FontBaseFamily;
+  color: $FontBaseColor;
+  font-size: $FontBaseSize;
+  line-height: $FontBaseLineHeight;
 
   h1, h2, h3, h4 {
     clear: both;
   }
 
-  header.h1, h1 {
+  header.h1, h1,
+  header.h2.from-h1 h2,
+  header.h3.from-h1 h3,
+  header.h4.from-h1 h4
+  {
 
     margin: 100px 0 60px 0;
 
+    font-size: $HeadlineH1Size;
+    line-height: $HeadlineH1LineHeight;
+    font-weight: $HeadlineH1FontWeight;
+
     h1 {
-      margin: 0;
-      padding: 0;
+      font-size: $HeadlineH1SizeLg;
+      line-height: $HeadlineH1LineHeightLg;
     }
 
     &.first {
       margin-top: 0;
+    }
+
+    .subtitle {
+      color: $HeadlineH1SubTitleColor;
+      font-size: $HeadlineH1SubTitleSize;
+      font-weight: $HeadlineH1SubTitleFontWeight;
     }
   }
 
   header.h2, h2 {
 
     margin: 60px 0 40px 0;
+
+    font-size: $HeadlineH2Size;
+    line-height: $HeadlineH2LineHeight;
+    font-weight: $HeadlineH2FontWeight;
 
     h2 {
       margin: 0;
@@ -39,6 +57,10 @@ html body {
   header.h3, h3 {
 
     margin: 60px 0 40px 0;
+
+    font-size: $HeadlineH3Size;
+    line-height: $HeadlineH3LineHeight;
+    font-weight: $HeadlineH3FontWeight;
 
     h3 {
       margin: 0;

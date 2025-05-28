@@ -1,6 +1,6 @@
 <?php
 /**
- *
+ * @noinspection SqlNoDataSourceInspection
  */
 
 namespace Frootbox\Ext\Core\Images\Plugins\References\Persistence;
@@ -46,25 +46,26 @@ class Category extends \Frootbox\Persistence\Category
     /**
      *
      */
-    public function getContacts(): \Frootbox\Db\Result
+    public function getReferences(): \Frootbox\Db\Result
     {
         // Build sql
         $sql = 'SELECT
-            p.*,
+            a.*,
             i.config as connConfig,
             i.id as connId
         FROM
-            persons p,
+            assets a,
             categories_2_items i
         WHERE
             i.categoryId = ' . $this->getId() . ' AND
-            i.itemId = p.id AND
-            p.visibility >= ' . (IS_LOGGED_IN ? 1 : 2) . '
+            i.itemId = a.id AND
+            a.visibility >= ' . (IS_LOGGED_IN ? 1 : 2) . ' AND
+            a.className = "Frootbox\\\\Ext\\\\Core\\\\Images\\\\Plugins\\\\References\\\\Persistence\\\\Reference"
         ORDER BY
             i.orderId DESC';
 
         // Fetch contacts
-        $model = new \Frootbox\Ext\Core\HelpAndSupport\Persistence\Repositories\Contacts($this->db);
+        $model = new \Frootbox\Ext\Core\Images\Plugins\References\Persistence\Repositories\References($this->db);
         $result = $model->fetchByQuery($sql);
 
         return $result;

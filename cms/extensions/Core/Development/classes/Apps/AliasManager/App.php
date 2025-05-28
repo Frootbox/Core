@@ -24,6 +24,7 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
         \Frootbox\Db\Db $db
     )
     {
+        /*
         // Clear dead aliases
         $result = $aliasesRepository->fetch();
 
@@ -52,6 +53,7 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
 
         d("OKKK");
         d($result);
+
         $result = $aliasesRepository->fetchByQuery('SELECT SQL_CALC_FOUND_ROWS itemModel, itemId FROM aliases GROUP BY itemModel, itemId');
 
         // Refresh aliases
@@ -80,7 +82,7 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
 
 
         die("Fixed " . $loop . " Aliases.");
-
+  */
         return self::getResponse();
     }    
 }

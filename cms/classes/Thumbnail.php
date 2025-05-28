@@ -128,7 +128,7 @@ class Thumbnail extends GenericObject
 
         $path .= $fileName[0] . '/' . $fileName[1] . '/' . substr($fileName, 2);
 
-        if (strpos($_SERVER['HTTP_ACCEPT'], 'image/webp') !== false and !empty($this->config->webp) and $this->type != 'svg') {
+        if (!empty($_SERVER['HTTP_ACCEPT']) and strpos($_SERVER['HTTP_ACCEPT'], 'image/webp') !== false and !empty($this->config->webp) and $this->type != 'svg') {
             // $path .= '.webp';
         }
 

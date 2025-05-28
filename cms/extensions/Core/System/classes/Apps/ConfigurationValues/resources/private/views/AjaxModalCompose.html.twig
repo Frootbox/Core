@@ -1,0 +1,20 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ view.set({
+    'frame' : false,
+}) }}
+
+<form method="post" class="ajax" action="{{ app.getUri('ajaxCreate') }}">
+
+    <div class="modal-body">
+
+        <div class="form-group">
+            <label for="Key">Key</label>
+            <input type="text" class="form-control" name="Key" required id="Key" placeholder="Key">
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Formular erstellen</button>
+    </div>
+</form>

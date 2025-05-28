@@ -11,13 +11,31 @@ class Form extends \Frootbox\Persistence\AbstractAsset
 
     /**
      * @return void
+     * @throws \Frootbox\Exceptions\RuntimeError
      */
     public function delete()
     {
+        // Start database transaction
+        $this->getDb()->transactionStart();
+
         // Clean up groups
         $this->getGroups()->map('delete');
 
-        return parent::delete();
+        // Clear logs
+        $logsRepository = $this->getDb()->getRepository(\Frootbox\Ext\Core\ContactForms\Persistence\Repositories\Logs::class);
+        $logs = $logsRepository->fetch([
+            'where' => [
+                'parentId' => $this->getId(),
+            ],
+        ]);
+
+        $logs->map('delete');
+
+        // Delete record itself
+        parent::delete();
+
+        // Commit database transaction
+        $this->getDb()->transactionCommit();
     }
 
     /**
@@ -39,7 +57,8 @@ class Form extends \Frootbox\Persistence\AbstractAsset
     }
 
     /**
-     *
+     * @return \Frootbox\Ext\Core\ContactForms\Persistence\Group[]
+     * @throws \Frootbox\Exceptions\RuntimeError
      */
     public function getGroups(): \Frootbox\Db\Result
     {

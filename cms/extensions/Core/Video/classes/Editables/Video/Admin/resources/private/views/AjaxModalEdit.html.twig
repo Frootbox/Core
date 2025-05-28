@@ -1,0 +1,107 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<script nonce="{{ settings.nonce }}">
+    $(function ( ) {
+
+        /**
+         *
+         */
+        $('#updateForm').submit(function ( event ) {
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            var form = $(this);
+
+            $.ajax({
+                url : $(this).attr('action'),
+                data : $(this).serialize(),
+                type : 'POST',
+                success : function ( response ) {
+
+                    $('#fbxEditorGenericModal').modal('hide');
+
+                    if ($('header[data-uid="' + form.attr('data-uid') + '"]').length > 0) {
+                        var element = $('header[data-uid="' + form.attr('data-uid') + '"]');
+                    }
+                    else {
+                        var element = $('[data-editable][data-uid="' + form.attr('data-uid') + '"]');
+                    }
+
+                    var tagName = response.headline.level ? response.headline.level : element.find('h1, h2, h3, h4, h5').prop("tagName").toLowerCase();
+
+                    var html = '<header class="' + element.attr('class') + '" data-uid="' + form.attr('data-uid') + '"><p class="supertitle">' + (response.headline.supertitle ? response.headline.supertitle : '') + '</p><' + tagName + ' data-editable data-uid="' + form.attr('data-uid') + '">' + response.headline.text + '</' + tagName + '><p class="subtitle">' + (response.headline.subtitle ? response.headline.subtitle : '') + '</p></header>';
+
+
+                    /*
+                    if (response.headline.subTitleAbove) {
+                        var html = '<' + tagName + ' data-editable data-uid="' + form.attr('data-uid') + '"><span class="subtitle">' + (response.headline.subtitle ? response.headline.subtitle : '') + '</span><span class="head">' + response.headline.text + '</span></' + tagName + '>';
+                    }
+                    else {
+                        var html = '<' + tagName + ' data-editable data-uid="' + form.attr('data-uid') + '"><span class="head">' + response.headline.text + '</span><span class="subtitle">' + (response.headline.subtitle ? response.headline.subtitle : '') + '</span></' + tagName + '>';
+                    }
+                    */
+
+
+                    element.replaceWith(html);
+                },
+                error: function ( xhr ) {
+                    alert(xhr.responseText);
+                }
+            });
+        });
+    });
+</script>
+
+<form id="updateForm" action="{{ controller.getActionUri('ajaxUpdate', { uid: get.get('uid') }) }}" method="post" data-uid="{{ get.get('uid') }}">
+
+    {% set headlineLevel = (text.getConfig('level') | default(get.get('headlineTag'))) %}
+
+    <div class="modal-header">
+        <h5 class="modal-title">Video bearbeiten</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+
+        <div class="form-group form-check">
+            <input type="checkbox" class="form-check-input" id="Muted" name="Muted" {% if text.getConfig('Muted') %}checked{% endif %}>
+            <label class="form-check-label" for="Muted">Ohne Ton</label>
+        </div>
+        <div class="form-group form-check">
+            <input type="checkbox" class="form-check-input" id="Autoplay" name="Autoplay" {% if text.getConfig('Autoplay') %}checked{% endif %}>
+            <label class="form-check-label" for="Autoplay">Autoplay</label>
+        </div>
+        <div class="form-group form-check">
+            <input type="checkbox" class="form-check-input" id="Loop" name="Loop" {% if text.getConfig('Loop') %}checked{% endif %}>
+            <label class="form-check-label" for="Loop">Loop</label>
+        </div>
+        <div class="form-group form-check">
+            <input type="checkbox" class="form-check-input" id="Controls" name="Controls" {% if text.getConfig('Controls') %}checked{% endif %}>
+            <label class="form-check-label" for="Controls">Controls</label>
+        </div>
+
+        {{ get.get('uid') }}
+
+        {{ v.injectPartial('Frootbox/Ext/Core/FileManager/Editor/Partials/FileUpload', {
+            uid: get.get('uid'),
+            multiple: true,
+            label: "Video-Dateien",
+        }) | raw }}
+
+        {{ v.injectPartial('Frootbox/Ext/Core/FileManager/Editor/Partials/FileManager', {
+            uid: get.get('uid')
+        }) | raw }}
+
+        {{ v.injectPartial('Frootbox/Ext/Core/FileManager/Editor/Partials/FileUpload', {
+            multiple: false,
+            uid: text.getUid('thumbnail'),
+            label: "Thumbnail"
+        }) | raw }}
+
+        <button type="submit" class="btn btn-primary">Speichern</button>
+
+    </div>
+
+</form>

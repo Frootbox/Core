@@ -35,236 +35,230 @@ variables:
                     <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title-review') }}">{{ "Core.ShopSystem.H1CompleteOrder" | translate }}</h2>
 
 
-                        <div class="row">
-                            <div class="col-md-5">
+                    <div class="row">
+                        <div class="col-md-5">
 
-                                <h3>{{ "Core.ShopSystem.H3PersonalData" | translate }}</h3>
+                            <h3>{{ "Core.ShopSystem.H3PersonalData" | translate }}</h3>
+
+                            <div class="card">
+                                <div class="card-body">
+
+                                    {% if shopcart.getPersonal('company') %}
+                                        <p>{{ shopcart.getPersonal('company') }}</p>
+                                    {% endif %}
+
+                                    <p>{{ shopcart.getPersonal('firstname') }} {{ shopcart.getPersonal('lastname') }}</p>
+                                    <p>
+                                        {{ shopcart.getPersonal('street') }} {{ shopcart.getPersonal('streetNumber') }}<br />
+                                        {{ shopcart.getPersonal('postalCode') }} {{ shopcart.getPersonal('city') }}
+
+
+                                        {% if shopcart.getPersonal('country') %}
+                                            <br />{{ t.translate('Country.' ~ shopcart.getPersonal('country')) }}
+                                        {% endif %}
+                                    </p>
+
+                                    {% if mailcheck %}
+                                        <p>{{ shopcart.getPersonal('email') }}</p>
+                                    {% else %}
+                                        <p style="color: red;">{{ shopcart.getPersonal('email') }} <a href="{{ plugin.getActionUri('checkout') }}"><i class="fa fa-pencil"></i></a></p>
+                                        <p style="margin-top: -10px; color: red; font-size: 14px; line-height: 18px;">
+                                            <i class="fa fa-exclamation-triangle"></i> Wir haben ein mögliches Problem mit der E-Mail festgestellt, bitte überprüfen Sie noch einmal die Schreibweise!
+                                        </p>
+                                    {% endif %}
+
+                                    {% if shopcart.getPersonal('phone') %}
+                                        <p>Telefon {{ shopcart.getPersonal('phone') }}</p>
+                                    {% endif %}
+
+                                </div>
+                            </div>
+
+
+                            {% if shopcart.getBilling('differentBillingRecipient') %}
 
                                 <div class="card">
                                     <div class="card-body">
 
-                                        {% if shopcart.getPersonal('company') %}
-                                            <p>{{ shopcart.getPersonal('company') }}</p>
+                                        <h3>Rechnungsadresse</h3>
+
+                                        {% if shopcart.getBilling('company') %}
+                                            <p>{{ shopcart.getBilling('company') }}</p>
                                         {% endif %}
 
-                                        <p>{{ shopcart.getPersonal('firstname') }} {{ shopcart.getPersonal('lastname') }}</p>
+                                        <p>{{ shopcart.getBilling('firstname') }} {{ shopcart.getBilling('lastname') }}</p>
                                         <p>
-                                            {{ shopcart.getPersonal('street') }} {{ shopcart.getPersonal('streetNumber') }}<br />
-                                            {{ shopcart.getPersonal('postalCode') }} {{ shopcart.getPersonal('city') }}
+                                            {{ shopcart.getBilling('street') }} {{ shopcart.getBilling('streetNumber') }}<br />
+                                            {{ shopcart.getBilling('postalCode') }} {{ shopcart.getBilling('city') }}
 
-
-                                            {% if shopcart.getPersonal('country') %}
-                                                <br />{{ t.translate('Country.' ~ shopcart.getPersonal('country')) }}
+                                            {% if shopcart.getBilling('country') %}
+                                                <br />{{ t.translate('Country.' ~ shopcart.getBilling('country')) }}
                                             {% endif %}
                                         </p>
 
-                                        {% if mailcheck %}
-                                            <p>{{ shopcart.getPersonal('email') }}</p>
-                                        {% else %}
-                                            <p style="color: red;">{{ shopcart.getPersonal('email') }} <a href="{{ plugin.getActionUri('checkout') }}"><i class="fa fa-pencil"></i></a></p>
-                                            <p style="margin-top: -10px; color: red; font-size: 14px; line-height: 18px;">
-                                                <i class="fa fa-exclamation-triangle"></i> Wir haben ein mögliches Problem mit der E-Mail festgestellt, bitte überprüfen Sie noch einmal die Schreibweise!
-                                            </p>
+
+                                        {% if shopcart.getBilling('email') %}
+                                            <p>{{ shopcart.getBilling('email') }}</p>
                                         {% endif %}
 
-                                        {% if shopcart.getPersonal('phone') %}
-                                            <p>Telefon {{ shopcart.getPersonal('phone') }}</p>
+                                        {% if shopcart.getBilling('phone') %}
+                                            <p>Telefon {{ shopcart.getBilling('phone') }}</p>
                                         {% endif %}
 
                                     </div>
                                 </div>
+                            {% endif %}
 
 
-                                {% if shopcart.getBilling('differentBillingRecipient') %}
-
-                                    <div class="card">
-                                        <div class="card-body">
-
-                                            <h3>Rechnungsadresse</h3>
-
-                                            {% if shopcart.getBilling('company') %}
-                                                <p>{{ shopcart.getBilling('company') }}</p>
-                                            {% endif %}
-
-                                            <p>{{ shopcart.getBilling('firstname') }} {{ shopcart.getBilling('lastname') }}</p>
-                                            <p>
-                                                {{ shopcart.getBilling('street') }} {{ shopcart.getBilling('streetNumber') }}<br />
-                                                {{ shopcart.getBilling('postalCode') }} {{ shopcart.getBilling('city') }}
-
-                                                {% if shopcart.getBilling('country') %}
-                                                    <br />{{ t.translate('Country.' ~ shopcart.getBilling('country')) }}
-                                                {% endif %}
-                                            </p>
-
-
-                                            {% if shopcart.getBilling('email') %}
-                                                <p>{{ shopcart.getBilling('email') }}</p>
-                                            {% endif %}
-
-                                            {% if shopcart.getBilling('phone') %}
-                                                <p>Telefon {{ shopcart.getBilling('phone') }}</p>
-                                            {% endif %}
-
-                                        </div>
-                                    </div>
-                                {% endif %}
-
-
-                                {% if not plugin.getConfig('skipShipping') %}
-                                    <div class="card">
-                                        <div class="card-body">
-
-                                            <h3>{{ "Core.ShopSystem.H3DeliveryAddress" | translate }}</h3>
-
-                                            {% if shopcart.getShipping('type') == 'shipToBillingAddress' %}
-                                                <p>Rechnungsadresse ist Lieferadresse.</p>
-                                            {% elseif shopcart.getShipping('type') == 'shipToAddress' %}
-                                                <p>{{ "Core.ShopSystem.Plugins.Checkout.DeliveryToTheFollowingAddress" | translate }}</p>
-                                                <p>{{ shopcart.getShipping('firstname') }} {{ shopcart.getShipping('lastname') }}</p>
-                                                <p>
-                                                    {{ shopcart.getShipping('street') }} {{ shopcart.getShipping('streetNumber') }}<br />
-
-                                                    {% if shopcart.getShipping('addition') %}
-                                                        {{ shopcart.getShipping('addition') }}<br />
-                                                    {% endif %}
-
-                                                    {{ shopcart.getShipping('postalCode') }} {{ shopcart.getShipping('city') }}
-                                                </p>
-
-                                            {% elseif shopcart.getShipping('type') == 'selfPickup' %}
-                                                <p>{{ "Core.ShopSystem.OptionSelfPickup" | translate }}</p>
-
-                                                {% if shopcart.getShipping('selfpickupAddressId') %}
-
-                                                    {% set address = shopcart.getSelfpickupAddress() %}
-
-                                                    <p>
-                                                        <b>{{ address.getTitle() }}</b><br />
-                                                        {{ address.getStreet() }} {{ address.getStreetNumber() }}<br />
-                                                        {{ address.getZipcode() }} {{ address.getCity() }}
-                                                    </p>
-
-                                                    <div data-editable data-nowidgets data-uid="{{ address.getUid('text-shipping') }}"></div>
-
-                                                {% endif %}
-
-                                                {% if shopcart.getShipping('pickupDay') %}
-                                                    <p>
-                                                        <b>{{ "Core.ShopSystem.LabelDesiredPickupDate" | translate }}:</b><br />
-                                                        {{ shopcart.getShipping('pickupDay') | date('d.m.Y') }}
-                                                    </p>
-                                                {% endif %}
-
-                                                {% if shopcart.getShipping('pickupTime') %}
-                                                    <p>
-                                                        <b>{{ "Core.ShopSystem.Plugins.Checkout.LabelPreferredPickupTime" | translate }}</b><br />
-                                                        {{ shopcart.getShipping('pickupTime') }}
-                                                    </p>
-                                                {% endif %}
-
-                                            {% endif %}
-
-                                            {% if shopcart.getShipping('deliveryDay') %}
-                                                <p>
-                                                    <b>{{ "Core.ShopSystem.LabelDesiredDeliveryDate" | translate }}:</b><br />
-                                                    {{ shopcart.getShipping('deliveryDay') | date('d.m.Y') }} <a class="edit-pencil after" href="{{ plugin.getActionUri('choiceOfDelivery') }}">{{ icons.render('pencil') | raw }}</a>
-                                                </p>
-                                            {% endif %}
-
-                                        </div>
-                                    </div>
-
-                                {% endif %}
-
-
+                            {% if not plugin.getConfig('skipShipping') %}
                                 <div class="card">
                                     <div class="card-body">
 
-                                        <h3>{{ "Core.ShopSystem.H3Payment" | translate }}</h3>
+                                        <h3>{{ "Core.ShopSystem.H3DeliveryAddress" | translate }}</h3>
 
-                                        <p>{{ ("Core.ShopSystem.PaymentMethods." ~ shopcart.getPaymentMethodId() ~ ".Method.Title") | translate }}</p>
-                                        <p>{{ paymentSummary | raw }}</p>
+                                        {% if shopcart.getShipping('type') == 'shipToBillingAddress' %}
+                                            <p>{{ "Core.ShopSystem.Plugins.Checkout.BillingAddressIsDeliveryAddress" | translate }}</p>
+                                        {% elseif shopcart.getShipping('type') == 'shipToAddress' %}
+                                            <p>{{ "Core.ShopSystem.Plugins.Checkout.DeliveryToTheFollowingAddress" | translate }}</p>
+                                            <p>{{ shopcart.getShipping('firstname') }} {{ shopcart.getShipping('lastname') }}</p>
+                                            <p>
+                                                {{ shopcart.getShipping('street') }} {{ shopcart.getShipping('streetNumber') }}<br />
+
+                                                {% if shopcart.getShipping('addition') %}
+                                                    {{ shopcart.getShipping('addition') }}<br />
+                                                {% endif %}
+
+                                                {{ shopcart.getShipping('postalCode') }} {{ shopcart.getShipping('city') }}
+                                            </p>
+
+                                        {% elseif shopcart.getShipping('type') == 'selfPickup' %}
+                                            <p>{{ "Core.ShopSystem.OptionSelfPickup" | translate }}</p>
+
+                                            {% if shopcart.getShipping('selfpickupAddressId') %}
+
+                                                {% set address = shopcart.getSelfpickupAddress() %}
+
+                                                <p>
+                                                    <b>{{ address.getTitle() }}</b><br />
+                                                    {{ address.getStreet() }} {{ address.getStreetNumber() }}<br />
+                                                    {{ address.getZipcode() }} {{ address.getCity() }}
+                                                </p>
+
+                                                <div data-editable data-nowidgets data-uid="{{ address.getUid('text-shipping') }}"></div>
+
+                                            {% endif %}
+
+                                            {% if shopcart.getShipping('pickupDay') %}
+                                                <p>
+                                                    <b>{{ "Core.ShopSystem.LabelDesiredPickupDate" | translate }}:</b><br />
+                                                    {{ shopcart.getShipping('pickupDay') | date('d.m.Y') }}
+                                                </p>
+                                            {% endif %}
+
+                                            {% if shopcart.getShipping('pickupTime') %}
+                                                <p>
+                                                    <b>{{ "Core.ShopSystem.Plugins.Checkout.LabelPreferredPickupTime" | translate }}</b><br />
+                                                    {{ shopcart.getShipping('pickupTime') }}
+                                                </p>
+                                            {% endif %}
+
+                                        {% endif %}
+
+                                        {% if shopcart.getShipping('deliveryDay') %}
+                                            <p>
+                                                <b>{{ "Core.ShopSystem.LabelDesiredDeliveryDate" | translate }}:</b><br />
+                                                {{ shopcart.getShipping('deliveryDay') | date('d.m.Y') }} <a class="edit-pencil after" href="{{ plugin.getActionUri('choiceOfDelivery') }}">{{ icons.render('pencil') | raw }}</a>
+                                            </p>
+                                        {% endif %}
 
                                     </div>
                                 </div>
 
-
-                                {% set newsletterConnector = i.getNewsletterConnector() %}
-
-                                {% if newsletterConnector %}
-                                    {{ newsletterConnector.getInputHtml() | raw }}
-                                {% endif %}
+                            {% endif %}
 
 
-                                {% if offerAccount %}
+                            <div class="card">
+                                <div class="card-body">
 
-                                    <h3>Benutzeraccount</h3>
+                                    <h3>{{ "Core.ShopSystem.H3Payment" | translate }}</h3>
 
-                                    <p>Sie können sich für spätere Einkäufe ein Benutzerprofil anlegen. Setzen Sie dafür einfach ein Passwort, Ihr Benutzername ist dann die E-Mail Adresse.</p>
+                                    <p>{{ ("Core.ShopSystem.PaymentMethods." ~ shopcart.getPaymentMethodId() ~ ".Method.Title") | translate }}</p>
+                                    <p>{{ paymentSummary | raw }}</p>
 
-                                    <div class="form-group">
-                                        <label for="password">Passwort</label>
-                                        <input class="form-control" type="password" id="password" name="password" />
-                                    </div>
-                                {% endif %}
-
+                                </div>
                             </div>
-                            <div class="col-md-7">
-
-                                <form action="{{ plugin.getAjaxUri('CheckoutPre') }}" id="checkOutPreForm" method="post">
 
 
-                                    {% if plugin.getConfig('ownOrderNumber') %}
-                                        <div class="form-group">
-                                            <label for="ownOrderNumber">eigene Bestellnummer</label>
-                                            <input class="form-control" type="text" id="ownOrderNumber" name="ownOrderNumber" />
-                                        </div>
-                                    {% endif %}
+                            {% set newsletterConnector = i.getNewsletterConnector() %}
+
+                            {% if newsletterConnector %}
+                                {{ newsletterConnector.getInputHtml() | raw }}
+                            {% endif %}
 
 
-                                    <div id="itemsTableReceiver">
-                                        {{ p.renderPartial('ItemsSummaryFinal', { plugin: plugin, shopcart: shopcart, editable: false }) | raw }}
-                                    </div>
+                            {% if offerAccount %}
 
-                                    <div class="form-group">
-                                        <label for="Note">{{ "Core.ShopSystem.LabelRemark" | translate }}</label>
-                                        <textarea class="form-control" id="Note" name="Note" rows="3">{{ shopcart.getNote() }}</textarea>
-                                    </div>
+                                <h3>Benutzeraccount</h3>
 
-                                    {% block afterNote %}{% endblock %}
+                                <p>Sie können sich für spätere Einkäufe ein Benutzerprofil anlegen. Setzen Sie dafür einfach ein Passwort, Ihr Benutzername ist dann die E-Mail Adresse.</p>
 
-                                    <br />
+                                <div class="form-group">
+                                    <label for="password">Passwort</label>
+                                    <input class="form-control" type="password" id="password" name="password" />
+                                </div>
+                            {% endif %}
 
-                                </form>
-
-
-                                <h3>{{ "Core.ShopSystem.H3PayNow" | translate }}</h3>
-
-                                {% set PaymentMethod = shopcart.getPaymentMethod() %}
-
-                                {% if PaymentMethod.hasCheckoutControl() %}
-
-                                    {{ paymentMethodRenderer.renderPreCheckoutAction(PaymentMethod, t) | raw }}
-
-                                {% else %}
-
-                                    <br />
-
-                                    <button type="submit" class="btn btn-primary">{{ "Core.ShopSystem.ButtonOrderNow" | translate }}</button>
-                                {% endif %}
-
-
-                            </div>
                         </div>
+                        <div class="col-md-7">
+
+                            <form action="{{ plugin.getAjaxUri('CheckoutPre') }}" id="checkOutPreForm" method="post">
+
+                                {% if plugin.getConfig('ownOrderNumber') %}
+                                    <div class="form-group">
+                                        <label for="ownOrderNumber">eigene Bestellnummer</label>
+                                        <input class="form-control" type="text" id="ownOrderNumber" name="ownOrderNumber" />
+                                    </div>
+                                {% endif %}
 
 
+                                <div id="itemsTableReceiver">
+                                    {{ p.renderPartial('ItemsSummaryFinal', { plugin: plugin, shopcart: shopcart, editable: false }) | raw }}
+                                </div>
 
-                        <div class="row justify-content-between align-items-center footer-nav-buttons">
-                            <div class="col-md-6 order-md-1">
-                                <a href="{{ plugin.getActionUri('checkout') }}" class="btn btn-secondary">{{ "Core.ShopSystem.ButtonGoBack" | translate }}</a>
-                            </div>
+                                <div class="form-group">
+                                    <label for="Note">{{ "Core.ShopSystem.LabelRemark" | translate }}</label>
+                                    <textarea class="form-control" id="Note" name="Note" rows="3">{{ shopcart.getNote() }}</textarea>
+                                </div>
+
+                                {% block afterNote %}{% endblock %}
+
+                                <br />
+
+                            </form>
+
+                            <h3>{{ "Core.ShopSystem.H3PayNow" | translate }}</h3>
+
+                            {% set PaymentMethod = shopcart.getPaymentMethod() %}
+
+                            {% if PaymentMethod.hasCheckoutControl() %}
+
+                                {{ paymentMethodRenderer.renderPreCheckoutAction(PaymentMethod, t) | raw }}
+
+                            {% else %}
+
+                                <br />
+
+                                <button type="submit" class="btn btn-primary">{{ "Core.ShopSystem.ButtonOrderNow" | translate }}</button>
+                            {% endif %}
+
                         </div>
+                    </div>
 
+                    <div class="row justify-content-between align-items-center footer-nav-buttons">
+                        <div class="col-md-6 order-md-1">
+                            <a href="{{ plugin.getActionUri('selectPayment') }}" class="btn btn-secondary">{{ "Core.ShopSystem.ButtonGoBack" | translate }}</a>
+                        </div>
+                    </div>
 
                     {{ p.renderPartial('BasketFooter', { shopcart: shopcart, plugin: plugin }) | raw }}
 

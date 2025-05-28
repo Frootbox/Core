@@ -105,6 +105,9 @@ class HtmlParser
                 $textSource .= '<p></p>';
             }
 
+            $textSource = preg_replace('/(<p>\s+)/i', '<p>', $textSource);
+            $textSource = preg_replace("/\r/", "", $textSource);
+
             $element->setInnerHtml($textSource);
         });
 
@@ -840,6 +843,29 @@ class HtmlParser
         });
 
         $html = $crawler->saveHTML();
+
+        // Parse direct file pointer in inline-css
+        if (preg_match_all('/background-image:\s*url\((FILE:([^)]+))\);/', $html, $matches)) {
+
+            foreach ($matches[0] as $index => $tagline) {
+
+                $src = $matches[2][$index];
+
+                $cacheFilePath = 'cache/public/' . $cacheRevision . '/assets/' . md5($src) . '-' . basename($src);
+                $cacheFilePathFull = $configuration->get('filesRootFolder') . $cacheFilePath;
+
+                if (!file_exists($cacheFilePathFull)) {
+
+                    $file = new \Frootbox\Filesystem\File($cacheFilePathFull);
+                    $file->write();
+
+                    copy($src, $cacheFilePathFull);
+                }
+
+                $html = str_replace($tagline, 'background-image: url(' . $configuration->get('publicCacheDir') . $cacheFilePath . ');', $html);
+
+            }
+        }
 
         $this->html = $html;
     }

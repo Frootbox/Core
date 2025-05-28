@@ -527,6 +527,7 @@ variables:
                         {% if not plugin.getConfig('PaymentExtraStep') and not i.hasPaymentExtraStep() %}
 
                             {% set paymentMethod = i.getPaymentMethod() %}
+
                             {% if paymentMethod %}
                                 <div class="col-12">
 

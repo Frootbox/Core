@@ -19,6 +19,10 @@ variables:
 {% set i = view.getViewhelper('Delegator', { object: plugin }) %}
 {% set formRenderer = view.getViewhelper('Ext/Core/ContactForms/FormRenderer', {   }) %}
 
+{% block config %}
+
+{% endblock %}
+
 <script nonce="{{ settings.nonce }}">
     $(function ( ) {
 

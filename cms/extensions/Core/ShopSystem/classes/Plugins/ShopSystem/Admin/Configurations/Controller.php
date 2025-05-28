@@ -66,8 +66,10 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
 
         $paymentMethods = [];
 
-        foreach ($post->get('paymentmethods') as $paymentMethod => $state) {
-            $paymentMethods[] = $paymentMethod;
+        if (!empty($post->get('paymentmethods'))) {
+            foreach ($post->get('paymentmethods') as $paymentMethod => $state) {
+                $paymentMethods[] = $paymentMethod;
+            }
         }
 
         $this->plugin->addConfig([

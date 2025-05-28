@@ -1,4 +1,4 @@
-<div class="form-group field-input">
+<div class="form-group field-input" data-field="{{ field.getId() }}">
     <label for="field-{{ field.getId() }}">
         <span {% if renderer.options.editable %}data-editable-element data-uid="{{ field.getUid('title') }}"{% endif %}>{{ field.getTitle() }}</span><!--
         -->{% if field.getMandatory() %}<span class="mandatory">*</span>{% endif %}

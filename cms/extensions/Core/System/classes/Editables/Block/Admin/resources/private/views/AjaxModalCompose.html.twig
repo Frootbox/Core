@@ -22,6 +22,8 @@
 
                     $('[data-blocks][data-uid="' + response.uid + '"] .blocks-content').html(response.html);
                     $('#fbxEditorGenericModal').modal('hide');
+
+                    $(window).trigger('resize');
                 },
                 error: function ( xhr ) {
                     alert(xhr.responseText);
@@ -77,33 +79,36 @@
     {% endif %}
 
     <style>
-        .btn-primary[data-category] {
-            color: #FFF !important;
-        }
-
-        div[data-block] {
-            .content-wrapper {
-                margin-top: -15px;
-                margin-bottom: 30px;
-                padding: 15px;
-
-                background: #f0f0f0;
-                border-radius: 4px;
+        #blockCreateForm {
+            .btn-primary[data-category] {
+                color: #FFF !important;
             }
 
-            .marker {
-                text-align: center;
+            div[data-block] {
+                .content-wrapper {
+                    margin-top: -15px;
+                    margin-bottom: 30px;
+                    padding: 15px;
 
-                span {
-                    display: inline-block;
-                    margin-bottom: -2px;
-                    width: 15px;
-                    height: 15px;
-                    transform: rotate(45deg);
                     background: #f0f0f0;
+                    border-radius: 4px;
+                }
+
+                .marker {
+                    text-align: center;
+
+                    span {
+                        display: inline-block;
+                        margin-bottom: -2px;
+                        width: 15px;
+                        height: 15px;
+                        transform: rotate(45deg);
+                        background: #f0f0f0;
+                    }
                 }
             }
         }
+
     </style>
 
     <script>
@@ -129,7 +134,7 @@
 
                 event.stopImmediatePropagation();
 
-                $('div[data-block]').addClass('d-none');
+                $('#blockCreateForm').find('div[data-block]').addClass('d-none');
 
                 if ($(this).is(':checked')) {
 

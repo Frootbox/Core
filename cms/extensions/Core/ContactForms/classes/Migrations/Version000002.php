@@ -26,6 +26,8 @@ class Version000002 extends \Frootbox\AbstractMigration
 
         foreach ($result as $group) {
 
+            continue;
+
             if (empty($group->getTitle())) {
                 continue;
             }

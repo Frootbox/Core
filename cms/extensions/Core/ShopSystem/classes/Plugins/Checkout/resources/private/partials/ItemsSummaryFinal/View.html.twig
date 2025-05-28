@@ -52,10 +52,17 @@
                 {% endfor %}
             </tbody>
             <tfoot>
+
+                {% if data.shopcart.getShippingCosts() %}
+                    <tr>
+                        <td class="total" colspan="3">{{ "Core.ShopSystem.TableFootShippingAndFees" | translate | raw }}</td>
+                        <td class="total">{{ data.shopcart.getShippingCosts() | number_format(2,',','.') }} {{ currencySign }}</td>
+                    </tr>
+                {% endif %}
+
                 <tr>
                     <td class="total" colspan="3">{{ "Core.ShopSystem.TableFootTotal" | translate }}</td>
                     <td class="total" nowrap>{{ data.shopcart.getTotal() | number_format(2,',','.') }} {{ currencySign }}</td>
-
                 </tr>
             </tfoot>
         </table>

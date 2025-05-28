@@ -37,15 +37,18 @@
 
                 </h2>
 
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Absender</th>
-                            <th>Datum</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
+                {% if logs | length == 0 %}
+                    <div class="message info">Es gibt keine Anfragen in diesem Formular.</div>
+                {% else %}
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Absender</th>
+                                <th>Datum</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
 
                         {% for log in logs %}
 
@@ -64,10 +67,9 @@
                             </tr>
                         {% endfor %}
 
-                    </tbody>
-                </table>
-
-
+                        </tbody>
+                    </table>
+                {% endif %}
 
             </div>
         </div>

@@ -7,6 +7,7 @@ namespace Frootbox\Ext\Core\ContactForms\Apps\FormsManager;
 
 use Frootbox\Admin\Controller\Response;
 use Frootbox\Admin\View;
+use Frootbox\Db\Db;
 use Frootbox\Http\Get;
 
 class App extends \Frootbox\Admin\Persistence\AbstractApp
@@ -304,12 +305,16 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
     }
 
     public function ajaxDuplicateAction(
+        \Frootbox\Db\Db $db,
         \Frootbox\Http\Get $get,
         \Frootbox\Ext\Core\ContactForms\Persistence\Repositories\Forms $formsRepository,
         \Frootbox\Ext\Core\ContactForms\Persistence\Repositories\Groups $groupsRepository,
         \Frootbox\Ext\Core\ContactForms\Persistence\Repositories\Fields $fieldsRepository,
     ): Response
     {
+        // Start database transaction
+        $db->transactionStart();
+
         // Fetch form
         $form = $formsRepository->fetchById($get->get('formId'));
 
@@ -343,16 +348,15 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
                     'parentId' => $newGroup->getId(),
                     'className' => \Frootbox\Ext\Core\ContactForms\Persistence\Field::class,
                     'customClass' => $fieldClass,
-                    'config' => [
-                        'type' => $field->getConfig('type'),
-                        'column' => $field->getConfig('column'),
-                        'mandatory' => $field->getConfig('mandatory'),
-                    ],
+                    'config' => $field->getConfig(),
                 ]);
 
                 $fieldsRepository->insert($newField);
             }
         }
+
+        // Commit database transaction
+        $db->transactionCommit();
 
         return new Response('json', 200, [
 
@@ -390,13 +394,14 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
 
         $f = fopen('php://memory', 'w');
 
-        foreach ($result as $row) {
+        foreach ($result as $entry) {
 
-            $logData = $row->getLogData();
+            $logData = $entry->getLogData();
 
             if ($loop == 0) {
 
                 $row = [];
+                $row[] = 'Datum';
 
                 foreach ($logData['formData'] as $group) {
                     foreach ($group['fields'] as $field) {
@@ -409,8 +414,9 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
 
             $row = [];
 
-
             if (!empty($logData['formData'])) {
+
+                $row[] = $entry->getDate();
 
                 foreach ($logData['formData'] as $group) {
                     foreach ($group['fields'] as $field) {
@@ -429,7 +435,7 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
 
         header('Content-Type: text/csv');
         // tell the browser we want to save it instead of displaying it
-        header('Content-Disposition: attachment; filename="export.csv";');
+        header('Content-Disposition: attachment; filename="' . $form->getTitle() . '.csv";');
         // make php send the generated csv lines to the browser
         fpassthru($f);
 
@@ -548,6 +554,7 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
         // Update field
         $field->setTitle($title);
         $field->setCustomClass($fieldClass);
+        $field->setParentId($post->get('GroupId'));
         $field->addConfig([
             'titles' => $post->get('titles'),
             'type' => $post->get('type'),
@@ -584,9 +591,13 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
         \Frootbox\Admin\Viewhelper\GeneralPurpose $gp,
     ): Response
     {
-        // Fetch form
+        /**
+         * Fetch form
+         * @var \Frootbox\Ext\Core\ContactForms\Persistence\Form $form
+         */
         $form = $formsRepository->fetchById($get->get('formId'));
 
+        // Delete form
         $form->delete();
 
         return new Response('json', 200, [

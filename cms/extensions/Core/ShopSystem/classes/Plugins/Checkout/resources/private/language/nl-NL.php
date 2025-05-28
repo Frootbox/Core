@@ -70,7 +70,7 @@ return [
     'H3Note' => 'Opmerking',
 
     'H4PersonalData' => 'persoonlijke gegevens',
-    'H4DeliveryAddress' => 'Lieferadres',
+    'H4DeliveryAddress' => 'Bezorgadres',
     'H4PaymentMethod' => 'Betalingsmiddel',
 
     'LabelChoosePickupMonth' => 'Selecteer maand',

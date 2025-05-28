@@ -11,6 +11,7 @@
 {% set nav = view.getViewhelper('Ext/Core/Navigation/Navigation') %}
 {% set gf = view.getViewhelper('Ext/HerrUndFrauPixelExt/GoogleFonts/GoogleFonts') %}
 {% set icons = view.getViewhelper('Ext/HerrUndFrauPixelExt/Icons/Icons', {   }) %}
+{% set css = view.getViewhelper('Ext/HerrUndFrauPixelExt/AdvancedStyleControl/Css') %}
 
 <!DOCTYPE html>
 <html lang="{{ globalLanguage }}" xml:lang="{{ globalLanguage }}" xmlns="http://www.w3.org/1999/xhtml">
@@ -30,6 +31,8 @@
                 {% endverbatim %}{{ title }}{% verbatim %}
             {% endif %}
         </title>
+
+        {{ css.getStylesheet() | raw }}
 
         {% if pagedata.ogImage %}
             <meta property="og:image" content="{{ pagedata.ogImage.getUri({ width: 700, height: 700 }) }}" />
@@ -144,7 +147,7 @@
 
             <div class="container">
                 <div class="row">
-                    <div class="col-md-3>
+                    <div class="col-md-3">
                         <a class="logo" href="{{ v.link('') }}"><img src="EXT:{% endverbatim %}{{ vendorId }}/{{ extensionId }}{% verbatim %}/images/logo.svg" alt="Logo" /></a>
                     </div>
                     <div class="col-md-3">
