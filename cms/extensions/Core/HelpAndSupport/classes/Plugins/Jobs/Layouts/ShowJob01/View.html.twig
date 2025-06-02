@@ -65,8 +65,9 @@ variables:
     <div class="row">
         <div class="col-12">
 
-
-            <h2 class="first main-title" data-editable data-uid="{{ job.getUid('title') }}">{{ job.getTitle(globalLanguage) }}</h2>
+            {% block headline %}
+                <h2 class="first main-title" data-editable data-uid="{{ job.getUid('title') }}">{{ job.getTitle(globalLanguage) }}</h2>
+            {% endblock %}
 
             <div class="content-teaser">
                 <div data-editable data-uid="{{ job.getUid('teaser') }}"></div>

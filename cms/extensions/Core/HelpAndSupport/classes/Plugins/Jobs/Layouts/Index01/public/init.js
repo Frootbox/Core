@@ -1,14 +1,36 @@
 $(function ( ) {
 
-    $(document).on('change', 'form.refresh-jobs-form input', function ( event ) {
-        $(this).parents('form').trigger('submit');
-    });
+    $(document).on('click', 'form.refresh-jobs-form input', function ( event ) {
 
-    $(document).on('click', 'form.refresh-jobs-form label', function ( event ) {
         event.preventDefault();
         event.stopImmediatePropagation();
 
-        $(this).find('input')
+        let input = $(this);
+
+        window.setTimeout(function() {
+            input.parents('label').trigger('click');
+        }, 100);
+
+    });
+
+    /**
+     *
+     */
+    $(document).on('click', 'form.refresh-jobs-form label', function (event) {
+
+        event.preventDefault();
+        event.stopImmediatePropagation();
+
+        let input = $(this).find('input');
+
+        if (input.is(':checked')) {
+            input.prop('checked', false);
+        }
+        else {
+            input.prop('checked', true);
+        }
+
+        $(this).parents('form').trigger('submit');
     });
 
     $(document).on('submit', 'form.refresh-jobs-form', function ( event ) {
