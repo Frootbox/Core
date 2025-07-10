@@ -177,7 +177,6 @@ trait Tags
     {
         // Obtain tags repository
         $tagsRepository = $this->getDb()->getModel(\Frootbox\Persistence\Repositories\Tags::class);
-
         $result = $tagsRepository->fetchOne([
             'where' => [
                 'itemId' => $this->getId(),

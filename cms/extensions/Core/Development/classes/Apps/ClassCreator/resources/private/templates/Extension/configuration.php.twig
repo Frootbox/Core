@@ -15,14 +15,15 @@ return [
         'name' => 'Frootbox'
     ],
     'version' => '0.0.1',
+    {% if type == 'Template' %}
     'requires' => [
         'Core/Navigation' => '0.0.1',
         'HerrUndFrauPixelExt/Icons' => '0.0.1',
         'HerrUndFrauPixelExt/GoogleFonts' => '0.0.1',
         'HerrUndFrauPixelExt/BlocksLibrary' => '0.0.1',
         'HerrUndFrauPixelExt/CookieConsentTool' => '0.0.1',
+        'AdvancedStyleControl' => '0.0.1',
     ],
-    {% if type == 'Template' %}
     'autoinstall' => [
         'config' => [
             'layoutRootFolder' => $VENDOR_DIR . 'layouts/',

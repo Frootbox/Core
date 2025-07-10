@@ -1,4 +1,5 @@
-<?php
+<?php /** @noinspection SqlNoDataSourceInspection */
+
 /**
  *
  */
@@ -187,7 +188,6 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
             ) ';
         }
 
-
         $sql .= ' ORDER BY
             e.dateStart ASC';
 
@@ -206,6 +206,87 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         }
 
         return $result;
+    }
+
+    /**
+     *
+     */
+    public function getEventsGroupedByMonth(
+        array $options = null,
+    ): array
+    {
+        // Build sql
+        $sql = 'SELECT
+            e.*,
+            DATE_FORMAT(dateStart, "%Y-%m") AS monthYear,
+            l.id as locationId,
+            l.title as locationTitle,
+            l.street as locationStreet,
+            l.streetNumber as locationStreetNumber,
+            l.zipcode as locationZipcode,
+            l.city as locationCity,
+            l.phone as locationPhone,
+            l.email as locationEmail,
+            l.config as locationConfig,
+            l.alias as locationAlias
+        FROM
+            assets e
+        LEFT JOIN
+            locations l
+        ON
+            e.parentId = l.id
+        WHERE
+            e.visibility >= ' . (IS_LOGGED_IN ? 1 : 2) . ' AND  
+            e.pluginId = ' . $this->getId() . ' AND
+            e.className = "Frootbox\\\\Ext\\\\Core\\\\Events\\\\Persistence\\\\Event" ';
+
+        if (empty($options['showPastDates'])) {
+
+            $sql .= ' AND            
+            (
+                e.dateStart >= "' . date('Y-m-d H:i:s') . '" OR
+                (
+                    e.dateStart <= "' . date('Y-m-d H:i:s') . '" AND
+                    e.dateEnd >= "' . date('Y-m-d H:i:s') . '"
+                )
+            ) ';
+        }
+
+        $sql .= ' ORDER BY
+            e.dateStart ASC';
+
+        // Fetch events
+        $eventRepository = $this->getDb()->getRepository(\Frootbox\Ext\Core\Events\Persistence\Repositories\Events::class);
+        $result = $eventRepository->fetchByQuery($sql);
+
+        if (!empty($options['onlyBookable'])) {
+
+            foreach ($result as $index => $event) {
+
+                if (!$event->isBookable()) {
+                    $result->removeByIndex($index);
+                }
+            }
+        }
+
+        $months = [];
+
+        foreach ($result as $event) {
+
+            $key = $event->getMonthYear();
+
+            if (!isset($months[$key])) {
+                $months[$key] = [
+                    'month' => [
+                        'date' => $event->getDateStart(),
+                    ],
+                ];
+            }
+
+            $months[$key]['events'][] = $event;
+        }
+
+        return $months;
     }
 
     /**

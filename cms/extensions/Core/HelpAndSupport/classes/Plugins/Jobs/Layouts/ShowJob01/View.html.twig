@@ -22,9 +22,16 @@ variables:
     skipMapLocation:
         type: bool
         label: ohne Standort-Karte
+    withLocationIcon:
+        type: bool
+        label: mit Standort-Icon
     withTopBlocks:
         type: bool
         label: Blöcke über jedem Artikel
+    contentWidthColumns:
+        label: Spalten-Breits des Inhalts
+        type: int
+        default: 12
 
 /config #}
 
@@ -62,8 +69,9 @@ variables:
 
     {% if variables.withContainer %}<div class="container">{% endif %}
 
-    <div class="row">
-        <div class="col-12">
+
+    <div class="row justify-content-end">
+        <div class="col-md-{{ variables.contentWidthColumns }}">
 
             {% block headline %}
                 <h2 class="first main-title" data-editable data-uid="{{ job.getUid('title') }}">{{ job.getTitle(globalLanguage) }}</h2>
@@ -107,14 +115,14 @@ variables:
                 <div class="row">
 
                     {% if job.getType() %}
-                        <div class="col-md-3">
+                        <div class="col">
                             {{ icons.render('clock') | raw }}
                             {{ t.translate("Type" ~ job.getType()) }}
                         </div>
                     {% endif %}
 
                     {% if job.getConfig('asSoonAsPossible') or job.getDateStart() %}
-                        <div class="col-md-3">
+                        <div class="col">
                             {{ icons.render('calendar') | raw }}
 
                             {% if job.getConfig('asSoonAsPossible') %}
@@ -122,6 +130,14 @@ variables:
                             {% elseif job.getDateStart() %}
                                 {{ job.getDateStart() | date('d.m.Y') }}
                             {% endif %}
+                        </div>
+                    {% endif %}
+
+                    {% if location and variables.withLocationIcon %}
+                        <div class="col">
+                            {{ icons.render('location-dot') | raw }}
+
+                            {{ location.getTitle() }}
                         </div>
                     {% endif %}
 

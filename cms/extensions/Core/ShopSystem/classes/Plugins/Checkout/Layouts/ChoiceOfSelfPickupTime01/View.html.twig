@@ -38,7 +38,7 @@ variables:
 
                             {% for PickupTime in SelfPickupTimes %}
                                 <div class="form-group form-check">
-                                    <input type="radio" class="form-check-input" id="PickupTime{{ loop.index }}" name="PickupTime" value="{{ PickupTime.getId() }}">
+                                    <input {% if SelfPickupTimes | length == 1 %}checked{% endif %} type="radio" class="form-check-input" id="PickupTime{{ loop.index }}" name="PickupTime" value="{{ PickupTime.getId() }}">
                                     <label class="form-check-label" for="PickupTime{{ loop.index }}">{{ PickupTime.getDateStart() | date('H:i') }}–{{ PickupTime.getDateEnd() | date('H:i') }} {{ "Core.ShopSystem.Plugins.Checkout.Time" | translate }}</label>
                                 </div>
                             {% endfor %}

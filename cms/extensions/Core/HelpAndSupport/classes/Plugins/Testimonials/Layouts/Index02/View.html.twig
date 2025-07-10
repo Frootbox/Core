@@ -1,0 +1,60 @@
+{# config
+
+title: Standard
+subtitle: Mit Bild
+
+_variables:
+    withContainer:
+        type: bool
+        label: mit Layout-Container
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+{% set Testimonials = i.getTestimonials() %}
+
+<div class="plugin Core HelpAndSupport Testimonials Index02">
+
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+
+                <div class="inner-wrapper">
+
+                    <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+
+                    <div data-editable data-uid="{{ plugin.getUid('teaser') }}"></div>
+
+                    <div class="teasers">
+                        <div class="row">
+                            {% for Testimonial in Testimonials %}
+                                <div class="col-md-6">
+                                    <div class="teaser">
+                                        <div class="row align-items-center">
+                                            <div class="col-md-4">
+                                                <picture class="fluid" data-editable data-uid="{{ Testimonial.getUid('image') }}">
+                                                    <img width="500" height="500" src="{{ i.getDummyImage({ width: 500, height: 500 }) }}" alt="" />
+                                                </picture>
+                                            </div>
+                                            <div class="col-md-8">
+                                                <figure class="testimonial">
+                                                    <blockquote class="me">
+                                                        <div data-nowidgets data-editable data-uid="{{ Testimonial.getUid('text') }}"></div>
+                                                    </blockquote>
+                                                    <figcaption>{{ Testimonial.getTitle() }}</figcaption>
+                                                </figure>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

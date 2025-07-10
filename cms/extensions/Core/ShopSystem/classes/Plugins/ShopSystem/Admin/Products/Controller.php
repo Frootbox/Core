@@ -168,8 +168,9 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     ): Response
     {
         // Validate required input
-        $post->require([
-            'title'
+        $post->requireOne([
+            'title',
+            'Titles',
         ]);
 
         // Start database transaction
@@ -181,26 +182,42 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         // Mark last datasheet
         $_SESSION['back']['shopsystem']['lastDatasheetId'] = $datasheet->getId();
 
-        // Insert new product
-        $product = $productsRepository->persist(new \Frootbox\Ext\Core\ShopSystem\Persistence\Product([
-            'pageId' => $this->plugin->getPageId(),
-            'pluginId' => $this->plugin->getId(),
-            'datasheetId' => $datasheet->getId(),
-            'title' => $post->get('title'),
-            'visibility' => (DEVMODE ? 2 : 1),
-        ]));
+
+        if (!empty($post->get('Titles'))) {
+            $titles = explode("\n", trim($post->get('Titles')));
+        }
+        else {
+            $titles = [ $post->get('title') ];
+        }
+
+        foreach ($titles as $title) {
+
+            // Insert new product
+            $product = $productsRepository->persist(new \Frootbox\Ext\Core\ShopSystem\Persistence\Product([
+                'pageId' => $this->plugin->getPageId(),
+                'pluginId' => $this->plugin->getId(),
+                'datasheetId' => $datasheet->getId(),
+                'title' => $title,
+                'visibility' => (DEVMODE ? 2 : 1),
+            ]));
+
+
+            if (!empty($get->get('categoryId'))) {
+
+                $category = $categriesRepository->fetchById($get->get('categoryId'));
+
+                // Connect contact to category
+                $category->connectItem($product);
+
+
+                // Trigger save to create aliases
+                $product->save();
+            }
+        }
+
+        $database->transactionCommit();
 
         if (!empty($get->get('categoryId'))) {
-
-            $category = $categriesRepository->fetchById($get->get('categoryId'));
-
-            // Connect contact to category
-            $category->connectItem($product);
-
-            $database->transactionCommit();
-
-            // Trigger save to create aliases
-            $product->save();
 
             // Compose response
             return self::getResponse('json', 200, [
@@ -216,8 +233,6 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
             ]);
         }
         else {
-
-            $database->transactionCommit();
 
             // Compose response
             return self::getResponse('json', 200, [

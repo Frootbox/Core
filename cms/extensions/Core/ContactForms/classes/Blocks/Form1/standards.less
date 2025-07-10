@@ -1,6 +1,14 @@
 $colorSpot1Mid: #CCC !default;
 
-.EditableBlock.BlocksLibrary.ContactForm {
+.EditableBlock.ContactForms.Form1 {
+
+  form {
+    margin-top: 30px;
+
+    @media (min-width: 768px) {
+      margin-top: 0;
+    }
+  }
 
   div[data-editable]:not(:empty) {
     margin-bottom: 50px;
@@ -14,7 +22,6 @@ $colorSpot1Mid: #CCC !default;
         margin-top: 8px;
       }
     }
-
 
     .form-group {
       input {

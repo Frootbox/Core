@@ -27,6 +27,11 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Products $productsRepository
     ): Response
     {
+
+
+
+        return self::getResponse();
+        /*
         $result = $productsRepository->fetch();
 
         foreach ($result as $product) {
@@ -316,6 +321,7 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         d(json_encode($list));
 
 
-        return self::getResponse();
+
+        */
     }
 }

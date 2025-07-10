@@ -10,6 +10,8 @@ class Category extends \Frootbox\Persistence\Category implements \Frootbox\Persi
     use \Frootbox\Persistence\Traits\Alias {
         getUri as getTraitUri;
     }
+    use \Frootbox\Persistence\Traits\Tags;
+
     protected $model = Repositories\Categories::class;
     protected $connectionModel = Repositories\CategoriesConnections::class;
     protected $connectionClass = CategoryConnection::class;

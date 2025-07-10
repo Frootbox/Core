@@ -1,0 +1,70 @@
+{# config
+
+title: Tabelle mit Zwischenüberschriften
+
+variables:
+
+#}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+
+{% set Months = i.getEventsGroupedByMonth() %}
+
+<div class="plugin Core Events Schedule Index09">
+
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+
+                <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+
+                <div data-editable data-uid="{{ plugin.getUid('teaser-text') }}"></div>
+
+                {% for Month in Months %}
+
+                    <h3>{{ ("Core.Events.Month" ~ (Month.month.date | date('m'))) | translate }} {{ (Month.month.date | date('Y')) }}</h3>
+
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th width="200">Datum</th>
+                                <th>Kurs</th>
+                                <th width="200">Ort</th>
+                                <th width="100"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for Event in Month.events %}
+                                <tr>
+                                    <td>
+                                        {% if Event.getDateStart() | date('d.m.Y') == Event.getDateEnd() | date('d.m.Y') %}
+                                            {{ Event.getDateStart() | date('d.m.Y') }}
+                                        {% else %}
+                                            {{ Event.getDateStart() | date('d.m.') }}–{{ Event.getDateEnd() | date('d.m.Y') }}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {{ Event.getTitle() }}
+
+                                        {% for Tag in Event.getTags() %}
+                                            <span class="badge {{ Tag.getTag() | cleanescape }}">{{ Tag.getTag() }}</span>
+                                        {% endfor %}
+                                    </td>
+                                    <td>
+                                        {{ Event.getLocationTitle() }}
+                                    </td>
+                                    <td class="text-right">
+                                        <a class="btn btn-primary btn-sm" href="{{ Event.getUri() }}">Anfrage</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                {% endfor %}
+
+            </div>
+        </div>
+    </div>
+
+</div>
