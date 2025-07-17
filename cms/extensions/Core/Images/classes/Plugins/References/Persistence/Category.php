@@ -19,6 +19,14 @@ class Category extends \Frootbox\Persistence\Category
      */
     protected function getNewAlias(): ?\Frootbox\Persistence\Alias
     {
+        // Check plugin config
+        $repository = $this->getDb()->getRepository(\Frootbox\Persistence\Content\Repositories\ContentElements::class);
+        $plugin = $repository->fetchbyId($this->getPluginId());
+
+        if (!empty($plugin->getConfig('noCategoriesDetailPage'))) {
+            return null;
+        }
+
         if (!empty($this->getConfig('noCategoriesDetailPage'))) {
             return null;
         }

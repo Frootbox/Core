@@ -59,12 +59,14 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     public function ajaxUpdateAction(
         \Frootbox\Http\Post $post,
         \Frootbox\Ext\Core\Images\Plugins\References\Persistence\Repositories\References $referencesRepository,
+        \Frootbox\Ext\Core\Images\Plugins\References\Persistence\Repositories\Categories $categoriesRepository,
     ): Response
     {
         // Update config
         $this->plugin->addConfig([
             'order' => $post->get('order'),
             'noReferencesDetailPage' => !empty($post->get('noReferencesDetailPage')),
+            'noCategoriesDetailPage' => !empty($post->get('noCategoriesDetailPage')),
             'dedicatedLocationPerReference' => !empty($post->get('dedicatedLocationPerReference')),
             'formId' => $post->get('formId'),
         ]);
@@ -86,6 +88,19 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
             ]);
 
             $entity->save();
+        }
+
+        // Update categories
+        $categories = $categoriesRepository->fetch([
+            'where' => [
+                'pluginId' => $this->plugin->getId(),
+            ],
+        ]);
+
+        foreach ($categories as $category) {
+
+            // Trigger save on category
+            $category->save();
         }
 
         return self::getResponse('json', 200, [

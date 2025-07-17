@@ -1,6 +1,6 @@
 <?php
 /**
- *
+ * @noinspection SqlNoDataSourceInspection
  */
 
 namespace Frootbox\Ext\Core\Images\Plugins\References;
@@ -179,10 +179,12 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
             return null;
         }
 
+        // Fetch categories
         $categories = $categoryRepository->fetch([
             'where' => [
                 'rootId' => $root->getId(),
                 'parentId' => $root->getId(),
+                new \Frootbox\Db\Conditions\GreaterOrEqual('visibility',(IS_LOGGED_IN ? 1 : 2)),
             ],
             'order' => [ 'lft ASC' ],
         ]);

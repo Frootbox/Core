@@ -1,6 +1,6 @@
 <?php
 /**
- *
+ * @noinspection SqlNoDataSourceInspection
  */
 
 namespace Frootbox\Ext\Core\News\Plugins\News;
@@ -20,7 +20,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
     ];
 
     /**
-     *
+     * @return string
      */
     public function getPath(): string
     {
@@ -28,7 +28,8 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
     }
 
     /**
-     *
+     * @param \Frootbox\Ext\Core\News\Persistence\Repositories\Articles $articleRepository
+     * @return void
      */
     public function onBeforeDelete(
         \Frootbox\Ext\Core\News\Persistence\Repositories\Articles $articleRepository,
@@ -45,7 +46,12 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
     }
 
     /**
-     *
+     * @param \DI\Container $container
+     * @param \Frootbox\Persistence\AbstractRow $ancestor
+     * @return void
+     * @throws \DI\DependencyException
+     * @throws \DI\NotFoundException
+     * @throws \Frootbox\Exceptions\RuntimeError
      */
     public function cloneContentFromAncestor(
         \DI\Container $container,

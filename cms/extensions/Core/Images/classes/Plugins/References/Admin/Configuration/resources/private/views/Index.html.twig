@@ -32,7 +32,11 @@
 
                     <div class="form-group form-check">
                         <input {% if plugin.getConfig('noReferencesDetailPage') %}checked{% endif %} type="checkbox" class="form-check-input" id="noReferencesDetailPage" name="noReferencesDetailPage">
-                        <label class="form-check-label" for="noReferencesDetailPage">Keine Detailseite für Referenzen</label>
+                        <label class="form-check-label" for="noReferencesDetailPage">Keine Detailseiten für Referenzen</label>
+                    </div>
+                    <div class="form-group form-check">
+                        <input {% if plugin.getConfig('noCategoriesDetailPage') %}checked{% endif %} type="checkbox" class="form-check-input" id="noCategoriesDetailPage" name="noCategoriesDetailPage">
+                        <label class="form-check-label" for="noCategoriesDetailPage">Keine Detailseiten für Kategorien</label>
                     </div>
 
                     {#
