@@ -1,0 +1,30 @@
+<div class="modal-header">
+    <h5 class="modal-title">Adresse bearbeiten</h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+
+<form class="block-controller-action" method="post" action="{{ controller.getActionUri('ajaxModalEdit', { blockId: block.getId(), blockAction: 'ajaxUpdate' }) }}">
+
+    <div class="modal-body">
+
+        <div class="form-group">
+            <label for="CategoryId">Galerie wählen</label>
+            <select class="form-control" id="CategoryId" name="CategoryId">
+                <option value="">Option wählen</option>
+
+                {% for Category in Categories %}
+                    <option {% if block.getConfig('CategoryId') == Category.getId() %}selected{% endif %} value="{{ Category.getId() }}">{{ Category.getTitle() }}</option>
+                {% endfor %}
+
+            </select>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary mr-auto">Speichern</button>
+    </div>
+
+</form>
+

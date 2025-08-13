@@ -1,0 +1,111 @@
+{# config
+
+title: Galerie-Teaser
+category: Images
+subtitle: 
+variables:
+    imageWidth:
+        label: Bild-Breite
+        type: int
+        default: 400
+    imageHeight:
+        label: Bild-Höhe
+        type: int
+        default: 400
+    columns:
+        label: Spalten
+        default: 3
+        type: int
+    columnsMobile:
+        label: Spalten (mobil)
+        default: 2
+        type: int
+    withHeadline:
+        label: mit Überschrift
+        type: bool
+    withText:
+        label: mit Text
+        type: bool
+
+/config #}
+
+
+{% set i = view.getViewhelper('Delegator', { object: block }) %}
+
+{% set variables = block.getVariables() %}
+
+{% if variables.columnsMobile == 1 %}
+    {% set colClass = 'col-12' %}
+{% elseif variables.columnsMobile == "" or variables.columnsMobile == 2 %}
+    {% set colClass = 'col-6' %}
+{% elseif variables.columnsMobile == 3 %}
+    {% set colClass = 'col-4' %}
+{% elseif variables.columnsMobile == 4 %}
+    {% set colClass = 'col-3' %}
+{% endif %}
+
+{% if variables.columns == 1 %}
+    {% set colClass = colClass ~ ' col-md-12' %}
+{% elseif variables.columns == 2 %}
+    {% set colClass = colClass ~ ' col-md-6' %}
+{% elseif variables.columns == "" or variables.columns == 3 %}
+    {% set colClass = colClass ~ ' col-md-4' %}
+{% elseif variables.columns == 4 %}
+    {% set colClass = colClass ~ ' col-md-3' %}
+{% endif %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+
+            {% if variables.withHeadline %}
+                <h2 class="first main-title" data-editable data-uid="{{ block.getUid('title') }}">Überschrift</h2>
+            {% endif %}
+
+            {% if variables.withText %}
+                <div data-editable data-uid="{{ block.getUid('text-1') }}"></div>
+            {% endif %}
+
+            {% set category = block.getCategory() %}
+            {% set images = category.getImages(4) %}
+
+            <div class="images align-{{ variables.imageAlign }}">
+                <div class="row align-items-center {% if variables.imageAlign == "center" %}justify-content-center{% endif %}">
+                    {% for image in images %}
+                        <div class="{{ colClass }}">
+                            <div class="image">
+                                <a {% if variables.withMagnifier %}href="{{ image.getUriThumbnail() }}" data-fancybox="gallery-{{ block.getId() }}"{% endif %}>
+                                    <picture class="fluid" data-fileid="{{ image.getId() }}">
+                                        <img {% if variables.imageWidth %}width="{{ variables.imageWidth }}"{% endif %} src="{{ image.getUriThumbnail({ width: variables.imageWidth, height: variables.imageHeight }) }}" alt="{{ image.getAlt() }}" />
+                                    </picture>
+
+                                    {% if variables.withCaption and image.getConfig('caption') %}
+                                        <div class="caption {{ variables.captionAlign }}">
+                                            <p>{{ image.getConfig('caption') | nl2br }}</p>
+                                        </div>
+                                    {% endif %}
+                                </a>
+
+                                {% if variables.withImageHeadline %}
+                                    <h4 data-editable data-uid="{{ image.getUid('title') }}">Überschrift</h4>
+                                {% endif %}
+
+                                {% if variables.withImageText %}
+                                    <div data-editable data-nowidgets data-uid="{{ image.getUid('text-1') }}"></div>
+                                {% endif %}
+
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            {% set page = category.getPage() %}
+
+            <p class="read-more">
+                <a href="{{ page.getUri() }}">Mehr erfahren</a>
+            </p>
+
+        </div>
+    </div>
+</div>

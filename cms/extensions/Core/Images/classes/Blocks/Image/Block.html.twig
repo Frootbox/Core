@@ -1,0 +1,36 @@
+{# config
+
+title: Bild
+category: Images
+subtitle: 
+_variables:
+    skipHeadline:
+        label: ohne Überschrift
+        type: bool
+    imageHeight:
+        label: Bildhöhe
+        type: int
+        default: 350
+    imageWidth:
+        label: Bildhöhe
+        type: int
+        default: 350
+
+/config #}
+
+
+{% set i = view.getViewhelper('Delegator', { object: block }) %}
+
+{% set variables = block.getVariables() %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+
+            <picture class="fluid" data-editable data-uid="{{ block.getUid('image')}}">
+                <img width="1110" src="{{ i.getDummyImage({ width: 1110, height: null }) }}" alt="" />
+            </picture>
+
+        </div>
+    </div>
+</div>

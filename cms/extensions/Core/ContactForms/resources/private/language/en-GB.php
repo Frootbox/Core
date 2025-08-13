@@ -13,4 +13,6 @@ return [
     '.YourDataHasBeenSend' => 'Your data has been sent.',
     '.FormHasAlreadyBeenSent' => 'The form has already been sent.',
     '.DataCouldNotBeSent' => 'The data could not be sent.',
+
+    '.CookieConsentNotice' => 'To use the form, you must agree to our <a class="pxf-raise-cookieconsentmanager" href="#">cookie policy</a>.',
 ];

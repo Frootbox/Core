@@ -113,6 +113,20 @@ class Category extends \Frootbox\Persistence\Category
         return $result;
     }
 
+    /**
+     *
+     */
+    public function getPage(): ?\Frootbox\Persistence\Page
+    {
+        if (empty($this->getPageId())) {
+            return null;
+        }
+
+        $pagesRepository = $this->db->getRepository(\Frootbox\Persistence\Repositories\Pages::class);
+        $page = $pagesRepository->fetchById($this->getPageId());
+
+        return $page;
+    }
 
     /**
      *

@@ -32,7 +32,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
      * @return Persistence\Question
      * @throws \Frootbox\Exceptions\RuntimeError
      */
-    public function getPredecessorOf(\Frootbox\Ext\Core\HelpAndSupport\Plugins\FAQ\Persistence\Question $question): \Frootbox\Ext\Core\HelpAndSupport\Plugins\FAQ\Persistence\Question
+    public function getPredecessorOf(\Frootbox\Ext\Core\HelpAndSupport\Plugins\FAQ\Persistence\Question $question): ?\Frootbox\Ext\Core\HelpAndSupport\Plugins\FAQ\Persistence\Question
     {
         $repository = $this->getDb()->getRepository(\Frootbox\Ext\Core\HelpAndSupport\Plugins\FAQ\Persistence\Repositories\Questions::class);
 
@@ -53,7 +53,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
      * @return Persistence\Question
      * @throws \Frootbox\Exceptions\RuntimeError
      */
-    public function getSuccessorOf(\Frootbox\Ext\Core\HelpAndSupport\Plugins\FAQ\Persistence\Question $question): \Frootbox\Ext\Core\HelpAndSupport\Plugins\FAQ\Persistence\Question
+    public function getSuccessorOf(\Frootbox\Ext\Core\HelpAndSupport\Plugins\FAQ\Persistence\Question $question): ?\Frootbox\Ext\Core\HelpAndSupport\Plugins\FAQ\Persistence\Question
     {
         $repository = $this->getDb()->getRepository(\Frootbox\Ext\Core\HelpAndSupport\Plugins\FAQ\Persistence\Repositories\Questions::class);
 

@@ -340,8 +340,20 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
         foreach ($files as $file) {
 
             if (!file_exists(FILES_DIR . $file->getPath())) {
+
                 if (file_exists($trashPath . basename($file->getPath()))) {
+
+                    if (!file_exists(dirname(FILES_DIR . $file->getPath()))) {
+
+                        $oldUmask = umask(0);
+
+                        mkdir(dirname(FILES_DIR . $file->getPath()), 0777, true);
+
+                        umask($oldUmask);
+                    }
+
                     ++$loop;
+
                     rename($trashPath . basename($file->getPath()), FILES_DIR . $file->getPath());
                 }
             }
