@@ -20,7 +20,7 @@ html body {
     line-height: $HeadlineH1LineHeight;
     font-weight: $HeadlineH1FontWeight;
 
-    h1 {
+    @media (min-width: 768px) {
       font-size: $HeadlineH1SizeLg;
       line-height: $HeadlineH1LineHeightLg;
     }
@@ -44,6 +44,11 @@ html body {
     line-height: $HeadlineH2LineHeight;
     font-weight: $HeadlineH2FontWeight;
 
+    @media (min-width: 768px) {
+      font-size: $HeadlineH2SizeLg;
+      line-height: $HeadlineH2LineHeightLg;
+    }
+
     h2 {
       margin: 0;
       padding: 0;
@@ -62,6 +67,11 @@ html body {
     line-height: $HeadlineH3LineHeight;
     font-weight: $HeadlineH3FontWeight;
 
+    @media (min-width: 768px) {
+      font-size: $HeadlineH3SizeLg;
+      line-height: $HeadlineH3LineHeightLg;
+    }
+
     h3 {
       margin: 0;
       padding: 0;
@@ -75,6 +85,15 @@ html body {
   header.h4, h4 {
 
     margin: 60px 0 40px 0;
+
+    font-size: $HeadlineH4Size;
+    line-height: $HeadlineH4LineHeight;
+    font-weight: $HeadlineH4FontWeight;
+
+    @media (min-width: 768px) {
+      font-size: $HeadlineH4SizeLg;
+      line-height: $HeadlineH4LineHeightLg;
+    }
 
     h4 {
       margin: 0;

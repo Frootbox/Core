@@ -69,8 +69,9 @@ class Teaser extends \Frootbox\Persistence\AbstractAsset implements \Frootbox\Pe
             !empty($this->config['noSelfPage'])
         )
         {
-            // Remove unnecessery alias
-            if (!empty($this->getAlias())) {
+
+            // Remove unnecessary alias
+            if (!empty($this->getAlias()) and !str_starts_with($this->getAlias(), '?forceLanguage')) {
 
                 $this->removeAlias();
 
