@@ -8,6 +8,17 @@ html body {
     clear: both;
   }
 
+  header.h1, header.h2, header.h3, header.h4 {
+    &.center {
+      text-align: center;
+    }
+
+    h1, h2, h3, h4 {
+      margin: 0;
+      padding: 0;
+    }
+  }
+
   header.h1, h1,
   header.h2.from-h1 h2,
   header.h3.from-h1 h3,
@@ -16,6 +27,7 @@ html body {
 
     margin: 100px 0 60px 0;
 
+    color: $HeadlineH1Color;
     font-size: $HeadlineH1Size;
     line-height: $HeadlineH1LineHeight;
     font-weight: $HeadlineH1FontWeight;
@@ -32,7 +44,15 @@ html body {
     .subtitle {
       color: $HeadlineH1SubTitleColor;
       font-size: $HeadlineH1SubTitleSize;
+      line-height: $HeadlineH1SubTitleLineHeight;
       font-weight: $HeadlineH1SubTitleFontWeight;
+    }
+
+    .super-title {
+      color: $HeadlineH1SuperTitleColor;
+      font-size: $HeadlineH1SuperTitleSize;
+      line-height: $HeadlineH1SuperTitleLineHeight;
+      font-weight: $HeadlineH1SuperTitleFontWeight;
     }
   }
 
@@ -40,6 +60,7 @@ html body {
 
     margin: 60px 0 40px 0;
 
+    color: $HeadlineH2Color;
     font-size: $HeadlineH2Size;
     line-height: $HeadlineH2LineHeight;
     font-weight: $HeadlineH2FontWeight;
@@ -57,12 +78,21 @@ html body {
     &.first {
       margin-top: 0;
     }
+
+    .super-title {
+      color: $HeadlineH2SuperTitleColor;
+      font-family: $HeadlineH2SuperTitleFamily;
+      font-size: $HeadlineH2SuperTitleSize;
+      line-height: $HeadlineH2SuperTitleLineHeight;
+      font-weight: $HeadlineH2SuperTitleFontWeight;
+    }
   }
 
   header.h3, h3 {
 
     margin: 60px 0 40px 0;
 
+    color: $HeadlineH3Color;
     font-size: $HeadlineH3Size;
     line-height: $HeadlineH3LineHeight;
     font-weight: $HeadlineH3FontWeight;
@@ -80,10 +110,25 @@ html body {
     &.first {
       margin-top: 0;
     }
+
+    .subtitle {
+      margin: 10px 0 0 0;
+
+      color: $HeadlineH3SubTitleColor;
+      font-size: $HeadlineH3SubTitleSize;
+      line-height: $HeadlineH3SubTitleLineHeight;
+      font-weight: $HeadlineH3SubTitleFontWeight;
+
+      @media (min-width: 768px) {
+        font-size: $HeadlineH3SubTitleSizeLg;
+        line-height: $HeadlineH3SubTitleLineHeightLg;
+      }
+    }
   }
 
-  header.h4, h4 {
-
+  header.h4, h4,
+  header.h3.from-h4 h3
+  {
     margin: 60px 0 40px 0;
 
     font-size: $HeadlineH4Size;
@@ -102,6 +147,12 @@ html body {
 
     &.first {
       margin-top: 0;
+    }
+
+    .super-title {
+      font-size: $HeadlineH4SuperTitleSize;
+      line-height: $HeadlineH4SuperTitleLineHeight;
+      font-weight: $HeadlineH4SuperTitleFontWeight;
     }
   }
 

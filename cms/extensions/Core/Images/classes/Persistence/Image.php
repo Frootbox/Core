@@ -27,9 +27,9 @@ class Image extends \Frootbox\Persistence\File
         $data = getimagesize(FILES_DIR . $this->getPath());
 
         return [
-            'width' => $data[0],
-            'height' => $data[1],
-            'mime' => $data['mime']
+            'width' => $data[0] ?? null,
+            'height' => $data[1] ?? null,
+            'mime' => $data['mime'] ?? null,
         ];
     }
 }

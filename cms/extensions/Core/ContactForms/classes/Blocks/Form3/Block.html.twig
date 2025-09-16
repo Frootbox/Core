@@ -1,0 +1,57 @@
+{# config
+
+title: Formular
+extension: Core/ContactForms
+category: Contact
+extends: Core/ContactForms/Form1
+variables:
+    skipHeadline:
+        label: keine Überschrift
+        type: bool
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: block }) %}
+
+{% set formRenderer = view.getViewhelper('Ext/Core/ContactForms/FormRenderer', {   }) %}
+{% set variables = block.getVariables() %}
+
+<div class="outer-wrapper" data-width="600" data-type="Images/Background" data-uid="{{ block.getUid('background')}}">
+
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+
+                {% if not variables.skipHeadline %}
+                    <h3 class="first" data-editable data-uid="{{ block.getUid('title') }}">Überschrift</h3>
+                {% endif %}
+
+                <div data-editable data-uid="{{ block.getUid('text') }}"></div>
+
+            </div>
+            <div class="col-md-6">
+
+                {% if not form %}
+                    {% if editing %}
+                        <div class="editors-note">
+                            <a class="block-edit" data-norewrite="1" href="#{{ block.getId() }}">Es wurden noch kein Formular verknüpft.</a>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    {{ formRenderer.render({
+                        formId: form.getId(),
+                        options: {
+                            editable: variables.fieldLabelsEditable,
+                        },
+                        payload: {
+                            Seite: page.getTitle()
+                        }
+                    }) | raw }}
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+
+</div>
+

@@ -21,7 +21,7 @@
     </td>
 </tr>
 
-{% for child in data.item.getItems() %}
+{% for child in data.item.getItemsAll() %}
     {{ v.injectPartial('\\Frootbox\\Admin\\Controller\\NavigationBars\\Partials\\ListNavigationItemsRow\\Partial', {
         item: child,
         language: data.language,

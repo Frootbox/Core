@@ -642,8 +642,6 @@ try {
         $view->addPath($configuration->get('pageRootFolder'));
     }
 
-
-
     // Get sockets config from cache
     $key = md5($_SERVER['REQUEST_URI']);
     $cacheFile = FILES_DIR . 'cache/system/sockets/' . $key . '.php';
@@ -897,9 +895,17 @@ try {
     $response = $container->get(\Frootbox\Http\Response::class);
     $response->setBody($html);
 
-    // Parse html
-    $parser = new \Frootbox\View\HtmlParser($html, $container);
-    $html = $container->call([ $parser, 'parse' ]);
+    try {
+
+        // Parse html
+        $parser = new \Frootbox\View\HtmlParser($html, $container);
+        $html = $container->call([ $parser, 'parse' ]);
+    }
+    catch (\Exception $e) {
+        d($e);
+        d($e->getMessage());
+    }
+
 
     if (!preg_match('#<h1.*?>#', $html)) {
 
@@ -1003,7 +1009,7 @@ try {
 
         $scriptSrc = !empty($configuration->get('contentSecurityPolicy.domains')) ? implode(' ', $configuration->get('contentSecurityPolicy.domains')->getData()) : '';
 
-        // header("Content-Security-Policy: script-src * 'self' 'unsafe-inline' 'unsafe-eval' " . $scriptSrc . " www.google.com cookieconsent.herrundfraupixel.de 'nonce-" . SCRIPT_NONCE . "'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'");
+        // header("Content-Security-Policy: script-src * 'self' 'unsafe-inline' 'unsafe-hashes' 'unsafe-eval' " . $scriptSrc . " www.google.com cookieconsent.herrundfraupixel.de 'nonce-" . SCRIPT_NONCE . "'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'");
         // header("Content-Security-Policy: script-src * 'self' 'unsafe-inline' 'unsafe-eval' " . $scriptSrc . " www.google.com cookieconsent.herrundfraupixel.de 'nonce-" . SCRIPT_NONCE . "'; base-uri 'self'; form-action 'self'; object-src 'none'");
         header('Strict-Transport-Security: max-age=31536000');
         header('X-Content-Type-Options: nosniff');

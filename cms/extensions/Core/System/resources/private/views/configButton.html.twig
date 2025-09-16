@@ -95,16 +95,23 @@
                 method: 'POST',
                 success: function ( response ) {
 
-                    if (typeof response.success != 'undefined') {
-                        alert(response.success);
-                    }
-
                     if (typeof response.title != 'undefined') {
                         $('#frootboxOnPageConfigModalLabel').html(response.title);
                     }
 
                     if (typeof response.html != 'undefined') {
                         $('#frootboxOnPageConfigModal .modal-body-wrapper').html(response.html);
+                    }
+
+                    if (typeof response.setFields != 'undefined') {
+
+                        response.setFields.forEach(field => {
+                            $(field.selector).val(field.value);
+                        });
+                    }
+
+                    if (typeof response.success != 'undefined') {
+                        alert(response.success);
                     }
                 },
                 error: function ( xhr, textStatus ) {

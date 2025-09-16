@@ -8,6 +8,10 @@
     {% set colWidth = "33%" %}
 {% endif %}
 
+{% if contacts.getCount() == 0 and children and children.getCount() == 0 %}
+    {% set contacts = plugin.getContacts() %}
+{% endif %}
+
 {% if contacts.getCount() > 0 %}
     <table class="table contact-persons">
 

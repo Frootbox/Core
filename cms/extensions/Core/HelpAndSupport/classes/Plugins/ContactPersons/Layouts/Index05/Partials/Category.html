@@ -1,6 +1,10 @@
 
 {% set contacts = data.category.getContacts() %}
 
+{% if contacts.getCount() == 0 %}
+    {% set contacts = plugin.getContacts() %}
+{% endif %}
+
 {% if contacts.getCount() > 0 %}
 
     <div class="row">

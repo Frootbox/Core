@@ -23,21 +23,76 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
         \Frootbox\Persistence\Repositories\Aliases $aliasesRepository
     ): Response
     {
+
         // Fetch alias
         $alias = $aliasesRepository->fetchById($get->get('aliasId'));
 
-        $alias->addConfig([
-            'seo' => [
-                'title' => $post->get('seoTitle'),
-                'keywords' => $post->get('metaKeywords'),
-                'description' => $post->get('metaDescription'),
-            ],
-        ]);
+        if (!empty($post->get('ImportUrl'))) {
+
+            $result = [];
+
+            // Get the HTML content
+            $html = @file_get_contents($post->get('ImportUrl'));
+
+            // Load HTML into DOM
+            $doc = new \DOMDocument();
+            libxml_use_internal_errors(true);
+            $doc->loadHTML($html);
+            libxml_clear_errors();
+
+            $xpath = new \DOMXPath($doc);
+
+            // Extract title
+            $nodes = $xpath->query('//title');
+            if ($nodes->length > 0) {
+                $result['title'] = trim($nodes->item(0)->nodeValue);
+            }
+
+            // Extract meta description
+            $nodes = $xpath->query('//meta[@name="description"]/@content');
+            if ($nodes->length > 0) {
+                $result['description'] = trim($nodes->item(0)->nodeValue);
+            }
+
+            // Extract meta keywords
+            $nodes = $xpath->query('//meta[@name="keywords"]/@content');
+            if ($nodes->length > 0) {
+                $result['keywords'] = trim($nodes->item(0)->nodeValue);
+            }
+
+            $alias->addConfig([
+                'seo' => [
+                    'title' => $result['title'] ?? null,
+                    'keywords' => $result['keywords'] ?? null,
+                    'description' => $result['description'] ?? null,
+                ],
+            ]);
+        }
+        else {
+
+            $alias->addConfig([
+                'seo' => [
+                    'title' => $post->get('seoTitle'),
+                    'keywords' => $post->get('metaKeywords'),
+                    'description' => $post->get('metaDescription'),
+                ],
+            ]);
+        }
 
         $alias->save();
 
         return self::getResponse('json', 200, [
-            'success' => 'Die Daten wurden gespeichert.'
+            'success' => 'Die Daten wurden gespeichert.',
+            'setFields' => [
+                [
+                    'selector' => '#metaDescription',
+                    'value' => $alias->getConfig('seo.description'),
+                ],
+                [
+                    'selector' => '#seoTitle',
+                    'value' => $alias->getConfig('seo.title'),
+                ],
+            ],
         ]);
     }
 

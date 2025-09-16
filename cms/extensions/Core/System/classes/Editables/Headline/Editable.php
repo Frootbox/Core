@@ -116,10 +116,10 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
             $template = '<header ' . $addedHtml . ' class="' . $classes . '" data-uid="' . $uid . '">';
 
             if (!empty($element->getAttribute('data-supertitle'))) {
-                $template .= '<p class="supertitle super-title">' . $element->getAttribute('data-supertitle') . '</p>';
+                $template .= '<p class="supertitle super-title"><span>' . $element->getAttribute('data-supertitle') . '</span></p>';
             }
             elseif ($text and !empty($text->getConfig('supertitle')) and empty($element->getAttribute('data-skipsupertitle'))) {
-                $template .= '<p class="supertitle super-title">' . $text->getConfig('supertitle') . '</p>';
+                $template .= '<p class="supertitle super-title"><span>' . $text->getConfig('supertitle') . '</span></p>';
             }
 
             $subtitle = null;
@@ -158,6 +158,9 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
             }
             elseif ($subtitle) {
                 $template .= '<p class="subtitle">' . nl2br($subtitle) . '</p>';
+            }
+            elseif (!empty($element->getAttribute('data-subtitle-preset'))) {
+                $template .= '<p class="subtitle">' . $element->getAttribute('data-subtitle-preset') . '</p>';
             }
 
             $template .= '</header>';

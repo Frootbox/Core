@@ -32,6 +32,9 @@ variables:
         label: Spalten-Breits des Inhalts
         type: int
         default: 12
+    withImageAboveApplication:
+        label: Bild über Bewerbung
+        type: bool
 
 /config #}
 
@@ -182,6 +185,12 @@ variables:
                 <div class="col-md-5">
 
                     <div class="sticky-top">
+
+                        {% if variables.withImageAboveApplication %}
+                            <picture class="fluid" data-editable data-uid="{{ job.getUid('image')}}">
+                                <img width="800" src="{{ i.getDummyImage({ width: 800, height: null }) }}" alt="" />
+                            </picture>
+                        {% endif %}
 
                         {% if job.getConfig('formId') or plugin.getConfig('formId') %}
 

@@ -12,6 +12,15 @@
         </script>
     {% endif %}
 
+    <script nonce="{{ settings.nonce }}">
+        $(function ( ) {
+
+            $('a.no-ajax').click(function(event) {
+                event.stopImmediatePropagation();
+            });
+        });
+    </script>
+
     <table class="table">
         <tbody>
 
@@ -28,13 +37,12 @@
                         <span class="dropdown">
                             <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <i class="fa fa-bars icon"></i>
-                            </a>
-                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            </a>&nbsp;<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                 <a class="dropdown-item" data-modal data-title="neue Unterkategorie erstellen" href="{{ v.getUri('Assets/Categories', 'ajaxModalCompose', { 'categoryId' : category.getId(), pluginId: data.plugin.getId() }) }}"><i class="fa fa-plus fa-fw"></i> neue Unterkategorie erstellen</a>
                                 <!-- <div class="dropdown-divider"></div> -->
                                 <a class="dropdown-item" data-modal data-title="Kategorie bearbeiten „{{ category.getTitle() }}“ (#{{ category.getId() }})" href="{{ v.getUri('Assets/Categories', 'ajaxModalEdit', { 'categoryId' : category.getId(), pluginId: data.plugin.getId() }) }}"><i class="fa fa-pencil fa-fw"></i> Kategorie bearbeiten</a>
                                 <a class="dropdown-item ajax" data-confirm="Soll diese Kategorie wirklich gelöscht werden?" href="{{ v.getUri('Assets/Categories', 'ajaxDelete', { 'categoryId' : category.getId(), pluginId: data.plugin.getId() }) }}"><i class="fa fa-times fa-fw"></i> Kategorie löschen</a>
-                                <a class="dropdown-item" href="{{ v.getUri('Assets/Categories', 'sort', { 'categoryId' : category.getId(), pluginId: data.plugin.getId() }) }}"><i class="fa fa-sort fa-fw"></i> Kategorien sortieren</a>
+                                <a class="no-ajax dropdown-item" href="{{ v.getUri('Assets/Categories', 'sort', { 'categoryId' : category.getId(), pluginId: data.plugin.getId() }) }}"><i class="fa fa-sort fa-fw"></i> Kategorien sortieren</a>
                                 <a class="dropdown-item" data-modal data-title="Zweig duplizieren" href="{{ v.getUri('Assets/Categories', 'ajaxModalBranchDuplicate', { 'categoryId' : category.getId(), pluginId: data.plugin.getId() }) }}"><i class="fa fa-code-branch fa-fw"></i> Zweig duplizieren</a>
                             </div>
                         </span>

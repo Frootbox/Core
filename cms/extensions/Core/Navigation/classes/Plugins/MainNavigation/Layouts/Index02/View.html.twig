@@ -48,13 +48,13 @@ variables:
         <nav>
             {% for npage in pages %}
                 <span class="link-wrapper">
-                    <a class="link {% if npage.getParentId() != 0 and npage.hasChildren() %}has-children{% endif %} link-{{ loop.index }} {% if npage.getIsActive() %}active{% endif %}" href="{{ npage.getUri() }}"><span>{{ npage.getTitle }}</span></a>
+                    <a tabindex="0" class="link {% if npage.getParentId() != 0 and npage.hasChildren() %}has-children{% endif %} link-{{ loop.index }} {% if npage.getIsActive() %}active{% endif %}" href="{{ npage.getUri() }}"><span>{{ npage.getTitle }}</span></a>
 
                     {% if variables.withPopdownMenu and npage.getParentId() != 0 and npage.hasChildren() %}
                         <ul>
 
                             {% for child in npage.getChildrenVisible() %}
-                                <li><a href="{{ child.getUri() }}">{{ child.getTitle() }}</a></li>
+                                <li><a tabindex="0" href="{{ child.getUri() }}">{{ child.getTitle() }}</a></li>
                             {% endfor %}
 
                         </ul>

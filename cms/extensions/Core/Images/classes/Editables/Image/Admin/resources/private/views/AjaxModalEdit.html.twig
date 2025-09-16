@@ -161,12 +161,11 @@
                 </div>
             {% endif %}
 
-            {#
             <div class="form-group form-check">
-                <input type="checkbox" class="form-check-input" id="exampleCheck1">
-                <label class="form-check-label" for="exampleCheck1">mit Lupenfunktion</label>
+                <input type="checkbox" class="form-check-input" id="isPresentationOnly" name="isPresentationOnly" {% if file.getConfig('isPresentationOnly') %}checked{% endif %}>
+                <label class="form-check-label" for="isPresentationOnly">Bild dient rein dekorativen Zwecken</label>
             </div>
-            #}
+
         {% endif %}
 
         <button type="submit" class="btn btn-primary">Speichern</button>
