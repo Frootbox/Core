@@ -18,6 +18,11 @@ class Page
         // Fetch file
         $file = $files->fetchById($get->get('f'));
 
+        if ($file->isPrivate()) {
+            http_response_code(401);
+            die("Unauthorized");
+        }
+
         $path = FILES_DIR . $file->getPath();
 
         if ($fp = fopen($path, "rb")) {
@@ -84,6 +89,11 @@ class Page
         // Fetch file
         $file = $files->fetchById($get->get('f'));
 
+        if ($file->isPrivate()) {
+            header('Location: ' . SERVER_PATH_PROTOCOL);
+            exit;
+        }
+
         header('Content-type: ' . $file->getType());
         header('Content-Disposition: attachment; filename="' . $file->getNameClean() . '"');
         
@@ -101,6 +111,11 @@ class Page
     {
         // Fetch file
         $file = $files->fetchById($get->get('f'));
+
+        if ($file->isPrivate()) {
+            http_response_code(401);
+            die("Unauthorized");
+        }
 
         /*
         header('Content-type: ' . $file->getType());

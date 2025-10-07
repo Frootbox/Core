@@ -10,7 +10,7 @@ return [
         'id' => 'Core',
         'name' => 'Frootbox'
     ],
-    'version' => '0.0.5',
+    'version' => '0.0.6',
     'requires' => [
     ],
     'autoinstall' => [

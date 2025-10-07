@@ -10,7 +10,43 @@ class Teaser extends \Frootbox\Persistence\AbstractAsset implements \Frootbox\Pe
     protected $model = Repositories\Teasers::class;
 
     /**
-     *
+     * @return string|null
+     */
+    public function getLabel(): ?string
+    {
+        if (!empty($this->getConfig('labels'))) {
+
+            if (!empty($this->getConfig('labels.' . GLOBAL_LANGUAGE))) {
+                return $this->getConfig('labels.' . GLOBAL_LANGUAGE);
+            }
+
+            if (DEFAULT_LANGUAGE != GLOBAL_LANGUAGE) {
+
+                if (!empty($this->getConfig('labels.' . DEFAULT_LANGUAGE))) {
+                    return $this->getConfig('labels.' . DEFAULT_LANGUAGE);
+                }
+            }
+        }
+
+        return $this->getConfig('labels');
+    }
+
+    /**
+     * @param $language
+     * @return string|null
+     */
+    public function getLabelWithoutFallback($language = null): ?string
+    {
+
+        if (empty($language) or $language == DEFAULT_LANGUAGE) {
+            return parent::getTitle();
+        }
+
+        return $this->getConfig('titles')[$language] ?? null;
+    }
+
+    /**
+     * @return array
      */
     public function getLanguageAliases(): array
     {
@@ -19,7 +55,8 @@ class Teaser extends \Frootbox\Persistence\AbstractAsset implements \Frootbox\Pe
     }
 
     /**
-     *
+     * @return \Frootbox\Persistence\Alias|null
+     * @throws \Exception
      */
     protected function getNewAlias(): ?\Frootbox\Persistence\Alias
     {
@@ -140,6 +177,10 @@ class Teaser extends \Frootbox\Persistence\AbstractAsset implements \Frootbox\Pe
      */
     public function getUri(array $options = null): string
     {
+        if (!empty($this->getConfig('targets.' . GLOBAL_LANGUAGE))) {
+           return $this->getConfig('targets.' . GLOBAL_LANGUAGE);
+        }
+
         if (!empty($this->config['redirect']['target'])) {
             return $this->config['redirect']['target'];
         }

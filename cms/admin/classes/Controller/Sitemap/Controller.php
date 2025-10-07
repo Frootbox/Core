@@ -12,6 +12,37 @@ namespace Frootbox\Admin\Controller\Sitemap;
 class Controller extends \Frootbox\Admin\Controller\AbstractController
 {
     /**
+     * @param \Frootbox\Persistence\Repositories\Pages $pageRepository
+     * @return \Frootbox\Admin\Controller\Response
+     */
+    public function export(
+        \Frootbox\Persistence\Repositories\Pages $pageRepository,
+    ): \Frootbox\Admin\Controller\Response
+    {
+        // Fetch root page
+        $rootPage = $pageRepository->fetchOne([
+            'where' => [
+                'language' => 'de-DE',
+                new \Frootbox\Db\Conditions\MatchColumn('rootId', 'id')
+            ]
+        ]);
+
+        $data = [];
+
+        foreach ($rootPage->getTree() as $page) {
+
+            $data[] = [
+                'title' => $page->getTitle(),
+                'url' => SERVER_PATH_PROTOCOL . trim($page->getUri(), '/'),
+            ];
+        }
+
+        die(json_encode($data));
+
+        return self::getResponse();
+    }
+
+    /**
      * Display main sitemap
      */
     public function index(): \Frootbox\Admin\Controller\Response

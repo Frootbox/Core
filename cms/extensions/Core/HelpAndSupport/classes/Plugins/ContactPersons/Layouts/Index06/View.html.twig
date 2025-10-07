@@ -81,7 +81,7 @@ variables:
                                                         {% endif %}
                                                     </p>
                                                     <p>
-                                                        {% if contact.getPhone() %}
+                                                        {% if contact.getEmail() %}
                                                             <a href="mailto:{{ contact.getEmail() }}">{{ contact.getEmail() }}</a>
                                                         {% endif %}
                                                         {% if contact.getPhone() %}

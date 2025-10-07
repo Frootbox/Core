@@ -4,7 +4,7 @@
 		<label for="field_{{ field.getId() }}">{{ field.getLabel }}{% if field.isRequired %}*{% endif %}</label>
 	{% endif %}
 
-	<input aria-describedby="fieldHelp_{{ field.getId() }}" type="text" class="form-control" id="field_{{ field.getId() }}" name="fields[{{ field.getId() }}]" placeholder="{% if parameters.placeholder %}{{ parameters.placeholder }}{% else %}{{ parameters.t.translate('Core.Forms.Plugins.Form.PleaseFill') }}{% endif %}" {% if field.isRequired %}required{% endif %} value="{{ parameters.value }}">
+	<input {% if field.getConfig('helpText') %}aria-describedby="fieldHelp_{{ field.getId() }}"{% endif %} type="text" class="form-control" id="field_{{ field.getId() }}" name="fields[{{ field.getId() }}]" placeholder="{% if parameters.placeholder %}{{ parameters.placeholder }}{% else %}{{ parameters.t.translate('Core.Forms.Plugins.Form.PleaseFill') }}{% endif %}" {% if field.isRequired %}required{% endif %} value="{{ parameters.value }}">
 
 	{% if field.getConfig('helpText') %}
 		<small id="fieldHelp_{{ field.getId() }}" class="form-text text-muted">

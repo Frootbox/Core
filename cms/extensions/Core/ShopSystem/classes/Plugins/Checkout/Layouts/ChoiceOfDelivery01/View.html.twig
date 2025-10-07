@@ -6,6 +6,12 @@ variables:
         label: mit Container
         type: bool
         default: false
+    skipSundayMobile:
+        label: Sonntag mobil ausblenden
+        type: bool
+    skipSaturdayMobile:
+        label: Samstag mobil ausblenden
+        type: bool
 
 /config #}
 
@@ -73,7 +79,8 @@ variables:
 
                 <h3>{{ "Core.ShopSystem.Plugins.Checkout.H3ChooseDeliveryDay" | translate }}</h3>
 
-                <table class="calendar">
+
+                <table class="calendar {% if variables.skipSaturdayMobile %}skip-saturday-mobile{% endif %} {% if variables.skipSundayMobile %}skip-sunday-mobile{% endif %}">
                     <thead>
                         <tr>
                             <th>
@@ -91,10 +98,10 @@ variables:
                             <th>
                                 <span class="content">Fr</span>
                             </th>
-                            <th>
+                            <th class="day-6">
                                 <span class="content">Sa</span>
                             </th>
-                            <th>
+                            <th class="day-7">
                                 <span class="content">So</span>
                             </th>
                         </tr>
@@ -103,7 +110,7 @@ variables:
                         {% for week in weeks %}
                             <tr>
                                 {% for day in week.days %}
-                                    <td>
+                                    <td class="day-{{ loop.index }}">
                                         {% if day.isActive %}
                                             <a href="{{ plugin.getAjaxUri('UpdateDeliveryDay', { deliveryDay: (day.date | date('Y-m-d')) }) }}" class="day">
                                                 <span class="content">

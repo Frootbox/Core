@@ -47,12 +47,12 @@ variables:
                     </ul>
                 {% endif %}
 
-                <div class="accordion" id="accordionExample">
+                <div class="accordion" id="accordion-{{ plugin.getId() }}">
 
                     {% for question in questions %}
                         <div class="card" tabindex="0" data-toggle-accordion>
                             <div class="card-header">
-                                <h3 class="mb-0">
+                                <h3 class="mb-0" id="question-{{ question.getId() }}">
                                     <span data-toggle="collapse" data-target="#collapse{{ question.getId() }}" aria-expanded="true" aria-controls="collapseOne" class="collapsed">
                                         <span data-editable-element data-uid="{{ question.getUid('title') }}">{{ question.getTitle }}</span>
 
@@ -63,7 +63,7 @@ variables:
                                     </span>
                                 </h3>
                             </div>
-                            <div id="collapse{{ question.getId() }}" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
+                            <div id="collapse{{ question.getId() }}" class="collapse" aria-labelledby="question-{{ question.getId() }}" data-parent="#accordion-{{ plugin.getId() }}">
                                 <div class="card-body">
 
                                     <div data-editable data-uid="{{ question.getUid('teaser') }}"></div>
