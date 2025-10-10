@@ -95,7 +95,17 @@ variables:
 
 
 
+            </div>
+        </div>
+    {% if variables.withContainer %}</div>{% endif %}
 
+    <div class="blocks" data-blocks data-label="Blöcke des Artikels" data-uid="{{ article.getUid('block-content') }}"></div>
+
+    {% if variables.withContainer %}<div class="container">{% endif %}
+
+
+        <div class="row">
+            <div class="col-12">
 
                 {% set articles = i.getArticles({ limit: 5, skip: [ article.getId() ] }) %}
 

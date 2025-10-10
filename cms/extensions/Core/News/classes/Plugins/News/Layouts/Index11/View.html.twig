@@ -63,7 +63,7 @@ variables:
                                 </div>
                                 <div class="col-md-5">
 
-                                    <picture class="fluid" data-caption="1" data-editable {% if variables.noImageDummy %}data-skipempty="1"{% endif %} data-uid="{{ article.getUid('image')}}">
+                                    <picture data-skipempty class="fluid" data-caption="1" data-editable {% if variables.noImageDummy %}data-skipempty="1"{% endif %} data-uid="{{ article.getUid('image')}}">
                                         <img width="1110" src="{{ i.getDummyImage({ width: 1110, height: null }) }}" alt="" />
                                     </picture>
 
