@@ -48,6 +48,7 @@ try {
     $config = $container->get(\Frootbox\Config\Config::class);
 
     define('DEVMODE', !empty($config->get('devmode')));
+    define('IS_BACKEND', true);
 
     define('SCRIPT_NONCE', !empty($_SESSION['SCRIPT_NONCE']) ? $_SESSION['SCRIPT_NONCE'] : base64_encode(random_bytes(20)));
 

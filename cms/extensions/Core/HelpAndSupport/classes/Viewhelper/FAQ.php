@@ -9,7 +9,7 @@ class FAQ extends \Frootbox\View\Viewhelper\AbstractViewhelper
 {
     protected $arguments = [
         'getQuestions' => [
-
+            'params',
         ],
     ];
 
@@ -17,12 +17,20 @@ class FAQ extends \Frootbox\View\Viewhelper\AbstractViewhelper
      *
      */
     public function getQuestionsAction(
+        \Frootbox\Ext\Core\HelpAndSupport\Plugins\FAQ\Persistence\Repositories\Questions $questionsRepository,
         array $params = null,
-        \Frootbox\Ext\Core\HelpAndSupport\Plugins\FAQ\Persistence\Repositories\Questions $questionsRepository
     ): \Frootbox\Db\Result
     {
+        $where = [];
+
+        if (!empty($params['pluginId'])) {
+            $where['pluginId'] = $params['pluginId'];
+        }
+
         // Fetch contacts
-        $questions = $questionsRepository->fetch();
+        $questions = $questionsRepository->fetch([
+            'where' => $where,
+        ]);
 
         return $questions;
     }

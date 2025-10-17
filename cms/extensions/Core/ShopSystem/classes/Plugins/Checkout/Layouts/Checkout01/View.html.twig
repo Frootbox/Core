@@ -182,6 +182,7 @@ variables:
                             </div>
 
                             {% if i.getCountries() %}
+                            {# {{ config.get('Ext.Core.ShopSystem.CountryDefault') }} #}
                                     <div class="form-group">
                                         <label for="country">{{ "Core.ShopSystem.LabelCountry" | translate }} *</label>
                                         <select tabindex="13" required class="form-control" id="country" name="personal[country]">

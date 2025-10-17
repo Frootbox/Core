@@ -54,7 +54,11 @@ class Renderer
 
         $html = '<nav class="' . ($this->parameters['class'] ?? null) . '">';
 
+        $configuration = $this->container->get(\Frootbox\Config\Config::class);
+
         foreach ($this->navigation->getItems() as $item) {
+
+            $item->setConfiguration($configuration);
 
             if ($item->hasAutoItems()) {
                 $items = $this->container->call([ $item, 'getAutoItems' ]);

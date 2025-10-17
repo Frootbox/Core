@@ -32,7 +32,6 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
 
             $uid = $element->getAttribute('data-uid');
 
-
             preg_match('#^\<(.*?) #', (string)$element, $match);
 
             if ($match[1] == 'picture') {
@@ -42,7 +41,6 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
                     'fallbackLanguageDefault' => true,
                     'order' => 'orderId DESC',
                 ]);
-
 
                 if (!$file and $element->getAttribute('data-fallback-uid') !== null) {
                     /**
@@ -88,24 +86,22 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
                     $payload['height'] = $match[1];
                 }
 
-
                 $default = (preg_match('#<img.*?src="(.*?)".*?>#i', $innerHtml, $match)) ? $match[1] : (string) null;
 
                 $class = (preg_match('#<img.*?class="(.*?)".*?>#i', $innerHtml, $match)) ? $match[1] : (string) null;
 
                 // $alt = !empty($file->getConfig('caption')) ? strip_tags($file->getConfig('caption')) : $file->getName();
                 $html = '<div class="ext-core-images-image">
-                    <img data-image-edited="true" data-default="' . $default . '" class="' . $class . '" src="' . $file->getUriThumbnail($payload) . '" ' . ($payload['height'] ? 'height="' . $payload['height'] . '"' : '') . ' ' . ($payload['width'] ? 'width="' . $payload['width'] . '"' : '') . ' alt="' . $file->getAlt() . '" />
+                    <img data-image-edited="true" ' . (!empty($file->getConfig('isPresentationOnly')) ? 'role="presentation"' : '') . ' data-default="' . $default . '" class="' . $class . '" src="' . $file->getUriThumbnail($payload) . '" ' . ($payload['height'] ? 'height="' . $payload['height'] . '"' : '') . ' ' . ($payload['width'] ? 'width="' . $payload['width'] . '"' : '') . ' alt="' . $file->getAlt(default: $element->getAttribute('data-alt')) . '" />
                 ';
 
-                if (!empty($file->getConfig('caption')) and !empty($config->get('Ext.Core.Images.Editables.Image.Caption'))) {
+                if (!empty($file->getConfig('caption')) and (!empty($element->attr('data-caption')) or !empty($config->get('Ext.Core.Images.Editables.Image.Caption')))) {
                     $html .= '<div class="caption">' . nl2br($file->getConfig('caption')) . '</div>';
                 }
 
                 if (!empty($file->getCopyright()) and !empty($config->get('Ext.Core.Images.Editables.Image.Copyright'))) {
                     $html .= '<div class="copyright">' . nl2br($file->getCopyright()) . '</div>';
                 }
-
 
                 if ($element->getAttribute('data-skiplink') === null and !empty($file->getConfig('link'))) {
                     $html = '<a href="' . $file->getConfig('link') . '">' . $html . '</a>';

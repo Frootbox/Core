@@ -1581,6 +1581,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
      * @param Container $container
      * @param Post $post
      * @param Config $config
+     * @param Config $configuration
      * @param \Frootbox\TranslatorFactory $translationFactory
      * @param \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Products $productsRepository
      * @return Response
@@ -1592,6 +1593,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         Container $container,
         \Frootbox\Http\Post $post,
         \Frootbox\Config\Config $config,
+        \Frootbox\Config\Config $configuration,
         \Frootbox\TranslatorFactory $translationFactory,
         \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Products $productsRepository,
     ): Response
@@ -1664,13 +1666,21 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
             }
         }
 
+        if (!empty($config->get('Ext.Core.ShopSystem.CartFilter'))) {
+            foreach ($config->get('Ext.Core.ShopSystem.CartFilter') as $filterClass) {
 
-        if (!empty($config->get('Ext.Core.ShopSystem.CartFilter.PostCheckout'))) {
-            foreach ($config->get('Ext.Core.ShopSystem.CartFilter.PostCheckout') as $filterClass) {
                 $filter = new $filterClass($shopcart, $this);
-                $container->call([$filter, 'run']);
+
+                if (method_exists($filter, 'onAfterSubmitPersonalData')) {
+                    $response = $container->call([$filter, 'onAfterSubmitPersonalData']);
+
+                    if ($response instanceof \Frootbox\View\ResponseRedirect) {
+                        return $response;
+                    }
+                }
             }
         }
+
 
         // Validate shipping costs
         $shopcart->updateShippingCosts();

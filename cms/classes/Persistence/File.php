@@ -107,20 +107,28 @@ class File extends AbstractRow
     }
 
     /**
-     *
+     * @param string|null $default
+     * @return string|null
      */
-    public function getAlt(): ?string
+    public function getAlt(
+        string $default = null,
+    ): ?string
     {
+
         if (!empty($this->getConfig('alt'))) {
             return $this->getConfig('alt');
         }
 
-        if (!empty($this->getTitle())) {
-            return $this->getTitle();
+        if (!empty($title = $this->getTitle(useNameDefault: false))) {
+            return $title;
         }
 
         if (!empty($this->getConfig('caption'))) {
             return strip_tags($this->getConfig('caption'));
+        }
+
+        if ($default !== null) {
+            return $default;
         }
 
         return $this->getName();
@@ -229,11 +237,14 @@ class File extends AbstractRow
     }
 
     /**
-     *
+     * @param bool $useNameDefault
+     * @return string
      */
-    public function getTitle ( ): string
+    public function getTitle(
+        bool $useNameDefault = true,
+    ): ?string
     {
-        if (empty($title = parent::getTitle())) {
+        if (empty($title = parent::getTitle()) and $useNameDefault) {
             return $this->getName();
         }
 
@@ -245,7 +256,13 @@ class File extends AbstractRow
      */
     public function getTitleReal ( ): ?string
     {
-        return parent::getTitle();
+        $title = parent::getTitle();
+
+        if ($title == $this->getName()) {
+            return null;
+        }
+
+        return $title;
     }
 
     /**

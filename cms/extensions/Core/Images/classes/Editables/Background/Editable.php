@@ -29,15 +29,33 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
 
         // Replace picture tags
         $crawler = \Wa72\HtmlPageDom\HtmlPageCrawler::create($html);
-        $crawler->filter('[data-type="Images/Background"][data-uid]')->each(function ( $element ) use ($files, &$injectedHtml) {
+        $crawler->filter('[data-type="Images/Background"][data-uid], [data-type="Images/Background"][data-file]')->each(function ( $element ) use ($files, &$injectedHtml) {
 
             $uid = $element->getAttribute('data-uid');
 
-            // Fetch file
-            $file = $files->fetchByUid($uid, [
-                'fallbackLanguageDefault' => true,
-                'order' => 'orderId DESC',
-            ]);
+            if (empty($uid)) {
+
+                $fileId = $element->getAttribute('data-file');
+
+                try {
+
+                    // Fetch file
+                    $file = $files->fetchById($fileId);
+                }
+                catch (\Frootbox\Exceptions\NotFound $e) {
+                    // Ignore missing file
+
+                    $file = null;
+                }
+            }
+            else {
+
+                // Fetch file
+                $file = $files->fetchByUid($uid, [
+                    'fallbackLanguageDefault' => true,
+                    'order' => 'orderId DESC',
+                ]);
+            }
 
             if (!$file and $element->getAttribute('data-fallback-uid') !== null) {
 
@@ -45,9 +63,7 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
                     'fallbackLanguageDefault' => true,
                     'order' => 'orderId DESC',
                 ]);
-
             }
-
 
             if ($file and ($element->getAttribute('data-physicalwidth') !== null or $element->getAttribute('data-physicalheight') !== null)) {
 

@@ -38,6 +38,8 @@ variables:
     {% set colClass = "col-md-3" %}
 {% endif %}
 
+{% set categories = i.getTopCategories() %}
+
 <div class="plugin Core HelpAndSupport ContactPersons Index04">
 
     {% if variables.withContainer %}<div class="container">{% endif %}
@@ -52,10 +54,16 @@ variables:
 
                 <div class="categories">
 
-                    {{ p.renderPartial('category', { category: i.getCategory(), colClass: colClass, skipContactData: variables.skipContactData }) | raw }}
+                    {{ p.renderPartial('category', {
+                        category: i.getCategory(),
+                        colClass: colClass,
+                        skipContactData: variables.skipContactData,
+                        children: categories,
+                        plugin: plugin,
+                    }) | raw }}
 
                     {% if not variables.skipCategories %}
-                        {% for category in i.getTopCategories() %}
+                        {% for category in categories %}
                             {{ p.renderPartial('category', { category: category, colClass: colClass, skipContactData: variables.skipContactData }) | raw }}
                         {% endfor %}
                     {% endif %}

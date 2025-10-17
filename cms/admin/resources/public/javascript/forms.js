@@ -1,10 +1,10 @@
 $(function ( ) {
-	
+
 	/**
 	 * 
 	 */
 	$(document).on('submit', 'form.ajax', function ( event ) {
-		
+
 		event.preventDefault();
 		event.stopImmediatePropagation();
 

@@ -40,7 +40,7 @@ variables:
         <div class="accordion" id="contactsAccordion{{ plugin.getId() }}">
 
             {% for category in i.getTopCategories() %}
-                <div class="card">
+                <div class="card" tabindex="0" data-toggle-accordion>
                     <div class="card-header" id="collapseHead{{ category.getId() }}">
                         <h2 class="mb-0 collapsed" data-toggle="collapse" data-target="#collapse{{ category.getId() }}" aria-expanded="true" aria-controls="collapse{{ category.getId() }}">
                             {{ category.getTitle() }}
@@ -81,7 +81,7 @@ variables:
                                                         {% endif %}
                                                     </p>
                                                     <p>
-                                                        {% if contact.getPhone() %}
+                                                        {% if contact.getEmail() %}
                                                             <a href="mailto:{{ contact.getEmail() }}">{{ contact.getEmail() }}</a>
                                                         {% endif %}
                                                         {% if contact.getPhone() %}

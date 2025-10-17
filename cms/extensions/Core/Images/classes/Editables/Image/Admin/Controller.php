@@ -58,10 +58,15 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
         ]);
     }
 
-
-
     /**
-     *
+     * @param \Frootbox\Http\Get $get
+     * @param \Frootbox\Http\Post $post
+     * @param \Frootbox\Persistence\Repositories\Files $files
+     * @param \Frootbox\Persistence\Repositories\Folders $folders
+     * @param Config $config
+     * @return Response
+     * @throws \Frootbox\Exceptions\NotFound
+     * @throws \Frootbox\Exceptions\RuntimeError
      */
     public function ajaxUpdate (
         \Frootbox\Http\Get $get,
@@ -190,6 +195,7 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
                 'caption' => $post->get('caption'),
                 'alt' => $post->get('alt'),
                 'link' => $post->get('link'),
+                'isPresentationOnly' => $post->getBoolean('isPresentationOnly'),
             ]);
 
             $file->save();

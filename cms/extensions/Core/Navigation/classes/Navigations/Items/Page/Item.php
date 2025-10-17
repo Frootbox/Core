@@ -5,6 +5,8 @@
 
 namespace Frootbox\Ext\Core\Navigation\Navigations\Items\Page;
 
+use \Frootbox\Persistence\Repositories;
+
 class Item extends \Frootbox\Ext\Core\Navigation\Navigations\Items\AbstractItem
 {
     /**
@@ -95,6 +97,22 @@ class Item extends \Frootbox\Ext\Core\Navigation\Navigations\Items\AbstractItem
         return $items;
     }
 
+    public function getPage(): ?\Frootbox\Persistence\Page
+    {
+        if (empty($this->getConfig('pageId'))) {
+            return null;
+        }
+
+        $repository = $this->getDb()->getRepository(Repositories\Pages::class);
+
+        try {
+            return $repository->fetchById($this->getConfig('pageId'));
+        }
+        catch (\Exception $e) {
+            return null;
+        }
+    }
+
     /**
      *
      */
@@ -161,7 +179,6 @@ class Item extends \Frootbox\Ext\Core\Navigation\Navigations\Items\AbstractItem
             return true;
         }
 
-
         if ($this->config['pageId'] == $page->getParentId() and $page->getParent()->getParentId() != 0) {
             return true;
         }
@@ -170,8 +187,14 @@ class Item extends \Frootbox\Ext\Core\Navigation\Navigations\Items\AbstractItem
             return true;
         }
 
+
         // Check left and right
         return false;
+
+
+        ob_end_clean();
+        d($this);
+        d($parameters);
 
         d($parameters);
     }

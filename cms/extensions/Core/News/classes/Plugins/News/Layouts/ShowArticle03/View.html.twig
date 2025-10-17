@@ -1,0 +1,156 @@
+{# config
+
+title: Standard
+variables:
+    skipSharing:
+        type: bool
+        label: ohne Teilen
+    withContainer:
+        label: mit Layout-Container
+        type: bool
+        default: false
+    skipTopImage:
+        label: ohne großes Artikel-Bild
+        type: bool
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set b = view.getViewhelper('Breadcrumb', { singleton: true }) %}
+{% set text = view.getViewhelper('Text') %}
+{% set t = i.getTranslator() %}
+{% set h = view.getViewhelper('Hreflang', { singleton: true }) %}
+
+{% set icons = view.getViewhelper('Ext/HerrUndFrauPixelExt/Icons/Icons', { createDummyOnFail: true  }) %}
+
+{{ view.set('hideGlobalBlocks', true) }}
+
+{{ b.addSection(article.getTitle(globalLanguage), article.getUri()) }}
+
+{{ view.set({ pagedata: { title: article.getTitle(globalLanguage) } }) }}
+
+{% set image = article.getFileByUid('image') %}
+
+{% if  image %}
+    {{ view.set({ pagedata: { ogImage: image } }) }}
+{% endif %}
+
+{{ view.set({ pagedata: { ogTitle: article.getTitle(globalLanguage) } }) }}
+{{ view.set({ pagedata: { ogDescription: text.getTextByUid(article.getUid('teaser')).getText() } }) }}
+
+{% set a = view.getViewhelper('Ext/Core/System/Assets', {   }) %}
+
+{{ a.import('https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css') | raw }}
+{{ a.import('https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js') | raw }}
+
+{% for language, xalias in article.getLanguageAliases() %}
+    {{ h.addItem(language, xalias) }}
+{% endfor %}
+
+<param name="cloak" value="1" />
+
+<div class="plugin Core News News ShowArticle03">
+
+    {% if variables.withContainer %}<div class="container">{% endif %}
+
+    <div class="row">
+        <div class="col-12">
+
+            <div class="inner-wrapper">
+
+                <h2 class="first main-title" data-editable data-uid="{{ article.getUid('title') }}">{{ article.getTitle }}</h2>
+
+                <p class="backlink"><a href="{{ page.getUri() }}">{{ t.translate('Back') }}</a></p>
+
+                <div class="row">
+                    <div class="col-md-6">
+
+                        <div class="content-teaser">
+                            <div data-nowidgets data-editable data-uid="{{ article.getUid('teaser') }}"></div>
+                        </div>
+
+                        <hr />
+
+                        <div data-editable data-uid="{{ article.getUid('text') }}"></div>
+
+                    </div>
+                    <div class="col-md-6">
+
+                        <div class="sticky-top">
+
+                            {% if not variables.skipTopImage %}
+                                <figure data-type="Images/PictureFull" data-uid="{{ article.getUid('image')}}">
+                                    <picture class="fluid">
+                                        <img width="1110" src="{{ i.getDummyImage({ width: 1110, height: null }) }}" alt="" />
+                                    </picture>
+                                    <figcaption></figcaption>
+                                </figure>
+                            {% endif %}
+
+                        </div>
+
+
+                    </div>
+                </div>
+
+
+
+            </div>
+        </div>
+    {% if variables.withContainer %}</div>{% endif %}
+
+    <div class="blocks" data-blocks data-label="Blöcke des Artikels" data-uid="{{ article.getUid('block-content') }}"></div>
+
+    {% if variables.withContainer %}<div class="container">{% endif %}
+
+
+        <div class="row">
+            <div class="col-12">
+
+                {% set articles = i.getArticles({ limit: 5, skip: [ article.getId() ] }) %}
+
+                {% if articles | length %}
+                    <h3>{{ t.translate('MoreArticles') }}</h3>
+
+                    <nav class="articles-subnavigation">
+                        {% for subarticle in articles %}
+                            <a class="read-more" href="{{ subarticle.getUri }}">
+                                {{ subarticle.getTitle }}
+                            </a>
+                        {% endfor %}
+                    </nav>
+
+                    {%  if articles.getTotal > articles.getCount %}
+                        <p><a class="read-more" href="{{ plugin.getUri }}">mehr Artikel in der Übersicht</a></p>
+                    {% endif %}
+                {% endif %}
+
+                {% if not variables.skipSharing %}
+                    {% set articleUrl = article.getUri({ absolute: true }) %}
+
+                    <nav class="social-sharing">
+
+                        <h4>{{ t.translate('ShareArticle') }}</h4>
+
+                        <a data-toggle="tooltip" data-placement="bottom" title="Artikel teilen auf Facebook" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u={{ articleUrl | url_encode }}">{{ icons.render('facebook') | raw }}</a>
+                        <a data-toggle="tooltip" data-placement="bottom" title="Artikel teilen auf Twitter" target="_blank" href="https://twitter.com/home?status={{ articleUrl | url_encode }}">{{ icons.render('twitter') | raw }}</a>
+                        <a data-toggle="tooltip" data-placement="bottom" title="Artikel teilen auf Xing" target="_blank" href="https://www.xing.com/spi/shares/new?url={{ articleUrl | url_encode }}">{{ icons.render('xing') | raw }}</a>
+                        <a data-toggle="tooltip" data-placement="bottom" title="Artikel teilen auf LinkedIn" target="_blank" href="https://www.linkedin.com/share?id={{ articleUrl | url_encode }}">{{ icons.render('linkedin') | raw }}</a>
+
+                        {% if image %}
+                            <a data-toggle="tooltip" data-placement="bottom" title="Artikel teilen auf Pinterest" target="_blank" href="https://pinterest.com/pin/create/button/?media={{ image.getUriThumbnail() | url_encode }}&amp;url={{ articleUrl | url_encode }}&amp;media="><i class="fab fa-pinterest"></i></a>
+                        {% endif %}
+
+                        <a data-toggle="tooltip" data-placement="bottom" title="Artikel empfehlen per E-Mail" href="mailto:?subject=Empfehlung&amp;body={{ articleUrl | url_encode }}"><i class="fa fa-envelope"></i></a>
+
+                    </nav>
+                {% endif %}
+
+            </div>
+
+        </div>
+    </div>
+
+    {% if variables.withContainer %}</div>{% endif %}
+
+</div>

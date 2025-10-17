@@ -1,9 +1,15 @@
 {% set i = view.getViewhelper('Delegator', { object: plugin }) %}
 {% set icons = view.getViewhelper('Ext/HerrUndFrauPixelExt/Icons/Icons', { createDummyOnFail: true  }) %}
 
+{% set contacts = data.category.getContacts() %}
+
+{% if contacts.getCount() == 0 %}
+    {% set contacts = plugin.getContacts() %}
+{% endif %}
+
 <div class="contacts">
     <div class="row {% if variables.lastRowCentered %}justify-content-center{% endif %}">
-        {% for contact in data.category.getContacts() %}
+        {% for contact in contacts %}
             <div class="{{ data.colClass }} contact">
 
                 <picture {% if not variables.withRolloverEffect %}data-editable{% else %}data-editable-rollover{% endif %} data-uid="{{ contact.getUid('image')}}">
@@ -26,35 +32,27 @@
                     </p>
                 {% endif %}
 
-                <p>
-                    {% if contact.getPhone() %}
-                        <a href="tel:{{ contact.getPhone() }}">
-                            {% if not variables.withoutIcons %}
-                                {{ icons.render('phone', [ 'fa-fw' ]) | raw }}
-                            {% else %}
-                                Telefon
-                            {% endif %}
-                            {{ contact.getPhone() }}
-                        </a>
-                        <br />
-                    {% endif %}
+                {% if contact.getPhone() or contact.getEmail() or contact.getFax() %}
+                    <p>
+                        {% if contact.getPhone() %}
+                            <a href="tel:{{ contact.getPhone() }}">{% if not variables.withoutIcons %}{{ icons.render('phone', [ 'fa-fw' ]) | raw }}{% else %}Telefon{% endif %}{{ contact.getPhone() }}</a>
+                            <br />
+                        {% endif %}
 
-                    {% if contact.getEmail() %}
-                        <a class="email" href="mailto:{{ contact.getEmail() }}">
-                            {% if not variables.withoutIcons %}
-                                {{ icons.render('envelope', [ 'fa-fw' ]) | raw }}
-                            {% endif %}
-                            {% if variables.showFullEmail %}{{ contact.getEmail() }}{% else %}E-Mail{% endif %}
-                        </a>
-                        <br />
-                    {% endif %}
+                        {% if contact.getEmail() %}
+                            <a class="email" href="mailto:{{ contact.getEmail() }}">{% if not variables.withoutIcons %}{{ icons.render('envelope', [ 'fa-fw' ]) | raw }}{% endif %}{% if variables.showFullEmail %}{{ contact.getEmail() }}{% else %}E-Mail{% endif %}</a>
+                            <br />
+                        {% endif %}
 
-                    {% if contact.getFax() %}
-                        <i class="fa fa-fw fa-fax"></i>{{ contact.getFax() }}
-                        <br />
-                    {% endif %}
+                        {% if contact.getFax() %}
+                            <i class="fa fa-fw fa-fax"></i>{{ contact.getFax() }}
+                            <br />
+                        {% endif %}
 
-                </p>
+                    </p>
+                {% endif %}
+
+                <div data-nowidgets data-editable data-uid="{{ contact.getUid('teaser-text') }}"></div>
 
             </div>
         {% endfor %}

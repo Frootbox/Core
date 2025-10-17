@@ -1,0 +1,79 @@
+{# config
+
+title: Standard
+variables:
+    imageWidth:
+        type: int
+        label: Bildbreite
+        default: 500
+    imageHeight:
+        type: int
+        label: Bildhöhe
+        default: 250
+
+/config #}
+
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set articles = i.getArticles() %}
+
+<div class="plugin Core News News Index11">
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-10">
+
+                <h2 class="main-title first" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+
+                <div data-editable data-uid="{{ plugin.getUid('teaser-text') }}"></div>
+
+                <div class="teasers">
+                    {% for article in articles %}
+                        <div class="teaser" data-href>
+
+                            <div class="row">
+                                <div class="col-md-2">
+
+                                    <div class="date">
+                                        <div class="day">
+                                            {{ article.getDateStart() | date('d')}}
+                                        </div>
+                                        <div class="month">
+                                            {{ article.getDateStart() | date('m') }}
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="col-md-10">
+
+                                    <h3 class="first" data-editable data-uid="{{ article.getUid('title') }}">{{ article.getTitle() }}</h3>
+
+
+                                </div>
+                            </div>
+                            <div class="row justify-content-end">
+                                <div class="col-md-5">
+                                    <div data-editable data-nowidgets data-uid="{{ article.getUid('teaser') }}"></div>
+
+                                    {% if article.showReadMore() %}
+                                        <p class="read-more">
+                                            <a class="btn btn-primary" href="{{ article.getUri() }}">Mehr erfahren</a>
+                                        </p>
+                                    {% endif %}
+
+                                </div>
+                                <div class="col-md-5">
+
+                                    <picture data-skipempty class="fluid" data-caption="1" data-editable {% if variables.noImageDummy %}data-skipempty="1"{% endif %} data-uid="{{ article.getUid('image')}}">
+                                        <img width="1110" src="{{ i.getDummyImage({ width: 1110, height: null }) }}" alt="" />
+                                    </picture>
+
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

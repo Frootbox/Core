@@ -241,6 +241,14 @@ class HtmlParser
         $this->html = str_replace('---', '&shy;', $this->html);
 
 
+        $crawler = \Wa72\HtmlPageDom\HtmlPageCrawler::create($this->html);
+
+        $crawler->filter('a:not([tabindex])')->each(function ( $element ) {
+            $element->setAttribute('tabindex', '0');
+        });
+
+        $this->html = $crawler->saveHTML();
+
         return $this->html;
     }
 

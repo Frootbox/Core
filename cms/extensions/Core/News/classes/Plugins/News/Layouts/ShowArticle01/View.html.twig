@@ -104,16 +104,16 @@ variables:
 
                         <h4>{{ t.translate('ShareArticle') }}</h4>
 
-                        <a data-toggle="tooltip" data-placement="bottom" title="Artikel teilen auf Facebook" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u={{ articleUrl | url_encode }}">{{ icons.render('facebook') | raw }}</a>
-                        <a data-toggle="tooltip" data-placement="bottom" title="Artikel teilen auf Twitter" target="_blank" href="https://twitter.com/home?status={{ articleUrl | url_encode }}">{{ icons.render('twitter') | raw }}</a>
-                        <a data-toggle="tooltip" data-placement="bottom" title="Artikel teilen auf Xing" target="_blank" href="https://www.xing.com/spi/shares/new?url={{ articleUrl | url_encode }}">{{ icons.render('xing') | raw }}</a>
-                        <a data-toggle="tooltip" data-placement="bottom" title="Artikel teilen auf LinkedIn" target="_blank" href="https://www.linkedin.com/share?id={{ articleUrl | url_encode }}">{{ icons.render('linkedin') | raw }}</a>
+                        <a data-toggle="tooltip" data-placement="bottom" title="Artikel teilen auf Facebook" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u={{ articleUrl | url_encode }}">{{ icons.render('facebook') | raw }}<span class="sr-only">Artikel teilen auf Facebook</span></a>
+                        <a data-toggle="tooltip" data-placement="bottom" title="Artikel teilen auf Twitter" target="_blank" href="https://twitter.com/home?status={{ articleUrl | url_encode }}">{{ icons.render('twitter') | raw }}<span class="sr-only">Artikel teilen auf Twitter</span></a>
+                        <a data-toggle="tooltip" data-placement="bottom" title="Artikel teilen auf Xing" target="_blank" href="https://www.xing.com/spi/shares/new?url={{ articleUrl | url_encode }}">{{ icons.render('xing') | raw }}<span class="sr-only">Artikel teilen auf Xing</span></a>
+                        <a data-toggle="tooltip" data-placement="bottom" title="Artikel teilen auf LinkedIn" target="_blank" href="https://www.linkedin.com/share?id={{ articleUrl | url_encode }}">{{ icons.render('linkedin') | raw }}<span class="sr-only">Artikel teilen auf LinkedIn</span></a>
 
                         {% if image %}
-                            <a data-toggle="tooltip" data-placement="bottom" title="Artikel teilen auf Pinterest" target="_blank" href="https://pinterest.com/pin/create/button/?media={{ image.getUriThumbnail() | url_encode }}&amp;url={{ articleUrl | url_encode }}&amp;media="><i class="fab fa-pinterest"></i></a>
+                            <a data-toggle="tooltip" data-placement="bottom" title="Artikel teilen auf Pinterest" target="_blank" href="https://pinterest.com/pin/create/button/?media={{ image.getUriThumbnail() | url_encode }}&amp;url={{ articleUrl | url_encode }}&amp;media=">{{ icons.render('pinterest') | raw }}<span class="sr-only">Artikel teilen auf Pinterest</span></a>
                         {% endif %}
 
-                        <a data-toggle="tooltip" data-placement="bottom" title="Artikel empfehlen per E-Mail" href="mailto:?subject=Empfehlung&amp;body={{ articleUrl | url_encode }}"><i class="fa fa-envelope"></i></a>
+                        <a data-toggle="tooltip" data-placement="bottom" title="Artikel empfehlen per E-Mail" href="mailto:?subject=Empfehlung&amp;body={{ articleUrl | url_encode }}">{{ icons.render('envelope') | raw }}<span class="sr-only">Artikel empfehlen per E-Mail</span></a>
 
                     </nav>
                 {% endif %}

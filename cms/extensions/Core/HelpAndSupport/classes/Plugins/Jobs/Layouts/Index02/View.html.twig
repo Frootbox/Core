@@ -39,18 +39,18 @@ variables:
                 {% for job in jobs %}
                     <div class="card">
                         <div class="card-header">
-                            <h3 class="first mb-0">
-                                    <span data-toggle="collapse" data-target="#collapse{{ job.getId() }}" aria-expanded="true" aria-controls="collapseOne" class="collapsed">
-                                        <span data-editable-element data-uid="{{ job.getUid('title') }}">{{ job.getTitle }}</span>
+                            <h3 class="first mb-0" id="heading-{{ job.getId() }}">
+                                <span data-toggle="collapse" data-target="#collapse{{ job.getId() }}" aria-expanded="true" aria-controls="collapseOne" class="collapsed">
+                                    <span data-editable-element data-uid="{{ job.getUid('title') }}">{{ job.getTitle }}</span>
 
-                                        <span class="icons">
-                                            {{ icons.render('plus', [ 'down' ]) | raw }}
-                                            {{ icons.render('minus', [ 'up' ]) | raw }}
-                                        </span>
+                                    <span class="icons">
+                                        {{ icons.render('plus', [ 'down' ]) | raw }}
+                                        {{ icons.render('minus', [ 'up' ]) | raw }}
                                     </span>
+                                </span>
                             </h3>
                         </div>
-                        <div id="collapse{{ job.getId() }}" class="collapse" aria-labelledby="headingOne" data-parent="#jobsAccordion{{ plugin.getId() }}">
+                        <div id="collapse{{ job.getId() }}" class="collapse" aria-labelledby="heading-{{ job.getId() }}" data-parent="#jobsAccordion{{ plugin.getId() }}">
                             <div class="card-body">
 
                                 <div data-editable data-uid="{{ job.getUid('text') }}"></div>

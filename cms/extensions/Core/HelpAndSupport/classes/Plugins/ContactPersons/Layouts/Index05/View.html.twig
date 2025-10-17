@@ -18,7 +18,7 @@ title: Standard
 
         <div data-editable data-uid="{{ plugin.getUid('teaser-text') }}"></div>
 
-        {{ p.renderPartial('category', { category: i.getCategory() }) | raw }}
+        {{ p.renderPartial('category', { category: i.getCategory(), plugin: plugin, }) | raw }}
 
     </div>
 </div>

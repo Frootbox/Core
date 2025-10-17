@@ -1,7 +1,7 @@
 
 <div class="form-group field-input">
     <label for="field-{{ field.getId() }}">{{ field.getTitle() }}{% if field.getMandatory() %}<span class="mandatory">*</span>{% endif %}</label>
-    <input {% if field.isRequired() %}required{% endif %} type="email" class="form-control" id="field-{{ field.getId() }}" placeholder="{% if field.getConfig('placeholder') %}{{ field.getConfig('placeholder') }}{% elseif renderer.options.placeholderLabel %}{{ field.getTitle() }}{% if field.isRequired() %}*{% endif %}{% endif %}" name="fields[{{ field.getId() }}]" aria-describedby="helpField{{ field.getId() }}">
+    <input {% if field.isRequired() %}required{% endif %} type="email" class="form-control" id="field-{{ field.getId() }}" placeholder="{% if field.getConfig('placeholder') %}{{ field.getConfig('placeholder') }}{% elseif renderer.options.placeholderLabel %}{{ field.getTitle() }}{% if field.isRequired() %}*{% endif %}{% endif %}" name="fields[{{ field.getId() }}]" {% if field.getConfig('helpText') %}aria-describedby="helpField{{ field.getId() }}"{% endif %}>
     {% if field.getConfig('helpText') %}
         <small id="helpField{{ field.getId() }}" class="form-text text-muted">{{ field.getConfig('helpText') }}</small>
     {% endif %}

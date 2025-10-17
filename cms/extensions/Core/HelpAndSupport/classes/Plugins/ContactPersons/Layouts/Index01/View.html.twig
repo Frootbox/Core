@@ -28,9 +28,11 @@ variables:
 
                 <div class="top-teaser" data-editable data-uid="{{ plugin.getUid('teaser-text') }}"></div>
 
-                {{ p.renderPartial('category', { category: i.getCategory() }) | raw }}
+                {% set categories = i.getTopCategories() %}
 
-                {% for category in i.getTopCategories() %}
+                {{ p.renderPartial('category', { category: i.getCategory(), children: categories, plugin: plugin }) | raw }}
+
+                {% for category in categories %}
 
                     <h3 data-editable data-uid="{{ category.getUid('title') }}">{{ category.getTitle() }}</h3>
 

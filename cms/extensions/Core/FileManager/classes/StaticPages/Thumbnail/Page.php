@@ -19,6 +19,11 @@ class Page
         // Fetch file
         $file = $files->fetchById($get->get('fileId'));
 
+        if ($file->isPrivate()) {
+            http_response_code(401);
+            die("Unauthorized");
+        }
+
         // Generate thumbnail
         $thumbnail = new \Frootbox\Thumbnail([
             'path' => $file->getPath(),

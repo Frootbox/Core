@@ -5,7 +5,11 @@
         /**
          * Show "picture edit" buttons
          */
-        $(document).on('mouseover', 'picture[data-editable][data-uid]', function ( event ) {
+        $(document).on('mouseover', 'picture[data-editable][data-uid]', function (event) {
+
+            if (typeof $(this).data('noediting') != "undefined") {
+                return;
+            }
 
             event.preventDefault();
             event.stopImmediatePropagation();

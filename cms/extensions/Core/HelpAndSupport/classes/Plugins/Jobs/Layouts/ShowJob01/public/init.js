@@ -1,5 +1,7 @@
 $(function( ) {
 
+    $('.sticky-top').css('top', ($('#banner').outerHeight() + 30) + 'px');
+
     /**
      *
      */

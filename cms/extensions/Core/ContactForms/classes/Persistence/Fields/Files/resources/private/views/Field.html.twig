@@ -59,12 +59,14 @@
                 }
             });
         });
+
+        $('.dz-hidden-input').attr('id', 'hidden-field-{{ field.getId() }}');
     });
-
-
 </script>
 
 <div class="Core Forms Field File">
+
+    <label for="hidden-field-{{ field.getId() }}" class="sr-only">Datei hochladen</label>
 
     <label for="field-{{ field.getId() }}">
         <span {% if renderer.options.editable %}data-editable-element data-uid="{{ field.getUid('title') }}"{% endif %}>{{ field.getTitle() }}</span><!--
@@ -84,5 +86,6 @@
 
     </div>
 
-</div>
 
+
+</div>

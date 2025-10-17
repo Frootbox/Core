@@ -60,7 +60,7 @@ variables:
 
                 <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
 
-                {{ p.renderPartial('Category', { category: i.getCategory(), colClass: colClass }) | raw }}
+                {{ p.renderPartial('Category', { category: i.getCategory(), colClass: colClass, plugin: plugin, }) | raw }}
 
             </div>
         </div>

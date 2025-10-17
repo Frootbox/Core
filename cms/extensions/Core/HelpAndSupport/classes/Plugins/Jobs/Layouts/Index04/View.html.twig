@@ -56,13 +56,15 @@ variables:
                             <div class="content-wrapper">
                                 <h4>{{ job.getTitle() }}</h4>
 
+                                {% if job.getSubtitle() %}
+                                    <p class="subtitle">{{ job.getSubtitle() }}</p>
+                                {% endif %}
+
                                 {% if job.getTypes() | length %}
                                     {% for TypeId in job.getTypes() %}
                                         <span class="badge bg-light">{{ t.translate('Type' ~ TypeId) }}</span>
                                     {% endfor %}
                                 {% endif %}
-
-
 
                                 <p>
                                     {% if job.getConfig('typeId') %}

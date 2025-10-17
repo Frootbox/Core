@@ -12,10 +12,14 @@ class Contact extends \Frootbox\Persistence\AbstractPerson
     protected $model = Repositories\Contacts::class;
 
     /**
-     *
+     * @return array|null
      */
     public function getConnConfig(): ?array
     {
+        if (empty($this->data['connConfig'])) {
+            return null;
+        }
+
         return json_decode($this->data['connConfig'], true);
     }
 
