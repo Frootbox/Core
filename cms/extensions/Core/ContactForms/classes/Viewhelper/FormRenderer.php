@@ -58,6 +58,7 @@ class FormRenderer extends \Frootbox\View\Viewhelper\AbstractViewhelper
         $view->set('renderer', $this);
         $view->set('form', $form);
         $view->set('addedPayload', $parameters['payload'] ?? []);
+        $view->set('options', $parameters['options'] ?? []);
         $view->set('config', $config);
         $view->set('plugin', $parameters['plugin'] ?? null);
         $view->set('onSuccess', $parameters['onSuccess'] ?? null);

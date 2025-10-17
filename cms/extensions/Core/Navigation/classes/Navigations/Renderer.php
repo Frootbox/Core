@@ -204,7 +204,9 @@ class Renderer
     }
 
     /**
-     *
+     * @return string
+     * @throws \DI\DependencyException
+     * @throws \DI\NotFoundException
      */
     public function render(): string
     {

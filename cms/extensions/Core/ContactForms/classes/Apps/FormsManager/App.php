@@ -829,6 +829,39 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
         ]);
     }
 
+    public function ajaxTruncateAction(
+        \Frootbox\Http\Get $get,
+        \Frootbox\Ext\Core\ContactForms\Persistence\Repositories\Logs $logsRepository,
+        \Frootbox\Ext\Core\ContactForms\Persistence\Repositories\Forms $formsRepository,
+    ): Response
+    {
+        /**
+         * Fetch form
+         */
+        $form = $formsRepository->fetchById($get->get('formId'));
+
+        // Fetch logs
+        $result = $logsRepository->fetch([
+            'where' => [
+                'parentId' => $form->getId(),
+            ],
+            'order' => [
+                'date DESC',
+            ]
+        ]);
+
+        $loop = 0;
+
+        foreach ($result as $log) {
+            $log->delete();
+            ++$loop;
+        }
+
+        return new Response('json', 200, [
+            'success' => 'Es wurden ' . $loop . ' Anfragen gelöscht.',
+        ]);
+    }
+
     /**
      *
      */

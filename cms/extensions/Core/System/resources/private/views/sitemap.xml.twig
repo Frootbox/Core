@@ -1,9 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-    {%  for alias in aliases %}
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+
+    {% for alias in aliases %}
         <url>
-            <loc>{{  alias.getUri() }}</loc>
-            <lastmod>{{  alias.getUpdated() | date('Y-m-d') }}</lastmod>
+            <loc>{{ alias.location }}</loc>
+            <lastmod>{{ alias.updated | date('Y-m-d') }}</lastmod>
+
+            {% if alias.links | length %}
+                {% for link in alias.links %}
+                    <xhtml:link rel="alternate" hreflang="{{ link.language }}" href="{{ link.href }}" />
+                {% endfor %}
+            {% endif %}
         </url>
     {%  endfor %}
+
 </urlset>

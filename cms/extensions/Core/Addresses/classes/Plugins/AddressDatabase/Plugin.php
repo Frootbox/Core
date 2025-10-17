@@ -1,6 +1,6 @@
 <?php
 /**
- *
+ * @noinspection SqlNoDataSourceInspection
  */
 
 namespace Frootbox\Ext\Core\Addresses\Plugins\AddressDatabase;
@@ -8,7 +8,6 @@ namespace Frootbox\Ext\Core\Addresses\Plugins\AddressDatabase;
 use DI\Container;
 use Frootbox\View\Response;
 use Frootbox\View\ResponseJson;
-
 
 class Plugin extends \Frootbox\Persistence\AbstractPlugin
 {
@@ -69,6 +68,27 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         }
 
         return $list;
+    }
+
+    /**
+     * @return array
+     * @throws \Frootbox\Exceptions\RuntimeError
+     */
+    public function getCities(): array
+    {
+        // Build sql
+        $sql = 'SELECT
+            city
+        FROM
+            locations
+        WHERE
+            city IS NOT NULL
+        GROUP BY
+            city';
+
+        $result = $this->getDb()->query($sql)->fetchAll();
+
+        return $result;
     }
 
     /**

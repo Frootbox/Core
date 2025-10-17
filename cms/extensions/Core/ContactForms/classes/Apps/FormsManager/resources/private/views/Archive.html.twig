@@ -31,6 +31,7 @@
                             <i class="far fa-bars dropdown-toggle" data-toggle="dropdown"></i>
                             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                 <a class="dropdown-item" href="{{ app.getUri('ajaxExport', { formId: form.getId() }) }}">Daten exportieren</a>
+                                <a class="dropdown-item ajax" data-confirm="Sollen wirklich ALLE Anfragen gelöscht werden?" href="{{ app.getUri('ajaxTruncate', { formId: form.getId() }) }}">Alle Anfragen löschen</a>
                             </div>
                         </span>
                     </span>
@@ -61,8 +62,8 @@
                                 </td>
                                 <td>{{ log.getDate() | date('d.m.Y H:i') }} Uhr</td>
                                 <td class="text-right">
-                                    <a class="ajax" href="{{ app.getUri('ajaxArchiveLogSend', { logId: log.getId() }) }}"><i class="fa fa-paper-plane icon"></i></a>
-                                    <a class="ajax" data-confirm="Soll diese Anfrage wirklich gelöscht werden?" href="{{ app.getUri('ajaxArchiveLogDelete', { logId: log.getId() }) }}"><i class="fa fa-times icon"></i></a>
+                                    <a class="ajax" href="{{ app.getUri('ajaxArchiveLogSend', { logId: log.getId() }) }}"><i class="far fa-paper-plane icon"></i></a>
+                                    <a class="ajax" data-confirm="Soll diese Anfrage wirklich gelöscht werden?" href="{{ app.getUri('ajaxArchiveLogDelete', { logId: log.getId() }) }}"><i class="far fa-trash icon"></i></a>
                                 </td>
                             </tr>
                         {% endfor %}

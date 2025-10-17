@@ -307,7 +307,7 @@ class ShopcartItem
         }
 
         $perEach = ($total / $this->getAmount()) * 100;
-        $perEach = ceil($perEach) / 100;
+        $perEach = round($perEach) / 100;
 
         return $perEach * $this->getAmount();
     }
