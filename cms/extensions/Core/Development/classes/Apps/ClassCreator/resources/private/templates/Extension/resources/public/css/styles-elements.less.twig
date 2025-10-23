@@ -27,15 +27,10 @@ html body {
 
     margin: 100px 0 60px 0;
 
-    color: $HeadlineH1Color;
-    font-size: $HeadlineH1Size;
-    line-height: $HeadlineH1LineHeight;
-    font-weight: $HeadlineH1FontWeight;
-
-    @media (min-width: 768px) {
-      font-size: $HeadlineH1SizeLg;
-      line-height: $HeadlineH1LineHeightLg;
-    }
+    color: var(--headline-h1-color);
+    font-size: var(--headline-h1-size);
+    line-height: var(--headline-h1-line-height);
+    font-weight: var(--headline-h1-font-weight);
 
     h1 {
       margin: 0;
@@ -54,17 +49,10 @@ html body {
     }
 
     .subtitle {
-      color: $HeadlineH1SubTitleColor;
-      font-size: $HeadlineH1SubTitleSize;
-      line-height: $HeadlineH1SubTitleLineHeight;
-      font-weight: $HeadlineH1SubTitleFontWeight;
-    }
-
-    .super-title {
-      color: $HeadlineH1SuperTitleColor;
-      font-size: $HeadlineH1SuperTitleSize;
-      line-height: $HeadlineH1SuperTitleLineHeight;
-      font-weight: $HeadlineH1SuperTitleFontWeight;
+      color: var(--headline-h1-sub-title-color);
+      font-size: var(--headline-h1-sub-title-size);
+      line-height: var(--headline-h1-sub-title-line-height);
+      font-weight: var(--headline-h1-sub-title-font-weight);
     }
   }
 
@@ -98,13 +86,19 @@ html body {
       line-height: $HeadlineH2SuperTitleLineHeight;
       font-weight: $HeadlineH2SuperTitleFontWeight;
     }
+
+    .subtitle {
+      color: var(--headline-h2-sub-title-color);;
+      font-size: var(--headline-h2-sub-title-size);
+      line-height: var(--headline-h2-sub-title-line-height);
+      font-weight: var(--headline-h2-sub-title-font-weight);
+    }
   }
 
   header.h3, h3 {
 
     margin: 60px 0 40px 0;
 
-    color: $HeadlineH3Color;
     font-size: $HeadlineH3Size;
     line-height: $HeadlineH3LineHeight;
     font-weight: $HeadlineH3FontWeight;

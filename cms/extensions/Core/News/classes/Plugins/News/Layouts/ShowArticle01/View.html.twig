@@ -93,7 +93,7 @@ variables:
                     </nav>
 
                     {%  if articles.getTotal > articles.getCount %}
-                        <p><a class="read-more" href="{{ plugin.getUri }}">mehr Artikel in der Übersicht</a></p>
+                        <p><a class="read-more" href="{{ plugin.getUri }}">{{ t.translate('MoreArticlesInArchive') }}</a></p>
                     {% endif %}
                 {% endif %}
 

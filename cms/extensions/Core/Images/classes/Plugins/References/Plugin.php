@@ -338,6 +338,11 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
         return new ResponseRedirect($reference->getUri());
     }
 
+    /**
+     * @param \Frootbox\Session $session
+     * @param Persistence\Repositories\References $referencesRepository
+     * @return Response
+     */
     public function jumpPreviousAction(
         \Frootbox\Session $session,
         \Frootbox\Ext\Core\Images\Plugins\References\Persistence\Repositories\References $referencesRepository
