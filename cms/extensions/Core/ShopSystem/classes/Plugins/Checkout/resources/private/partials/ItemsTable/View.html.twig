@@ -175,8 +175,8 @@
 
                     {% if not plugin.getConfig('skipShipping') and data.shopcart.getShipping('type') != "selfPickup" %}
                         <tr>
-                            <td class="d-none d-md-table-cell"></td>
-                            <td class="text-right" colspan="2">
+                            <td class="text-right" colspan="3">
+
                                 {% if data.shopcart.getShippingCosts() is same as (null) %}
                                     zzgl. Versand
                                 {% elseif data.shopcart.getShippingCosts() == 0 %}
@@ -184,6 +184,17 @@
                                 {% else %}
                                     Versand
                                 {% endif %}
+
+
+                                {% if data.shopcart.getShippingCostsExtra() %}
+                                    <div style="color: #999; font-size: 16px;">
+                                        {% for extra in data.shopcart.getShippingCostsExtra() %}
+                                            inkl. {{ extra.description }} ({{ extra.costs }} €)<br />
+                                        {% endfor %}
+                                    </div>
+
+                                {% endif %}
+
                             </td>
                             <td class="text-right">
                                 {% if data.shopcart.getShippingCosts() is same as (null) or data.shopcart.getShippingCosts() == 0 %}

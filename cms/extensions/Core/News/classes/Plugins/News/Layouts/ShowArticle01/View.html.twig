@@ -79,49 +79,65 @@ variables:
 
                 <div data-editable data-uid="{{ article.getUid('text') }}"></div>
 
-                {% set articles = i.getArticles({ limit: 5, skip: [ article.getId() ] }) %}
-
-                {% if articles | length %}
-                    <h3>{{ t.translate('MoreArticles') }}</h3>
-
-                    <nav class="articles-subnavigation">
-                        {% for subarticle in articles %}
-                            <a class="read-more" href="{{ subarticle.getUri }}">
-                                {{ subarticle.getTitle }}
-                            </a>
-                        {% endfor %}
-                    </nav>
-
-                    {%  if articles.getTotal > articles.getCount %}
-                        <p><a class="read-more" href="{{ plugin.getUri }}">{{ t.translate('MoreArticlesInArchive') }}</a></p>
-                    {% endif %}
-                {% endif %}
-
-                {% if not variables.skipSharing %}
-                    {% set articleUrl = article.getUri({ absolute: true }) %}
-
-                    <nav class="social-sharing">
-
-                        <h4>{{ t.translate('ShareArticle') }}</h4>
-
-                        <a data-toggle="tooltip" data-placement="bottom" title="Artikel teilen auf Facebook" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u={{ articleUrl | url_encode }}">{{ icons.render('facebook') | raw }}<span class="sr-only">Artikel teilen auf Facebook</span></a>
-                        <a data-toggle="tooltip" data-placement="bottom" title="Artikel teilen auf Twitter" target="_blank" href="https://twitter.com/home?status={{ articleUrl | url_encode }}">{{ icons.render('twitter') | raw }}<span class="sr-only">Artikel teilen auf Twitter</span></a>
-                        <a data-toggle="tooltip" data-placement="bottom" title="Artikel teilen auf Xing" target="_blank" href="https://www.xing.com/spi/shares/new?url={{ articleUrl | url_encode }}">{{ icons.render('xing') | raw }}<span class="sr-only">Artikel teilen auf Xing</span></a>
-                        <a data-toggle="tooltip" data-placement="bottom" title="Artikel teilen auf LinkedIn" target="_blank" href="https://www.linkedin.com/share?id={{ articleUrl | url_encode }}">{{ icons.render('linkedin') | raw }}<span class="sr-only">Artikel teilen auf LinkedIn</span></a>
-
-                        {% if image %}
-                            <a data-toggle="tooltip" data-placement="bottom" title="Artikel teilen auf Pinterest" target="_blank" href="https://pinterest.com/pin/create/button/?media={{ image.getUriThumbnail() | url_encode }}&amp;url={{ articleUrl | url_encode }}&amp;media=">{{ icons.render('pinterest') | raw }}<span class="sr-only">Artikel teilen auf Pinterest</span></a>
-                        {% endif %}
-
-                        <a data-toggle="tooltip" data-placement="bottom" title="Artikel empfehlen per E-Mail" href="mailto:?subject=Empfehlung&amp;body={{ articleUrl | url_encode }}">{{ icons.render('envelope') | raw }}<span class="sr-only">Artikel empfehlen per E-Mail</span></a>
-
-                    </nav>
-                {% endif %}
-
             </div>
-
         </div>
     </div>
+
+    {% if variables.withContainer %}</div>{% endif %}
+
+    <div class="blocks" data-blocks data-label="Blöcke des Artikels" data-uid="{{ article.getUid('block-content') }}"></div>
+
+
+    {% if variables.withContainer %}<div class="container">{% endif %}
+
+        <div class="row">
+            <div class="col-12">
+                <div class="inner-wrapper">
+
+
+                    {% set articles = i.getArticles({ limit: 5, skip: [ article.getId() ] }) %}
+
+                    {% if articles | length %}
+                        <h3>{{ t.translate('MoreArticles') }}</h3>
+
+                        <nav class="articles-subnavigation">
+                            {% for subarticle in articles %}
+                                <a class="read-more" href="{{ subarticle.getUri }}">
+                                    {{ subarticle.getTitle }}
+                                </a>
+                            {% endfor %}
+                        </nav>
+
+                        {%  if articles.getTotal > articles.getCount %}
+                            <p><a class="read-more" href="{{ plugin.getUri }}">{{ t.translate('MoreArticlesInArchive') }}</a></p>
+                        {% endif %}
+                    {% endif %}
+
+                    {% if not variables.skipSharing %}
+                        {% set articleUrl = article.getUri({ absolute: true }) %}
+
+                        <nav class="social-sharing">
+
+                            <h4>{{ t.translate('ShareArticle') }}</h4>
+
+                            <a data-toggle="tooltip" data-placement="bottom" title="Artikel teilen auf Facebook" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u={{ articleUrl | url_encode }}">{{ icons.render('facebook') | raw }}<span class="sr-only">Artikel teilen auf Facebook</span></a>
+                            <a data-toggle="tooltip" data-placement="bottom" title="Artikel teilen auf Twitter" target="_blank" href="https://twitter.com/home?status={{ articleUrl | url_encode }}">{{ icons.render('twitter') | raw }}<span class="sr-only">Artikel teilen auf Twitter</span></a>
+                            <a data-toggle="tooltip" data-placement="bottom" title="Artikel teilen auf Xing" target="_blank" href="https://www.xing.com/spi/shares/new?url={{ articleUrl | url_encode }}">{{ icons.render('xing') | raw }}<span class="sr-only">Artikel teilen auf Xing</span></a>
+                            <a data-toggle="tooltip" data-placement="bottom" title="Artikel teilen auf LinkedIn" target="_blank" href="https://www.linkedin.com/share?id={{ articleUrl | url_encode }}">{{ icons.render('linkedin') | raw }}<span class="sr-only">Artikel teilen auf LinkedIn</span></a>
+
+                            {% if image %}
+                                <a data-toggle="tooltip" data-placement="bottom" title="Artikel teilen auf Pinterest" target="_blank" href="https://pinterest.com/pin/create/button/?media={{ image.getUriThumbnail() | url_encode }}&amp;url={{ articleUrl | url_encode }}&amp;media=">{{ icons.render('pinterest') | raw }}<span class="sr-only">Artikel teilen auf Pinterest</span></a>
+                            {% endif %}
+
+                            <a data-toggle="tooltip" data-placement="bottom" title="Artikel empfehlen per E-Mail" href="mailto:?subject=Empfehlung&amp;body={{ articleUrl | url_encode }}">{{ icons.render('envelope') | raw }}<span class="sr-only">Artikel empfehlen per E-Mail</span></a>
+
+                        </nav>
+                    {% endif %}
+
+                </div>
+
+            </div>
+        </div>
 
     {% if variables.withContainer %}</div>{% endif %}
 

@@ -30,6 +30,7 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
 
             // Fetch editor
             $viewFile = $this->getPath() . 'Admin/resources/private/views/Navbar.html.twig';
+
             $editorHtml = $view->render($viewFile, [
                 'label' => $element->getAttribute('data-label'),
                 'uid' => $uid,
@@ -70,7 +71,7 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
             $result = $blocks->fetch([
                 'where' => [
                     'uid' => $uid,
-                    new \Frootbox\Db\Conditions\GreaterOrEqual('visibility',(IS_EDITOR ? 0 : 2)),
+                    new \Frootbox\Db\Conditions\GreaterOrEqual('visibility',2),
                 ],
                 'order' => [ 'orderId DESC' ]
             ]);

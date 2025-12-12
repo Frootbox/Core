@@ -1,3 +1,14 @@
+{# config
+
+title: Standard
+variables:
+    withContainer:
+        label: mit Layout-Container
+        type: bool
+        default: false
+
+/config #}
+
 {% set b = view.getViewhelper('Breadcrumb', { singleton: true }) %}
 {% set i = view.getViewhelper('Delegator', { object: plugin }) %}
 
@@ -6,26 +17,34 @@
 
 {% set articles = i.getArticles({ limit: 9999999 }) %}
 
-<div class="row">
-    <div class="col-12 plugin Core News News Archive01">
+<div class="plugin Core News News Archive01">
 
-        <div class="inner-wrapper">
+    {% if variables.withContainer %}<div class="container">{% endif %}
 
-            {% if plugin.isFirst %}
-                <h1 data-editable data-uid="{{ plugin.getUid('archive-title') }}">News-Archiv</h1>
-            {% else %}
-                <h2 data-editable data-uid="{{ plugin.getUid('archive-title') }}">News-Archiv</h2>
-            {% endif %}
+    <div class="row">
+        <div class="col-12">
 
-            <div data-editable data-uid="{{ plugin.getUid('archive-text') }}"></div>
+            <div class="inner-wrapper">
 
-            <ul>
-                {% for article in articles %}
-                    <li><a href="{{ article.getUri() }}">{{ article.getTitle(globalLanguage) }}</a></li>
-                {% endfor %}
-            </ul>
+                {% if plugin.isFirst %}
+                    <h1 data-editable data-uid="{{ plugin.getUid('archive-title') }}">News-Archiv</h1>
+                {% else %}
+                    <h2 data-editable data-uid="{{ plugin.getUid('archive-title') }}">News-Archiv</h2>
+                {% endif %}
+
+                <div data-editable data-uid="{{ plugin.getUid('archive-text') }}"></div>
+
+                <ul>
+                    {% for article in articles %}
+                        <li><a href="{{ article.getUri() }}">{{ article.getTitle(globalLanguage) }}</a></li>
+                    {% endfor %}
+                </ul>
+
+            </div>
 
         </div>
-
     </div>
+
+    {% if variables.withContainer %}</div>{% endif %}
+
 </div>

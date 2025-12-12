@@ -20,6 +20,17 @@
         {% endfor %}
 
         <div class="form-group">
+            <label for="ProductId">Einzelprodukt</label>
+            <select class="form-control" id="ProductId" name="ProductId">
+                <option value="">Option wählen</option>
+
+                {% for product in products %}
+                    <option {% if product.getId() == block.getConfig('productId') %}selected{% endif %} value="{{ product.getId() }}">{{ product.getTitle() }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
             <label for="limit">Anzahl</label>
             <input type="number" class="form-control" id="limit" name="limit" value="{{ block.getLimit() }}">
         </div>

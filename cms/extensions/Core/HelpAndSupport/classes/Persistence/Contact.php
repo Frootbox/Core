@@ -1,6 +1,6 @@
 <?php
 /**
- *
+ * @noinspection SqlNoDataSourceInspection
  */
 
 namespace Frootbox\Ext\Core\HelpAndSupport\Persistence;
@@ -10,6 +10,42 @@ class Contact extends \Frootbox\Persistence\AbstractPerson
     use \Frootbox\Persistence\Traits\Alias;
 
     protected $model = Repositories\Contacts::class;
+
+    /**
+     * @param int|null $parentId
+     * @return \Frootbox\Db\Result
+     */
+    public function getCategories(
+        int $parentId = null,
+    ): \Frootbox\Db\Result
+    {
+        // Build sql
+        $sql = 'SELECT
+            c.*,
+            i.config as connConfig,
+            i.id as connId
+        FROM
+            categories c,
+            categories_2_items i
+        WHERE            
+            i.categoryId = c.id AND
+            i.itemId = ' . $this->getId() . ' AND
+            c.visibility >= ' . (IS_LOGGED_IN ? 1 : 2) . ' ';
+
+        if ($parentId) {
+            $sql .= ' AND c.parentId = ' . $parentId;
+
+        }
+
+        $sql .= ' ORDER BY
+            i.orderId DESC';
+
+        // Fetch contacts
+        $model = new \Frootbox\Ext\Core\HelpAndSupport\Persistence\Repositories\Contacts($this->db);
+        $result = $model->fetchByQuery($sql);
+
+        return $result;
+    }
 
     /**
      * @return array|null
@@ -45,5 +81,19 @@ class Contact extends \Frootbox\Persistence\AbstractPerson
                 'contactId' => $this->getId(),
             ]),
         ]);
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getPosition(): ?string
+    {
+        $config = $this->getConnConfig() ?? [];
+
+        if (!empty($config['position'])) {
+            return $config['position'];
+        }
+
+        return parent::getPosition();
     }
 }

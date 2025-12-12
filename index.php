@@ -103,7 +103,6 @@ try {
         $extensions->writeAutoloader($configuration);
     }
 
-
     try {
         require $autoloadConfig;
     }
@@ -172,13 +171,15 @@ try {
         'page' => null,
     ]);
 
+    define('ORIGINAL_REQUEST_URI', $_SERVER['REQUEST_URI']);
+
     // TODO: alle router zurückbauen
     $requestX = $request;
     $request = $request->getRequestTarget();
 
     define('REQUEST_URI', $request);
 
-    if (preg_match('/[A-Z]/', $request)){
+    if (!str_starts_with($request, 'api/v') and preg_match('/[A-Z]/', $request)){
 
         header("HTTP/1.1 301 Moved Permanently");
         header('Location: ' . SERVER_PATH_PROTOCOL . strtolower($request) . (!empty($_SERVER['QUERY_STRING']) ? '?' . $_SERVER['QUERY_STRING'] : ''));

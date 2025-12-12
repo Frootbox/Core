@@ -536,13 +536,20 @@ class Shopcart
      */
     public function getShippingCosts(): ?float
     {
+        $costs = 0;
+        $extraCosts = 0;
+
+        if (!empty($_SESSION['cart']['shipping']['costsExtra'])) {
+            foreach ($_SESSION['cart']['shipping']['costsExtra'] as $xExtraCosts) {
+                $extraCosts += (float) $xExtraCosts['costs'];
+            }
+        }
+
         if ($this->getShipping('type') == 'selfPickup') {
-            return 0;
+            return $extraCosts;
         }
 
         $repository = $this->db->getRepository(\Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\ShippingCosts::class);
-
-        $costs = 0;
 
         foreach ($this->getItems() as $item) {
 
@@ -568,7 +575,12 @@ class Shopcart
             }
         }
 
-        return $costs;
+        return $costs + $extraCosts;
+    }
+
+    public function getShippingCostsExtra(): array
+    {
+        return $_SESSION['cart']['shipping']['costsExtra'] ?? [];
     }
 
     /**
@@ -933,6 +945,7 @@ class Shopcart
      */
     public function setShipping(?array $shippingData): void
     {
+
         $this->shipping = $shippingData;
 
         $_SESSION['cart']['shipping'] = $this->shipping;
@@ -944,6 +957,17 @@ class Shopcart
     public function setShippingCosts($costs)
     {
         $_SESSION['cart']['shipping']['costs'] = $costs;
+    }
+
+    /**
+     *
+     */
+    public function setShippingCostsExtra(string $key, float $costs, string $description = null): void
+    {
+        $_SESSION['cart']['shipping']['costsExtra'][$key] = [
+            'costs' => $costs,
+            'description' => $description,
+        ];
     }
 
     public function updateShippingCosts(): void

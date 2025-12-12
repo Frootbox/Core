@@ -28,6 +28,9 @@ variables:
     withTopBlocks:
         type: bool
         label: Blöcke über jedem Artikel
+    withBottomBlocks:
+        type: bool
+        label: Blöcke unter jedem Artikel
     contentWidthColumns:
         label: Spalten-Breits des Inhalts
         type: int
@@ -221,12 +224,24 @@ variables:
             <div class="content-teaser-below">
                 <div data-editable data-uid="{{ job.getUid('text-below') }}"></div>
             </div>
-
-
-            <p class="back-button"><a href="{{ plugin.getActionUri('index') }}">{{ icons.render('angle-left') | raw }}zurück</a></p>
-
         </div>
     </div>
+
+    {% if variables.withContainer %}</div>{% endif %}
+
+    {% if variables.withBottomBlocks %}
+        <div class="top-blocks" data-blocks data-label="Blöcke unter jedem Artikel" data-uid="{{ plugin.getUid('job-details-bottom-blocks') }}"></div>
+    {% endif %}
+
+    {% if variables.withContainer %}<div class="container">{% endif %}
+
+        <div class="row">
+            <div class="col-12">
+                {% block BackButton %}
+                    <p class="back-button"><a href="{{ plugin.getActionUri('index') }}">{{ icons.render('angle-left') | raw }}zurück</a></p>
+                {% endblock %}
+            </div>
+        </div>
 
     {% if variables.withContainer %}</div>{% endif %}
 

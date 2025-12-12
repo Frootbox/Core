@@ -1,6 +1,10 @@
 <?php
 /**
+ * @author Jan Habbo Brüning <jan.habbo.bruening@gmail.com>
  *
+ * @noinspection PhpUnnecessaryLocalVariableInspection
+ * @noinspection SqlNoDataSourceInspection
+ * @noinspection PhpFullyQualifiedNameUsageInspection
  */
 
 namespace Frootbox\Persistence\Repositories\Traits;
@@ -11,6 +15,7 @@ trait Tags
 {
     /**
      * @param string $tag
+     * @param array|null $parameters
      * @return Result
      */
     public function fetchByTag(string $tag, array $parameters = null): Result
@@ -43,6 +48,7 @@ trait Tags
 
     /**
      * @param array $tags
+     * @param array|null $parameters
      * @return Result
      */
     public function fetchByTags(array $tags, array $parameters = null): Result
@@ -59,81 +65,75 @@ trait Tags
 
         $params = [];
 
-        // Compose sql
-        $sql = 'SELECT 
-            p.*
-        FROM ';
+        $placeholders = [];
 
-        foreach ($tags as $index => $tag) {
-            $sql .= ' tags t' . $index . ',';
+        foreach ($tags as $i => $tag) {
+            $placeholders[] = ":tag{$i}";
         }
 
-            $sql .= ' ' . $this->getTable() . ' p
-        WHERE
-            p.visibility >= ' . (IS_LOGGED_IN ? 1 : 2) . ' AND 
-        ( ';
+        if ($parameters['mode'] == 'matchAny') {
 
-        $tagsGlue = $parameters['mode'] == 'matchAll' ? ' AND ' : ' OR ';
+            $sql = 'SELECT 
+                p.*
+            FROM 
+                ' . $this->getTable() . ' p
+            JOIN 
+                tags t ON t.itemId = p.id AND t.itemClass = :class
+                WHERE
+                p.visibility >= 1
+                AND t.tag IN (' . implode(', ', $placeholders) . ') ';
 
-        foreach ($tags as $index => $tag) {
+            if (!empty($parameters['where'])) {
 
-            $sql .= ($index > 0 ? $tagsGlue : '') . '
-                (
-                    t' . $index . '.tag = :tag' . $index . ' AND
-                    t' . $index . '.itemClass = :class AND
-                    t' . $index . '.itemId = p.id 
-                ) ';
-        }
-
-        $sql .= '
-         ) ';
-
-        if (!empty($parameters['where'])) {
-
-            if (empty($parameters['where']['or']) and empty($parameters['where']['and'])) {
-                $parameters['where']['and'] = $parameters['where'];
-            }
-
-            if (!empty($parameters['where']['or'])) {
-
-                $sql .= ' AND ( ';
-                $or = '';
-
-                foreach ($parameters['where']['or'] as $key => $value) {
-
-                    if ($value instanceof \Frootbox\Db\Conditions\AbstractCondition) {
-                        $sql .= $or . ' p.' . $value->toString();
-
-                        foreach ($value->getParameters() as $parameter) {
-                            $params[$parameter->getKey()] = $parameter->getValue();
-                        }
-                    }
-                    else {
-
-                    }
-
-                    $or = ' OR ';
+                if (empty($parameters['where']['or']) and empty($parameters['where']['and'])) {
+                    $parameters['where']['and'] = $parameters['where'];
                 }
 
-                $sql.= ' ) ';
+                if (!empty($parameters['where']['or'])) {
+
+                    $sql .= ' AND ( ';
+                    $or = '';
+
+                    foreach ($parameters['where']['or'] as $key => $value) {
+
+                        if ($value instanceof \Frootbox\Db\Conditions\AbstractCondition) {
+                            $sql .= $or . ' p.' . $value->toString();
+
+                            foreach ($value->getParameters() as $parameter) {
+                                $params[$parameter->getKey()] = $parameter->getValue();
+                            }
+                        }
+
+                        $or = ' OR ';
+                    }
+
+                    $sql.= ' ) ';
+                }
             }
+
+            $sql .= ' GROUP BY p.id ';
+
+
+        }
+        else {
+
+
+            $sql = 'SELECT 
+                p.*
+            FROM 
+                ' . $this->getTable() . ' p
+            JOIN 
+                tags t ON t.itemId = p.id AND t.itemClass = :class
+            WHERE 
+                p.visibility >= 1
+                AND t.tag IN (' . implode(', ', $placeholders) . ')
+            GROUP BY 
+                p.id
+            HAVING 
+                COUNT(DISTINCT t.tag) = ' . count($tags);
+
         }
 
-        $sql .= ' GROUP BY p.id ';
-
-        if (!empty($parameters['order'])) {
-
-            $sql .= ' ORDER BY ';
-
-            foreach ($parameters['order'] as $order) {
-                $sql .= $order;
-            }
-        }
-
-
-        if (!empty($parameters['limit'])) {
-            $sql .= ' LIMIT ' . $parameters['limit'];
-        }
 
         if (!empty($tags)) {
             $params['class'] = $this->class;
@@ -145,6 +145,7 @@ trait Tags
 
         // Fetch result
         $result = $this->fetchByQuery($sql, $params);
+
 
         return $result;
     }

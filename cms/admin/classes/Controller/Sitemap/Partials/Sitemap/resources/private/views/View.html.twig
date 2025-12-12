@@ -129,14 +129,14 @@
                         <i class="fa fa-bars"></i>
                     </a>
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                        <a data-title="neue Unterseite erstellen" class="dropdown-item" data-modal href="{{ v.getUri('Page', 'ajaxModalCompose', { 'pageId' : page.getId() }) }}"><i class="fa fa-plus fa-fw"></i> neue Unterseite erstellen</a>
-                        <a data-preservestate class="dropdown-item ajax" href="{{ v.getUri('Page', 'ajaxPanelConfig', { 'pageId' : page.getId() }) }}"><i class="fa fa-cog fa-fw"></i> Einstellungen</a>
-                        <a class="dropdown-item ajax" href="{{ v.getUri('Page', 'ajaxPanelDelete', { 'pageId' : page.getId() } ) }}"><i class="fa fa-times fa-fw"></i> Seite löschen</a></a>
+                        <a data-title="neue Unterseite erstellen" class="dropdown-item" data-modal href="{{ v.getUri('Page', 'ajaxModalCompose', { 'pageId' : page.getId() }) }}"><i class="far fa-plus fa-fw"></i> neue Unterseite erstellen</a>
+                        <a data-preservestate class="dropdown-item ajax" href="{{ v.getUri('Page', 'ajaxPanelConfig', { 'pageId' : page.getId() }) }}"><i class="far fa-cog fa-fw"></i> Einstellungen</a>
+                        <a class="dropdown-item ajax" href="{{ v.getUri('Page', 'ajaxPanelDelete', { 'pageId' : page.getId() } ) }}"><i class="far fa-trash fa-fw"></i> Seite löschen</a></a>
 
                         {% if page.getVisibility() != "Locked" %}
                             <div class="dropdown-divider"></div>
-                            <a target="view" class="dropdown-item" href="{{ page.getUri({ absolute: true }) }}"><i class="fa fa-external-link fa-fw"></i> Seite besuchen</a>
-                            <a target="edit" class="dropdown-item" href="{{ page.getUriEdit }}"><i class="fa fa-pencil fa-fw"></i> Seite bearbeiten</a>
+                            <a target="view" class="dropdown-item" href="{{ page.getUri({ absolute: true }) }}"><i class="far fa-external-link fa-fw"></i> Seite besuchen</a>
+                            <a target="edit" class="dropdown-item" href="{{ page.getUriEdit }}"><i class="far fa-pencil fa-fw"></i> Seite bearbeiten</a>
                         {% endif %}
 
                     </div>

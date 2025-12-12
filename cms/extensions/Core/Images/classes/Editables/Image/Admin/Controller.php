@@ -135,19 +135,22 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
                         "User-Agent: Mozilla/5.0 (iPad; U; CPU OS 3_2 like Mac OS X; en-us) AppleWebKit/531.21.10 (KHTML, like Gecko) Version/4.0.4 Mobile/7B334b Safari/531.21.102011-10-16 20:23:10\r\n" // i.e. An iPad
                 )
             ));
-            $source = file_get_contents($post->get('url'), false, $context);
-            $tmpfname = tempnam(sys_get_temp_dir(), md5(microtime(true)));
-            $info = pathinfo($post->get('url'));
 
-            $handle = fopen($tmpfname, "w");
+            $source = file_get_contents($post->get('url'), false, $context);
+
+            $tmpName = tempnam(sys_get_temp_dir(), md5(microtime(true)));
+            $baseName = explode('?', $post->get('url'))[0];
+            $info = pathinfo($baseName);
+
+            $handle = fopen($tmpName, "w");
             fwrite($handle, $source);
 
             if (!empty($info['extension'])) {
                 $type = $files::getMimeTypeFromExtension($info['extension']);
-                $name = basename($post->get('url'));
+                $name = basename($baseName);
             }
             else {
-                $da = getimagesize($tmpfname);
+                $da = getimagesize($tmpName);
                 $type = $da['mime'];
                 $name = 'unknown';
             }
@@ -158,8 +161,8 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
                 'name' => $name,
                 'uid' => $get->get('uid'),
                 'type' => $type,
-                'size' => filesize($tmpfname),
-                'sourceFile' => $tmpfname,
+                'size' => filesize($tmpName),
+                'sourceFile' => $tmpName,
                 'targetPath' => $config->get('filesRootFolder'),
             ]));
 

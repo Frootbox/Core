@@ -1,4 +1,5 @@
-<?php
+<?php /** @noinspection SqlNoDataSourceInspection */
+
 /**
  *
  */
@@ -40,6 +41,7 @@ class Controller extends \Frootbox\Persistence\Content\Blocks\AbstractAdminContr
         $this->block->addConfig([
             'tags' => $post->get('tags'),
             'limit' => $post->get('limit'),
+            'productId' => $post->get('ProductId'),
         ]);
 
         $this->block->save();
@@ -61,16 +63,21 @@ class Controller extends \Frootbox\Persistence\Content\Blocks\AbstractAdminContr
      */
     public function indexAction (
         \Frootbox\Persistence\Repositories\Tags $tagsRepository,
+        \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Products $productRepository,
     ): Response
     {
         // Build sql
         $sql = 'SELECT MIN(id) as id, tag FROM tags GROUP BY tag ORDER BY tag ASC';
 
         // Fetch tags
-        $result = $tagsRepository->fetchByQuery($sql);
+        $tags = $tagsRepository->fetchByQuery($sql);
+
+        // Fetch products
+        $products = $productRepository->fetch();
 
         return self::getResponse('plain', 200, [
-            'tags' => $result
+            'tags' => $tags,
+            'products' => $products,
         ]);
     }
 }

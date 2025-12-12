@@ -1,4 +1,9 @@
 RewriteEngine on
+
+# Make Basic Auth header available for PHP
+RewriteCond %{HTTP:Authorization} .+
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
 # IONOS
 # RewriteBase /
 RewriteRule . index.php

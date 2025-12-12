@@ -12,7 +12,7 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
     protected $type = 'NonStructural';
 
     /**
-     *
+     * @return string
      */
     public function getPath(): string
     {
@@ -20,7 +20,10 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
     }
 
     /**
-     *
+     * @param $html
+     * @param \Frootbox\Config\Config $configuration
+     * @param \Frootbox\Persistence\Content\Repositories\Texts $texts
+     * @return string
      */
     public function parse(
         $html,
@@ -115,11 +118,11 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
 
             $template = '<header ' . $addedHtml . ' class="' . $classes . '" data-uid="' . $uid . '">';
 
-            if (!empty($element->getAttribute('data-supertitle'))) {
-                $template .= '<p class="supertitle super-title"><span>' . $element->getAttribute('data-supertitle') . '</span></p>';
-            }
-            elseif ($text and !empty($text->getConfig('supertitle')) and empty($element->getAttribute('data-skipsupertitle'))) {
+            if ($text and !empty($text->getConfig('supertitle')) and empty($element->getAttribute('data-skipsupertitle'))) {
                 $template .= '<p class="supertitle super-title"><span>' . $text->getConfig('supertitle') . '</span></p>';
+            }
+            elseif (!$text and !empty($element->getAttribute('data-supertitle'))) {
+                $template .= '<p class="supertitle super-title"><span>' . $element->getAttribute('data-supertitle') . '</span></p>';
             }
 
             $subtitle = null;
@@ -150,11 +153,11 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
 
             $template .= '<' . $tagName . ' ' . $id . ' data-editable data-uid="' . $uid . '" style="' . $styles . '">' . $headlineText . '</' . $tagName . '>';
 
-            if (!empty($element->getAttribute('data-subtitle'))) {
-                $template .= '<p class="subtitle">' . $element->getAttribute('data-subtitle') . '</p>';
-            }
-            elseif ($text and !empty($text->getConfig('subtitle')) and empty($element->getAttribute('data-skipsubline'))) {
+            if ($text and !empty($text->getConfig('subtitle')) and empty($element->getAttribute('data-skipsubline'))) {
                 $template .= '<p class="subtitle">' . nl2br($text->getConfig('subtitle')) . '</p>';
+            }
+            elseif (!$text and !empty($element->getAttribute('data-subtitle'))) {
+                $template .= '<p class="subtitle">' . $element->getAttribute('data-subtitle') . '</p>';
             }
             elseif ($subtitle) {
                 $template .= '<p class="subtitle">' . nl2br($subtitle) . '</p>';

@@ -1,6 +1,11 @@
 {# config
 
 title: tabellarisch, kompakter
+variables:
+    withContainer:
+        label: mit Layout-Container
+        type: bool
+        default: false
 
 /config #}
 
@@ -11,60 +16,68 @@ title: tabellarisch, kompakter
 
 {% set events = i.getEvents() %}
 
-<div class="row">
-    <div class="col-12 plugin Core HelpAndSupport ContactPersons Index05">
+<div class="plugin Core Events Schedule Index05">
 
-        {% if plugin.isFirst %}
-        <h1 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h1>
-        {% else %}
-        <h2 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
-        {% endif %}
+    {% if variables.withContainer %}<div class="container">{% endif %}
 
-        <div data-editable data-uid="{{ plugin.getUid('teaser-text') }}"></div>
+    <div class="row">
+        <div class="col-12">
 
-        <table class="table events">
-            <tbody>
+            {% if plugin.isFirst %}
+            <h1 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h1>
+            {% else %}
+            <h2 data-editable data-uid="{{ plugin.getUid('title') }}">{{ plugin.getTitle }}</h2>
+            {% endif %}
 
-            {% for event in events %}
-            <tr>
-                <td>
-                    {% if not event.hasOneDay() %}ab{% endif %}
-                    {{ t.translate(event.getDateStart.format('Weekday%u')) }}
-                </td>
-                <td>
-                    {% if event.hasOneDay() %}
-                    {{ event.getDateStart.format('%d.%m.%G') }}
-                    {% else %}
-                    {{ event.getDateStart.format('%d.%m.') }}–{{ event.getDateEnd.format('%d.%m.') }}
-                    {% endif %}
+            <div data-editable data-uid="{{ plugin.getUid('teaser-text') }}"></div>
 
-                    <br />
+            <table class="table events">
+                <tbody>
 
-                    {% if event.getDateStart.format('%H:%M') != "00:00" %}
-                    {% if not event.hasOneDay() %}
-                    {{ event.getDateStart.format('%H:%M') }} Uhr
-                    {% else %}
-                    {% if event.getDateStart.format('%H:%M') == event.getDateEnd.format('%H:%M') %}
-                    {{ event.getDateStart.format('%H:%M') }} Uhr
-                    {% else %}
-                    {{ event.getDateStart.format('%H:%M') }}–{{ event.getDateEnd.format('%H:%M') }} Uhr
-                    {% endif %}
-                    {% endif %}
-                    {% endif %}
+                {% for event in events %}
+                <tr>
+                    <td>
+                        {% if not event.hasOneDay() %}ab{% endif %}
+                        {{ t.translate(event.getDateStart.format('Weekday%u')) }}
+                    </td>
+                    <td nowrap>
+                        {% if event.hasOneDay() %}
+                        {{ event.getDateStart.format('%d.%m.%G') }}
+                        {% else %}
+                        {{ event.getDateStart.format('%d.%m.') }}–{{ event.getDateEnd.format('%d.%m.') }}
+                        {% endif %}
 
-                </td>
-                <td>{{ event.getVenue.getTitle }}</td>
-                <td>
-                    <p><b>{{ event.getTitle }}</b></p>
+                        <br />
 
-                    <div data-editable data-uid="{{ event.getUid('teaser') }}"></div>
+                        {% if event.getDateStart.format('%H:%M') != "00:00" %}
+                        {% if not event.hasOneDay() %}
+                        {{ event.getDateStart.format('%H:%M') }} Uhr
+                        {% else %}
+                        {% if event.getDateStart.format('%H:%M') == event.getDateEnd.format('%H:%M') %}
+                        {{ event.getDateStart.format('%H:%M') }} Uhr
+                        {% else %}
+                        {{ event.getDateStart.format('%H:%M') }}–{{ event.getDateEnd.format('%H:%M') }} Uhr
+                        {% endif %}
+                        {% endif %}
+                        {% endif %}
 
-                </td>
-            </tr>
-            {% endfor %}
+                    </td>
+                    <td>{{ event.getVenue.getTitle }}</td>
+                    <td>
+                        <p><b>{{ event.getTitle }}</b></p>
 
-            </tbody>
-        </table>
+                        <div data-editable data-uid="{{ event.getUid('teaser') }}"></div>
 
+                    </td>
+                </tr>
+                {% endfor %}
+
+                </tbody>
+            </table>
+
+        </div>
     </div>
+
+    {% if variables.withContainer %}</div>{% endif %}
+
 </div>

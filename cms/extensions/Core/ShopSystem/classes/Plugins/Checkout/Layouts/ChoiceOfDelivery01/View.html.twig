@@ -41,7 +41,7 @@ variables:
                 <div class="info-text-above" data-editable data-uid="{{ plugin.getUid('textDeliveryDay') }}"></div>
 
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
 
                         <form action="{{ plugin.getActionUri('choiceOfDelivery') }}" method="post">
 
@@ -56,25 +56,38 @@ variables:
 
                         </form>
 
-                        {#
-                        <form action="{{ plugin.getAjaxUri('UpdateDeliveryDay') }}" method="post">
-
-                            <div class="form-group">
-                                <label for="deliveryDay">{{ "Core.ShopSystem.LabelSelectDay" | translate }}</label>
-                                <select class="form-control" id="deliveryDay" name="deliveryDay">
-
-                                    {% for date in dayList %}
-                                        <option {% if selectedDayString == date.format('Y-m-d') %}selected{% endif %} value="{{ date.format('Y-m-d') }}">{{ date.format('d.m.Y') }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-
-                            <button type="submit" class="btn btn-primary">{{ "Core.ShopSystem.H2SelectDeliveryDay" | translate }}</button>
-
-                        </form>
-                        #}
-
                     </div>
+
+                    {% if plugin.getShopConfig('shipping.times') %}
+                        <div class="col-md-4">
+
+                            <form action="{{ plugin.getActionUri('choiceOfDeliveryWindow') }}" method="post">
+
+                                <div class="form-group">
+                                    <label for="PreferredDeliveryWindow">{{ "Core.ShopSystem.LabelSelectDeliveryPreferredTime" | translate }}</label>
+
+                                    {% if plugin.getShopConfig('shipping.times') | length == 1 %}
+                                        {% for Key, Time in plugin.getShopConfig('shipping.times') %}
+                                            <div class="form-group form-check">
+                                                <input {% if preferredDeliveryWindowFrom == Time.TimeFrom and preferredDeliveryWindowTo == Time.TimeTo %}checked{% endif %} type="checkbox" class="form-check-input" id="PreferredDeliveryWindow" name="PreferredDeliveryWindow" value="{{ Key }}">
+                                                <label class="form-check-label" for="PreferredDeliveryWindow">{{ Time.TimeFrom }}–{{ Time.TimeTo }} (Aufpreis {{ Time.Surcharge }} €)</label>
+                                            </div>
+                                        {% endfor %}
+                                    {% else %}
+                                        <select class="form-control" id="PreferredDeliveryWindow" name="PreferredDeliveryWindow">
+                                            <option value="">keine Auswahl</option>
+                                            {% for Key, Time in plugin.getShopConfig('shipping.times') %}
+                                                <option {% if preferredDeliveryWindowFrom == Time.TimeFrom and preferredDeliveryWindowTo == Time.TimeTo %}selected{% endif %} value="{{ Key }}">{{ Time.TimeFrom }}–{{ Time.TimeTo }} (Aufpreis {{ Time.Surcharge }} €)</option>
+                                            {% endfor %}
+                                        </select>
+                                    {% endif %}
+                                </div>
+
+                            </form>
+
+                        </div>
+                    {% endif %}
+
                 </div>
 
                 <h3>{{ "Core.ShopSystem.Plugins.Checkout.H3ChooseDeliveryDay" | translate }}</h3>

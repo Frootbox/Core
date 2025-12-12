@@ -34,6 +34,7 @@ return [
 
     'LabelSelectMonth' => 'Monat wählen',
     'LabelSelectDay' => 'Tag wählen',
+    'LabelSelectDeliveryPreferredTime' => 'gewünschtes Lieferfenster wählen',
 
     'LabelSalutation' => 'Anrede',
     'LabelTitle' => 'Titel',

@@ -115,6 +115,7 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
 
         $entity->addConfig([
             'stars' => $post->get('stars'),
+            'noIndividualDetailsPage' => $post->getBoolean('SkipDetailsPage'),
         ]);
 
         $entity->save();

@@ -73,6 +73,10 @@ class Files extends \Frootbox\Db\Model
 
                 if (!empty($exif['IFD0']['Copyright'])) {
                     $copyright = substr($exif['IFD0']['Copyright'], 0, 255);
+
+                    if (mb_detect_encoding($copyright, ['UTF-8', 'ISO-8859-1'], true) == 'ISO-8859-1') {
+                        $copyright = mb_convert_encoding($copyright, 'UTF-8', 'ISO-8859-1');
+                    }
                 }
 
                 if (preg_match('#adobestock-([0-9]+)#', $name, $match)) {

@@ -277,6 +277,9 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         ]);
     }
 
+    /**
+     *
+     */
     public function ajaxUpdateExcludesAction(
         \Frootbox\Http\Post $post,
         \Frootbox\Admin\Viewhelper\GeneralPurpose $gp
@@ -312,6 +315,50 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     /**
      *
      */
+    public function ajaxUpdateTimesAction(
+        \Frootbox\Http\Post $post,
+        \Frootbox\Admin\Viewhelper\GeneralPurpose $gp,
+    ): Response
+    {
+        // Filter times
+        $times = [];
+
+
+        if (!empty($post->get('Times'))) {
+
+            $loop = 0;
+
+            foreach ($post->get('Times') as $time) {
+
+                if (empty(trim($time['TimeFrom'])) and empty(trim($time['TimeTo']))) {
+                    continue;
+                }
+
+                $key = ((int) str_replace(':', '', $time['TimeFrom'])) * 100 + $loop++;
+
+                $times[$key] = $time;
+            }
+
+            ksort($times);
+            $times = array_values($times);
+        }
+
+        $this->plugin->unsetConfig('shipping.times');
+        $this->plugin->addConfig([
+            'shipping' => [
+                'times' => $times,
+            ]
+        ]);
+        $this->plugin->save();
+
+        return self::getResponse('json', 200, [
+            'success' => 'Die Daten wurden gespeichert.',
+        ]);
+    }
+
+    /**
+     *
+     */
     public function daysAction(
         \Frootbox\Http\Get $get,
     ): Response
@@ -327,6 +374,14 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
      *
      */
     public function indexAction(): Response
+    {
+        return self::getResponse();
+    }
+
+    /**
+     *
+     */
+    public function timesAction(): Response
     {
         return self::getResponse();
     }

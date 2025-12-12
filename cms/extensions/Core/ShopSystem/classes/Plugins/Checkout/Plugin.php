@@ -1644,6 +1644,8 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
 
         // Update shipping
         $shipping = $post->get('shipping');
+        $shipping['preferredDeliveryWindow'] = $_SESSION['cart']['shipping']['preferredDeliveryWindow'] ?? null;
+        $shipping['costsExtra'] = $_SESSION['cart']['shipping']['costsExtra'] ?? null;
         $shipping['deliveryDay'] = $shopcart->getShipping('deliveryDay');
         $shipping['pickupDay'] = $shopcart->getShipping('pickupDay');
         $shipping['pickupTime'] = $shopcart->getShipping('pickupTime');
@@ -2280,6 +2282,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
             }
         }
 
+
         return new Response([
             'selectedMonth' => $selectedMonth,
             'selectedMonthString' => $selectedMonthString ?? null,
@@ -2288,7 +2291,35 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
             'monthList' => $months,
             'dayList' => $dayList,
             'weeks' => $weeks,
+            'preferredDeliveryWindowFrom' => $_SESSION['cart']['shipping']['preferredDeliveryWindow']['from'] ?? null,
+            'preferredDeliveryWindowTo' => $_SESSION['cart']['shipping']['preferredDeliveryWindow']['to'] ?? null,
         ]);
+    }
+
+    /**
+     * @param Shopcart $shopcart
+     * @param Post $post
+     * @return Response
+     * @throws \Frootbox\Exceptions\NotFound
+     */
+    public function choiceOfDeliveryWindowAction(
+        Shopcart $shopcart,
+        \Frootbox\Http\Post $post,
+    ): Response
+    {
+        if (!empty($this->getShopPlugin()->getConfig('shipping.times'))) {
+
+            $times = $this->getShopPlugin()->getConfig('shipping.times');
+            $selectedTime = $times[$post->get('PreferredDeliveryWindow')];
+
+            $shopcart->setShippingCostsExtra('deliveryWindow', (float) $selectedTime['Surcharge'], 'Aufpreis für Lieferfenster ' . $selectedTime['TimeFrom'] . '–' . $selectedTime['TimeTo'] . ' Uhr');
+
+            $_SESSION['cart']['shipping']['preferredDeliveryWindow']['from'] = $selectedTime['TimeFrom'];
+            $_SESSION['cart']['shipping']['preferredDeliveryWindow']['to'] = $selectedTime['TimeTo'];
+            $_SESSION['cart']['shipping']['preferredDeliveryWindow']['surcharge'] = $selectedTime['Surcharge'];
+        }
+
+        return new \Frootbox\View\ResponseRedirect($this->getActionUri('choiceOfDelivery'));
     }
 
     /**

@@ -22,6 +22,10 @@ class Testimonial extends \Frootbox\Persistence\AbstractAsset
             return null;
         }
 
+        if (!empty($this->getConfig('noIndividualDetailsPage'))) {
+            return null;
+        }
+
         return new \Frootbox\Persistence\Alias([
             'pageId' => $this->getPageId(),
             'virtualDirectory' => [
@@ -33,5 +37,13 @@ class Testimonial extends \Frootbox\Persistence\AbstractAsset
                 'testimonialId' => $this->getId()
             ])
         ]);
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasDetailsPage(): bool
+    {
+        return !empty($this->getConfig('noTestimonialDetailPage')) and !empty($this->getConfig('noIndividualDetailsPage'));
     }
 }
