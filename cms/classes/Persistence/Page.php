@@ -387,6 +387,11 @@ class Page extends \Frootbox\Persistence\RowModels\ConfigurableNestedSet impleme
         return $_SESSION['security']['simplePasswords'][$this->getId()] == $this->getConfig('security.password');
     }
 
+    public function isAncestorOf(Page $page): bool
+    {
+        return ($page->getRgt() <= $this->getRgt() and $page->getLft() >= $this->getLft());
+    }
+
     /**
      *
      */

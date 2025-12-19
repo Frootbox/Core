@@ -9,6 +9,9 @@ variables:
         label: mit Layout-Container
         type: bool
         default: false
+    showDate:
+        type: bool
+        label: mit Anzeige des Datums
 
 /config #}
 
@@ -56,6 +59,15 @@ variables:
             <div class="top-teaser inner-wrapper">
 
                 <h2 class="first main-title" data-editable data-uid="{{ article.getUid('title') }}">{{ article.getTitle }}</h2>
+
+                {% if variables.showDate %}
+                    <p class="_skipsearch">
+                        {{ article.getDateStart.format('%d') }}.
+                        {{ t.translate(article.getDateStart.format('Monthname%m')) }}
+                        {{ article.getDateStart.format('%G') }}
+                    </p>
+                {% endif %}
+
 
                 {% if not variables.skipTeaser %}
                     <div class="content-teaser">

@@ -907,7 +907,6 @@ try {
         d($e->getMessage());
     }
 
-
     if (!preg_match('#<h1.*?>#', $html)) {
 
         $crawler = \Wa72\HtmlPageDom\HtmlPageCrawler::create($html);

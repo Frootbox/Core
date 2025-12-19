@@ -96,4 +96,14 @@ class Contact extends \Frootbox\Persistence\AbstractPerson
 
         return parent::getPosition();
     }
+
+    /**
+     * @return string|null
+     */
+    public function getPositionCategory(): ?string
+    {
+        $config = $this->getConnConfig() ?? [];
+
+        return $config['position'] ?? null;
+    }
 }

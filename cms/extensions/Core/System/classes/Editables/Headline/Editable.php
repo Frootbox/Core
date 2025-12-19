@@ -90,6 +90,12 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
             $classes .= ' ' . $element->getAttribute('class');
 
             if ($text and $text->getConfig('isVisible') === false) {
+
+                if (!defined('EDITING')) {
+                    $element->remove();
+                    return;
+                }
+
                 $classes .= ' disabled-headline';
             }
 

@@ -19,6 +19,24 @@ class SystemLog extends \Frootbox\Persistence\AbstractRow
         return $this->data['log_code'];
     }
 
+    public function getEntity(): ?\Frootbox\Db\Row
+    {
+        $data = $this->getLogData();
+
+        $entity = new $data[2];
+
+        try {
+
+            $repository = $this->getDb()->getRepository($entity->getModelClass());
+            $entity = $repository->fetchById($data[0]);
+
+            return $entity;
+        }
+        catch (\Exception $e) {
+            return null;
+        }
+    }
+
     /**
      *
      */

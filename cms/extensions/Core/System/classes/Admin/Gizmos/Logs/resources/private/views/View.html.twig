@@ -1,0 +1,32 @@
+{% set t = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\Translator') %}
+
+<style>
+    .Gizmo.Core.System.Logs {
+
+    }
+</style>
+
+<h4>Aktualiserungen</h4>
+
+
+{% if logs.getCount() == 0 %}
+    <div class="message warning">Es sind keine Änderungen vorhanden.</div>
+{% else %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Datum</th>
+                <th>Änderung</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in logs %}
+                {% set entity = log.getEntity() %}
+                <tr  data-href="{{ entity.getUri() }}" data-target="_blank">
+                    <td>{{ log.getDate() | date('d.m.Y H:i') }} Uhr</td>
+                    <td>{{ t.translate(log.getCode(), log.getLogData()) | raw }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endif %}

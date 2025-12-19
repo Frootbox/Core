@@ -2,9 +2,12 @@
 
 title: Standard
 variables:
+    showDateTop:
+        type: bool
+        label: mit Anzeige des Datums über dem Titel
     showDate:
         type: bool
-        label: mit Anzeige des Datums
+        label: mit Anzeige des Datums unter dem Titel
     noImage:
         type: bool
         label: ohne Teaser-Bild
@@ -79,6 +82,14 @@ variables:
                                     {% endif %}
 
                                     <div class="text-pillow">
+
+                                        {% if variables.showDateTop %}
+                                            <p class="_skipsearch date-top">
+                                                {{ article.getDateStart.format('%d') }}.
+                                                {{ t.translate(article.getDateStart.format('Monthname%m')) }}
+                                                {{ article.getDateStart.format('%G') }}
+                                            </p>
+                                        {% endif %}
 
                                         {% if not variables.skipPreTitle %}
                                             <div class="pre-title" data-editable data-nowidgets data-uid="{{ article.getUid('pre-title') }}"></div>

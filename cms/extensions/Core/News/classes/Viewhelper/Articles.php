@@ -37,11 +37,17 @@ class Articles extends \Frootbox\View\Viewhelper\AbstractViewhelper
                 $params['limit'] = 10;
             }
 
+            $where = [
+                new \Frootbox\Db\Conditions\LessOrEqual('dateStart', date('Y-m-d H:i:s')),
+                new \Frootbox\Db\Conditions\GreaterOrEqual('visibility',(IS_LOGGED_IN ? 1 : 2)),
+            ];
+
+            if (empty($params['pluginId'])) {
+                $where['pluginId'] = $params['pluginId'];
+            }
+
             $result = $articleRepository->fetch([
-                'where' => [
-                    new \Frootbox\Db\Conditions\LessOrEqual('dateStart', date('Y-m-d H:i:s')),
-                    new \Frootbox\Db\Conditions\GreaterOrEqual('visibility',(IS_LOGGED_IN ? 1 : 2)),
-                ],
+                'where' => $where,
                 'limit' => $params['limit'],
                 'order' => [ 'dateStart DESC' ],
             ]);

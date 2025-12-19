@@ -43,6 +43,13 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
 
         $question->save();
 
+        // Log action
+        $this->log('QuestionCreate', [
+            $question->getId(),
+            $question->getTitle(),
+            get_class($question),
+        ]);
+
         return self::getResponse('json', 200, [
             'replace' => [
                 'selector' => '#questionsReceiver',
@@ -135,21 +142,29 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     }
 
     /**
-     *
+     * @param \Frootbox\Http\Get $get
+     * @param \Frootbox\Ext\Core\HelpAndSupport\Plugins\FAQ\Persistence\Repositories\Questions $questions
+     * @param \Frootbox\Admin\Viewhelper\GeneralPurpose $gp
+     * @return Response
      */
     public function ajaxDeleteAction (
         \Frootbox\Http\Get $get,
         \Frootbox\Ext\Core\HelpAndSupport\Plugins\FAQ\Persistence\Repositories\Questions $questions,
-        \Frootbox\Admin\Viewhelper\GeneralPurpose $gp
+        \Frootbox\Admin\Viewhelper\GeneralPurpose $gp,
     ): Response
     {
         // Fetch question
         $question = $questions->fetchById($get->get('questionId'));
 
-
         // Delete question
         $question->delete();
 
+        // Log action
+        $this->log('QuestionDelete', [
+            $question->getId(),
+            $question->getTitle(),
+            get_class($question),
+        ]);
 
         return self::getResponse('json', 200, [
             'replace' => [
