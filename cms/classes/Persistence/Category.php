@@ -1,6 +1,10 @@
 <?php
 /**
+ * @author Jan Habbo Brüning <jan.habbo.bruening@gmail.com>
  *
+ * @noinspection PhpUnnecessaryLocalVariableInspection
+ * @noinspection SqlNoDataSourceInspection
+ * @noinspection PhpFullyQualifiedNameUsageInspection
  */
 
 namespace Frootbox\Persistence;
@@ -177,7 +181,8 @@ class Category extends \Frootbox\Persistence\RowModels\ConfigurableNestedSet
     }
 
     /**
-     *
+     * @param array|null $parameters
+     * @return \Frootbox\Db\Result
      */
     public function getItems(
         array $parameters = null
@@ -195,7 +200,7 @@ class Category extends \Frootbox\Persistence\RowModels\ConfigurableNestedSet
             i.*,
             x.config as connConfig,
             x.id as connId,
-            x.alias as alias
+            COALESCE(x.alias, i.alias) AS alias
         FROM
             ' . $model->getTable() . ' i,
             categories_2_items x,

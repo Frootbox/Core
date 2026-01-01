@@ -106,4 +106,12 @@ class Contact extends \Frootbox\Persistence\AbstractPerson
 
         return $config['position'] ?? null;
     }
+
+    /**
+     * @return string|null
+     */
+    public function getPositionGlobal(): ?string
+    {
+        return parent::getPosition();
+    }
 }
