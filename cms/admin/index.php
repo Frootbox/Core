@@ -123,7 +123,7 @@ try {
         $_SESSION['frontend']['language'] = $_GET['forceLanguage'];
     }
 
-    define('GLOBAL_LANGUAGE', !empty($_GET['forceLanguage']) ? $_GET['forceLanguage'] : 'de-DE');
+    define('GLOBAL_LANGUAGE', !empty($_GET['forceLanguage']) ? $_GET['forceLanguage'] : ($config->get('i18n.defaults')[0] ?? $config->get('i18n.languages')[0] ?? 'de-DE'));
     define('DEFAULT_LANGUAGE', $config->get('i18n.defaults')[0] ?? $config->get('i18n.languages')[0] ?? 'de-DE');
     define('MULTI_LANGUAGE', !empty($config->get('i18n.multiAliasMode')));
 

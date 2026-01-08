@@ -9,13 +9,13 @@ title: Standard
 {% block content %}
 
     {% if not view.get('hideGlobalBlocks') %}
-            <div class="top-blocks" data-blocks data-title="Blöcke über den Plugins" data-uid="{{ page.getUid('block-content') }}"></div>
+            <div class="top-blocks" data-blocks data-label="Blöcke über den Plugins" data-uid="{{ page.getUid('block-content') }}"></div>
     {% endif %}
 
     <div data-socket="MainContent" data-title="Inhalt" data-main></div>
 
     {% if not view.get('hideGlobalBlocks') %}
-        <div class="bottom-blocks" data-blocks data-title="Blöcke unter den Plugins" data-uid="{{ page.getUid('block-content-below') }}"></div>
+        <div class="bottom-blocks" data-blocks data-label="Blöcke unter den Plugins" data-uid="{{ page.getUid('block-content-below') }}"></div>
     {% endif %}
 
 {% endblock %}{% endverbatim %}

@@ -232,7 +232,7 @@ class Page
             'size' => $_FILES['file']['size'],
             'sourceFile' => $_FILES['file']['tmp_name'],
             'targetPath' => $config->get('filesRootFolder'),
-            'language' => $_SESSION['frontend']['language'],
+            'language' => $_SESSION['frontend']['language'] ?? GLOBAL_LANGUAGE,
         ]));
 
 

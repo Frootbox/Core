@@ -16,6 +16,7 @@ return [
     'H3Payment' => 'Zahlungsdaten',
     'H3PayNow' => 'Jetzt bezahlen',
     'H4ProductDetails' => 'Produktbeschreibung',
+    'H4ProductAccessories' => 'Zubehör',
     'H5ItemAddedToCart' => 'Artikel in den Warenkorb gelegt',
 
     'TableHeadItems' => 'Artikel',

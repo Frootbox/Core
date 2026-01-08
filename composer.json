@@ -39,7 +39,7 @@
         "frootbox/mail":"@dev",
         "frootbox/translation":"dev-master",
         "frootbox/date":"dev-master",
-        "wa72/htmlpagedom": "3.0.0",
+        "wa72/htmlpagedom": "^3",
         "scssphp/scssphp": "^2",
         "php-di/php-di":"6.3.5",
         "twig/twig":"3.*",

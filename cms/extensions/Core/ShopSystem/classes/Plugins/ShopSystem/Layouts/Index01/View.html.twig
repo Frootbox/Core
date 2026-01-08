@@ -79,8 +79,7 @@ variables:
                             <div class="row">
 
                                 {% for product in categoryDelegator.getProducts() %}
-
-                                    {{ p.renderPartial('/Frootbox/Ext/Core/ShopSystem/Plugins/ShopSystem/ProductTeaser', { product: product, i: i, colClass: colClass, category: category }) | raw }}
+                                    {{ p.renderPartial('/Frootbox/Ext/Core/ShopSystem/Plugins/ShopSystem/ProductTeaser', { product: product, i: i, colClass: colClass, category: category, loop: loop }) | raw }}
 
 
                                     {#

@@ -135,7 +135,10 @@ trait Alias
 
             $aliases = json_decode($this->data['aliases'], true);
 
-            if (!empty($aliases['index'][GLOBAL_LANGUAGE])) {
+            if (!empty($options['language']) and !empty($aliases['index'][$options['language']])) {
+                $uri = SERVER_PATH_PROTOCOL . $aliases['index'][$options['language']];
+            }
+            elseif (!empty($aliases['index'][GLOBAL_LANGUAGE])) {
                 $uri = SERVER_PATH_PROTOCOL . $aliases['index'][GLOBAL_LANGUAGE];
             }
             elseif (!empty($aliases['index'][DEFAULT_LANGUAGE])) {

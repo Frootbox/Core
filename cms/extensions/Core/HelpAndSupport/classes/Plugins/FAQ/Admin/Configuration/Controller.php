@@ -95,6 +95,59 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         die(json_encode($exportData, JSON_UNESCAPED_SLASHES));
     }
 
+    public function exportXlsAction(
+        \Frootbox\Persistence\Content\Repositories\Texts $textRepository,
+        \Frootbox\Ext\Core\HelpAndSupport\Plugins\FAQ\Persistence\Repositories\Questions $questionsRepository,
+    ): never
+    {
+        $result = $questionsRepository->fetch([
+            'where' => [
+                'pluginId' => $this->plugin->getId(),
+            ],
+        ]);
+
+        $filename = $this->plugin->getPage()->getTitle() . ' - ' . $this->plugin->getTitle() . '.csv';
+
+        header('Content-Type: text/csv; charset=UTF-8');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Pragma: no-cache');
+        header('Expires: 0');
+
+        $output = fopen('php://output', 'w');
+
+        fwrite($output, "\xEF\xBB\xBF");
+
+        fputcsv($output, [ 'ID', 'Titel', 'URL',], ';');
+
+        $data = [
+            ['Alice', 'alice@example.com', 100],
+            ['Bob', 'bob@example.com', 200],
+            ['Charlie', 'charlie@example.com', 300],
+        ];
+
+        foreach ($data as $row) {
+
+        }
+
+        foreach ($result as $question) {
+
+            $row = [
+                $question->getid(),
+                $question->getTitle(),
+                $question->getUri([
+                    'absolute' => true,
+                    'language' => 'nl-NL',
+                ]),
+            ];
+
+            fputcsv($output, $row, ';');
+        }
+
+        fclose($output);
+        exit;
+
+    }
+
     /**
      * @param \Frootbox\Http\Post $post
      * @param \Frootbox\Persistence\Content\Repositories\Texts $textRepository
