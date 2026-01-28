@@ -108,7 +108,7 @@
                                             </p>
 
                                             {% if booking.getConfig('personal.phone') %}
-                                                <p>Telefon <a class="email-link" href="tel:{{ booking.getConfig('personal.phone') }}">{{ booking.getConfig('personal.phone') }}</a></p>
+                                                <p>{{ ('Core.ShopSystem.Plugins.Checkout.Field.Phone' | translate) }} <a class="email-link" href="tel:{{ booking.getConfig('personal.phone') }}">{{ booking.getConfig('personal.phone') }}</a></p>
                                             {% endif %}
 
                                             <br />
@@ -212,7 +212,7 @@
 
                                 <h4>{{ "Core.ShopSystem.Plugins.Checkout.H4PaymentMethod" | translate }}</h4>
 
-                                <p>{{ booking.getPaymentMethod().getTitleFinalForBooking(booking) | translate }}</p>
+                                <p>{{ ("Core.ShopSystem.PaymentMethods." ~ booking.getPaymentMethod().getId() ~ ".Method.Title") | translate }}</p>
 
                                 {{ paymentInfo | raw }}
 

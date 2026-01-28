@@ -127,7 +127,7 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
             if ($text and !empty($text->getConfig('supertitle')) and empty($element->getAttribute('data-skipsupertitle'))) {
                 $template .= '<p class="supertitle super-title"><span>' . $text->getConfig('supertitle') . '</span></p>';
             }
-            elseif (!$text and !empty($element->getAttribute('data-supertitle'))) {
+            elseif ((!$text or empty($text->getConfig('supertitle'))) and !empty($element->getAttribute('data-supertitle'))) {
                 $template .= '<p class="supertitle super-title"><span>' . $element->getAttribute('data-supertitle') . '</span></p>';
             }
 

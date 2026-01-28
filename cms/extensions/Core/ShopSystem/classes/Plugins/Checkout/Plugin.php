@@ -1171,7 +1171,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         $file->setSource(json_encode($_SESSION['cart']));
         $file->write();
 
-        // unset($_SESSION['cart']);
+        unset($_SESSION['cart']);
 
         return new ResponseJson([
             'isCartValid' => true,
@@ -1317,7 +1317,9 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         // Get payment method
         $paymentMethod = $booking->getPaymentMethod();
 
-        $result = $container->call([ $paymentMethod, 'onValidatePaymentAfterCheckout' ]);
+        $result = $container->call([ $paymentMethod, 'onValidatePaymentAfterCheckout' ], [
+            'booking' => $booking
+        ]);
 
         if (!empty($result['isPaid'])) {
 

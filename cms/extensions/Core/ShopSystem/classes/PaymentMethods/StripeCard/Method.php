@@ -89,6 +89,7 @@ class Method extends \Frootbox\Ext\Core\ShopSystem\PaymentMethods\PaymentMethod
                 'customer' => $customer->id,
                 'capture_method' => 'automatic',
                 'payment_method_types' => [ $this->stripePaymentMethodType ],
+                'description' => 'Shop Bestellung',
             ]);
 
             $_SESSION['cart']['paymentmethod']['stripe']['paymentIntentId'] = $paymentIntent->id;
@@ -196,8 +197,14 @@ class Method extends \Frootbox\Ext\Core\ShopSystem\PaymentMethods\PaymentMethod
         ]);
     }
 
+    /**
+     * @param \Frootbox\Config\Config $configuration
+     * @param \Frootbox\Ext\Core\ShopSystem\Persistence\Booking|null $booking
+     * @return bool[]
+     */
     public function onValidatePaymentAfterCheckout(
         \Frootbox\Config\Config $configuration,
+        ?\Frootbox\Ext\Core\ShopSystem\Persistence\Booking $booking = null,
     ): array
     {
         // Init stripe client
@@ -210,6 +217,10 @@ class Method extends \Frootbox\Ext\Core\ShopSystem\PaymentMethods\PaymentMethod
             $this->paymentData['stripe']['paymentIntentId'],
             []
         );
+
+        $stripe->paymentIntents->update($paymentIntent->id, [
+            'description' => 'Shop Bestellung ' . $booking->getConfig('orderNumber'),
+        ]);
 
         return [
             'isPaid' => $paymentIntent->status == 'succeeded',

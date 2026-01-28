@@ -46,6 +46,14 @@ _e_xtends: HerrUndFrauPixelExt/BlocksLibrary/Teaser
 
                                 <div data-editable data-nowidgets data-uid="{{ teaser.getUid('text') }}"></div>
 
+                                {% if teaser.getUri() != "#" %}
+                                    <p class="read-more">
+                                        <a href="{{ teaser.getUri() }}" class="btn btn-primary btn-block">
+                                            <span class="label">{{ teaser.getConfig('label') | default('Mehr erfahren') }}</span>
+                                            {{ icons.render('arrow-right-long') | raw }}
+                                        </a>
+                                    </p>
+                                {% endif %}
                             </div>
                         </div>
                     {% endfor %}

@@ -42,6 +42,7 @@
         $('a.file-delete').click(function ( event ) {
 
             event.preventDefault();
+            event.stopImmediatePropagation();
 
             if (!confirm('Soll diese Datei wirklich gelöscht werden?')) {
                 return;

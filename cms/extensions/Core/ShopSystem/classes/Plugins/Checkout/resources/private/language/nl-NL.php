@@ -55,6 +55,7 @@ return [
     'Field.VAT' => 'BTW-identificatienummer',
     'Field.OrderNumber' => 'Ordernr.',
     'Field.SelfPickup' => 'Zelf ophalen',
+    'Field.Phone' => 'telefoon',
 
     'VatIncludedOn' => 'incl. %s %% BTW op %s EUR',
 
@@ -71,7 +72,7 @@ return [
 
     'H4PersonalData' => 'persoonlijke gegevens',
     'H4DeliveryAddress' => 'Bezorgadres',
-    'H4PaymentMethod' => 'Betalingsmiddel',
+    'H4PaymentMethod' => 'Betaling',
 
     'LabelChoosePickupMonth' => 'Selecteer maand',
     'LabelPreferredPickupDate' => 'gewenste ophaaldag',

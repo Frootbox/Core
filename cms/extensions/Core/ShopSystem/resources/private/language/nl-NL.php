@@ -19,7 +19,7 @@ return [
     'H5ItemAddedToCart' => 'Artikel toegevoegd aan winkelmand',
 
     'TableHeadItems' => 'Artikel',
-    'TableHeadNumber' => 'Hoeveelheid',
+    'TableHeadNumber' => 'Aantal',
     'TableHeadPrice' => 'Prijs',
     'TableHeadTotal' => 'Totaal',
 
@@ -32,8 +32,10 @@ return [
     'ButtonGoBack' => 'terug',
     'ButtonOrderNow' => 'Bestel nu tegen betaling',
 
+    'LabelSurcharge' => 'toeslag',
     'LabelSelectMonth' => 'Selecteer maand',
     'LabelSelectDay' => 'Kies dag',
+    'LabelSelectDeliveryPreferredTime' => 'Kies het gewenste leveringsvenster',
 
     'LabelSalutation' => 'Begroeting',
     'LabelTitle' => 'Titel',

@@ -33,6 +33,7 @@ return [
     'ButtonGoBack' => 'zurück',
     'ButtonOrderNow' => 'jetzt kostenpflichtig bestellen',
 
+    'LabelSurcharge' => 'Aufpreis',
     'LabelSelectMonth' => 'Monat wählen',
     'LabelSelectDay' => 'Tag wählen',
     'LabelSelectDeliveryPreferredTime' => 'gewünschtes Lieferfenster wählen',

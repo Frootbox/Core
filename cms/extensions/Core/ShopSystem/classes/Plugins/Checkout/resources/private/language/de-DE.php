@@ -64,6 +64,7 @@ return [
     'Field.VAT' => 'Ust. IdNr.',
     'Field.OrderNumber' => 'Bestellnummer',
     'Field.SelfPickup' => 'Selbstabholung',
+    'Field.Phone' => 'Telefon',
 
     'VatIncludedOn' => 'inkl. %s %% MwSt. auf %s EUR',
 

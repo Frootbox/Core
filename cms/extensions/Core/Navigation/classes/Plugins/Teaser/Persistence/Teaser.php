@@ -28,7 +28,7 @@ class Teaser extends \Frootbox\Persistence\AbstractAsset implements \Frootbox\Pe
             }
         }
 
-        return $this->getConfig('labels');
+        return $this->getConfig('label');
     }
 
     /**

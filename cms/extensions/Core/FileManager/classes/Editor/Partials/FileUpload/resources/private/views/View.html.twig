@@ -117,7 +117,31 @@
             }
         });
 
+        /**
+         *
+         */
+        $('a.file-delete').click(function ( event ) {
 
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            if (!confirm('Soll diese Datei wirklich gelöscht werden?')) {
+                return;
+            }
+
+            let fileId = $(this).attr('data-file');
+
+            $.ajax({
+                url: $(this).attr('href'),
+                success : function ( html ) {
+
+                    window.location.reload();
+                },
+                error : function ( ) {
+
+                }
+            });
+        });
     });
 </script>
 
@@ -151,7 +175,7 @@
         </div>
         <div class="col-10" style="line-height: 22px; font-size: 16px;">
             {{ File.getName() }}<br />
-            <a href="{{ File.getUriDownload() }}">Download</a>&nbsp;&nbsp;|&nbsp;&nbsp;{{ (File.getSize() / 1024  /1024) | round(2) }} MB&nbsp;&nbsp;|&nbsp;&nbsp;<a href="#"><i class="far fa-trash"></i></a>
+            <a href="{{ File.getUriDownload() }}">Download</a>&nbsp;&nbsp;|&nbsp;&nbsp;{{ (File.getSize() / 1024  /1024) | round(2) }} MB&nbsp;&nbsp;|&nbsp;&nbsp;<a class="file-delete" href="{{ serverpath }}static/Ext/Core/FileManager/Editor/ajaxFileDelete?fileId={{ File.getId() }}"><i class="far fa-trash"></i></a>
         </div>
     </div>
 {% endif %}

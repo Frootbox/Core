@@ -70,7 +70,7 @@ variables:
                                         {% for Key, Time in plugin.getShopConfig('shipping.times') %}
                                             <div class="form-group form-check">
                                                 <input {% if preferredDeliveryWindowFrom == Time.TimeFrom and preferredDeliveryWindowTo == Time.TimeTo %}checked{% endif %} type="checkbox" class="form-check-input" id="PreferredDeliveryWindow" name="PreferredDeliveryWindow" value="{{ Key }}">
-                                                <label class="form-check-label" for="PreferredDeliveryWindow">{{ Time.TimeFrom }}–{{ Time.TimeTo }} (Aufpreis {{ Time.Surcharge }} €)</label>
+                                                <label class="form-check-label" for="PreferredDeliveryWindow">{{ Time.TimeFrom }}–{{ Time.TimeTo }} ({{ "Core.ShopSystem.LabelSurcharge" | translate }} {{ Time.Surcharge }} €)</label>
                                             </div>
                                         {% endfor %}
                                     {% else %}

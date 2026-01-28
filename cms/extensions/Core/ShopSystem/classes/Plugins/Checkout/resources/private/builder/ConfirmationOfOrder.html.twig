@@ -140,9 +140,9 @@
 
         {% if booking.getConfig('shipping.deliveryDay') %}
             {% if booking.getConfig('shipping.type') == "selfPickup" %}
-                <p>gewünschter Abholtag: {{ booking.getConfig('shipping.deliveryDay') | date('d.m.Y') }}</p>
+                <p>{{ 'Core.ShopSystem.LabelDesiredPickupDate' | translate }}: {{ booking.getConfig('shipping.deliveryDay') | date('d.m.Y') }}</p>
             {% else %}
-                <p>gewünschtes Lieferdatum: {{ booking.getConfig('shipping.deliveryDay') | date('d.m.Y') }}</p>
+                <p>{{ 'Core.ShopSystem.LabelDesiredDeliveryDate' | translate }}: {{ booking.getConfig('shipping.deliveryDay') | date('d.m.Y') }}</p>
             {% endif %}
         {% endif %}
     </div>
@@ -155,34 +155,34 @@
         <col width="100">
         <col width="100">
         <thead>
-        <tr>
-            <th style="font-size: 8pt;">Pos.</th>
-            <th style="font-size: 8pt;">{{ "Core.ShopSystem.TableHeadNumber" | translate }}</th>
-            <th style="font-size: 8pt;">{{ "Core.ShopSystem.TableHeadItems" | translate }}</th>
-            <th style="font-size: 8pt; text-align: right;">{{ "Core.ShopSystem.TableHeadPrice" | translate }}</th>
-            <th style="font-size: 8pt; text-align: right;">{{ "Core.ShopSystem.TableHeadTotal" | translate }}</th>
-        </tr>
+            <tr>
+                <th style="font-size: 8pt;">Pos.</th>
+                <th style="font-size: 8pt;">{{ "Core.ShopSystem.TableHeadNumber" | translate }}</th>
+                <th style="font-size: 8pt;">{{ "Core.ShopSystem.TableHeadItems" | translate }}</th>
+                <th style="font-size: 8pt; text-align: right;">{{ "Core.ShopSystem.TableHeadPrice" | translate }}</th>
+                <th style="font-size: 8pt; text-align: right;">{{ "Core.ShopSystem.TableHeadTotal" | translate }}</th>
+            </tr>
         </thead>
         <tbody>
 
-        {% for product in booking.getItems() %}
-            <tr>
-                <td style="font-size: 8pt;">{{ loop.index }}</td>
-                <td style="font-size: 8pt;">{{ product.amount }}</td>
-                <td style="font-size: 8pt;">
-                    <b>{{ product.title }}</b>
-                    {% if product.customNote %}
-                        <br />{{ product.customNote | nl2br }}
-                    {% endif %}
-                </td>
-                <td style="text-align: right; font-size: 8pt;">
-                    {{ product.getPriceFinal() | number_format(2, ',', '.')}} {{ currencySign }}
-                </td>
-                <td style="text-align: right; font-size: 8pt;">
-                    {{ product.getTotal() | number_format(2, ',', '.')}} {{ currencySign }}
-                </td>
-            </tr>
-        {% endfor %}
+            {% for product in booking.getItems() %}
+                <tr>
+                    <td style="font-size: 8pt;">{{ loop.index }}</td>
+                    <td style="font-size: 8pt;">{{ product.amount }}</td>
+                    <td style="font-size: 8pt;">
+                        <b>{{ product.title }}</b>
+                        {% if product.customNote %}
+                            <br />{{ product.customNote | nl2br }}
+                        {% endif %}
+                    </td>
+                    <td style="text-align: right; font-size: 8pt;">
+                        {{ product.getPriceFinal() | number_format(2, ',', '.')}} {{ currencySign }}
+                    </td>
+                    <td style="text-align: right; font-size: 8pt;">
+                        {{ product.getTotal() | number_format(2, ',', '.')}} {{ currencySign }}
+                    </td>
+                </tr>
+            {% endfor %}
 
         </tbody>
         <tfoot>

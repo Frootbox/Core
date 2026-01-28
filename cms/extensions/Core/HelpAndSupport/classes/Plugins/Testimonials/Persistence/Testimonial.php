@@ -44,6 +44,6 @@ class Testimonial extends \Frootbox\Persistence\AbstractAsset
      */
     public function hasDetailsPage(): bool
     {
-        return !empty($this->getConfig('noTestimonialDetailPage')) and !empty($this->getConfig('noIndividualDetailsPage'));
+        return empty($this->getConfig('noTestimonialDetailPage')) and empty($this->getConfig('noIndividualDetailsPage'));
     }
 }
