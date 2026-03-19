@@ -182,7 +182,6 @@
         {% else %}
 
             {% if categories | length > 1 %}
-
                 <div class="btn-group" role="group" aria-label="Basic example">
                     {% for category in categories %}
                         <button style="padding: 6px 15px;" type="button" class="btn btn-outline-primary" data-category="{{ category.category }}">{{ category.category }}</button>
@@ -193,7 +192,9 @@
             {% for category in categories %}
                 <div class="category-wrapper" data-category="{{ category.category }}">
 
-                    <h3>{{ category.category }}</h3>
+                    {% if categories | length > 1 %}
+                        <h3>{{ category.category }}</h3>
+                    {% endif %}
 
                     <div class="row">
                         {% for block in category.blocks %}

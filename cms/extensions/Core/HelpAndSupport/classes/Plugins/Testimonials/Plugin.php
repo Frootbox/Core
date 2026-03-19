@@ -23,7 +23,8 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
     }
 
     /**
-     *
+     * @param Persistence\Repositories\Testimonials $testimonialsRepository
+     * @return void
      */
     public function onBeforeDelete(
         \Frootbox\Ext\Core\HelpAndSupport\Plugins\Testimonials\Persistence\Repositories\Testimonials $testimonialsRepository,
@@ -40,7 +41,8 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
     }
 
     /**
-     *
+     * @param array|null $parameters
+     * @return \Frootbox\Db\Result
      */
     public function getTestimonials(
         array $parameters = null,
@@ -66,7 +68,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
     }
 
     /**
-     *
+     * @return Response
      */
     public function indexAction(
 
@@ -75,6 +77,71 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         return new \Frootbox\View\Response([
 
         ]);
+    }
+
+    /**
+     * @param \Frootbox\Http\Get $get
+     * @param Persistence\Repositories\Testimonials $testimonialsRepository
+     * @return Response
+     */
+    public function jumpNextAction(
+        \Frootbox\Http\Get $get,
+        \Frootbox\Ext\Core\HelpAndSupport\Plugins\Testimonials\Persistence\Repositories\Testimonials $testimonialsRepository,
+    ): Response
+    {
+        // Fetch testimonial
+        $testimonial = $testimonialsRepository->fetchById($this->getAttribute('testimonialId'));
+
+
+        $result = $testimonialsRepository->fetch([
+            'where' => [
+                'pluginId' => $this->getId(),
+                 new \Frootbox\Db\Conditions\LessOrEqual('date', $testimonial->getDate()),
+                new \Frootbox\Db\Conditions\NotEqual('id', $testimonial->getId()),
+            ],
+            'order' => [ 'date DESC' ],
+        ]);
+
+        $next = null;
+
+        /**
+         * @var \Frootbox\Ext\Core\HelpAndSupport\Plugins\Testimonials\Persistence\Testimonial $checkTestimonial
+         */
+        foreach ($result as $checkTestimonial) {
+
+            if ($checkTestimonial->hasDetailsPage()) {
+                $next = $checkTestimonial;
+                break;
+            }
+        }
+
+        if ($next === null) {
+
+            $result = $testimonialsRepository->fetch([
+                'where' => [
+                    'pluginId' => $this->getId(),
+                    new \Frootbox\Db\Conditions\NotEqual('id', $testimonial->getId()),
+                ],
+                'order' => [ 'date DESC' ],
+            ]);
+
+            /**
+             * @var \Frootbox\Ext\Core\HelpAndSupport\Plugins\Testimonials\Persistence\Testimonial $checkTestimonial
+             */
+            foreach ($result as $checkTestimonial) {
+
+                if ($checkTestimonial->hasDetailsPage()) {
+                    $next = $checkTestimonial;
+                    break;
+                }
+            }
+
+            if ($next === null) {
+                return new \Frootbox\View\ResponseRedirect($this->getUri());
+            }
+        }
+
+        return new \Frootbox\View\ResponseRedirect($next->getUri());
     }
 
     /**

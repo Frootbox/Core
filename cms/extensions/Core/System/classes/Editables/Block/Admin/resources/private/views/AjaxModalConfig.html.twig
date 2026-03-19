@@ -153,7 +153,7 @@
             {% elseif variable.type == 'int' %}
                 <div class="form-group">
                     <label for="var__{{ variable.name }}">{{ variable.label }}</label>
-                    <input type="number" class="form-control" value="{{ variable.value }}" name="variables[{{ variable.name }}]" id="var__{{ variable.name }}" placeholder="{{ variable.label }}">
+                    <input type="number" class="form-control" value="{{ variable.value | default(variable.default) }}" name="variables[{{ variable.name }}]" id="var__{{ variable.name }}" placeholder="{{ variable.label }}">
                     {#<small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>#}
                 </div>
             {% elseif variable.type == 'file' %}
@@ -169,7 +169,7 @@
             {% else %}
                 <div class="form-group">
                     <label for="var__{{ variable.name }}">{{ variable.label }}</label>
-                    <input type="text" class="form-control" value="{{ variable.value }}" name="variables[{{ variable.name }}]" id="var__{{ variable.name }}" placeholder="{{ variable.label }}">
+                    <input type="text" class="form-control" value="{{ variable.value | default(variable.default) }}" name="variables[{{ variable.name }}]" id="var__{{ variable.name }}" placeholder="{{ variable.label }}">
                     {#<small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>#}
                 </div>
             {% endif %}

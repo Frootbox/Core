@@ -239,7 +239,10 @@
                     blockId: blockId
                 },
                 success: function ( html ) {
+
                     $('[data-editable-block][data-block="' + blockId + '"]').fadeOut();
+
+                    $('.add-block-in-position[data-block="' + blockId + '"]').remove();
                 }
             });
 

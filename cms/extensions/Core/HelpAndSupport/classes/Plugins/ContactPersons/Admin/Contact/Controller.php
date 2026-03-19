@@ -179,7 +179,12 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     }
 
     /**
-     *
+     * @param Get $get
+     * @param \Frootbox\Http\Post $post
+     * @param \Frootbox\Ext\Core\HelpAndSupport\Persistence\Repositories\Contacts $contacts
+     * @param \Frootbox\Persistence\Repositories\CategoriesConnections $connections
+     * @param \Frootbox\Admin\Viewhelper\GeneralPurpose $gp
+     * @return Response
      */
     public function ajaxUpdateAction(
         \Frootbox\Http\Get $get,
@@ -192,7 +197,10 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         // Fetch contact
         $contact = $contacts->fetchById($get->get('contactId'));
 
+        $data = $post->get('person');
+
         $contact->setData($post->get('person'));
+        $contact->setPhone2(trim($data['phone2']));
         $contact->save();
 
         // Update connection

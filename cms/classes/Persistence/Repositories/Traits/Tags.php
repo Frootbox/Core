@@ -112,11 +112,8 @@ trait Tags
             }
 
             $sql .= ' GROUP BY p.id ';
-
-
         }
         else {
-
 
             $sql = 'SELECT 
                 p.*
@@ -131,9 +128,13 @@ trait Tags
                 p.id
             HAVING 
                 COUNT(DISTINCT t.tag) = ' . count($tags);
-
         }
 
+        if (!empty($parameters['order'])) {
+            $sql .= ' ORDER BY ' . $parameters['order'];
+            # $sql .= ' ORDER BY :Order ';
+            # $params['Order'] = $parameters['order'];
+        }
 
         if (!empty($tags)) {
             $params['class'] = $this->class;
@@ -145,7 +146,6 @@ trait Tags
 
         // Fetch result
         $result = $this->fetchByQuery($sql, $params);
-
 
         return $result;
     }

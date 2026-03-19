@@ -160,6 +160,16 @@ $(function ( ) {
                 if (typeof response.error != 'undefined') {
                     toastr.error(response.error);
                 }
+
+                if (typeof response.callback !== 'undefined') {
+
+                    if (typeof window[response.callback] === "function") {
+                        window[response.callback](response);
+                    }
+                    else {
+                        alert("Unbekanntes Callback Ziel!");
+                    }
+                }
             },
             error : function ( xhr ) {
 

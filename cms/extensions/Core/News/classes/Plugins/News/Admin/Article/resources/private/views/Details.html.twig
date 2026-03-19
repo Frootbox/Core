@@ -99,6 +99,17 @@
                         object: article
                     }) | raw }}
 
+                    <div class="row">
+                        <div class="col-md-4">
+
+                            <div class="form-group">
+                                <label for="dateEnd">Artikel deaktivieren ab</label>
+                                <input type="date" class="form-control" id="dateEnd" name="dateEnd" placeholder="Enddatum" value="{% if article.getDateEnd() %}{{ article.getDateEnd() | date("Y-m-d") }}{% endif %}">
+                            </div>
+
+                        </div>
+                    </div>
+
                     <div class="form-group">
                         <label for="link">Link</label>
                         <input type="text" class="form-control" id="link" name="link" placeholder="Link" value="{{ article.getConfig('link') }}">

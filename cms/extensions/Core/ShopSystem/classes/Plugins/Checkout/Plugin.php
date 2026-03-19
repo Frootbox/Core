@@ -1,6 +1,10 @@
 <?php
 /**
+ * @author Jan Habbo Brüning <jan.habbo.bruening@gmail.com>
  *
+ * @noinspection PhpUnnecessaryLocalVariableInspection
+ * @noinspection SqlNoDataSourceInspection
+ * @noinspection PhpFullyQualifiedNameUsageInspection
  */
 
 namespace Frootbox\Ext\Core\ShopSystem\Plugins\Checkout;
@@ -400,31 +404,27 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
     }
 
     /**
-     * @param \Frootbox\Ext\Core\ShopSystem\Plugins\Checkout\Shopcart $shopcart
-     * @param \DI\Container $container
+     * @param Shopcart $shopcart
+     * @param Container $container
      * @param \Frootbox\Db\Db $dbms
      * @param \Frootbox\Http\Get $get
-     * @param \Frootbox\Http\Post $post
+     * @param Post $post
      * @param \Frootbox\Session $session
      * @param \Frootbox\Builder $builder
-     * @param \Frootbox\Config\Config $config
+     * @param Config $config
      * @param \Frootbox\View\Engines\Interfaces\Engine $view
      * @param \Frootbox\TranslatorFactory $translationFactory
      * @param \Frootbox\Persistence\Repositories\Files $fileRepository
      * @param \Frootbox\Persistence\Repositories\Users $usersRepository
      * @param \Frootbox\Ext\Core\ShopSystem\Integrations\Delegator $delegator
+     * @param \Frootbox\Persistence\Content\Repositories\Texts $testRepository
      * @param \Frootbox\Mail\Transports\Interfaces\TransportInterface $mailTransport
      * @param \Frootbox\Persistence\Content\Repositories\ContentElements $contentElements
      * @param \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Bookings $bookingsRepository
      * @param \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Coupons $couponsRepository
      * @param \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Stock $stockRepository
      * @param \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Products $productsRepository
-     * @return \Frootbox\View\Response
-     * @throws \Frootbox\Exceptions\InputInvalid
-     * @throws \Frootbox\Exceptions\InputMissing
-     * @throws \Frootbox\Exceptions\NotFound
-     * @throws \Frootbox\Exceptions\RuntimeError
-     * @throws \Spipu\Html2Pdf\Exception\Html2PdfException
+     * @return Response
      */
     public function ajaxCheckoutAction(
         Shopcart $shopcart,
@@ -2073,7 +2073,10 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
     }
 
     /**
-     *
+     * @param Shopcart $shopcart
+     * @param Post $post
+     * @param \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\ShippingDay $shippingDayRepository
+     * @return Response
      */
     public function choiceOfDeliveryAction(
         Shopcart $shopcart,
@@ -2136,11 +2139,24 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
 
         if (!empty($shopPlugin->getConfig('shipping.skipNextHours'))) {
 
-            $addedHours = $shopPlugin->getConfig('shipping.skipNextHours');
+            $addedHours = (int) $shopPlugin->getConfig('shipping.skipNextHours');
+            $addedSeconds = $addedHours * 3600;
 
-            $firstRegularDay->modify('+' . $addedHours . ' hours');
+            $timestamp = $_SERVER['REQUEST_TIME'] + $addedSeconds;
+            $tz = $tz ?? new \DateTimeZone(date_default_timezone_get());
+            $date = new \DateTime('@' . $timestamp);
+            $date->setTimezone($tz);
+
+            if ($date->format('H:i:s') !== '00:00:00') {
+                $date->modify('+1 day');
+            }
+
+            $date->setTime(0, 0, 0);
+
+            if ($firstRegularDay < $date) {
+                $firstRegularDay = $date;
+            }
         }
-
 
         $lastDate = new \DateTime($date->format('Y-m-d'));
         $lastDate->modify('+ ' . (($date->format('t') - $date->format('d')) + 1) . ' days');
@@ -2283,7 +2299,6 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
                 break;
             }
         }
-
 
         return new Response([
             'selectedMonth' => $selectedMonth,

@@ -61,6 +61,7 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
         ]);
 
         $orderId = $siblings->getCount() * 10 + 10;
+        $newOrderId = 0;
 
         if (!empty($get->get('predecessor'))) {
 
@@ -345,9 +346,24 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
 
         $addToDefault = [];
 
+        if (false and !empty($_SESSION['user']['type']) && $_SESSION['user']['type'] == 'SuperAdmin') {
+            $allowedCategories = null;
+        }
+        else {
+            $allowedCategories = $config->get('Ext.Core.System.Editables.Block.AllowedCategories');
+
+            if ($allowedCategories !== null) {
+                $allowedCategories = $allowedCategories->getData();
+            }
+        }
+
         foreach ($result as $extension) {
 
             $extController = $extension->getExtensionController();
+
+            if ($extController->getType() != 'Template' && !empty($allowedCategories) && !in_array($extension->getVendorId() . '/' . $extension->getExtensionId(), $allowedCategories)) {
+                continue;
+            }
 
             ++$extLoop;
             $loopKey = $extController->getType() == 'Template' ? $extLoop + 200 : $extLoop + 100;

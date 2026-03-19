@@ -41,6 +41,17 @@ class SitemapRoute extends \Frootbox\Routing\AbstractRoute
                 ],
             ]);
 
+            $aliases = [];
+
+            foreach ($result as $alias) {
+
+                $nalias = [
+                    'location' => SERVER_PATH_PROTOCOL . $alias->getAlias(),
+                    'updated' => $alias->getUpdated(),
+                ];
+
+                $aliases[] = $nalias;
+            }
         }
         else {
 

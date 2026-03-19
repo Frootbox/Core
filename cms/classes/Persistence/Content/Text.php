@@ -1,6 +1,10 @@
 <?php
 /**
+ * @author Jan Habbo Brüning <jan.habbo.bruening@gmail.com>
  *
+ * @noinspection PhpUnnecessaryLocalVariableInspection
+ * @noinspection SqlNoDataSourceInspection
+ * @noinspection PhpFullyQualifiedNameUsageInspection
  */
 
 namespace Frootbox\Persistence\Content;
@@ -15,7 +19,7 @@ class Text extends \Frootbox\Persistence\AbstractConfigurableRow
     /**
      * Delete text
      */
-    public function delete()
+    public function delete(): void
     {
         // Clear widgets from text
         if (preg_match_all('#<figure data-id="([0-9]{1,})"></figure>#', $this->getText(), $matches)) {
@@ -25,6 +29,10 @@ class Text extends \Frootbox\Persistence\AbstractConfigurableRow
             foreach ($matches[0] as $index => $tagline) {
 
                 try {
+
+                    /**
+                     * Fetch widget
+                     */
                     $widget = $widgets->fetchById($matches[1][$index]);
                     $widget->delete();
                 }
@@ -35,6 +43,6 @@ class Text extends \Frootbox\Persistence\AbstractConfigurableRow
             }
         }
         
-        return parent::delete();
+        parent::delete();
     }
 }

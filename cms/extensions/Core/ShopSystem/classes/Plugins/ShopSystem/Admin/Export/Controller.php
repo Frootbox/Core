@@ -26,6 +26,8 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     }
 
     public function exportJsonAction(
+        \Frootbox\Persistence\Repositories\Files $filesRepository,
+        \Frootbox\Persistence\Content\Repositories\Texts $textRepository,
         \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Products $productsRepository,
         \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Categories $categoriesRepository,
     ): Response
@@ -44,14 +46,44 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
             ];
         }
 
-        $products = $productsRepository->fetch();
+        $products = $productsRepository->fetch([
+            'order' => [ 'title ASC' ],
+        ]);
 
         foreach ($products as $product) {
 
+            // Fetch description text
+            $text = $textRepository->fetchOne([
+                'where' => [
+                    'uid' => $product->getUid('teaser'),
+                ],
+            ]);
+
+            $images = $filesRepository->fetch([
+                'where' => [
+                    'uid' => $product->getUid('image'),
+                ],
+            ]);
+
+            $imageList = [];
+
+            foreach ($images as $image) {
+
+                $url = $image->getUriDownload([
+                    'absolute' => true,
+                ]);
+
+                $imageList[] = $url;
+            }
 
             $productData = [
                 'id' => $product->getId(),
                 'title' => $product->getTitle(),
+                'price' => $product->getPrice(),
+                'taxRate' => $product->getTaxrate(),
+                'isVisible' => $product->getVisibility() == 2 ? 1 : 0,
+                'text' => $text ? $text->getText() : null,
+                'images' => $imageList,
                 'categories' => [],
             ];
 
@@ -66,7 +98,7 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
             $export['products'][] = $productData;
         }
 
-
-        d($export);
+        header('Content-Type: application/json; charset=utf-8');
+        die(json_encode($export, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR));
     }
 }

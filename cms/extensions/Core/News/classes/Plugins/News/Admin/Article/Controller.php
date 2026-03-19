@@ -1,10 +1,15 @@
 <?php
 /**
+ * @author Jan Habbo Brüning <jan.habbo.bruening@gmail.com>
  *
+ * @noinspection PhpUnnecessaryLocalVariableInspection
+ * @noinspection SqlNoDataSourceInspection
+ * @noinspection PhpFullyQualifiedNameUsageInspection
  */
 
 namespace Frootbox\Ext\Core\News\Plugins\News\Admin\Article;
 
+use Frootbox\Ext\Core\News\Persistence;
 use Frootbox\Admin\Controller\Response;
 
 class Controller extends \Frootbox\Admin\AbstractPluginController
@@ -156,18 +161,24 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     }
 
     /**
-     *
+     * @param \Frootbox\Http\Get $get
+     * @param \Frootbox\Http\Post $post
+     * @param Persistence\Repositories\Articles $articles
+     * @return Response
      */
     public function ajaxUpdateAction(
         \Frootbox\Http\Get $get,
         \Frootbox\Http\Post $post,
-        \Frootbox\Ext\Core\News\Persistence\Repositories\Articles $articles
+        Persistence\Repositories\Articles $articles
     ): Response
     {
-        // Validate requried input
+        // Validate required input
         $post->requireOne([ 'title', 'titles' ]);
 
-        // Fetch article
+        /**
+         * Fetch article
+         * @var Persistence\Article $article
+         */
         $article = $articles->fetchById($get->get('articleId'));
 
         // Parse title
@@ -180,6 +191,7 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         // Update article
         $article->setTitle($title);
         $article->setDateStart($post->get('dateStart') . ' ' . $post->get('timeStart'));
+        $article->setDateEnd($post->getWithDefault('dateEnd'));
         $article->setUserId(!empty($post->get('authorId')) ? $post->get('authorId') : null);
 
         $article->unsetConfig('titles');

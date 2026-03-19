@@ -43,6 +43,28 @@ $(function ( ) {
 					return;
 				}
 
+				if (typeof response.callback !== 'undefined') {
+
+					if (typeof window[response.callback] === "function") {
+						window[response.callback](response);
+					}
+					else {
+						alert("Unbekanntes Callback Ziel!");
+					}
+				}
+
+				if (typeof response.fadeOut !== 'undefined') {
+
+					if (typeof response.fadeOut == 'object') {
+						$.each(response.fadeOut, function(key, selector) {
+							$(selector).fadeOut();
+						});
+					}
+					else {
+						$(response.fadeOut).fadeOut();
+					}
+				}
+
 				if (typeof response.removeClass !== 'undefined') {
 					$(response.removeClass.selector).removeClass(response.removeClass.className)
 				}

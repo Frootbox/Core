@@ -71,7 +71,7 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
             $result = $blocks->fetch([
                 'where' => [
                     'uid' => $uid,
-                    new \Frootbox\Db\Conditions\GreaterOrEqual('visibility',2),
+                    new \Frootbox\Db\Conditions\GreaterOrEqual('visibility', IS_LOGGED_IN ? 1 : 2),
                 ],
                 'order' => [ 'orderId DESC' ]
             ]);
@@ -119,7 +119,7 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
                 $wasCalledFirst = $block->getWasCalledFirst();
 
                 if (defined('EDITING')) {
-                    $html .= '<p style="position: relative; z-index: 500; margin: 15px 0; text-align: center;"><a data-predecessor="' . $block->getId() . '" data-uid="' . $uid . '" class="block-compose" style="display: inline-block; padding: 2px 7px; color: #FFF; background: #CCC; border-radius: 4px; font-size: 12px;" href=""><i class="far fa-plus"></i> Block hier hinzufügen</a></p>';
+                    $html .= '<p class="add-block-in-position" data-block="' . $block->getId() . '" style="position: relative; z-index: 500; margin: 15px 0; text-align: center;"><a data-predecessor="' . $block->getId() . '" data-uid="' . $uid . '" class="block-compose" style="display: inline-block; padding: 2px 7px; color: #FFF; background: #CCC; border-radius: 4px; font-size: 12px;" href=""><i class="far fa-plus"></i> Block hier hinzufügen</a></p>';
                 }
             }
 

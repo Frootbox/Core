@@ -301,7 +301,8 @@ class Page extends \Frootbox\Persistence\RowModels\ConfigurableNestedSet impleme
     }
 
     /**
-     *
+     * @param $language
+     * @return string|null
      */
     public function getTitle($language = null): ?string
     {
@@ -309,7 +310,11 @@ class Page extends \Frootbox\Persistence\RowModels\ConfigurableNestedSet impleme
             return parent::getTitle();
         }
 
-        return $this->getConfig('titles')[$language] ?? parent::getTitle();
+        if (!empty($this->getConfig('titles')[$language])) {
+            return trim($this->getConfig('titles')[$language]);
+        }
+
+        return parent::getTitle();
     }
 
     /**

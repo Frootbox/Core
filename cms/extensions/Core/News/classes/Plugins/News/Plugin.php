@@ -1,6 +1,10 @@
 <?php
 /**
+ * @author Jan Habbo Brüning <jan.habbo.bruening@gmail.com>
+ *
+ * @noinspection PhpUnnecessaryLocalVariableInspection
  * @noinspection SqlNoDataSourceInspection
+ * @noinspection PhpFullyQualifiedNameUsageInspection
  */
 
 namespace Frootbox\Ext\Core\News\Plugins\News;
@@ -131,30 +135,37 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
         }
         else {
 
-            if ($order === null) {
+            $sql = 'SELECT
+                SQL_CALC_FOUND_ROWS
+                a.*
+            FROM
+                assets a
+            WHERE
+                a.pluginId = :pluginId AND
+                a.className = :className AND
+                a.visibility >= ' . (IS_LOGGED_IN ? 1 : 2) . ' AND
+                a.dateStart <= NOW() AND
+                (
+                    a.dateEnd IS NULL OR
+                    a.dateEnd >= NOW()
+                ) ';
 
-
-
-            }
-            $where = [
-                'pluginId' => $this->getId(),
-                new \Frootbox\Db\Conditions\LessOrEqual('dateStart', date('Y-m-d H:i:s')),
-                new \Frootbox\Db\Conditions\GreaterOrEqual('visibility',(IS_LOGGED_IN ? 1 : 2)),
-            ];
 
             if (!empty($skip)) {
                 foreach ($skip as $articleId) {
-                    $where[] = new \Frootbox\Db\Conditions\NotEqual('id', $articleId);
+                    $sql .= ' AND a.id != ' . (int) $articleId . ' ';
                 }
             }
 
-            // Fetch articles
-            $articles = $articleRepository->fetch([
-                'calcFoundRows' => true,
-                'where' => $where,
-                'order' => [ $order ],
-                'limit' => $limit,
-                'page' => $page,
+            $sql .= ' ORDER BY
+                ' . $order . '
+            LIMIT 
+                ' . ($limit * $page - $limit) . ',' . $limit . '
+            ';
+
+            $articles = $articleRepository->fetchByQuery($sql, [
+                'className' => \Frootbox\Ext\Core\News\Persistence\Article::class,
+                'pluginId' => $this->getId(),
             ]);
         }
 
