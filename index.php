@@ -359,6 +359,10 @@ try {
     }
     else {
 
+        if (!empty($_GET['_override_alias'])) {
+            $request = $_GET['_override_alias'];
+        }
+
         // Process request
         $aliases = $container->get(\Frootbox\Persistence\Repositories\Aliases::class);
 
@@ -417,7 +421,6 @@ try {
                     'route' => \Frootbox\Ext\Core\System\Routing\ApiRoute::class
                 ],
             ];
-
 
             if (!empty($configuration->get('failroutes'))) {
                 array_push($routes, ...$configuration->get('failroutes')->getData());

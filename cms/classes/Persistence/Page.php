@@ -62,7 +62,7 @@ class Page extends \Frootbox\Persistence\RowModels\ConfigurableNestedSet impleme
      */
     public function getAlias($section = 'index', $language = null): ?string
     {
-        if (MULTI_LANGUAGE or empty($this->data['alias'])) {
+        if ((defined('MULTI_LANGUAGE') and MULTI_LANGUAGE) or empty($this->data['alias'])) {
 
             $aliases = !empty($this->data['aliases']) ? json_decode($this->data['aliases'], true) : [];
 

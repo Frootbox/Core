@@ -131,7 +131,7 @@ trait Alias
             $base .= 'ajax/';
         }
 
-        if (MULTI_LANGUAGE and $this instanceof \Frootbox\Persistence\Interfaces\MultipleAliases and !empty($this->data['aliases'])) {
+        if (defined('MULTI_LANGUAGE') and MULTI_LANGUAGE and $this instanceof \Frootbox\Persistence\Interfaces\MultipleAliases and !empty($this->data['aliases'])) {
 
             $aliases = json_decode($this->data['aliases'], true);
 
