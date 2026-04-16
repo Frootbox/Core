@@ -346,7 +346,7 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
 
         $addToDefault = [];
 
-        if (false and !empty($_SESSION['user']['type']) && $_SESSION['user']['type'] == 'SuperAdmin') {
+        if (!empty($_SESSION['user']['type']) && $_SESSION['user']['type'] == 'SuperAdmin') {
             $allowedCategories = null;
         }
         else {
@@ -550,7 +550,15 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
             if (!isListedInTemplate($block, $templateBlocks)) {
 
                 if (empty($blockDataCache[$block->getVendorId()][$block->getExtensionId()][$block->getBlockId()])) {
-                    continue;
+
+                    $blockTemplate = new \Frootbox\View\Blocks\BlockTemplate($block->getExtensionController()->getPath() . 'classes/Blocks/' . $block->getBlockId());
+
+                    $blockDataCache[$block->getVendorId()][$block->getExtensionId()][$block->getBlockId()] = [
+                        'blockId' => (string) $block->getBlockId(),
+                        'vendorId' => $block->getVendorId(),
+                        'extensionId' => $block->getExtensionId(),
+                        'template' => $blockTemplate,
+                    ];
                 }
 
                 $blockData = $blockDataCache[$block->getVendorId()][$block->getExtensionId()][$block->getBlockId()];

@@ -417,7 +417,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
             require $algoliaController->getPath() . 'vendor/autoload.php';
 
             // Initialize algolia client
-            $client = \Algolia\AlgoliaSearch\SearchClient::create(
+            $client = \Algolia\AlgoliaSearch\Api\SearchClient::create(
                 $configuration->get('Ext.PixelFabrikLib.AlgoliaSearch.appId'),
                 $configuration->get('Ext.PixelFabrikLib.AlgoliaSearch.apiKey')
             );
@@ -449,22 +449,24 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
 
             // $filters .= ' AND _tags:' . GLOBAL_LANGUAGE;
 
-            $index = $client->initIndex('Website');
+            // $index = $client->initIndex('Website');
 
-            $result = $index->search($get->get('keyword'), [
+            $result = $client->searchSingleIndex('Website', [
+                'query' => $get->get('keyword'),
+                // 'filters' => '_tags:' . GLOBAL_LANGUAGE,
                 'tagFilters' => $tagFilters,
-              //  'filters' => $filters,
                 'attributesToRetrieve' => [
                     'title',
                     'url',
                     'categories'
                 ],
                 'attributesToSnippet' => [
-                    "context:20",
+                    'context:20',
                 ],
                 'hitsPerPage' => 1000,
                 'page' => $get->get('page') ?? 0,
             ]);
+
 
             $list = [];
 

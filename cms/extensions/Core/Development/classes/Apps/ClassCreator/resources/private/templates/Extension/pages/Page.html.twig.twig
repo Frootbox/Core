@@ -1,6 +1,9 @@
 {% verbatim %}{# config
 
-
+variables:
+    backToTop:
+        type: bool
+        label: Button nach-oben in schwarz
 
 /config #}
 
@@ -96,7 +99,7 @@
         <meta name="theme-color" content="#ffffff">
 
     </head>
-    <body class="--offcanvas-visible">
+    <body class="--offcanvas-visible {% if pageVariables.backToTop %}blackToTop{% endif %}">
 
         <div id="offcanvas">
             <div class="outer-wrapper">

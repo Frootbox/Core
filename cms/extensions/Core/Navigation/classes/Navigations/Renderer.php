@@ -130,7 +130,12 @@ class Renderer
 
         if ($listChildren) {
 
-            $children = $item->getItems();
+            if (method_exists($item, 'getChildrenGenerated')) {
+                $children = $this->container->call([ $item, 'getChildrenGenerated' ]);
+            }
+            else {
+                $children = $item->getItems();
+            }
 
             if ($children and $children->getCount()) {
 

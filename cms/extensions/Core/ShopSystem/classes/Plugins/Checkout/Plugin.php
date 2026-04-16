@@ -2122,6 +2122,9 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         }
 
         $firstRegularDay = new \DateTime();
+        // $firstRegularDay = new \DateTime('2026-04-15 13:00');
+
+        $_SERVER['REQUEST_TIME'] = $firstRegularDay->format('U');
 
         if (!empty($shopPlugin->getConfig('shipping.skipNextWorkdays'))) {
 
@@ -2147,16 +2150,11 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
             $date = new \DateTime('@' . $timestamp);
             $date->setTimezone($tz);
 
-            if ($date->format('H:i:s') !== '00:00:00') {
-                $date->modify('+1 day');
-            }
-
-            $date->setTime(0, 0, 0);
-
             if ($firstRegularDay < $date) {
                 $firstRegularDay = $date;
             }
         }
+
 
         $lastDate = new \DateTime($date->format('Y-m-d'));
         $lastDate->modify('+ ' . (($date->format('t') - $date->format('d')) + 1) . ' days');
@@ -2207,6 +2205,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         foreach ($period as $key => $actDate) {
 
             $dateString = $actDate->format('Y-m-d');
+            $actDate->setTime(0, 0, 0);
 
             // Check public holidays
             foreach ($publicHolidays as $holiday) {

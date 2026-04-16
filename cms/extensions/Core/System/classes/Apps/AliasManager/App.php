@@ -17,6 +17,19 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
         return __DIR__ . DIRECTORY_SEPARATOR;
     }
 
+    public function ajaxClearManualAction(
+        \Frootbox\Persistence\Repositories\Aliases $aliasesRepository,
+    ): Response
+    {
+        $result = $aliasesRepository->fetch([
+            'where' => [
+                'type' => 'Manual',
+            ],
+        ]);
+
+        $result->map('delete');
+    }
+
     /**
      *
      */
@@ -142,6 +155,7 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
      *
      */
     public function ajaxImportAction(
+        \Frootbox\Http\Get $get,
         \Frootbox\Http\Post $post,
         \Frootbox\Persistence\Repositories\Aliases $aliasesRepository
     ): Response
@@ -151,25 +165,35 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
 
         foreach ($aliases as $index => $alias) {
 
+            $alias = normalizer_normalize($alias, \Normalizer::FORM_C);
+
             $newAlias = str_replace(SERVER_PATH_PROTOCOL, '', $alias);
             $newAlias = trim($newAlias, '/');
 
             $target = str_replace(SERVER_PATH_PROTOCOL, '', $targets[$index]);
             $target = trim($target, '/');
 
-            $nalias = $aliasesRepository->insert(new \Frootbox\Persistence\Alias([
-                'alias' => $newAlias,
-                'status' => 301,
-                'type' => 'Manual',
-                'config' => [
-                    'target' => $target,
-                ],
-            ]));
+            try {
+                $nalias = $aliasesRepository->insert(new \Frootbox\Persistence\Alias([
+                    'alias' => $newAlias,
+                    'status' => 301,
+                    'type' => 'Manual',
+                    'config' => [
+                        'target' => $target,
+                    ],
+                ]));
+
+            }
+            catch (\Exception $e) {
+                d(($alias));
+            }
+
         }
 
         unset($_SESSION['_tmp_alias_import_source']);
 
         return self::getResponse('json', 200, [
+            'fadeOut' => '#' . $get->get('FormId'),
 
         ]);
     }
@@ -437,8 +461,11 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
             ];
         }
 
+        $chunks = array_chunk($list, 200, true);
+
         return self::getResponse('html', 200, [
             'aliases' => $list,
+            'chunks' => $chunks,
             'source' => $source,
         ]);
     }

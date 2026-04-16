@@ -34,10 +34,11 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
             $data[] = [
                 'title' => $page->getTitle(),
                 'url' => SERVER_PATH_PROTOCOL . trim($page->getUri(), '/'),
+                'itemDepth' => $page->getLevel(),
             ];
         }
 
-        die(json_encode($data));
+        d(json_encode($data, JSON_PRETTY_PRINT));
 
         return self::getResponse();
     }

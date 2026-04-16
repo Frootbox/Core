@@ -1,0 +1,50 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+{{ front.addTab('Alias-Verwaltung', app.getUri('index')) }}
+{{ front.addTab('manuelle Aliase') }}
+
+<h2>
+    manuelle Aliase
+
+    <span class="headoptions">
+		<a data-modal href="{{ app.getUri('ajaxModalCompose') }}" data-title="Alias hinzufügen"><i class="fa fa-plus-circle"></i></a>
+
+
+        <span class="dropdown">
+            <i class="fa fa-bars dropdown-toggle" data-toggle="dropdown" aria-hidden="true"></i>
+            <span class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <a class="dropdown-item ajax" href="{{ app.getUri('ajaxClearManual') }}">Alle manuellen Aliasse löschen</a>
+            </span>
+        </span>
+
+	</span>
+</h2>
+
+{% if aliases.getCount() == 0 %}
+    <div class="message info">Es wurde noch kein Alias erstellt.</div>
+{% else %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Alias</th>
+                <th>Status</th>
+                <th>Ziel</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+
+            {% for alias in aliases %}
+                <tr data-title="Alias bearbeiten" data-modal="{{ app.getUri('ajaxModalEdit', { aliasId: alias.getId() }) }}">
+                    <td>{{ alias.getAlias() }}</td>
+                    <td>{{ alias.getStatus() }}</td>
+                    <td>{{ alias.getConfig('target') }}</td>
+                    <td class="text-right">
+                        <a class="ajax" data-confirm="Soll dieser Alias wirklich gelöscht werden?" href="{{ app.getUri('ajaxDelete', { aliasId: alias.getId() }) }}"><i class="far fa-trash"></i></a>
+                    </td>
+                </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+{% endif %}

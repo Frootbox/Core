@@ -39,31 +39,44 @@
 
         <h3>Import-Vorschau</h3>
 
-        <form method="post" action="{{ app.getUri('ajaxImport') }}" class="ajax">
+        {% for chunk in chunks %}
 
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Alias</th>
-                        <th>Ziel</th>
-                    </tr>
-                </thead>
-                <tbody>
+            {% set RandomId = random(100, 999) %}
 
-                    {% for alias in aliases %}
-                        <tr>
-                            <td><input class="form-control" type="text" value="{{ alias.alias }}" name="aliases[]" /></td>
-                            <td><input class="form-control" type="text" value="{{ alias.target }}" name="targets[]" /></td>
-                        </tr>
-                    {% endfor %}
+            <form id="form-{{ RandomId }}" method="post" action="{{ app.getUri('ajaxImport', { FormId: "form-" ~ RandomId }) }}" class="ajax">
 
-                </tbody>
-            </table>
+                <div class="row">
+                    <div class="col-md-10">
 
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Alias</th>
+                                    <th>Ziel</th>
+                                </tr>
+                            </thead>
+                            <tbody>
 
-            <button type="submit" class="btn btn-primary">Importieren</button>
+                                {% for alias in chunk %}
+                                    <tr>
+                                        <td><input class="form-control" type="text" value="{{ alias.alias }}" name="aliases[]" /></td>
+                                        <td><input class="form-control" type="text" value="{{ alias.target }}" name="targets[]" /></td>
+                                    </tr>
+                                {% endfor %}
 
-        </form>
+                            </tbody>
+                        </table>
+
+                    </div>
+                    <div class="col-md-2">
+                        <div class="sticky-top">
+                            <button type="submit" class="btn btn-primary btn-block">Importieren</button>
+                        </div>
+                    </div>
+                </div>
+
+            </form>
+        {% endfor %}
 
     </div>
 </div>

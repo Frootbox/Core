@@ -99,7 +99,7 @@ variables:
 
                 <h3 data-editable data-uid="{{ plugin.getUid('titleCompletedBooking') }}">{{ "Core.ShopSystem.Plugins.Checkout.H2OrderCompleted" | translate }}</h3>
 
-                <p>{{ "Core.ShopSystem.Plugins.Checkout.Field.OrderNumber" | translate }}: {{ booking.getConfig('orderNumber') }}</p>
+                <p>{{ "Core.ShopSystem.Plugins.Checkout.Field.OrderNumber" | translate }}: {{ booking.getConfig('transfer.orderNumber') | default(booking.getConfig('orderNumber')) }}</p>
 
                 {% if not plugin.getConfig('skipShipping') %}
 
