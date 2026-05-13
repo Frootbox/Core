@@ -14,6 +14,7 @@ class References extends \Frootbox\View\Viewhelper\AbstractViewhelper
         'getByTags' => [
             'tags',
             'params',
+            'order',
         ],
     ];
 
@@ -36,19 +37,18 @@ class References extends \Frootbox\View\Viewhelper\AbstractViewhelper
      */
     public function getByTagsAction(
         array $tags,
-        array $params = null,
         \Frootbox\Ext\Core\Images\Plugins\References\Persistence\Repositories\References $referencesRepository,
+        array $params = null,
     ): \Frootbox\Db\Result
     {
+
         if (empty($params['limit'])) {
             $params['limit'] = 10;
         }
 
         return $referencesRepository->fetchByTags($tags, [
             'limit' => $params['limit'],
+            'order' => $params['order'] ?? null,
         ]);
     }
-
-
-
 }

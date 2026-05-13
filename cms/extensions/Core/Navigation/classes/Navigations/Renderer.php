@@ -37,6 +37,7 @@ class Renderer
             if (is_array($items)) {
                 d($item);
             }
+
             return $items;
         }
         else {
@@ -78,7 +79,8 @@ class Renderer
     }
 
     /**
-     *
+     * @param Items\AbstractItem $item
+     * @return string
      */
     protected function getItemHtml(\Frootbox\Ext\Core\Navigation\Navigations\Items\AbstractItem $item): string
     {
@@ -118,6 +120,10 @@ class Renderer
 
             if (empty($this->parameters['wrapLinkText'])) {
                 $html .= $item->getTitle();
+
+                if (!empty($item->getSubtitle())) {
+                    $html .= '<span class="subtitle">' . $item->getSubtitle() . '</span>';
+                }
             }
             else {
                 $html .= '<span class="link-title">' . $item->getTitle() . '</span>';

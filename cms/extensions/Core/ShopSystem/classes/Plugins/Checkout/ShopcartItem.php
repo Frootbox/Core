@@ -34,12 +34,10 @@ class ShopcartItem
     protected string $type;
     protected ?array $xdata = null;
     protected bool $isAmountFixed = false;
+    protected array $extras = [];
 
     protected $product;
 
-    /**
-     *
-     */
     public function __construct(array $itemData = null, \Frootbox\Ext\Core\ShopSystem\Persistence\Product $product = null)
     {
         $this->product = $product;
@@ -62,6 +60,7 @@ class ShopcartItem
         $this->variantId = $itemData['variantId'] ?? null;
         $this->additionalText = $itemData['additionalText'] ?? null;
         $this->type = $itemData['type'] ?? 'Product';
+        $this->extras = $itemData['extras'] ?? [];
 
         if (isset($itemData['isAmountFixed'])) {
             $this->isAmountFixed = $itemData['isAmountFixed'];
@@ -88,6 +87,30 @@ class ShopcartItem
         }
 
         $this->config = $itemData['config'] ?? [];
+    }
+
+    /**
+     * @param int $extraId
+     * @param float|null $price
+     * @param string|null $title
+     * @return void
+     */
+    public function addExtra(
+        int $extraId,
+        float $price = null,
+        string $title = null,
+    ): void
+    {
+        $this->extras[$extraId] = [
+            'extraId' => $extraId,
+            'price' => $price,
+            'title' => $title,
+        ];
+    }
+
+    public function clearExtras(): void
+    {
+        $this->extras = [];
     }
 
     /**
@@ -136,6 +159,11 @@ class ShopcartItem
     public function getEquipment(): array
     {
         return $this->equipment;
+    }
+
+    public function getExtras(): array
+    {
+        return $this->extras;
     }
 
     /**
@@ -216,21 +244,40 @@ class ShopcartItem
     }
 
     /**
-     *
+     * @return float
      */
     public function getPriceGrossFinal(): float
     {
         if (empty($this->shippingExtra)) {
-            return $this->getPriceGross();
+            $price = $this->getPriceGross();
+        }
+        else {
+
+            $total = (float) $this->getAmount() * $this->getPriceGross();
+
+            if (!empty($this->shippingExtra)) {
+                $total += $this->shippingExtra;
+            }
+
+            $perEach = ($total / $this->getAmount()) * 100;
+            $price = round($perEach) / 100;
         }
 
-        return $this->getTotal() / $this->getAmount();
+        if (!empty($this->getExtras())) {
+            foreach ($this->getExtras() as $extra) {
+                $price += $extra['price'];
+            }
+        }
+
+        return $price;
     }
 
     /**
      *
      */
-    public function getPriceFinal(): float
+    public function getPriceFinal(
+        bool $skipExtras = false,
+    ): float
     {
         if (empty($this->shippingExtra)) {
             return $this->getPriceGross();
@@ -300,11 +347,7 @@ class ShopcartItem
      */
     public function getTotal(): float
     {
-        $total = (float) $this->getAmount() * $this->getPriceGross();
-
-        if (!empty($this->shippingExtra)) {
-            $total += $this->shippingExtra;
-        }
+        $total = (float) $this->getAmount() * $this->getPriceGrossFinal();
 
         $perEach = ($total / $this->getAmount()) * 100;
         $perEach = round($perEach) / 100;

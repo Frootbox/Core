@@ -125,9 +125,10 @@ trait Tags
                 p.visibility >= 1
                 AND t.tag IN (' . implode(', ', $placeholders) . ')
             GROUP BY 
-                p.id
+                p.id            
             HAVING 
                 COUNT(DISTINCT t.tag) = ' . count($tags);
+
         }
 
         if (!empty($parameters['order'])) {
@@ -142,6 +143,10 @@ trait Tags
 
         foreach ($tags as $index => $tag) {
             $params['tag' . $index] = $tag;
+        }
+
+        if (!empty($parameters['limit'])) {
+            $sql .= ' LIMIT ' . $parameters['limit'];
         }
 
         // Fetch result

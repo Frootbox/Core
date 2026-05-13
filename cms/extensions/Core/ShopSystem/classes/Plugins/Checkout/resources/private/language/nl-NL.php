@@ -88,7 +88,7 @@ return [
     'Progress.Steps.Index' => 'Winkelmand',
     'Progress.Steps.ChoiceOfDelivery' => 'Leverdatum',
     'Progress.Steps.ChoiceOfSelfPickup' => 'Ophaaldag',
-    'Progress.Steps.ChoiceOfSelfPickupTime' => 'Aafhaaltijd',
+    'Progress.Steps.ChoiceOfSelfPickupTime' => 'Afhaaltijd',
     'Progress.Steps.Checkout' => 'Persoonlijke gegevens',
     'Progress.Steps.SelectPayment' => 'Betaalmethode',
     'Progress.Steps.Review' => 'Bestelling afmaken',

@@ -78,7 +78,7 @@
                                 <br />
 
                                 <p>
-                                    {{ "Core.ShopSystem.Plugins.Checkout.Field.OrderNumber" | translate }}: {{ booking.getConfig('orderNumber') }}<br />
+                                    {{ "Core.ShopSystem.Plugins.Checkout.Field.OrderNumber" | translate }}: {{ booking.getConfig('transfer.orderNumber') | default(booking.getConfig('orderNumber')) }}<br />
                                     Datum: {{ booking.getDate() | date('d.m.Y H:i') }} Uhr
                                 </p>
 
@@ -270,6 +270,10 @@
                                                 {% if item.getAdditionalText() %}
                                                     <br />{{ item.getAdditionalText() | nl2br }}
                                                 {% endif %}
+
+                                                {% for extra in item.getExtras() %}
+                                                    <br />inkl. {{ extra.title }}
+                                                {% endfor %}
                                             </td>
                                             <td class="text-right">
                                                 {{ item.getAmount() }} x

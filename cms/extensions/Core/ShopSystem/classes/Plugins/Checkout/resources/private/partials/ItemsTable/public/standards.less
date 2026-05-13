@@ -1,5 +1,15 @@
 .Partial.ShopSystem.Checkout.ItemsTable {
 
+  .no-mobile {
+    display: none;
+  }
+
+  @media (min-width: 768px) {
+    .no-mobile {
+      display: revert !important;
+    }
+  }
+
   .xmessage {
     margin: 30px 0;
     padding: 10px 0;
@@ -39,6 +49,12 @@
 
         td {
           border-top: 2px solid #CCC;
+        }
+      }
+
+      tr {
+        td {
+          font-size: 14px;
         }
       }
 

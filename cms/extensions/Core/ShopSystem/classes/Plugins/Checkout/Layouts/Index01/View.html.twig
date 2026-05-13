@@ -43,10 +43,12 @@ variables:
 
     {% if variables.withContainer %}<div class="container">{% endif %}
 
-    {{ p.renderPartial('\\Frootbox\\Ext\\Core\\ShopSystem\\Plugins\\Checkout\\Partials\\CartProgress', {
-        plugin: plugin,
-        step: 'Index'
-    }) | raw }}
+        {%  if shopcart.getItemCount() > 0 %}
+            {{ p.renderPartial('\\Frootbox\\Ext\\Core\\ShopSystem\\Plugins\\Checkout\\Partials\\CartProgress', {
+                plugin: plugin,
+                step: 'Index'
+            }) | raw }}
+        {% endif %}
 
     <div class="row">
         <div class="col-12">

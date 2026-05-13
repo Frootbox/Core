@@ -39,7 +39,7 @@ abstract class AbstractItem extends \Frootbox\Persistence\AbstractRow
     }
 
     /**
-     *
+     * @return string
      */
     abstract public function getHref(): string;
 
@@ -123,6 +123,14 @@ abstract class AbstractItem extends \Frootbox\Persistence\AbstractRow
      * Get path of navigation item
      */
     abstract public function getPath(): string;
+
+    /**
+     * @return string|null
+     */
+    public function getSubtitle(): ?string
+    {
+        return null;
+    }
 
     /**
      * @return string|null

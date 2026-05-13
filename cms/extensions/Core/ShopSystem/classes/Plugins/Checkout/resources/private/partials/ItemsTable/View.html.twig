@@ -17,7 +17,7 @@
                         <th width="200" class="text-right">{{ "Core.ShopSystem.TableHeadNumber" | translate }}</th>
                         <th class="text-right">{{ "Core.ShopSystem.TableHeadPrice" | translate }}</th>
                         <th class="text-right">{{ "Core.ShopSystem.TableHeadTotal" | translate }}</th>
-                        {% if data.editable %}<th width="75"></th>{% endif %}
+                        {% if data.editable %}<th width="75" class="no-mobile"></th>{% endif %}
                     </tr>
                 </thead>
                 <tbody>
@@ -84,6 +84,10 @@
                                 {% if item.getMinimumAge() %}
                                     <div class="minimum-age">Mindestsalter für den Verkauf dieses Artikels ist {{ item.getMinimumAge() }} Jahre!</div>
                                 {% endif %}
+
+                                {% for extra in item.getExtras() %}
+                                    <br />inkl. {{ extra.title }}
+                                {% endfor %}
                             </td>
                             <td class="text-right">
 
@@ -102,6 +106,15 @@
                                     </select>
                                 {% else %}
                                     {{ item.getAmount() }} x
+                                {% endif %}
+
+                                {% if data.editable %}
+                                    {% if not item.isBound() %}
+                                        <div class="text-left d-md-none">
+                                            <a style="color: red;" href="{{ data.plugin.getUriAjax('dropItem', { key: item.getKey() } ) }}" class="drop-item"><i class="fal fa-times"></i> entfernen</a>
+                                        </div>
+
+                                    {% endif %}
                                 {% endif %}
 
                             </td>
@@ -139,7 +152,7 @@
                             </td>
 
                             {% if data.editable %}
-                                <td class="text-right">
+                                <td class="text-right no-mobile">
 
                                     {% if not item.isBound() %}
                                         <a href="{{ data.plugin.getUriAjax('dropItem', { key: item.getKey() } ) }}" class="drop-item btn btn-danger"><i class="fal fa-times"></i></a>
@@ -157,7 +170,7 @@
                         <tr>
                             <td class="text-right" colspan="3">Netto</td>
                             <td class="text-right">{{ data.shopcart.getTotalNetItems() | number_format(2,',','.') }} {{ currencySign }}</td>
-                            {% if data.editable %}<td></td>{% endif %}
+                            {% if data.editable %}<td class="no-mobile"></td>{% endif %}
                         </tr>
                     {% endif %}
 
@@ -182,7 +195,7 @@
                                 {% elseif data.shopcart.getShippingCosts() == 0 %}
                                     {{ "Core.ShopSystem.FreeShipping" | translate }}
                                 {% else %}
-                                    Versand
+                                    {{ "Core.ShopSystem.Shipping" | translate }}
                                 {% endif %}
 
 
@@ -203,7 +216,7 @@
                                     {{ data.shopcart.getShippingCosts() | number_format(2,',','.') }} {{ currencySign }}
                                 {% endif %}
                             </td>
-                            {% if data.editable %}<td></td>{% endif %}
+                            {% if data.editable %}<td class="no-mobile"></td>{% endif %}
                         </tr>
                     {% endif %}
 
@@ -219,7 +232,7 @@
                                     {% endif %}
                                 </td>
                                 <td class="text-right tax">{{ section.tax | number_format(2,',','.') }} {{ currencySign }}</td>
-                                {% if data.editable %}<td></td>{% endif %}
+                                {% if data.editable %}<td class="no-mobile"></td>{% endif %}
                             </tr>
                         {% endfor %}
                     {% else %}
@@ -229,7 +242,7 @@
                                 zzgl 0 % MwSt. auf {{ section.total | number_format(2,',','.') }} {{ currencySign }}
                             </td>
                             <td class="text-right tax">0,00 {{ currencySign }}</td>
-                            {% if data.editable %}<td></td>{% endif %}
+                            {% if data.editable %}<td class="no-mobile"></td>{% endif %}
                         </tr>
                     {% endif %}
 
@@ -237,7 +250,7 @@
                         <td class="d-none d-md-table-cell"></td>
                         <td class="total" colspan="2">{{ "Core.ShopSystem.TableFootTotal" | translate }}</td>
                         <td class="total" nowrap>{{ data.shopcart.getTotal() | number_format(2,',','.') }} {{ currencySign }}</td>
-                        {% if data.editable %}<td></td>{% endif %}
+                        {% if data.editable %}<td class="no-mobile"></td>{% endif %}
                     </tr>
                 </tfoot>
             </table>

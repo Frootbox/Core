@@ -851,6 +851,7 @@ class Shopcart
         $this->items[$key]['priceGross'] = $item->getPriceGross();
         $this->items[$key]['hasSurcharge'] = $item->hasSurcharge();
         $this->items[$key]['shippingExtra'] = $item->getShippingExtra();
+        $this->items[$key]['extras'] = $item->getExtras();
 
         // Check amount of bound items
         $amount = 0;

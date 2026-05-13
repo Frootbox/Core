@@ -196,7 +196,7 @@ class Booking extends \Frootbox\Persistence\AbstractAsset
         $total = (float) 0;
 
         foreach ($this->getItems() as $item) {
-            $total += $item->getAmount() * $item->getPriceFinal();
+            $total += $item->getAmount() * $item->getPriceGrossFinal();
         }
 
         $total += $this->getShipping();

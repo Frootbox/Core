@@ -1,9 +1,98 @@
-<div class="btn-group btn-block mb-5" role="group" aria-label="Basic example">
+{% set icons = view.getViewhelper('Ext/HerrUndFrauPixelExt/Icons/Icons', { createDummyOnFail: true  }) %}
 
-    {% for Step in Steps %}
-        <a href="{% if not Step.Disabled %}{{ Step.Uri }}{% else %}#{% endif %}" class="{% if Step.Disabled %}disabled{% endif %} btn {% if Step.Active %}btn-secondary{% else %}btn-outline-secondary{% endif %}">
-                {{ ("Core.ShopSystem.Plugins.Checkout.Progress.Steps." ~ Step.Key) | translate }}
-        </a>
-    {% endfor %}
 
+<style>
+    .cart-progress {
+        .desktop {
+            display: none;
+
+            @media (min-width: 768px) {
+                display: block;
+            }
+        }
+
+        .mobile {
+            margin: 0 0 30px 0;
+            padding: 10px;
+            border: 1px solid #CCC;
+            border-radius: 5px;
+
+            @media (min-width: 768px) {
+                display: none;
+            }
+
+            .title {
+                margin: 0 0 5px 0;
+                font-weight: bold;
+                text-align: center;
+            }
+
+            nav {
+                display: flex;
+                justify-content: space-between;
+            }
+
+            a {
+                font-size: 16px;
+
+                &:first-of-type {
+                    svg {
+                        margin-right: 10px;
+                    }
+                }
+
+                &:last-of-type {
+                    svg {
+                        margin-left: 10px;
+                    }
+                }
+            }
+
+        }
+    }
+</style>
+
+{% set CurrentStep = null %}
+{% set PreviousStep = null %}
+{% set NextStep = null %}
+
+{% for Step in Steps %}
+    {% if Step.Active %}
+        {% set CurrentStep = Step %}
+
+        {% if loop.index0 > 0 %}
+            {% set PreviousStep = Steps[loop.index0 - 1] %}
+        {% endif %}
+
+        {% if loop.index0 < Steps|length - 1 %}
+            {% set NextStep = Steps[loop.index0 + 1] %}
+        {% endif %}
+    {% endif %}
+{% endfor %}
+
+<div class="cart-progress">
+    <div class="desktop">
+        <div class="btn-group btn-block mb-5" role="group">
+            {% for Step in Steps %}
+                <a href="{% if not Step.Disabled %}{{ Step.Uri }}{% else %}#{% endif %}" class="{% if Step.Disabled %}disabled{% endif %} btn {% if Step.Active %}btn-secondary{% else %}btn-outline-secondary{% endif %}">
+                        {{ ("Core.ShopSystem.Plugins.Checkout.Progress.Steps." ~ Step.Key) | translate }}
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="mobile">
+
+        <div class="title">{{ ("Core.ShopSystem.Plugins.Checkout.Progress.Steps." ~ CurrentStep.Key) | translate }}</div>
+
+        <nav>
+            {% if PreviousStep %}
+                <a href="{% if not PreviousStep.Disabled %}{{ PreviousStep.Uri }}{% else %}#{% endif %}">{{ icons.render('circle-chevron-left') | raw }}{{ ("Core.ShopSystem.Plugins.Checkout.Progress.Steps." ~ PreviousStep.Key) | translate }}</a>
+            {% endif %}
+
+            {% if NextStep %}
+                <a href="{% if not NextStep.Disabled %}{{ NextStep.Uri }}{% else %}#{% endif %}">{{ ("Core.ShopSystem.Plugins.Checkout.Progress.Steps." ~ NextStep.Key) | translate }}{{ icons.render('circle-chevron-right') | raw }}</a>
+            {% endif %}
+        </nav>
+
+    </div>
 </div>

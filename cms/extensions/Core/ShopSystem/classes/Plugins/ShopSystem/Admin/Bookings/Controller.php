@@ -1,6 +1,10 @@
 <?php
 /**
+ * @author Jan Habbo Brüning <jan.habbo.bruening@gmail.com>
  *
+ * @noinspection PhpUnnecessaryLocalVariableInspection
+ * @noinspection SqlNoDataSourceInspection
+ * @noinspection PhpFullyQualifiedNameUsageInspection
  */
 
 namespace Frootbox\Ext\Core\ShopSystem\Plugins\ShopSystem\Admin\Bookings;
@@ -104,7 +108,14 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     }
 
     /**
-     *
+     * @param \Frootbox\Http\Get $get
+     * @param \Frootbox\Config\Config $config
+     * @param \Frootbox\View\Engines\Interfaces\Engine $view
+     * @param \Frootbox\TranslatorFactory $translationFactory
+     * @param \Frootbox\Mail\Transports\Interfaces\TransportInterface $mailTransport
+     * @param \Frootbox\Persistence\Content\Repositories\ContentElements $pluginRepository
+     * @param \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Bookings $bookingsRepository
+     * @return Response
      */
     public function ajaxEmailResendModAction(
         \Frootbox\Http\Get $get,
@@ -119,7 +130,7 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         // Fetch booking
         $booking = $bookingsRepository->fetchById($get->get('bookingId'));
 
-        // Obtaincheckout plugin
+        // Obtain checkout plugin
         $checkoutPlugin = $pluginRepository->fetchOne([
             'where' => [
                 'className' => \Frootbox\Ext\Core\ShopSystem\Plugins\Checkout\Plugin::class,

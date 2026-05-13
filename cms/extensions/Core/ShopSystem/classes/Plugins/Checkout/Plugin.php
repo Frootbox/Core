@@ -27,6 +27,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         'complete',
         'review',
         'choiceOfDelivery',
+        'orderExtras',
         'choiceOfSelfPickup',
         'choiceOfSelfPickupTime',
     ];
@@ -716,7 +717,6 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
 
 
         $builder->setPlugin($this)->setTemplate('Mail');
-        $sourceSave = $builder->render('Mail.html.twig');
 
         $paymentInfo = $paymentMethod->renderSummary($view, $shopcart->getPaymentData());
         $view->set('paymentInfo', $paymentInfo);
@@ -781,6 +781,14 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
             );
         }
 
+
+        $dbms->transactionCommit();
+
+        // Check if bookings needs to be handed over to integrations
+        if ($delegator->canTransferBooking()) {
+            $delegator->transferBooking($booking);
+        }
+
         // Generate confirmation of order
         if (!empty($shopPlugin->getConfig('confirmationOfOrder.createOnCheckout'))) {
 
@@ -822,12 +830,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
             );
         }
 
-        // Check if bookings needs to be handed over to integrations
-        if ($delegator->canTransferBooking()) {
-            $delegator->transferBooking($booking);
-        }
-
-        $dbms->transactionCommit();
+        $sourceSave = $builder->render('Mail.html.twig');
 
         // Compose mails
         $subject = !empty($shopPlugin->getConfig('subject')) ? $shopPlugin->getConfig('subject') : 'Shop-Bestellung';
@@ -1296,6 +1299,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\Bookings $bookingsRepository,
     ): ResponseRedirect
     {
+
         /**
          * Fetch booking
          * @var \Frootbox\Ext\Core\ShopSystem\Persistence\Booking $booking
@@ -1356,7 +1360,10 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
     }
 
     /**
-     *
+     * @param Shopcart $shopcart
+     * @param Container $container
+     * @param Config $configuration
+     * @return ResponseRedirect
      */
     public function ajaxProceedToLoginAction(
         Shopcart $shopcart,
@@ -1364,6 +1371,10 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         \Frootbox\Config\Config $configuration,
     ): ResponseRedirect
     {
+        if ($shopcart->getItemCount() == 0) {
+            return new \Frootbox\View\ResponseRedirect($this->getActionUri('index'));
+        }
+
         // Check cart filter
         if (!empty($configuration->get('Ext.Core.ShopSystem.CartFilter'))) {
 
@@ -1779,6 +1790,59 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
     }
 
     /**
+     * @param Shopcart $cart
+     * @param Post $post
+     * @param Config $config
+     * @return Response
+     */
+    public function ajaxUpdateOrderExtrasAction(
+        Shopcart $cart,
+        \Frootbox\Http\Post $post,
+        \Frootbox\Config\Config $config,
+    ): Response
+    {
+        $checkedExtras = $post->get('Extras');
+        $extras = $config->get('Ext.Core.ShopSystem.OrderExtras');
+
+        foreach ($cart->getItems() as $item) {
+            $item->clearExtras();
+            $cart->setItem($item);
+        }
+
+        if (!empty($checkedExtras['Position'])) {
+
+            foreach ($checkedExtras['Position'] as $extraId => $state) {
+
+                foreach ($extras['Position'] as $extra) {
+
+                    if ($extra['Id'] != $extraId) {
+                        continue;
+                    }
+
+                    foreach ($cart->getItems() as $item) {
+
+                        if (!empty($extra['Applicable'])) {
+
+                            if (!in_array($item->getProduct()->getId(), $extra['Applicable'])) {
+                                continue;
+                            }
+                        }
+
+                        $item->addExtra(
+                            extraId: $extraId,
+                            price: $extra['Price'],
+                            title: $extra['Title'],
+                        );
+                        $cart->setItem($item);
+                    }
+                }
+            }
+        }
+
+        return new \Frootbox\View\ResponseRedirect($this->getActionUri('ajaxProceedToLogin'));
+    }
+
+    /**
      * @param \Frootbox\Ext\Core\ShopSystem\Plugins\Checkout\Shopcart $shopcart
      * @param \Frootbox\Http\Get $get
      * @param \Frootbox\Http\Post $post
@@ -1802,6 +1866,12 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         $shipping['deliveryDay'] = $post->get('deliveryDay') ?? $get->get('deliveryDay');
 
         $shopcart->setShipping($shipping);
+
+        /*
+        if (!empty($config->get('Ext.Core.ShopSystem.OrderExtras'))) {
+            return new \Frootbox\View\ResponseRedirect($this->getActionUri('orderExtras'));
+        }
+        */
 
         return new \Frootbox\View\ResponseRedirect($this->getActionUri('checkout'));
     }
@@ -1832,14 +1902,16 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
     }
 
     /**
-     * @param \Frootbox\Ext\Core\ShopSystem\Plugins\Checkout\Shopcart $shopcart
-     * @param \Frootbox\Http\Post $post
-     * @return \Frootbox\View\Response
-     * @throws \Frootbox\Exceptions\NotFound
+     * @param Shopcart $shopcart
+     * @param Post $post
+     * @param Config $config
+     * @param \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\SelfPickupTime $selfPickUpTimeRepository
+     * @return Response
      */
     public function ajaxUpdateDeliveryTimeAction(
         Shopcart $shopcart,
         \Frootbox\Http\Post $post,
+        \Frootbox\Config\Config $config,
         \Frootbox\Ext\Core\ShopSystem\Persistence\Repositories\SelfPickupTime $selfPickUpTimeRepository,
     ): Response
     {
@@ -1862,6 +1934,12 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
             $shipping['pickupTimeId'] = $pickUpTime->getId();
 
             $shopcart->setShipping($shipping);
+
+            /*
+            if (!empty($config->get('Ext.Core.ShopSystem.OrderExtras'))) {
+                return new \Frootbox\View\ResponseRedirect($this->getActionUri('orderExtras'));
+            }
+            */
 
             return new \Frootbox\View\ResponseRedirect($this->getActionUri('checkout'));
         }
@@ -2147,22 +2225,32 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
 
             $timestamp = $_SERVER['REQUEST_TIME'] + $addedSeconds;
             $tz = $tz ?? new \DateTimeZone(date_default_timezone_get());
-            $date = new \DateTime('@' . $timestamp);
-            $date->setTimezone($tz);
+            $xdate = new \DateTime('@' . $timestamp);
+            $xdate->setTimezone($tz);
 
-            if ($firstRegularDay < $date) {
-                $firstRegularDay = $date;
+            if ($firstRegularDay < $xdate) {
+                $firstRegularDay = $xdate;
             }
         }
 
 
-        $lastDate = new \DateTime($date->format('Y-m-d'));
-        $lastDate->modify('+ ' . (($date->format('t') - $date->format('d')) + 1) . ' days');
+        $periodStart = clone $date;
+        $periodStart->modify('first day of this month');
+
+        $firstDayNum = $periodStart->format('N');
+        $periodStart->modify('-' . ($firstDayNum - 1) . ' days');
+
+        $periodEnd = clone $date;
+        $periodEnd->modify('last day of this month');
+
+        $lastDayNum = $periodEnd->format('N');
+        $periodEnd->modify('+' . (7 - $lastDayNum) . ' days');
+        $periodEnd->modify('+1 day');
 
         $period = new \DatePeriod(
-            $date,
+            $periodStart,
             new \DateInterval('P1D'),
-            $lastDate,
+            $periodEnd,
         );
 
         $dayList = [];
@@ -2264,14 +2352,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
 
         $weeks = [];
 
-        $runningDate = clone $date;
-        $runningDate->modify('first day of this month');
-
-        $firstDayNum = $runningDate->format('N');
-
-        $runningDate->modify('-' . ($firstDayNum - 1) . ' days');
-
-        $checkMonth = $date->format('n');
+        $runningDate = clone $periodStart;
 
         for ($w = 0; $w < 6; ++$w) {
 
@@ -2294,7 +2375,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
 
             $weeks[] = $week;
 
-            if ($checkMonth != $runningDate->format('n')) {
+            if ($runningDate >= $periodEnd) {
                 break;
             }
         }
@@ -2443,13 +2524,23 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
             $firstRegularDay->modify('+' . $addedDays . ' days');
         }
 
-        $lastDate = new \DateTime($date->format('Y-m-d'));
-        $lastDate->modify('+ ' . (($date->format('t') - $date->format('d')) + 1) . ' days');
+        $periodStart = clone $date;
+        $periodStart->modify('first day of this month');
+
+        $firstDayNum = $periodStart->format('N');
+        $periodStart->modify('-' . ($firstDayNum - 1) . ' days');
+
+        $periodEnd = clone $date;
+        $periodEnd->modify('last day of this month');
+
+        $lastDayNum = $periodEnd->format('N');
+        $periodEnd->modify('+' . (7 - $lastDayNum) . ' days');
+        $periodEnd->modify('+1 day');
 
         $period = new \DatePeriod(
-            $date,
+            $periodStart,
             new \DateInterval('P1D'),
-            $lastDate,
+            $periodEnd,
         );
 
         $dayList = [];
@@ -2497,12 +2588,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
 
         $weeks = [];
 
-        $runningDate = clone $date;
-        $runningDate->modify('first day of this month');
-
-        $firstDayNum = $runningDate->format('N');
-
-        $runningDate->modify('-' . ($firstDayNum - 1) . ' days');
+        $runningDate = clone $periodStart;
 
         $checkMonth = $date->format('n');
 
@@ -2527,7 +2613,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
 
             $weeks[] = $week;
 
-            if ($checkMonth != $runningDate->format('n')) {
+            if ($runningDate >= $periodEnd) {
                 break;
             }
         }
@@ -2619,6 +2705,21 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         return new Response([
             'shopcart' => $shopcart,
             'currencySign' => $shopPlugin->getCurrencySign(),
+        ]);
+    }
+
+    /**
+     * @param Shopcart $shopCart
+     * @param Config $config
+     * @return Response
+     */
+    public function orderExtrasAction(
+        Shopcart $shopCart,
+        \Frootbox\Config\Config $config,
+    ): Response
+    {
+        return new Response([
+            'Extras' => $config->get('Ext.Core.ShopSystem.OrderExtras')->getData(),
         ]);
     }
 

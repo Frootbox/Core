@@ -155,67 +155,65 @@ variables:
 
                     {% endblock %}
 
-                    <br /><br />
+                    <script nonce="{{ settings.nonce }}">
 
-                            <script nonce="{{ settings.nonce }}">
+                        var isEditing = {% if settings.isEditor %}true{% else %}false{% endif %};
 
-                                var isEditing = {% if settings.isEditor %}true{% else %}false{% endif %};
+                        $(function ( ) {
 
-                                $(function ( ) {
+                            $('.product-options').change(function ( event ) {
 
-                                    $('.product-options').change(function ( event ) {
+                                $.ajax({
+                                    url: "{{ plugin.getUriAjax('getOptionsInStock', { productId: product.getId() }) | raw }}",
+                                    data: {
+                                        optionId: $(this).val(),
+                                        xdata: $('form.shopsystem-product-add-to-cart').serialize(),
+                                    },
+                                    success: function ( response ) {
 
-                                        $.ajax({
-                                            url: "{{ plugin.getUriAjax('getOptionsInStock', { productId: product.getId() }) | raw }}",
-                                            data: {
-                                                optionId: $(this).val(),
-                                                xdata: $('form.shopsystem-product-add-to-cart').serialize(),
-                                            },
-                                            success: function ( response ) {
+                                        $('.product-options option[value!=""]').each(function ( ) {
 
-                                                $('.product-options option[value!=""]').each(function ( ) {
+                                            if (isEditing) {
+                                                $(this).text($(this).data('title') + ' (0)');
+                                            }
+                                            else {
+                                                $(this).text($(this).data('title'));
+                                            }
 
-                                                    if (isEditing) {
-                                                        $(this).text($(this).data('title') + ' (0)');
-                                                    }
-                                                    else {
-                                                        $(this).text($(this).data('title'));
-                                                    }
+                                            $(this).attr('data-amount', 0);
+                                        });
 
-                                                    $(this).attr('data-amount', 0);
-                                                });
+                                        $.each(response.stocks, function(optionId, amount) {
 
-                                                $.each(response.stocks, function(optionId, amount) {
+                                            let option = $('option[value="' + optionId + '"]');
 
-                                                    let option = $('option[value="' + optionId + '"]');
+                                            if (amount > 0) {
 
-                                                    if (amount > 0) {
-
-                                                        if (isEditing) {
-                                                            option.text(option.data('title') + ' (' + amount + ')');
-                                                        } else {
-                                                            option.text(option.data('title') + ' (verfuegbar)');
-                                                        }
-                                                    }
-
-                                                    option.attr('data-amount', amount);
-                                                });
-
-                                                $('.product-options option:selected').each(function ( ) {
-
-                                                    if ($(this).attr('data-amount') == 0) {
-                                                        $(this).parents('select').val('');
-                                                    }
-                                                });
-
-                                                if (typeof response.selected != 'undefined' && typeof response.selected.price != 'undefined' && typeof response.selected.price > 0) {
-                                                    $('.price-tag').html(response.selected.price + ' EUR');
+                                                if (isEditing) {
+                                                    option.text(option.data('title') + ' (' + amount + ')');
+                                                } else {
+                                                    option.text(option.data('title') + ' (verfuegbar)');
                                                 }
                                             }
+
+                                            option.attr('data-amount', amount);
                                         });
-                                    });
+
+                                        $('.product-options option:selected').each(function ( ) {
+
+                                            if ($(this).attr('data-amount') == 0) {
+                                                $(this).parents('select').val('');
+                                            }
+                                        });
+
+                                        if (typeof response.selected != 'undefined' && typeof response.selected.price != 'undefined' && typeof response.selected.price > 0) {
+                                            $('.price-tag').html(response.selected.price + ' EUR');
+                                        }
+                                    }
                                 });
-                            </script>
+                            });
+                        });
+                    </script>
 
                             {#
                             <div class="form-group">

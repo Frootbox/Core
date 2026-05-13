@@ -1,0 +1,102 @@
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set p = view.getViewhelper('Partials', { plugin: plugin }) %}
+{% set t = i.getTranslator() %}
+
+<div class="plugin Core ShopSystem Checkout OrderExtra01">
+
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+
+
+
+                <div class="inner-wrapper">
+
+                    {#
+                        <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('title-orderextras') }}">{{ "Core.ShopSystem.H1OrderExtras" | translate }}</h2>
+                    #}
+
+                    <h2 class="first">🌿 Optionale Kühlung für längere Frische</h2>
+
+                    <p>
+                        <b>Mehr Zeit. Mehr Sicherheit. Besseres Ergebnis.</b>
+                    </p>
+                    <p>
+                        Mit unserer Vakuum-Kühlung bleibt Ihr Rollrasen deutlich länger frisch und verlegbar.
+                    </p>
+                    <p>
+                        Direkt nach der Ernte wird der Rasen schonend auf wenige Grad heruntergekühlt – dadurch wird der natürliche Stoffwechsel des Rasens verlangsamt und die Qualität länger erhalten.
+                    </p>
+                    <p>
+                        <b>👉 Das Ergebnis</b>
+                    </p>
+                    <p>
+                        Statt 24 Stunden haben Sie bis zu 48 Stunden Zeit, Ihren Rollrasen zu verlegen.
+                    </p>
+
+                    <form style="border: 1px solid rgba(0, 0, 0, .5); margin: 50px 0; padding: 30px;" action="{{ plugin.getAjaxUri('UpdateOrderExtras') }}" method="post">
+
+
+                        <p>
+                            ➕ Optional hinzubuchbar
+                        </p>
+
+                        {% for Extra in Extras.Document %}
+                            <div class="form-group form-check">
+                                <input type="checkbox" class="form-check-input" id="Document{{ loop.index }}" name="Extras[Document][{{ Extra.Id }}]">
+                                <label class="form-check-label" for="Document{{ loop.index }}">{{ Extra.Title }} ({{ Extra.Price | number_format(2, ",", ".") }} €)</label>
+                            </div>
+                        {% endfor %}
+
+                        {% for Extra in Extras.Position %}
+                            <div class="form-group form-check">
+                                <input type="checkbox" class="form-check-input" id="Position{{ loop.index }}" name="Extras[Position][{{ Extra.Id }}]">
+                                <label class="form-check-label" for="Position{{ loop.index }}">{{ Extra.Title }} ({{ Extra.Price | number_format(2, ",", ".") }} € pro qm)</label>
+                            </div>
+                        {% endfor %}
+
+                        <button class="btn btn-primary" type="submit">Weiter</button>
+
+                    </form>
+
+                    <p>
+                        <b>Empfohlen bei</b>
+                    </p>
+
+                    <ul>
+                        <li>warmen Temperaturen ☀️</li>
+                        <li>längeren Lieferwegen 🚛</li>
+                        <li>wenn Sie nicht sofort verlegen können 🕒</li>
+                    </ul>
+
+                    <p>
+                        <b>💡 Ihre Vorteile auf einen Blick</b>
+                    </p>
+
+                    <ul>
+                        <li>⏳ Doppelte Verlegezeit – deutlich mehr Flexibilität</li>
+                        <li>🌱 Frischeres, vitaleres Gras bei Ankunft</li>
+                        <li>🚚 Sicherer Transport, auch bei warmem Wetter</li>
+                        <li>🧘 Weniger Stress bei Planung & Verlegung</li>
+                    </ul>
+
+                    <p>
+                        <b>🔬 Was passiert bei der Kühlung?</b>
+                    </p>
+
+                    <p>
+                        Der Rollrasen wird unter reduziertem Luftdruck schnell auf ca. 4–5 °C heruntergekühlt.
+                    </p>
+                    <p>
+                        Dabei wird dem Gras Wärme entzogen, wodurch Wachstum und „Gärprozesse“ gestoppt werden – so bleibt der Rasen länger frisch und leistungsfähig.
+                    </p>
+
+                    {{ p.renderPartial('BasketFooter', { shopcart: shopcart, plugin: plugin }) | raw }}
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>

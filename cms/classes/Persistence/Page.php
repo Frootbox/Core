@@ -67,7 +67,7 @@ class Page extends \Frootbox\Persistence\RowModels\ConfigurableNestedSet impleme
             $aliases = !empty($this->data['aliases']) ? json_decode($this->data['aliases'], true) : [];
 
             if ($language === null) {
-                $language = GLOBAL_LANGUAGE;
+                $language = defined('GLOBAL_LANGUAGE') ? GLOBAL_LANGUAGE : 'de-DE';
             }
 
             if (!empty($aliases[$section][$language])) {

@@ -26,6 +26,33 @@ $(function ( ) {
         $('body').removeClass('offcanvas-visible');
     });
 
+    $('a').click(function(event) {
+
+        let da = $(this).attr('href').split('#');
+
+        if (da.length === 1) {
+            return;
+        }
+
+        if (da[1].length === 0) {
+            return;
+        }
+
+        if (this.pathname === window.location.pathname) {
+            event.preventDefault();
+
+            let offset = $('#' + da[1]).offset().top - 300;
+
+            $('body').removeClass('offcanvas-visible');
+
+            window.setTimeout(function() {
+
+                $([document.documentElement, document.body]).animate({
+                    scrollTop: offset
+                }, 0);
+            }, 100);
+        }
+    });
 
     $(window).resize(function ( event ) {
 
@@ -85,6 +112,26 @@ $(function ( ) {
 
             $(this).css('height', height + 'px');
             $(this).parent('div').css('min-height', height + 'px');
+        });
+
+        /**
+         * Set height of background image containers
+         */
+        $('.autoset-height-md').each(function ( ) {
+
+            if ($(window).width() > 420) {
+                var width = $(this).width();
+                var physicalWidth = $(this).data('physicalwidth');
+                var physicalHeight = $(this).data('physicalheight');
+
+                var ratio = width / physicalWidth;
+
+                var height = Math.floor(physicalHeight * ratio);
+
+                $(this).css('height', height + 'px');
+                $(this).parent('div').css('min-height', height + 'px');
+            }
+
         });
     });
 

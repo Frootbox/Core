@@ -66,6 +66,7 @@ return [
     'Message.NoItems' => 'U heeft geen artikelen in uw winkelwagen.',
 
     'FreeShipping' => 'Verzending: gratis',
+    'Shipping' => 'Verzending',
     'ItemHasBeenAddedToShopCart' => 'Het artikel is toegevoegd aan uw winkelmand.',
 
     'IncludingVat' => 'inclusief BTW',

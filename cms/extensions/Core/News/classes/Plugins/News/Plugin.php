@@ -84,7 +84,13 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
     }
 
     /**
-     *
+     * @param \Frootbox\Ext\Core\News\Persistence\Repositories\Articles $articleRepository
+     * @param $limit
+     * @param $order
+     * @param $skip
+     * @param $page
+     * @param $tagsExclude
+     * @return \Frootbox\Db\Result
      */
     public function getArticles(
         \Frootbox\Ext\Core\News\Persistence\Repositories\Articles $articleRepository,
@@ -168,6 +174,8 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
                 'pluginId' => $this->getId(),
             ]);
         }
+
+        $articles->getTotal();
 
         return $articles;
     }

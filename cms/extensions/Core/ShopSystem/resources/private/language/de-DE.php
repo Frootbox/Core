@@ -7,6 +7,7 @@ return [
     'ButtonAddToCart' => 'in den Warenkorb legen',
     'ButtonProductDetails' => 'Produkt-Details',
 
+    'H1OrderExtras' => 'Extraleistungen',
     'H1PaymentFailed' => 'Zahlung fehlgeschlagen',
     'H1CompleteOrder' => 'Bestellung abschließen',
     'H2SelectDeliveryDay' => 'Liefertag wählen',
@@ -66,6 +67,7 @@ return [
 
     'Message.NoItems' => 'Sie haben aktuell keine Artikel im Warenkorb.',
 
+    'Shipping' => 'Versand',
     'FreeShipping' => 'Versand kostenlos',
     'ItemHasBeenAddedToShopCart' => 'Der Artikel wurde Ihrem Warenkorb hinzugefügt.',
 
