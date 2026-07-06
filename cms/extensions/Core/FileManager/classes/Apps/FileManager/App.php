@@ -1,16 +1,22 @@
-<?php 
+<?php
 /**
- * 
+ * @author Jan Habbo Brüning <jan.habbo.bruening@gmail.com>
+ *
+ * @noinspection PhpUnnecessaryLocalVariableInspection
+ * @noinspection SqlNoDataSourceInspection
+ * @noinspection PhpFullyQualifiedNameUsageInspection
  */
 
 namespace Frootbox\Ext\Core\FileManager\Apps\FileManager;
+
+use \Frootbox\Persistence\Repositories;
 
 use Frootbox\Admin\Controller\Response;
 
 class App extends \Frootbox\Admin\Persistence\AbstractApp
 {
     /**
-     * 
+     * @return string
      */
     public function getPath(): string
     {
@@ -25,7 +31,7 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
         \Frootbox\Http\Get $get,
         \Frootbox\Persistence\Repositories\Files $files,
         \Frootbox\Admin\Viewhelper\GeneralPurpose $gp
-    )
+    ): Response
     {
         // Fetch file        
         $file = $files->fetchById($get->get('fileId'));
@@ -59,7 +65,7 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
         \Frootbox\Http\Get $get,
         \Frootbox\Admin\View $view,
         \Frootbox\Persistence\Repositories\Files $fileRepository,
-    )
+    ): Response
     {
         // Fetch file
         $file = $fileRepository->fetchById($get->get('fileId'));
@@ -180,6 +186,68 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
         }
         
         return new \Frootbox\Admin\Controller\Response('redirect', 302, $this->getUri('index', [ 'folderId' => $folder->getId() ]));        
+    }
+
+    /**
+     * @param Repositories\Files $fileRepository
+     * @return Response
+     */
+    public function altTagsAction(
+        \Frootbox\Http\Get $get,
+        Repositories\Files $fileRepository,
+    ): Response
+    {
+        $itemsPerPage = 100;
+        $page = max(1, (int) $get->get('page'));
+
+        // Fetch files
+        $result = $fileRepository->fetch([
+            'calcFoundRows' => true,
+            'where' => [
+                'type' => 'image/jpeg',
+                'isPrivate' => 0,
+            ],
+            'order' => [
+                'id DESC',
+            ],
+            'limit' => $itemsPerPage,
+            'page' => $page,
+        ]);
+
+        $result->getTotal();
+
+        $pages = max(1, (int) $result->getPages());
+
+        if ($page > $pages) {
+            $page = $pages;
+
+            $result = $fileRepository->fetch([
+                'where' => [
+                    'type' => 'image/jpeg',
+                ],
+                'order' => [
+                    'id DESC',
+                ],
+                'limit' => $itemsPerPage,
+                'page' => $page,
+            ]);
+        }
+
+        $firstPage = max(1, $page - 2);
+        $lastPage = min($pages, $page + 2);
+
+        return self::getResponse('html', 200, [
+            'files' => $result,
+            'pagination' => [
+                'page' => $page,
+                'pages' => $pages,
+                'firstPage' => $firstPage,
+                'lastPage' => $lastPage,
+                'previousPage' => $page > 1 ? $page - 1 : null,
+                'nextPage' => $page < $pages ? $page + 1 : null,
+                'total' => $result->getTotal(),
+            ],
+        ]);
     }
 
     /**

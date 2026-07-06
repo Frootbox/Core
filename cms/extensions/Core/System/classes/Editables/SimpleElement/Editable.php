@@ -1,6 +1,10 @@
 <?php
 /**
+ * @author Jan Habbo Brüning <jan.habbo.bruening@gmail.com>
  *
+ * @noinspection PhpUnnecessaryLocalVariableInspection
+ * @noinspection SqlNoDataSourceInspection
+ * @noinspection PhpFullyQualifiedNameUsageInspection
  */
 
 namespace Frootbox\Ext\Core\System\Editables\SimpleElement;
@@ -8,7 +12,7 @@ namespace Frootbox\Ext\Core\System\Editables\SimpleElement;
 class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\System\Editables\EditableInterface
 {
     /**
-     *
+     * @return string
      */
     public function getPath(): string
     {
@@ -37,6 +41,10 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
             // d($text);
             if (empty($text)) {
                 return;
+            }
+
+            if (!empty($text->getConfig('elementId'))) {
+                $element->setAttribute('id', $text->getConfig('elementId'));
             }
 
             $element->setInnerHtml(nl2br($text->getText()));

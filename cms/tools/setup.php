@@ -1,6 +1,10 @@
 <?php
 /**
- * 
+ * @author Jan Habbo Brüning <jan.habbo.bruening@gmail.com>
+ *
+ * @noinspection PhpUnnecessaryLocalVariableInspection
+ * @noinspection SqlNoDataSourceInspection
+ * @noinspection PhpFullyQualifiedNameUsageInspection
  */
 
 declare(strict_types = 1);
@@ -384,7 +388,6 @@ try {
       PRIMARY KEY (`id`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
     EOT;
-
 
 
     foreach ($queries as $query) {

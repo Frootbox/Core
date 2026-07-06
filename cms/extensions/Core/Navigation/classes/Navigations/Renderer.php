@@ -86,6 +86,23 @@ class Renderer
     {
         $itemIsActive = $item->isActive($this->parameters);
 
+        if (!empty($this->parameters['enableCustomRowViews'])) {
+
+            $config = $this->container->get(\Frootbox\Config\Config::class);
+            $views = $config->get('Ext.Core.Navigation.ItemRowViews');
+
+            if (!empty($views) and !empty($views->getData()[get_class($item)])) {
+
+                if ($this->view === null) {
+                    $this->view = $this->container->get(\Frootbox\View\Engines\Interfaces\Engine::class);
+                }
+
+                return $this->view->render($views->getData()[get_class($item)], [
+                    'item' => $item,
+                ]);
+            }
+        }
+
         $html = (string) null;
 
         if (!empty($this->parameters['wrapItems'])) {

@@ -1,6 +1,10 @@
-<?php 
+<?php
 /**
- * 
+ * @author Jan Habbo Brüning <jan.habbo.bruening@gmail.com>
+ *
+ * @noinspection PhpUnnecessaryLocalVariableInspection
+ * @noinspection SqlNoDataSourceInspection
+ * @noinspection PhpFullyQualifiedNameUsageInspection
  */
 
 namespace Frootbox\Ext\Core\ContactForms\Apps\FormsManager;
@@ -189,6 +193,7 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
             'modSubject' => $post->get('modSubject'),
             'customSubject' => $post->get('customSubject'),
             'replyTo' => $post->get('replyTo'),
+            'senderName' => $post->get('senderName'),
             'textAboveMail' => $post->get('textAboveMail'),
             'textBelowMail' => $post->get('textBelowMail'),
             'feedback' => $post->get('feedback'),

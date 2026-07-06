@@ -1,6 +1,10 @@
-<?php 
+<?php
 /**
- * 
+ * @author Jan Habbo Brüning <jan.habbo.bruening@gmail.com>
+ *
+ * @noinspection PhpUnnecessaryLocalVariableInspection
+ * @noinspection SqlNoDataSourceInspection
+ * @noinspection PhpFullyQualifiedNameUsageInspection
  */
 
 namespace Frootbox\Persistence;
@@ -333,9 +337,12 @@ abstract class AbstractPlugin extends AbstractRow
         return $translator;
     }
 
-
     /**
-     *
+     * @param $action
+     * @param array|null $payload
+     * @param array|null $options
+     * @return string
+     * @throws \Frootbox\Exceptions\NotFound
      */
     public function getUri(
         $action = null,
@@ -363,7 +370,10 @@ abstract class AbstractPlugin extends AbstractRow
             ]
         ];
 
-        return $this->page->getUri($options) . '?' . http_build_query($data);
+        $uri = $this->page->getUri($options);
+        $uri .= '?' . http_build_query($data);
+
+        return trim($uri, '?');
     }
 
     /**

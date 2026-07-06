@@ -116,6 +116,11 @@
                                 <small id="replyToHelp" class="form-text text-muted">Falls angegeben kann der Kunde an diese Adresse antworten. Dies ist hilfreich, falls die Adresse, über die zentral gesendet wird nicht die Antworten erhalten soll.</small>
                             </div>
                             <div class="form-group">
+                                <label for="senderName">Absender</label>
+                                <input type="text" class="form-control" name="senderName" id="senderName" placeholder="Absender" value="{{ form.getConfig('senderName') }}" aria-describedby="senderNameHelp">
+                                <small id="senderNameHelp" class="form-text text-muted">Falls angegeben wird der Absender aus der zentralen Mail-Konfiguration überschrieben.</small>
+                            </div>
+                            <div class="form-group">
                                 <label for="customSubject">Betreff</label>
                                 <input type="text" class="form-control" name="customSubject" id="customSubject" placeholder="Betreff" value="{{ form.getConfig('customSubject') }}" aria-describedby="customSubjectHelp">
                                 <small id="customSubjectHelp" class="form-text text-muted">Der Betreff der E-Mail Benachrichtgung an den Kunden. Wenn leer gelassen ist der Betreff „Anfrage: [Seitentitel]“</small>

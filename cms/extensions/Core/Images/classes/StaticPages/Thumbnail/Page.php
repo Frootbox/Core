@@ -1,6 +1,10 @@
-<?php 
+<?php
 /**
- * 
+ * @author Jan Habbo Brüning <jan.habbo.bruening@gmail.com>
+ *
+ * @noinspection PhpUnnecessaryLocalVariableInspection
+ * @noinspection SqlNoDataSourceInspection
+ * @noinspection PhpFullyQualifiedNameUsageInspection
  */
 
 namespace Frootbox\Ext\Core\Images\StaticPages\Thumbnail;
@@ -79,8 +83,8 @@ class Page
 
         if (!$thumbnail->exists()) {
 
-            $width = $get->get('width');
-            $height = $get->get('height');
+            $width = $get->get('width') ?? 300;
+            $height = $get->get('height') ?? 300;
 
             $image = imagecreate($width, $height);
             imagecolorallocate($image, 255, 255, 255);

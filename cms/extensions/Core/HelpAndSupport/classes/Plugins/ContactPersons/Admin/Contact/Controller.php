@@ -1,6 +1,10 @@
 <?php
 /**
+ * @author Jan Habbo Brüning <jan.habbo.bruening@gmail.com>
  *
+ * @noinspection PhpUnnecessaryLocalVariableInspection
+ * @noinspection SqlNoDataSourceInspection
+ * @noinspection PhpFullyQualifiedNameUsageInspection
  */
 
 namespace Frootbox\Ext\Core\HelpAndSupport\Plugins\ContactPersons\Admin\Contact;
@@ -11,7 +15,7 @@ use Frootbox\Http\Get;
 class Controller extends \Frootbox\Admin\AbstractPluginController
 {
     /**
-     *
+     * @return string
      */
     public function getPath(): string
     {
@@ -19,7 +23,7 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     }
 
     /**
-     *
+     * @return Response
      */
     public function ajaxModalComposeAction(): Response
     {
@@ -201,6 +205,10 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
 
         $contact->setData($post->get('person'));
         $contact->setPhone2(trim($data['phone2']));
+
+        // Set tags
+        $contact->setTags($post->get('tags'));
+
         $contact->save();
 
         // Update connection

@@ -1,6 +1,10 @@
 <?php
 /**
+ * @author Jan Habbo Brüning <jan.habbo.bruening@gmail.com>
  *
+ * @noinspection PhpUnnecessaryLocalVariableInspection
+ * @noinspection SqlNoDataSourceInspection
+ * @noinspection PhpFullyQualifiedNameUsageInspection
  */
 
 namespace Frootbox\Ext\Core\HelpAndSupport\Plugins\ContactPersons;
@@ -21,7 +25,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
     protected $icon = 'fas fa-users';
 
     /**
-     *
+     * @return string
      */
     public function getPath(): string
     {
@@ -29,7 +33,12 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin implements \Frootbox\P
     }
 
     /**
-     *
+     * @param \DI\Container $container
+     * @param \Frootbox\Persistence\AbstractRow $ancestor
+     * @return void
+     * @throws \DI\DependencyException
+     * @throws \DI\NotFoundException
+     * @throws \Frootbox\Exceptions\RuntimeError
      */
     public function cloneContentFromAncestor(
         \DI\Container $container,

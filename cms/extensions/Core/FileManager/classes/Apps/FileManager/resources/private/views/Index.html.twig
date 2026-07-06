@@ -2,6 +2,15 @@
 
 {{ front.addTab('Dateiverwaltung', app.getUri('index')) }}
 
+{{ v.injectPartial('\\Frootbox\\Admin\\View\\Partials\\Navigation\\Buttons', { links: [
+	{
+		url: app.getUri('altTags'),
+		icon: 'fa-file-image',
+		title: 'ALT-Tags',
+		type: "dfdf",
+	},
+]}) | raw }}
+
 <div id="folderReceiver">
 	{{ v.injectPartial('\\Frootbox\\Ext\\Core\\FileManager\\Apps\\FileManager\\Partials\\Folder', { folderId: get.get('folderId') }) | raw }}
 </div>

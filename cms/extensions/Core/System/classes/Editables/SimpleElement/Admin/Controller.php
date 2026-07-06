@@ -1,6 +1,10 @@
 <?php
 /**
+ * @author Jan Habbo Brüning <jan.habbo.bruening@gmail.com>
  *
+ * @noinspection PhpUnnecessaryLocalVariableInspection
+ * @noinspection SqlNoDataSourceInspection
+ * @noinspection PhpFullyQualifiedNameUsageInspection
  */
 
 namespace Frootbox\Ext\Core\System\Editables\SimpleElement\Admin;
@@ -10,7 +14,7 @@ use Frootbox\Admin\Controller\Response;
 class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
 {
     /**
-     *
+     * @return string
      */
     public function getPath(): string
     {
@@ -32,7 +36,11 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
             'createOnMiss' => true
         ]);
 
+        // Update text
         $text->setText($post->get('value'));
+        $text->addConfig([
+            'elementId' => $post->get('elementId'),
+        ]);
         $text->save();
 
         if (preg_match('#^([a-z\-]{1,})\:([0-9]{1,})\:title$#i', $get->get('uid'), $match)) {

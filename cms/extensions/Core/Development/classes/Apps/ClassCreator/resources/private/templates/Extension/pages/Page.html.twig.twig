@@ -109,7 +109,7 @@ variables:
                             <a class="logo" href="{{ v.link('') }}"><img src="EXT:{% endverbatim %}{{ vendorId }}/{{ extensionId }}{% verbatim %}/images/logo.svg" alt="Logo" /></a>
                         </div>
                         <div class="col-8 menu-col">
-                            <a class="toggle-offcanvas" href="#">{{ icons.render('xmark') | raw }}</a>
+                            <button class="toggle-offcanvas">{{ icons.render('xmark') | raw }}</button>
                         </div>
                     </div>
                     <div class="row">
@@ -138,7 +138,7 @@ variables:
                         <a class="logo" href="{{ v.link('') }}"><img src="EXT:{% endverbatim %}{{ vendorId }}/{{ extensionId }}{% verbatim %}/images/logo.svg" alt="Logo" /></a>
                     </div>
                     <div class="col-8 col-md-9 menu-col">
-                        <a class="toggle-offcanvas" href="#">{{ icons.render('bars') | raw }}</a>
+                        <button class="toggle-offcanvas">{{ icons.render('bars') | raw }}</button>
                     </div>
                 </div>
             </div>

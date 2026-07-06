@@ -138,6 +138,10 @@
                     {% endif %}
                 </div>
 
+                {{ v.injectPartial('\\Frootbox\\Admin\\View\\Partials\\Input\\Tags', {
+                    object: contact
+                }) | raw }}
+
                 <h4>Social-Media</h4>
 
                 <div class="form-group">

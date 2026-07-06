@@ -1,6 +1,10 @@
-<?php 
+<?php
 /**
- * 
+ * @author Jan Habbo Brüning <jan.habbo.bruening@gmail.com>
+ *
+ * @noinspection PhpUnnecessaryLocalVariableInspection
+ * @noinspection SqlNoDataSourceInspection
+ * @noinspection PhpFullyQualifiedNameUsageInspection
  */
 
 namespace Frootbox\Ext\Core\ContactForms\StaticPages\Form;
@@ -129,6 +133,10 @@ class Page extends \Frootbox\AbstractStaticPage
 
         // Fetch form
         $form = $formsRepository->fetchById($get->get('formId'));
+
+        if (!empty($form->getConfig('senderName')) && !empty($config->get('mail.defaults.from.address'))) {
+            $mailTransport->setFrom($config->get('mail.defaults.from.address'), $form->getConfig('senderName'));
+        }
 
         if (!empty($config->get('recaptcha.v3.key'))) {
 

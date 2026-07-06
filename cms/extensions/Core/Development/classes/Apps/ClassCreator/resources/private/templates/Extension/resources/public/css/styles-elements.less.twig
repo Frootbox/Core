@@ -65,6 +65,7 @@ html body {
     font-size: $HeadlineH2Size;
     line-height: $HeadlineH2LineHeight;
     font-weight: $HeadlineH2FontWeight;
+    font-family: var(--headline-h2-family);
 
     @media (min-width: 768px) {
       font-size: $HeadlineH2SizeLg;
@@ -178,12 +179,17 @@ html body {
   }
 
   .btn {
-
     border-radius: $ButtonPrimaryBorderRadius;
 
     &.btn-primary {
-      background: $colorSpot1;
-      border-color: $colorSpot1;
+      background: var(--color-spot1);
+      border-color: var(--color-spot1);
+    }
+
+    &.btn-outline-primary {
+      color: var(--color-spot1);
+      border-color: var(--color-spot1);
+      background: transparent;
     }
   }
 

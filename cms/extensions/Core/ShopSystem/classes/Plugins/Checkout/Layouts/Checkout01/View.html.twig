@@ -96,7 +96,7 @@ variables:
 
                                 <div class="form-group">
                                     <label for="lastUsedAddressBilling">aus vorhandenen Adressen auswählen</label>
-                                    <select tabindex="1" data-target="personal" class="form-control addressesSelector" id="lastUsedAddressBilling" name="lastUsedAddressBilling">
+                                    <select tabindex="1" data-target="personal" class="form-control addressesSelector" id="lastUsedAddressBilling" name="lastUsedAddressBilling" autocomplete="off">
                                         <option value="">bitte wählen ...</option>
                                         {% for address in addresses %}
                                             <option {% if shopcart.getPersonal('gender') == 'Female' %}selected{% endif %} data-index="{{ loop.index0 }}" value="{{ address.getId }}">{{ address.getTitle | default('kein Titel') }}</option>
@@ -110,7 +110,7 @@ variables:
                                 {% if not plugin.getShopConfig('fields.SkipGender') %}
                                     <div class="form-group col-6">
                                         <label for="gender">{{ "Core.ShopSystem.LabelSalutation" | translate }} *</label>
-                                        <select tabindex="2" required class="form-control" id="gender" name="personal[gender]">
+                                        <select tabindex="2" required class="form-control" id="gender" name="personal[gender]" autocomplete="section-personal sex">
                                             <option value="">{{ "Core.ShopSystem.OptionPleaseChoose" | translate }}</option>
                                             <option {% if shopcart.getPersonal('gender') == 'Female' %}selected{% endif %} value="Female">{{ "Core.ShopSystem.OptionFemale" | translate }}</option>
                                             <option {% if shopcart.getPersonal('gender') == 'Male' %}selected{% endif %} value="Male">{{ "Core.ShopSystem.OptionMale" | translate }}</option>
@@ -122,7 +122,7 @@ variables:
                                 {% if not plugin.getShopConfig('fields.SkipTitle') %}
                                     <div class="form-group col-6">
                                         <label for="title">{{ "Core.ShopSystem.LabelTitle" | translate }}</label>
-                                        <input tabindex="3" type="text" class="form-control" id="title" name="personal[title]" placeholder="{{ "Core.ShopSystem.LabelTitle" | translate }}" value="{{ shopcart.getPersonal('title') }}">
+                                        <input tabindex="3" type="text" class="form-control" id="title" name="personal[title]" autocomplete="section-personal honorific-prefix" placeholder="{{ "Core.ShopSystem.LabelTitle" | translate }}" value="{{ shopcart.getPersonal('title') }}">
                                     </div>
                                 {% endif %}
 
@@ -130,54 +130,54 @@ variables:
                             <div class="form-row">
                                 <div class="form-group col-6 col-md-6">
                                     <label for="firstname">{{ "Core.ShopSystem.LabelFirstName" | translate }} *</label>
-                                    <input tabindex="4" required type="text" class="form-control" id="firstname" name="personal[firstname]" placeholder="{{ "Core.ShopSystem.LabelFirstName" | translate }}" value="{{ shopcart.getPersonal('firstname') }}">
+                                    <input tabindex="4" required type="text" class="form-control" id="firstname" name="personal[firstname]" autocomplete="section-personal given-name" placeholder="{{ "Core.ShopSystem.LabelFirstName" | translate }}" value="{{ shopcart.getPersonal('firstname') }}">
                                 </div>
                                 <div class="form-group col-6 col-md-6">
                                     <label for="lastname">{{ "Core.ShopSystem.LabelLastName" | translate }} *</label>
-                                    <input tabindex="5" required type="text" class="form-control" id="lastname" name="personal[lastname]" placeholder="{{ "Core.ShopSystem.LabelLastName" | translate }}" value="{{ shopcart.getPersonal('lastname') }}">
+                                    <input tabindex="5" required type="text" class="form-control" id="lastname" name="personal[lastname]" autocomplete="section-personal family-name" placeholder="{{ "Core.ShopSystem.LabelLastName" | translate }}" value="{{ shopcart.getPersonal('lastname') }}">
                                 </div>
                             </div>
 
                             {% if plugin.getShopConfig('fields.Company') %}
                                 <div class="form-group">
                                     <label for="company">Firmenname{% if plugin.getShopConfig('fieldsMandatory.Company') %} *{% endif %}</label>
-                                    <input tabindex="6" type="text" class="form-control" id="company" name="personal[company]" placeholder="Firmenname" value="{{ shopcart.getPersonal('company') }}" {% if plugin.getShopConfig('fieldsMandatory.Company') %}required{% endif %}>
+                                    <input tabindex="6" type="text" class="form-control" id="company" name="personal[company]" autocomplete="section-personal organization" placeholder="Firmenname" value="{{ shopcart.getPersonal('company') }}" {% if plugin.getShopConfig('fieldsMandatory.Company') %}required{% endif %}>
                                 </div>
                             {% endif %}
 
                             {% if plugin.getShopConfig('fields.VAT') %}
                                 <div class="form-group">
                                     <label for="vat">{{ t.translate('Field.VAT') }}{% if plugin.getShopConfig('fieldsMandatory.VAT') %} *{% endif %}</label>
-                                    <input tabindex="7" type="text" class="form-control" id="company" name="personal[vat]" placeholder="Ust. IdNr." value="{{ shopcart.getPersonal('vat') }}" {% if plugin.getShopConfig('fieldsMandatory.VAT') %}required{% endif %}>
+                                    <input tabindex="7" type="text" class="form-control" id="vat" name="personal[vat]" autocomplete="section-personal organization" placeholder="Ust. IdNr." value="{{ shopcart.getPersonal('vat') }}" {% if plugin.getShopConfig('fieldsMandatory.VAT') %}required{% endif %}>
                                 </div>
                             {% endif %}
 
                             <div class="form-row">
                                 <div class="form-group col-8">
                                     <label for="street">{{ "Core.ShopSystem.LabelStreet" | translate }} *</label>
-                                    <input tabindex="9" required type="text" class="form-control" id="street" name="personal[street]" autocomplete="home street-address" placeholder="{{ "Core.ShopSystem.LabelStreet" | translate }}" value="{{ shopcart.getPersonal('street') }}">
+                                    <input tabindex="9" required type="text" class="form-control" id="street" name="personal[street]" autocomplete="section-personal address-line1" placeholder="{{ "Core.ShopSystem.LabelStreet" | translate }}" value="{{ shopcart.getPersonal('street') }}">
                                 </div>
                                 <div class="form-group col-4">
                                     <label for="streetNumber">{{ "Core.ShopSystem.LabelStreetNumber" | translate }} *</label>
-                                    <input tabindex="10" required type="text" class="form-control" id="streetNumber" name="personal[streetNumber]" placeholder="{{ "Core.ShopSystem.LabelStreetNumber" | translate }}" value="{{ shopcart.getPersonal('streetNumber') }}">
+                                    <input tabindex="10" required type="text" class="form-control" id="streetNumber" name="personal[streetNumber]" autocomplete="section-personal address-line2" placeholder="{{ "Core.ShopSystem.LabelStreetNumber" | translate }}" value="{{ shopcart.getPersonal('streetNumber') }}">
                                 </div>
                             </div>
 
                             {% if not plugin.getShopConfig('fields.SkipAddressSupplement') %}
                                 <div class="form-group">
                                     <label for="addition">{{ "Core.ShopSystem.LabelAddressSupplement" | translate }}</label>
-                                    <input tabindex="8" type="text" class="form-control" id="addition" name="personal[addition]" placeholder="{{ "Core.ShopSystem.LabelAddressSupplement" | translate }}" value="{{ shopcart.getPersonal('addition') }}">
+                                    <input tabindex="8" type="text" class="form-control" id="addition" name="personal[addition]" autocomplete="section-personal address-line3" placeholder="{{ "Core.ShopSystem.LabelAddressSupplement" | translate }}" value="{{ shopcart.getPersonal('addition') }}">
                                 </div>
                             {% endif %}
 
                             <div class="form-row">
                                 <div class="form-group col-4">
                                     <label for="postalCode">{{ "Core.ShopSystem.LabelZipcode" | translate }} *</label>
-                                    <input tabindex="11" required type="text" class="form-control" id="postalCode" name="personal[postalCode]" autocomplete="home postal-code" placeholder="{{ "Core.ShopSystem.LabelZipcode" | translate }}" value="{{ shopcart.getPersonal('postalCode') }}">
+                                    <input tabindex="11" required type="text" class="form-control" id="postalCode" name="personal[postalCode]" autocomplete="section-personal postal-code" placeholder="{{ "Core.ShopSystem.LabelZipcode" | translate }}" value="{{ shopcart.getPersonal('postalCode') }}">
                                 </div>
                                 <div class="form-group col-8">
                                     <label for="city">{{ "Core.ShopSystem.LabelCity" | translate }} *</label>
-                                    <input tabindex="12" required type="text" class="form-control" id="city" name="personal[city]" autocomplete="home locality" placeholder="{{ "Core.ShopSystem.LabelCity" | translate }}" value="{{ shopcart.getPersonal('city') }}">
+                                    <input tabindex="12" required type="text" class="form-control" id="city" name="personal[city]" autocomplete="section-personal address-level2" placeholder="{{ "Core.ShopSystem.LabelCity" | translate }}" value="{{ shopcart.getPersonal('city') }}">
                                 </div>
                             </div>
 
@@ -185,7 +185,7 @@ variables:
                             {# {{ config.get('Ext.Core.ShopSystem.CountryDefault') }} #}
                                     <div class="form-group">
                                         <label for="country">{{ "Core.ShopSystem.LabelCountry" | translate }} *</label>
-                                        <select tabindex="13" required class="form-control" id="country" name="personal[country]">
+                                        <select tabindex="13" required class="form-control" id="country" name="personal[country]" autocomplete="section-personal country">
                                             <option value="">{{ "Core.ShopSystem.OptionPleaseChoose" | translate }}</option>
                                             {% for isocode in i.getCountries() %}
                                                 <option {% if shopcart.getPersonal('country') == isocode or (not shopcart.getPersonal('country') and config.get('Ext.Core.ShopSystem.CountryDefault') == isocode) %}selected{% endif %} value="{{ isocode }}">{{ t.translate('Country.' ~ isocode) }}</option>
@@ -196,14 +196,14 @@ variables:
 
                             <div class="form-group">
                                 <label for="email">{{ "Core.ShopSystem.LabelEmail" | translate }} *</label>
-                                <input tabindex="14" required type="email" class="form-control" id="email" name="personal[email]" placeholder="E-Mail" value="{{ shopcart.getPersonal('email') | default(user.getEmail()) }}">
+                                <input tabindex="14" required type="email" class="form-control" id="email" name="personal[email]" autocomplete="section-personal email" placeholder="E-Mail" value="{{ shopcart.getPersonal('email') | default(user.getEmail()) }}">
                             </div>
                             <div class="form-group">
                                 <label for="phone">{{ "Core.ShopSystem.LabelPhone" | translate }} {% if plugin.getShopConfig('fieldsMandatory.Phone') %}*{% endif %}</label>
-                                <input tabindex="15" type="tel" class="form-control" id="phone" name="personal[phone]" placeholder="{{ "Core.ShopSystem.LabelPhone" | translate }}" value="{{ shopcart.getPersonal('phone') }}" {% if plugin.getShopConfig('fieldsMandatory.Phone') %}required{% endif %}>
+                                <input tabindex="15" type="tel" class="form-control" id="phone" name="personal[phone]" autocomplete="section-personal tel" placeholder="{{ "Core.ShopSystem.LabelPhone" | translate }}" value="{{ shopcart.getPersonal('phone') }}" {% if plugin.getShopConfig('fieldsMandatory.Phone') %}required{% endif %}>
                             </div>
                             <div class="form-group form-check">
-                                <input tabindex="16" type="checkbox" {% if shopcart.getBilling('differentBillingRecipient') %}checked{% endif %} class="form-check-input" id="differentBillingRecipient" name="billing[differentBillingRecipient]">
+                                <input tabindex="16" type="checkbox" {% if shopcart.getBilling('differentBillingRecipient') %}checked{% endif %} class="form-check-input" id="differentBillingRecipient" name="billing[differentBillingRecipient]" autocomplete="off">
                                 <label class="form-check-label" for="differentBillingRecipient">{{ "Core.ShopSystem.Plugins.Checkout.DifferenBillingAddress" | translate }}</label>
                             </div>
 
@@ -219,7 +219,7 @@ variables:
                                     {% if not plugin.getShopConfig('fields.SkipGender') %}
                                         <div class="form-group col-6">
                                             <label for="billing_gender">{{ "Core.ShopSystem.LabelSalutation" | translate }} *</label>
-                                            <select tabindex="201" required class="form-control" id="billing_gender" name="billing[gender]">
+                                            <select tabindex="201" required class="form-control" id="billing_gender" name="billing[gender]" autocomplete="section-billing billing sex">
                                                 <option value="">{{ "Core.ShopSystem.OptionPleaseChoose" | translate }}</option>
                                                 <option {% if shopcart.getBilling('gender') == 'Female' %}selected{% endif %} value="Female">{{ "Core.ShopSystem.OptionFemale" | translate }}</option>
                                                 <option {% if shopcart.getBilling('gender') == 'Male' %}selected{% endif %} value="Male">{{ "Core.ShopSystem.OptionMale" | translate }}</option>
@@ -230,63 +230,63 @@ variables:
 
                                     <div class="form-group col-6">
                                         <label for="billing_title">{{ "Core.ShopSystem.LabelTitle" | translate }}</label>
-                                        <input type="text" class="form-control" id="billing_title" name="billing[title]" placeholder="{{ "Core.ShopSystem.LabelTitle" | translate }}" value="{{ shopcart.getBilling('title') }}">
+                                        <input type="text" class="form-control" id="billing_title" name="billing[title]" autocomplete="section-billing billing honorific-prefix" placeholder="{{ "Core.ShopSystem.LabelTitle" | translate }}" value="{{ shopcart.getBilling('title') }}">
                                     </div>
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group col-6 col-md-6">
                                         <label for="billing_firstname">{{ "Core.ShopSystem.LabelFirstName" | translate }} *</label>
-                                        <input required type="text" class="form-control" id="billing_firstname" name="billing[firstname]" placeholder="{{ "Core.ShopSystem.LabelFirstName" | translate }}" value="{{ shopcart.getBilling('firstname') }}">
+                                        <input required type="text" class="form-control" id="billing_firstname" name="billing[firstname]" autocomplete="section-billing billing given-name" placeholder="{{ "Core.ShopSystem.LabelFirstName" | translate }}" value="{{ shopcart.getBilling('firstname') }}">
                                     </div>
                                     <div class="form-group col-6 col-md-6">
                                         <label for="billing_lastname">{{ "Core.ShopSystem.LabelLastName" | translate }} *</label>
-                                        <input required type="text" class="form-control" id="billing_lastname" name="billing[lastname]" placeholder="{{ "Core.ShopSystem.LabelLastName" | translate }}" value="{{ shopcart.getBilling('lastname') }}">
+                                        <input required type="text" class="form-control" id="billing_lastname" name="billing[lastname]" autocomplete="section-billing billing family-name" placeholder="{{ "Core.ShopSystem.LabelLastName" | translate }}" value="{{ shopcart.getBilling('lastname') }}">
                                     </div>
                                 </div>
 
                                 {% if plugin.getShopConfig('fields.Company') %}
                                     <div class="form-group">
                                         <label for="billing_company">Firmenname{% if plugin.getShopConfig('fieldsMandatory.Company') %} *{% endif %}</label>
-                                        <input type="text" class="form-control" id="billing_company" name="billing[company]" placeholder="Firmenname" value="{{ shopcart.getBilling('company') }}" {% if plugin.getShopConfig('fieldsMandatory.Company') %}required{% endif %}>
+                                        <input type="text" class="form-control" id="billing_company" name="billing[company]" autocomplete="section-billing billing organization" placeholder="Firmenname" value="{{ shopcart.getBilling('company') }}" {% if plugin.getShopConfig('fieldsMandatory.Company') %}required{% endif %}>
                                     </div>
                                 {% endif %}
 
                                 {% if plugin.getShopConfig('fields.VAT') %}
                                     <div class="form-group">
                                         <label for="billing_vat">{{ t.translate('Field.VAT') }}{% if plugin.getShopConfig('fieldsMandatory.VAT') %} *{% endif %}</label>
-                                        <input type="text" class="form-control" id="billing_vat" name="billing[vat]" placeholder="Ust. IdNr." value="{{ shopcart.getBilling('vat') }}" {% if plugin.getShopConfig('fieldsMandatory.VAT') %}required{% endif %}>
+                                        <input type="text" class="form-control" id="billing_vat" name="billing[vat]" autocomplete="section-billing billing organization" placeholder="Ust. IdNr." value="{{ shopcart.getBilling('vat') }}" {% if plugin.getShopConfig('fieldsMandatory.VAT') %}required{% endif %}>
                                     </div>
                                 {% endif %}
 
                                 <div class="form-group">
                                     <label for="billing_addition">{{ "Core.ShopSystem.LabelAddressSupplement" | translate }}</label>
-                                    <input type="text" class="form-control" id="billing_addition" name="billing[addition]" placeholder="{{ "Core.ShopSystem.LabelAddressSupplement" | translate }}" value="{{ shopcart.getBilling('addition') }}">
+                                    <input type="text" class="form-control" id="billing_addition" name="billing[addition]" autocomplete="section-billing billing address-line3" placeholder="{{ "Core.ShopSystem.LabelAddressSupplement" | translate }}" value="{{ shopcart.getBilling('addition') }}">
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group col-8">
                                         <label for="billing_street">{{ "Core.ShopSystem.LabelStreet" | translate }} *</label>
-                                        <input required type="text" class="form-control" id="billing_street" name="billing[street]" placeholder="{{ "Core.ShopSystem.LabelStreet" | translate }}" value="{{ shopcart.getBilling('street') }}">
+                                        <input required type="text" class="form-control" id="billing_street" name="billing[street]" autocomplete="section-billing billing address-line1" placeholder="{{ "Core.ShopSystem.LabelStreet" | translate }}" value="{{ shopcart.getBilling('street') }}">
                                     </div>
                                     <div class="form-group col-4">
                                         <label for="billing_streetNumber">{{ "Core.ShopSystem.LabelStreetNumber" | translate }}</label>
-                                        <input required type="text" class="form-control" id="billing_streetNumber" name="billing[streetNumber]" placeholder="{{ "Core.ShopSystem.LabelStreetNumber" | translate }}" value="{{ shopcart.getBilling('streetNumber') }}">
+                                        <input required type="text" class="form-control" id="billing_streetNumber" name="billing[streetNumber]" autocomplete="section-billing billing address-line2" placeholder="{{ "Core.ShopSystem.LabelStreetNumber" | translate }}" value="{{ shopcart.getBilling('streetNumber') }}">
                                     </div>
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group col-4">
                                         <label for="billing_postalCode">{{ "Core.ShopSystem.LabelZipcode" | translate }} *</label>
-                                        <input required type="text" class="form-control" id="billing_postalCode" name="billing[postalCode]" placeholder="{{ "Core.ShopSystem.LabelZipcode" | translate }}" value="{{ shopcart.getBilling('postalCode') }}">
+                                        <input required type="text" class="form-control" id="billing_postalCode" name="billing[postalCode]" autocomplete="section-billing billing postal-code" placeholder="{{ "Core.ShopSystem.LabelZipcode" | translate }}" value="{{ shopcart.getBilling('postalCode') }}">
                                     </div>
                                     <div class="form-group col-8">
                                         <label for="billing_city">{{ "Core.ShopSystem.LabelCity" | translate }} *</label>
-                                        <input required type="text" class="form-control" id="billing_city" name="billing[city]" placeholder="{{ "Core.ShopSystem.LabelCity" | translate }}" value="{{ shopcart.getBilling('city') }}">
+                                        <input required type="text" class="form-control" id="billing_city" name="billing[city]" autocomplete="section-billing billing address-level2" placeholder="{{ "Core.ShopSystem.LabelCity" | translate }}" value="{{ shopcart.getBilling('city') }}">
                                     </div>
                                 </div>
 
                                 {% if i.getCountries() %}
                                     <div class="form-group">
                                         <label for="billing_country">{{ "Core.ShopSystem.LabelCountry" | translate }} *</label>
-                                        <select required class="form-control" id="billing_country" name="billing[country]">
+                                        <select required class="form-control" id="billing_country" name="billing[country]" autocomplete="section-billing billing country">
                                             <option value="">{{ "Core.ShopSystem.OptionPleaseChoose" | translate }}</option>
                                             {% for isocode in i.getCountries() %}
                                                 <option {% if shopcart.getBilling('country') == isocode %}selected{% endif %} value="{{ isocode }}">{{ t.translate('Country.' ~ isocode) }}</option>
@@ -297,11 +297,11 @@ variables:
 
                                 <div class="form-group">
                                     <label for="billing_email">{{ "Core.ShopSystem.LabelEmail" | translate }} *</label>
-                                    <input required type="email" class="form-control" id="billing_email" name="billing[email]" placeholder="{{ "Core.ShopSystem.LabelEmail" | translate }}" value="{{ shopcart.getBilling('email') | default(user.getEmail()) }}">
+                                    <input required type="email" class="form-control" id="billing_email" name="billing[email]" autocomplete="section-billing billing email" placeholder="{{ "Core.ShopSystem.LabelEmail" | translate }}" value="{{ shopcart.getBilling('email') | default(user.getEmail()) }}">
                                 </div>
                                 <div class="form-group">
                                     <label for="billing_phone">{{ "Core.ShopSystem.LabelPhone" | translate }}</label>
-                                    <input type="text" class="form-control" id="billing_phone" name="billing[phone]" placeholder="{{ "Core.ShopSystem.LabelPhone" | translate }}" value="{{ shopcart.getBilling('phone') }}">
+                                    <input type="tel" class="form-control" id="billing_phone" name="billing[phone]" autocomplete="section-billing billing tel" placeholder="{{ "Core.ShopSystem.LabelPhone" | translate }}" value="{{ shopcart.getBilling('phone') }}">
                                 </div>
 
                             </div>
@@ -324,17 +324,17 @@ variables:
                                 </script>
 
                                 <div class="form-check">
-                                    <input {% if shopcart.getShipping('type') == "shipToBillingAddress" %}checked{% endif %} class="form-check-input" type="radio" name="shipping[type]" id="shipToBillingAddress" value="shipToBillingAddress" checked>
+                                    <input {% if shopcart.getShipping('type') == "shipToBillingAddress" %}checked{% endif %} class="form-check-input" type="radio" name="shipping[type]" id="shipToBillingAddress" value="shipToBillingAddress" checked autocomplete="off">
                                     <label class="form-check-label" for="shipToBillingAddress">{{ "Core.ShopSystem.OptionDeliveryToBillingAddress" | translate }}</label>
                                 </div>
                                 <div class="form-check">
-                                    <input {% if shopcart.getShipping('type') == "shipToAddress" %}checked{% endif %} class="form-check-input" type="radio" name="shipping[type]" id="shipToAddress" value="shipToAddress">
+                                    <input {% if shopcart.getShipping('type') == "shipToAddress" %}checked{% endif %} class="form-check-input" type="radio" name="shipping[type]" id="shipToAddress" value="shipToAddress" autocomplete="off">
                                     <label class="form-check-label" for="shipToAddress">{{ "Core.ShopSystem.OptionDeliveryToAnotherAddress" | translate }}</label>
                                 </div>
 
                                 {% if not plugin.getShopConfig('skipSelfpickup') %}
                                     <div class="form-check">
-                                        <input {% if shopcart.getShipping('type') == "selfPickup" %}checked{% endif %} class="form-check-input" type="radio" name="shipping[type]" id="selfPickup" value="selfPickup">
+                                        <input {% if shopcart.getShipping('type') == "selfPickup" %}checked{% endif %} class="form-check-input" type="radio" name="shipping[type]" id="selfPickup" value="selfPickup" autocomplete="off">
                                         <label class="form-check-label" for="selfPickup">{{ "Core.ShopSystem.OptionSelfPickup" | translate }}</label>
                                     </div>
                                 {% endif %}
@@ -346,7 +346,7 @@ variables:
                                     {% if addresses | length %}
                                         <div class="form-group">
                                             <label for="lastUsedAddressShipping">aus vorhandenen Adressen auswählen</label>
-                                            <select data-target="shipping" class="form-control addressesSelector" id="lastUsedAddressShipping" name="lastUsedAddressShipping">
+                                            <select data-target="shipping" class="form-control addressesSelector" id="lastUsedAddressShipping" name="lastUsedAddressShipping" autocomplete="off">
                                                 <option value="">bitte wählen ...</option>
                                                 {% for address in addresses %}
                                                     <option {% if shopcart.getPersonal('gender') == 'Female' %}selected{% endif %} data-index="{{ loop.index0 }}" value="{{ address.getId }}">{{ address.getTitle | default('kein Titel') }}</option>
@@ -358,42 +358,42 @@ variables:
                                     <div class="form-row">
                                         <div class="form-group col-md-6">
                                             <label for="shipping_firstname">{{ "Core.ShopSystem.LabelFirstName" | translate }} *</label>
-                                            <input required type="text" class="form-control" id="shipping_firstname" name="shipping[firstname]" placeholder="{{ "Core.ShopSystem.LabelFirstName" | translate }}" value="{{ shopcart.getShipping('firstname') }}">
+                                            <input required type="text" class="form-control" id="shipping_firstname" name="shipping[firstname]" autocomplete="section-shipping shipping given-name" placeholder="{{ "Core.ShopSystem.LabelFirstName" | translate }}" value="{{ shopcart.getShipping('firstname') }}">
                                         </div>
                                         <div class="form-group col-md-6">
                                             <label for="shipping_lastname">{{ "Core.ShopSystem.LabelLastName" | translate }} *</label>
-                                            <input required type="text" class="form-control" id="shipping_lastname" name="shipping[lastname]" placeholder="{{ "Core.ShopSystem.LabelLastName" | translate }}" value="{{ shopcart.getShipping('lastname') }}">
+                                            <input required type="text" class="form-control" id="shipping_lastname" name="shipping[lastname]" autocomplete="section-shipping shipping family-name" placeholder="{{ "Core.ShopSystem.LabelLastName" | translate }}" value="{{ shopcart.getShipping('lastname') }}">
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label for="shipping_addition">{{ "Core.ShopSystem.LabelAddressSupplement" | translate }}</label>
-                                        <input type="text" class="form-control" id="shipping_addition" name="shipping[addition]" placeholder="{{ "Core.ShopSystem.LabelAddressSupplement" | translate }}" value="{{ shopcart.getShipping('addition') }}">
+                                        <input type="text" class="form-control" id="shipping_addition" name="shipping[addition]" autocomplete="section-shipping shipping address-line3" placeholder="{{ "Core.ShopSystem.LabelAddressSupplement" | translate }}" value="{{ shopcart.getShipping('addition') }}">
                                     </div>
                                     <div class="form-row">
                                         <div class="form-group col-md-8">
                                             <label for="shipping_street">{{ "Core.ShopSystem.LabelStreet" | translate }} *</label>
-                                            <input required type="text" class="form-control" id="shipping_street" name="shipping[street]" placeholder="{{ "Core.ShopSystem.LabelStreet" | translate }}" value="{{ shopcart.getShipping('street') }}">
+                                            <input required type="text" class="form-control" id="shipping_street" name="shipping[street]" autocomplete="section-shipping shipping address-line1" placeholder="{{ "Core.ShopSystem.LabelStreet" | translate }}" value="{{ shopcart.getShipping('street') }}">
                                         </div>
                                         <div class="form-group col-md-4">
                                             <label for="shipping_streetNumber">{{ "Core.ShopSystem.LabelStreetNumber" | translate }} *</label>
-                                            <input required type="text" class="form-control" id="shipping_streetNumber" name="shipping[streetNumber]" placeholder="{{ "Core.ShopSystem.LabelStreetNumber" | translate }}" value="{{ shopcart.getShipping('streetNumber') }}">
+                                            <input required type="text" class="form-control" id="shipping_streetNumber" name="shipping[streetNumber]" autocomplete="section-shipping shipping address-line2" placeholder="{{ "Core.ShopSystem.LabelStreetNumber" | translate }}" value="{{ shopcart.getShipping('streetNumber') }}">
                                         </div>
                                     </div>
                                     <div class="form-row">
                                         <div class="form-group col-md-4">
                                             <label for="shipping_postalCode">{{ "Core.ShopSystem.LabelZipcode" | translate }} *</label>
-                                            <input required type="text" class="form-control" id="shipping_postalCode" name="shipping[postalCode]" placeholder="{{ "Core.ShopSystem.LabelZipcode" | translate }}" value="{{ shopcart.getShipping('postalCode') }}">
+                                            <input required type="text" class="form-control" id="shipping_postalCode" name="shipping[postalCode]" autocomplete="section-shipping shipping postal-code" placeholder="{{ "Core.ShopSystem.LabelZipcode" | translate }}" value="{{ shopcart.getShipping('postalCode') }}">
                                         </div>
                                         <div class="form-group col-md-8">
                                             <label for="shipping_city">{{ "Core.ShopSystem.LabelCity" | translate }} *</label>
-                                            <input required type="text" class="form-control" id="shipping_city" name="shipping[city]" placeholder="{{ "Core.ShopSystem.LabelCity" | translate }}" value="{{ shopcart.getShipping('city') }}">
+                                            <input required type="text" class="form-control" id="shipping_city" name="shipping[city]" autocomplete="section-shipping shipping address-level2" placeholder="{{ "Core.ShopSystem.LabelCity" | translate }}" value="{{ shopcart.getShipping('city') }}">
                                         </div>
                                     </div>
 
                                     {% if config.get('shop.shipping.countries') %}
                                         <div class="form-group">
                                             <label for="shipping_country">{{ "Core.ShopSystem.LabelCountry" | translate }} *</label>
-                                            <select required class="form-control" id="shipping_country" name="shipping[country]">
+                                            <select required class="form-control" id="shipping_country" name="shipping[country]" autocomplete="section-shipping shipping country">
                                                 <option value="">{{ "Core.ShopSystem.OptionPleaseChoose" | translate }}</option>
                                                 {% for isocode in config.get('shop.shipping.countries') %}
                                                     <option {% if shopcart.getShipping('country') == isocode %}selected{% endif %} value="{{ isocode }}">{{ t.translate('Country.' ~ isocode) }}</option>
@@ -427,7 +427,7 @@ variables:
                                     {% if pickupLocations | length > 0 %}
                                         <div class="form-group">
                                             <label for="shippingSelfpickupLocationId">Abholadresse *</label>
-                                            <select required class="form-control" id="shippingSelfpickupLocationId" name="shipping[selfpickupAddressId]">
+                                            <select required class="form-control" id="shippingSelfpickupLocationId" name="shipping[selfpickupAddressId]" autocomplete="off">
                                                 <option value="">bitte wählen ...</option>
                                                 {% for pickupLocation in pickupLocations %}
                                                     <option {% if shopcart.getShipping('selfpickupAddressId') == pickupLocation.getId() %}selected{% endif %} value="{{ pickupLocation.getId() }}">{{ pickupLocation.getTitle() }}</option>
@@ -445,7 +445,7 @@ variables:
                             {% if plugin.getShopConfig('fields.EarlyNote') %}
                                 <div class="form-group">
                                     <label for="note">{{ "Core.ShopSystem.LabelRemark" | translate }}</label>
-                                    <textarea class="form-control" id="note" name="personal[note]" rows="3">{{ shopcart.getPersonal('note') }}</textarea>
+                                    <textarea class="form-control" id="note" name="personal[note]" rows="3" autocomplete="off">{{ shopcart.getPersonal('note') }}</textarea>
                                 </div>
                             {% endif %}
 
@@ -512,7 +512,7 @@ variables:
                                     <div class="form-group">
                                         <label for="couponCode">Coupon einlösen</label>
                                         <div class="input-group mb-2">
-                                            <input type="text" class="form-control" name="couponCode" id="couponCode" placeholder="Coupon-Code">
+                                            <input type="text" class="form-control" name="couponCode" id="couponCode" autocomplete="off" placeholder="Coupon-Code">
                                             <div class="input-group-append">
                                                 <div class="input-group-text">
                                                     <a class="submit-coupon" href="{{ i.getUriAjax({ action: 'redeemCoupon' }) }}"><i class="fal fa-check"></i></a>

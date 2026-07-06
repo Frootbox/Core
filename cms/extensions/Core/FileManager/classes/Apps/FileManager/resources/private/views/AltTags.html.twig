@@ -1,0 +1,75 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<h2>Bilder {{ files.getTotal() }}</h2>
+
+{% if pagination.pages > 1 %}
+    <nav aria-label="Bilder Seiten">
+        <ul class="pagination">
+            <li class="page-item {% if pagination.previousPage is empty %}disabled{% endif %}">
+                <a class="page-link" href="{% if pagination.previousPage is empty %}#{% else %}{{ app.getUri('altTags', { page: pagination.previousPage }) }}{% endif %}" tabindex="-1">Zurück</a>
+            </li>
+
+            {% if pagination.firstPage > 1 %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ app.getUri('altTags', { page: 1 }) }}">1</a>
+                </li>
+
+                {% if pagination.firstPage > 2 %}
+                    <li class="page-item disabled">
+                        <span class="page-link">...</span>
+                    </li>
+                {% endif %}
+            {% endif %}
+
+            {% for page in pagination.firstPage..pagination.lastPage %}
+                <li class="page-item {% if page == pagination.page %}active{% endif %}">
+                    <a class="page-link" href="{{ app.getUri('altTags', { page: page }) }}">{{ page }}</a>
+                </li>
+            {% endfor %}
+
+            {% if pagination.lastPage < pagination.pages %}
+                {% if pagination.lastPage < pagination.pages - 1 %}
+                    <li class="page-item disabled">
+                        <span class="page-link">...</span>
+                    </li>
+                {% endif %}
+
+                <li class="page-item">
+                    <a class="page-link" href="{{ app.getUri('altTags', { page: pagination.pages }) }}">{{ pagination.pages }}</a>
+                </li>
+            {% endif %}
+
+            <li class="page-item {% if pagination.nextPage is empty %}disabled{% endif %}">
+                <a class="page-link" href="{% if pagination.nextPage is empty %}#{% else %}{{ app.getUri('altTags', { page: pagination.nextPage }) }}{% endif %}">Weiter</a>
+            </li>
+        </ul>
+    </nav>
+{% endif %}
+
+<table class="table table-row-dashed">
+    <tbody>
+
+        {% for file in files %}
+            <tr>
+                <td width="250">
+                    <img class="img-fluid" height="200" width="200" src="{{ file.getUriThumbnail({ width: 200, height: 200 }) }}" alt="" />
+                </td>
+                <td>
+
+                    <form class="ajax" method="post" action="{{ app.getUri('altTags', { page: pagination.pages }) }}">
+
+                        <div class="form-group">
+                            <label for="exampleFormControlTextarea1">ALT-Text</label>
+                            <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Speichern</button>
+
+                    </form>
+
+                </td>
+            </tr>
+        {% endfor %}
+
+    </tbody>
+</table>

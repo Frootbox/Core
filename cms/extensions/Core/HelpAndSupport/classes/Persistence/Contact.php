@@ -8,6 +8,7 @@ namespace Frootbox\Ext\Core\HelpAndSupport\Persistence;
 class Contact extends \Frootbox\Persistence\AbstractPerson
 {
     use \Frootbox\Persistence\Traits\Alias;
+    use \Frootbox\Persistence\Traits\Tags;
 
     protected $model = Repositories\Contacts::class;
 

@@ -2,4 +2,5 @@
 .idea
 .project
 localconfig.php
+_localconfig.php
 /lib
