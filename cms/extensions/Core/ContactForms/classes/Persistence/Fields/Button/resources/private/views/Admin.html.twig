@@ -1,0 +1,13 @@
+{% set v = view.getViewHelper('\\Frootbox\\Admin\\Viewhelper\\GeneralPurpose') %}
+
+<div class="form-group">
+    <label for="ButtonType">Button-Typ</label>
+    <select class="form-control" id="ButtonType" name="ButtonType">
+        <option {% if field.getConfig('ButtonType') == "primary" %}selected{% endif %} value="primary">Primärbutton</option>
+        <option {% if field.getConfig('ButtonType') == "secondary" %}selected{% endif %} value="secondary">Sekundärbutton</option>
+        <option {% if field.getConfig('ButtonType') == "outline-primary" %}selected{% endif %} value="outline-primary">Primärbutton (Outline)</option>
+        <option {% if field.getConfig('ButtonType') == "outline-secondary" %}selected{% endif %} value="outline-secondary">Sekundärbutton (Outline)</option>
+    </select>
+</div>
+
+

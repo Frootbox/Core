@@ -14,6 +14,9 @@ variables:
     skipHeadline:
         label: keine Überschrift
         type: bool
+    withFormHeadline:
+        label: mit Überschrift über dem Formular
+        type: bool
     contentColumns:
         label: Breite des Inhaltes
         type: list
@@ -100,6 +103,11 @@ variables:
 
                     </div>
                     <div class="col-md-6">
+
+
+                        {% if variables.withFormHeadline %}
+                            <h3 class="first" data-editable data-uid="{{ block.getUid('title-form') }}">Überschrift</h3>
+                        {% endif %}
 
                         {% if not form %}
                             {% if editing %}

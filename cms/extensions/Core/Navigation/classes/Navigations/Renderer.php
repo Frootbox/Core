@@ -1,6 +1,10 @@
 <?php
 /**
+ * @author Jan Habbo Brüning <jan.habbo.bruening@gmail.com>
  *
+ * @noinspection PhpUnnecessaryLocalVariableInspection
+ * @noinspection SqlNoDataSourceInspection
+ * @noinspection PhpFullyQualifiedNameUsageInspection
  */
 
 namespace Frootbox\Ext\Core\Navigation\Navigations;
@@ -53,7 +57,11 @@ class Renderer
     {
         $this->loop = 0;
 
-        $html = '<nav class="' . ($this->parameters['class'] ?? null) . '">';
+        $html = (string) null;
+
+        if (empty($this->parameters['skipOuterNav'])) {
+            $html .= '<nav class="' . ($this->parameters['class'] ?? null) . '">';
+        }
 
         $configuration = $this->container->get(\Frootbox\Config\Config::class);
 
@@ -73,7 +81,9 @@ class Renderer
             }
         }
 
-        $html .= '</nav>';
+        if (empty($this->parameters['skipOuterNav'])) {
+            $html .= '</nav>';
+        }
 
         return $html;
     }
