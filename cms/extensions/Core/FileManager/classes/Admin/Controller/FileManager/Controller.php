@@ -69,6 +69,7 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
         $file->setCopyright($post->get('copyright'));
         $file->addConfig([
             'caption' => $post->get('caption'),
+            'link' => $post->get('link'),
         ]);
         $file->save();
 

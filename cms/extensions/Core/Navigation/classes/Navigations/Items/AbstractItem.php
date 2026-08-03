@@ -1,6 +1,10 @@
 <?php
 /**
+ * @author Jan Habbo Brüning <jan.habbo.bruening@gmail.com>
  *
+ * @noinspection PhpUnnecessaryLocalVariableInspection
+ * @noinspection SqlNoDataSourceInspection
+ * @noinspection PhpFullyQualifiedNameUsageInspection
  */
 
 namespace Frootbox\Ext\Core\Navigation\Navigations\Items;
@@ -8,6 +12,7 @@ namespace Frootbox\Ext\Core\Navigation\Navigations\Items;
 abstract class AbstractItem extends \Frootbox\Persistence\AbstractRow
 {
     use \Frootbox\Persistence\Traits\Config;
+    use \Frootbox\Persistence\Traits\Uid;
     use \Frootbox\Persistence\Traits\Visibility;
 
     protected $table = 'navigations_items';
