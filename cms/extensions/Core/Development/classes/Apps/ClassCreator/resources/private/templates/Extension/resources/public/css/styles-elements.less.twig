@@ -1,8 +1,8 @@
 html body {
-  font-family: $FontBaseFamily;
-  color: $FontBaseColor;
-  font-size: $FontBaseSize;
-  line-height: $FontBaseLineHeight;
+  font-family: var(--font-base-family);
+  color: var(--font-base-color);
+  font-size: var(--font-base-size);
+  line-height: var(--font-base-line-height);
 
   h1, h2, h3, h4 {
     clear: both;
@@ -179,7 +179,10 @@ html body {
   }
 
   .btn {
-    border-radius: $ButtonPrimaryBorderRadius;
+    font-size: var(--font-base-size);
+    line-height: var(--font-base-line-height);
+
+    border-radius: var(--button-primary-border-radius);
 
     &.btn-primary {
       background: var(--color-spot1);

@@ -43,6 +43,11 @@
                         <input type="text" class="form-control" name="link" id="link" placeholder="Link" value="{{ file.getConfig('link') }}">
                     </div>
 
+                    {% if file.isImage() and file.isExistant() %}
+                        <input type="hidden" name="position[x]" id="imagePositionX" value="{{ file.getConfig('position.x') }}" />
+                        <input type="hidden" name="position[y]" id="imagePositionY" value="{{ file.getConfig('position.y') }}" />
+                    {% endif %}
+
                     <button type="submit" class="btn btn-primary">Speichern</button>
 
                 </form>
@@ -55,8 +60,32 @@
 
         {% if file.isImage() and file.isExistant() %}
             <div style="margin: 0 0 30px 0; padding: 20px; background: #FFF; border: 1px solid #CCC;">
-                <img class="img-fluid" src="{{ file.getUriThumbnail() }}" alt="" />
+                <img id="positionSourceImage" class="img-fluid" style="cursor: crosshair;" src="{{ file.getUriThumbnail() }}" alt="" />
             </div>
+
+            <script nonce="{{ settings.nonce }}">
+                $(function ( ) {
+
+                    $('#positionSourceImage').on('click', function ( event ) {
+
+                        var image = this;
+                        var bounds = image.getBoundingClientRect();
+
+                        if (!bounds.width || !bounds.height || !image.naturalWidth || !image.naturalHeight) {
+                            return;
+                        }
+
+                        var positionX = Math.floor((event.clientX - bounds.left) * image.naturalWidth / bounds.width);
+                        var positionY = Math.floor((event.clientY - bounds.top) * image.naturalHeight / bounds.height);
+
+                        positionX = Math.max(0, Math.min(image.naturalWidth - 1, positionX));
+                        positionY = Math.max(0, Math.min(image.naturalHeight - 1, positionY));
+
+                        $('#imagePositionX').val(positionX);
+                        $('#imagePositionY').val(positionY);
+                    });
+                });
+            </script>
         {% endif %}
 
     </div>

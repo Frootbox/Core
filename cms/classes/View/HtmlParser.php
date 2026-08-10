@@ -1,6 +1,10 @@
 <?php
 /**
+ * @author Jan Habbo Brüning <jan.habbo.bruening@gmail.com>
  *
+ * @noinspection PhpUnnecessaryLocalVariableInspection
+ * @noinspection SqlNoDataSourceInspection
+ * @noinspection PhpFullyQualifiedNameUsageInspection
  */
 
 namespace Frootbox\View;
@@ -13,7 +17,8 @@ class HtmlParser
     protected $container;
 
     /**
-     *
+     * @param string $html
+     * @param \DI\Container $container
      */
     public function __construct(string $html, \DI\Container $container)
     {
@@ -22,7 +27,9 @@ class HtmlParser
     }
 
     /**
-     *
+     * @return void
+     * @throws \DI\DependencyException
+     * @throws \DI\NotFoundException
      */
     protected function parseEditableTags(): void
     {

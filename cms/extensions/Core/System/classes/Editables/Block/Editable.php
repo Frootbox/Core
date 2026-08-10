@@ -1,6 +1,10 @@
 <?php
 /**
+ * @author Jan Habbo Brüning <jan.habbo.bruening@gmail.com>
  *
+ * @noinspection PhpUnnecessaryLocalVariableInspection
+ * @noinspection SqlNoDataSourceInspection
+ * @noinspection PhpFullyQualifiedNameUsageInspection
  */
 
 namespace Frootbox\Ext\Core\System\Editables\Block;
@@ -16,7 +20,9 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
     }
 
     /**
-     *
+     * @param string $html
+     * @param \Frootbox\View\Engines\Interfaces\Engine $view
+     * @return string
      */
     public function initEditing(
         string $html,
@@ -48,7 +54,12 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
     }
 
     /**
-     *
+     * @param $html
+     * @param \Frootbox\Config\Config $config
+     * @param \DI\Container $container
+     * @return string
+     * @throws \DI\DependencyException
+     * @throws \DI\NotFoundException
      */
     public function parse(
         $html,

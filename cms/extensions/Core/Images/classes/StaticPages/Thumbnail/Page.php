@@ -37,13 +37,13 @@ class Page
         // Generate thumbnail
         $thumbnailClass = $config->get('thumbnails.customThumbnailClass') ?? \Frootbox\Thumbnail::class;
 
-
         $thumbnail = new $thumbnailClass([
             'path' => $file->getPath(),
             'width' => $get->get('width'),
             'height' => $get->get('height'),
             'crop' => $get->get('crop'),
             'rotation' => $file->getRotation(),
+            'focusPoint' => $file->getConfig('focusPoint') ?? null,
         ], $config->get('thumbnails'));
 
 

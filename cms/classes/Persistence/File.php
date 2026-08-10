@@ -326,12 +326,17 @@ class File extends AbstractRow
         
         $options['hash'] = $hash;
 
+        if (!empty($this->getConfig('focusPoint'))) {
+            $focusPoint = $this->getConfig('focusPoint');
+        }
+
         $thumbnail = new \Frootbox\Thumbnail([
             'width' => $options['width'] ?? null,
             'height' => $options['height'] ?? null,
             'crop' => $options['crop'] ?? null,
             'rotation' => $this->getRotation(),
             'path' => $this->getPath(),
+            'focusPoint' => $focusPoint ?? null,
         ]);
 
         $path = $thumbnail->getCacheFilePath();

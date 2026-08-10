@@ -1,6 +1,10 @@
 <?php
 /**
+ * @author Jan Habbo Brüning <jan.habbo.bruening@gmail.com>
  *
+ * @noinspection PhpUnnecessaryLocalVariableInspection
+ * @noinspection SqlNoDataSourceInspection
+ * @noinspection PhpFullyQualifiedNameUsageInspection
  */
 
 namespace Frootbox\Persistence\Content\Blocks;
@@ -49,7 +53,7 @@ class Block extends \Frootbox\Persistence\AbstractConfigurableRow
     }
 
     /**
-     *
+     * @return \Frootbox\AbstractExtensionController
      */
     public function getExtensionController(): \Frootbox\AbstractExtensionController
     {
@@ -73,7 +77,7 @@ class Block extends \Frootbox\Persistence\AbstractConfigurableRow
     }
 
     /**
-     *
+     * @return string|null
      */
     public function getNameFromView(): ?string
     {
@@ -90,7 +94,8 @@ class Block extends \Frootbox\Persistence\AbstractConfigurableRow
     }
 
     /**
-     *
+     * @param \Frootbox\Config\Config|null $config
+     * @return string|null
      */
     public function getPathFromConfig(
         \Frootbox\Config\Config $config = null
@@ -147,6 +152,9 @@ class Block extends \Frootbox\Persistence\AbstractConfigurableRow
         ]);
     }
 
+    /**
+     * @return string
+     */
     public function getThumbnailSrc(): string
     {
         $controller = $this->getExtensionController();
@@ -178,7 +186,7 @@ class Block extends \Frootbox\Persistence\AbstractConfigurableRow
     }
 
     /**
-     *
+     * @return string|null
      */
     public function getTitleClean(): ?string
     {
@@ -194,7 +202,7 @@ class Block extends \Frootbox\Persistence\AbstractConfigurableRow
     }
 
     /**
-     *
+     * @return array
      */
     public function getVariables(): array
     {
@@ -366,6 +374,21 @@ class Block extends \Frootbox\Persistence\AbstractConfigurableRow
             'data' => $injectedVariables,
         ]);
 
+        $autoInjectedVariables = [];
+
+        if (!empty($template->getConfig('variables'))) {
+
+
+            foreach ($template->getVariables() as $variable) {
+
+                if (empty($variable['autoInject'])) {
+                    continue;
+                }
+
+                $autoInjectedVariables[] = $variable['name'] . '-' . $variable['value'];
+            }
+        }
+
         // Auto-inject css files
         $stylesheet = $path . 'standards.less';
 
@@ -401,7 +424,7 @@ class Block extends \Frootbox\Persistence\AbstractConfigurableRow
             $customStyles = 'style="' . $customStyles . '"';
         }
 
-        $html = '<div ' . $customStyles . ' class="' . $this->getCssClass() . '" data-class="' . !empty($this->getClassName()) . '" data-editable-block data-block="' . $this->getId() . '" data-loop="' . ($injectedVariables['loopId'] ?? 1) . '">' . $html . '</div>';
+        $html = '<div ' . $customStyles . ' class="' . $this->getCssClass() . ' ' . implode(' ', $autoInjectedVariables) . '" data-class="' . !empty($this->getClassName()) . '" data-editable-block data-block="' . $this->getId() . '" data-loop="' . ($injectedVariables['loopId'] ?? 1) . '">' . $html . '</div>';
 
         return trim($html);
     }

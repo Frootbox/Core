@@ -96,11 +96,36 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
         $file->setName($post->get('name'));
         $file->setCopyright($post->get('copyright'));
 
-        $file->addConfig([
+        $config = [
             'caption' => $post->get('caption'),
             'alt' => $post->get('alt'),
             'link' => $post->get('link'),
-        ]);
+        ];
+
+        $position = $post->get('position');
+
+        if (
+            is_array($position)
+            and isset($position['x'], $position['y'])
+            and $position['x'] !== ''
+            and $position['y'] !== ''
+        ) {
+            $positionX = filter_var($position['x'], FILTER_VALIDATE_INT, [
+                'options' => [ 'min_range' => 0 ],
+            ]);
+            $positionY = filter_var($position['y'], FILTER_VALIDATE_INT, [
+                'options' => [ 'min_range' => 0 ],
+            ]);
+
+            if ($positionX !== false and $positionY !== false) {
+                $config['focusPoint'] = [
+                    'x' => $positionX,
+                    'y' => $positionY,
+                ];
+            }
+        }
+
+        $file->addConfig($config);
 
         $file->save();
 

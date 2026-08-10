@@ -1,6 +1,10 @@
-<?php 
+<?php
 /**
- * 
+ * @author Jan Habbo Brüning <jan.habbo.bruening@gmail.com>
+ *
+ * @noinspection PhpUnnecessaryLocalVariableInspection
+ * @noinspection SqlNoDataSourceInspection
+ * @noinspection PhpFullyQualifiedNameUsageInspection
  */
 
 namespace Frootbox;
@@ -16,6 +20,7 @@ class Thumbnail extends GenericObject
     protected $height;
     protected $crop;
     protected $rotation = 0;
+    protected ?array $focusPoint = null;
 
     protected $cropmode = null;
     protected $forceCacheFile = false;
@@ -51,6 +56,10 @@ class Thumbnail extends GenericObject
 
         if (!empty($options['crop'])) {
             $this->crop = $options['crop'];
+        }
+
+        if (!empty($options['focusPoint'])) {
+            $this->focusPoint = $options['focusPoint'];
         }
 
         if (!empty($params['forceCacheFile'])) {
@@ -123,6 +132,10 @@ class Thumbnail extends GenericObject
             (int) $this->rotation,
             $this->path,
         ];
+
+        if (!empty($this->focusPoint)) {
+            $data[] = $this->focusPoint;
+        }
 
         $fileName = md5(serialize($data)) . '.' . $this->type;
 
