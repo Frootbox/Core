@@ -169,6 +169,58 @@ class Thumbnail extends GenericObject
     }
 
     /**
+     * Compute the crop offset after the image has been resized to fill the
+     * requested dimensions. The focus point uses pixels of the full-size,
+     * rotated image.
+     */
+    protected function getFocusPointCropOffset(int $targetWidth, int $targetHeight): ?array
+    {
+        if (
+            $targetWidth <= 0
+            or $targetHeight <= 0
+            or is_array($this->crop)
+            or empty($this->focusPoint)
+            or !isset($this->focusPoint['x'], $this->focusPoint['y'])
+            or !is_numeric($this->focusPoint['x'])
+            or !is_numeric($this->focusPoint['y'])
+        ) {
+            return null;
+        }
+
+        $imageData = @getimagesize($this->getPath());
+
+        if (empty($imageData[0]) or empty($imageData[1])) {
+            return null;
+        }
+
+        $sourceWidth = (int) $imageData[0];
+        $sourceHeight = (int) $imageData[1];
+        $rotation = (($this->rotation % 360) + 360) % 360;
+
+        if ($rotation === 90 or $rotation === 270) {
+            [ $sourceWidth, $sourceHeight ] = [ $sourceHeight, $sourceWidth ];
+        }
+        elseif ($rotation !== 0 and $rotation !== 180) {
+            return null;
+        }
+
+        $scale = max($targetWidth / $sourceWidth, $targetHeight / $sourceHeight);
+        $resizedWidth = max($targetWidth, (int) round($sourceWidth * $scale));
+        $resizedHeight = max($targetHeight, (int) round($sourceHeight * $scale));
+
+        $focusX = max(0, min($sourceWidth - 1, (float) $this->focusPoint['x']));
+        $focusY = max(0, min($sourceHeight - 1, (float) $this->focusPoint['y']));
+
+        $cropX = (int) round(($focusX * $resizedWidth / $sourceWidth) - ($targetWidth / 2));
+        $cropY = (int) round(($focusY * $resizedHeight / $sourceHeight) - ($targetHeight / 2));
+
+        return [
+            'x' => max(0, min($resizedWidth - $targetWidth, $cropX)),
+            'y' => max(0, min($resizedHeight - $targetHeight, $cropY)),
+        ];
+    }
+
+    /**
      * Render thumbnail
      */
     public function render(): Thumbnail
@@ -235,7 +287,15 @@ class Thumbnail extends GenericObject
             else {
 
                 $resize = ' -resize ' . $this->width . 'x' . $this->height . '^ -quality 100 ';
-                $postcmd = ' -gravity center -crop ' . $this->width . 'x' . $this->height . '+0+0';
+
+                $cropOffset = $this->getFocusPointCropOffset((int) $this->width, (int) $this->height);
+
+                if ($cropOffset === null) {
+                    $postcmd = ' -gravity center -crop ' . $this->width . 'x' . $this->height . '+0+0';
+                }
+                else {
+                    $postcmd = ' -gravity northwest -crop ' . $this->width . 'x' . $this->height . '+' . $cropOffset['x'] . '+' . $cropOffset['y'] . ' +repage';
+                }
             }
 
         }

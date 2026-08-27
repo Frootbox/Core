@@ -46,7 +46,6 @@ class Page
             'focusPoint' => $file->getConfig('focusPoint') ?? null,
         ], $config->get('thumbnails'));
 
-
         if (empty($get->get('path')) and empty($file->getConfig('detectedOrientation'))) {
 
             $orientation = $thumbnail->detectOrientation();

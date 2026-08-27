@@ -27,7 +27,6 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
 
         $order = $parameters['order'] ?? [];
 
-
         // Fetch addresses
         $addressesRepository = $this->getDb()->getRepository(\Frootbox\Ext\Core\Addresses\Persistence\Repositories\Addresses::class);
         $result = $addressesRepository->fetch([
@@ -43,8 +42,38 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
     }
 
     /**
+     * @return array
+     * @throws \Frootbox\Exceptions\RuntimeError
+     */
+    public function getAddressesByCity(): array
+    {
+        // Fetch addresses
+        $addressesRepository = $this->getDb()->getRepository(\Frootbox\Ext\Core\Addresses\Persistence\Repositories\Addresses::class);
+        $result = $addressesRepository->fetch([
+            'where' => [
+                'pluginId' => $this->getId(),
+                new \Frootbox\Db\Conditions\GreaterOrEqual('visibility',(IS_EDITOR ? 1 : 2)),
+            ],
+            'limit' => 1024,
+            'order' => [ 'orderId DESC' ],
+        ]);
+
+        $list = [];
+
+        foreach ($result as $address) {
+
+            $key = $address->getCity() ?? 'unbekannt';
+
+            $list[$key][] = $address;
+        }
+
+        return $list;
+    }
+
+    /**
      * @param array $parameters
      * @return array
+     * @throws \Frootbox\Exceptions\RuntimeError
      */
     public function getAddressesByLetter(array $parameters = []): array
     {
