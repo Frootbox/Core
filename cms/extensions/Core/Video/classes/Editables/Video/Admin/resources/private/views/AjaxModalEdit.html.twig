@@ -18,35 +18,11 @@
                 data : $(this).serialize(),
                 type : 'POST',
                 success : function ( response ) {
-
                     $('#fbxEditorGenericModal').modal('hide');
-
-                    if ($('header[data-uid="' + form.attr('data-uid') + '"]').length > 0) {
-                        var element = $('header[data-uid="' + form.attr('data-uid') + '"]');
-                    }
-                    else {
-                        var element = $('[data-editable][data-uid="' + form.attr('data-uid') + '"]');
-                    }
-
-                    var tagName = response.headline.level ? response.headline.level : element.find('h1, h2, h3, h4, h5').prop("tagName").toLowerCase();
-
-                    var html = '<header class="' + element.attr('class') + '" data-uid="' + form.attr('data-uid') + '"><p class="supertitle">' + (response.headline.supertitle ? response.headline.supertitle : '') + '</p><' + tagName + ' data-editable data-uid="' + form.attr('data-uid') + '">' + response.headline.text + '</' + tagName + '><p class="subtitle">' + (response.headline.subtitle ? response.headline.subtitle : '') + '</p></header>';
-
-
-                    /*
-                    if (response.headline.subTitleAbove) {
-                        var html = '<' + tagName + ' data-editable data-uid="' + form.attr('data-uid') + '"><span class="subtitle">' + (response.headline.subtitle ? response.headline.subtitle : '') + '</span><span class="head">' + response.headline.text + '</span></' + tagName + '>';
-                    }
-                    else {
-                        var html = '<' + tagName + ' data-editable data-uid="' + form.attr('data-uid') + '"><span class="head">' + response.headline.text + '</span><span class="subtitle">' + (response.headline.subtitle ? response.headline.subtitle : '') + '</span></' + tagName + '>';
-                    }
-                    */
-
-
-                    element.replaceWith(html);
+                    window.location.reload();
                 },
                 error: function ( xhr ) {
-                    alert(xhr.responseText);
+                    alert(xhr.responseJSON && xhr.responseJSON.error ? xhr.responseJSON.error : xhr.responseText);
                 }
             });
         });
@@ -65,6 +41,26 @@
     </div>
     <div class="modal-body">
 
+        {% set sourceType = text.getConfig('SourceType') | default('file') %}
+
+        <div class="form-group">
+            <label>Video-Quelle</label>
+            <div class="form-check">
+                <input class="form-check-input video-source" type="radio" name="SourceType" id="SourceTypeFile" value="file" {% if sourceType != 'youtube' %}checked{% endif %}>
+                <label class="form-check-label" for="SourceTypeFile">Video-Datei</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input video-source" type="radio" name="SourceType" id="SourceTypeYoutube" value="youtube" {% if sourceType == 'youtube' %}checked{% endif %}>
+                <label class="form-check-label" for="SourceTypeYoutube">YouTube-URL</label>
+            </div>
+        </div>
+
+        <div id="youtubeSource" class="form-group">
+            <label for="VideoUrl">YouTube-URL</label>
+            <input type="url" class="form-control" id="VideoUrl" name="VideoUrl" value="{{ text.getConfig('VideoUrl') }}" placeholder="https://www.youtube.com/watch?v=…">
+            <small class="form-text text-muted">Unterstützt werden YouTube-, youtu.be-, Shorts- und Embed-URLs.</small>
+        </div>
+
         <div class="form-group form-check">
             <input type="checkbox" class="form-check-input" id="Muted" name="Muted" {% if text.getConfig('Muted') %}checked{% endif %}>
             <label class="form-check-label" for="Muted">Ohne Ton</label>
@@ -82,6 +78,7 @@
             <label class="form-check-label" for="Controls">Controls</label>
         </div>
 
+        <div id="fileSource">
         {{ v.injectPartial('Frootbox/Ext/Core/FileManager/Editor/Partials/FileUpload', {
             uid: get.get('uid'),
             multiple: true,
@@ -97,6 +94,7 @@
             uid: text.getUid('thumbnail'),
             label: "Thumbnail"
         }) | raw }}
+        </div>
 
 
 
@@ -105,3 +103,17 @@
     </div>
 
 </form>
+
+<script nonce="{{ settings.nonce }}">
+    $(function () {
+        function updateVideoSourceFields() {
+            var youtubeSelected = $('input[name="SourceType"]:checked').val() === 'youtube';
+            $('#youtubeSource').toggle(youtubeSelected);
+            $('#fileSource').toggle(!youtubeSelected);
+            $('#VideoUrl').prop('required', youtubeSelected);
+        }
+
+        $(document).on('change', '.video-source', updateVideoSourceFields);
+        updateVideoSourceFields();
+    });
+</script>

@@ -269,7 +269,8 @@ class Product extends \Frootbox\Persistence\AbstractConfigurableRow implements \
         $sql = 'SELECT
             a.id as fieldId,
             a.*,
-            d.valueText as valueDisplay
+            d.valueText as valueText,
+            d.valueTextI18n
         FROM
             assets a        
         LEFT JOIN
@@ -301,6 +302,7 @@ class Product extends \Frootbox\Persistence\AbstractConfigurableRow implements \
             a.id as fieldId,
             a.*,
             d.valueText as valueText,
+            d.valueTextI18n,
             d.valueInt as valueInt
         FROM
             assets a        
@@ -336,6 +338,7 @@ class Product extends \Frootbox\Persistence\AbstractConfigurableRow implements \
             a.*,
             d.id as dataId,
             d.valueText,
+            d.valueTextI18n,
             d.valueInt,
             d.type
         FROM

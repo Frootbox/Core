@@ -12,6 +12,45 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
     protected $type = 'NonStructural';
 
     /**
+     * Extract a YouTube video id from the commonly shared URL formats.
+     */
+    public static function getYoutubeVideoId(?string $url): ?string
+    {
+        $url = trim((string) $url);
+
+        if ($url === '') {
+            return null;
+        }
+
+        $parts = parse_url($url);
+
+        if (empty($parts['host'])) {
+            return null;
+        }
+
+        $host = strtolower($parts['host']);
+        $host = preg_replace('#^www\.#', '', $host);
+        $videoId = null;
+
+        if ($host === 'youtu.be') {
+            $videoId = trim($parts['path'] ?? '', '/');
+        }
+        elseif (in_array($host, ['youtube.com', 'm.youtube.com', 'music.youtube.com', 'youtube-nocookie.com'], true)) {
+            $path = trim($parts['path'] ?? '', '/');
+
+            if ($path === 'watch') {
+                parse_str($parts['query'] ?? '', $query);
+                $videoId = $query['v'] ?? null;
+            }
+            elseif (preg_match('#^(?:embed|shorts|live)/([^/]+)#', $path, $match)) {
+                $videoId = $match[1];
+            }
+        }
+
+        return is_string($videoId) && preg_match('#^[A-Za-z0-9_-]{11}$#', $videoId) ? $videoId : null;
+    }
+
+    /**
      *
      */
     public function getPath(): string
@@ -53,7 +92,7 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
     {
         // Initialize html crawler
         $crawler = \Wa72\HtmlPageDom\HtmlPageCrawler::create($html);
-        $crawler->filter('video[data-editable-video][data-uid]')->each(function ( $element ) use ($fileRepository, $textRepository, $configuration) {
+        $crawler->filter('[data-editable-video][data-uid]')->each(function ( $element ) use ($fileRepository, $textRepository, $configuration) {
 
             // Obtain uid
             $uid = $element->getAttribute('data-uid');
@@ -62,6 +101,33 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
             $text = $textRepository->fetchByUid($uid, [
                 'createOnMiss' => true,
             ]);
+
+            $videoId = self::getYoutubeVideoId($text->getConfig('VideoUrl'));
+
+            if ($text->getConfig('SourceType') === 'youtube' && $videoId !== null) {
+                $parameters = [
+                    'autoplay' => !empty($text->getConfig('Autoplay')) ? '1' : '0',
+                    'controls' => !empty($text->getConfig('Controls')) ? '1' : '0',
+                    'loop' => !empty($text->getConfig('Loop')) ? '1' : '0',
+                    'mute' => !empty($text->getConfig('Muted')) ? '1' : '0',
+                    'playsinline' => '1',
+                    'rel' => '0',
+                ];
+
+                if (!empty($text->getConfig('Loop'))) {
+                    $parameters['playlist'] = $videoId;
+                }
+
+                $source = 'https://www.youtube-nocookie.com/embed/' . rawurlencode($videoId) . '?' . http_build_query($parameters, '', '&amp;');
+                $template = '<iframe data-editable-video data-uid="' . htmlspecialchars($uid, ENT_QUOTES, 'UTF-8') . '" '
+                    . 'src="' . $source . '" title="YouTube Video" loading="lazy" '
+                    . 'allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" '
+                    . 'allowfullscreen style="display:block;width:100%;aspect-ratio:16/9;border:0"></iframe>';
+
+                $element->replaceWith($template);
+
+                return;
+            }
 
             // Fetch video source files
             $files = $fileRepository->fetch([

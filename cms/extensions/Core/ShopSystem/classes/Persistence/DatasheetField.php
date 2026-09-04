@@ -148,6 +148,50 @@ class DatasheetField extends \Frootbox\Persistence\AbstractAsset implements \Fro
     }
 
     /**
+     * Get the product-specific value in the requested language.
+     */
+    public function getValueText($language = null): ?string
+    {
+        $value = $this->data['valueText'] ?? null;
+
+        if (!MULTI_LANGUAGE) {
+            return $value;
+        }
+
+        $language ??= GLOBAL_LANGUAGE;
+
+        if ($language == DEFAULT_LANGUAGE) {
+            return $value;
+        }
+
+        $values = $this->data['valueTextI18n'] ?? [];
+
+        if (!is_array($values)) {
+            $values = json_decode($values ?: '[]', true) ?: [];
+        }
+
+        return $values[$language] ?? $value;
+    }
+
+    /**
+     * Get the product-specific value without falling back to the default language.
+     */
+    public function getValueTextWithoutFallback($language = null): ?string
+    {
+        if (empty($language) or $language == DEFAULT_LANGUAGE) {
+            return $this->data['valueText'] ?? null;
+        }
+
+        $values = $this->data['valueTextI18n'] ?? [];
+
+        if (!is_array($values)) {
+            $values = json_decode($values ?: '[]', true) ?: [];
+        }
+
+        return $values[$language] ?? null;
+    }
+
+    /**
      *
      */
     public function isOptional(): bool
@@ -182,9 +226,11 @@ class DatasheetField extends \Frootbox\Persistence\AbstractAsset implements \Fro
     /**
      *
      */
-    public function getValueDisplay(): ?string
+    public function getValueDisplay($language = null): ?string
     {
-        if (strlen(trim($this->getValueText())) == 0) {
+        $valueText = $this->getValueText($language);
+
+        if (strlen(trim($valueText ?? '')) == 0) {
             return null;
         }
 
@@ -207,12 +253,12 @@ class DatasheetField extends \Frootbox\Persistence\AbstractAsset implements \Fro
 
             case 'OptionalList':
 
-                $options = explode("\n", $this->getValueText());
+                $options = explode("\n", $valueText);
                 $value = implode(", ", array_map('trim', $options));
                 break;
 
             default:
-                $value = trim($this->getValueText() . ' ' . $this->getSuffix());
+                $value = trim($valueText . ' ' . $this->getSuffix());
         }
 
         return $value;

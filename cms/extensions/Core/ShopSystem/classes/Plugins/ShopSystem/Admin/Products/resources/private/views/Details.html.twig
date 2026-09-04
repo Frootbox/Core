@@ -314,6 +314,34 @@
                         {% endif %}
 
                         {% for field in fields %}
+                            {% if configuration.get('i18n.multiAliasMode') %}
+                                {% for language in configuration.get('i18n.languages') %}
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="field_{{ field.getId() }}_{{ loop.index }}">{{ field.getTitle(language) }} ({{ language }}){% if settings.default_language == language %}*{% endif %}</label>
+                                                <div class="input-group mb-2">
+                                                    {% if field.getType() == "OptionalList" or field.getType() == "TextArea" %}
+                                                        <textarea class="form-control" name="fields[{{ field.getId() }}][{{ language }}]" id="field_{{ field.getId() }}_{{ loop.index }}" placeholder="{{ field.getTitle(language) }}">{{ field.getValueTextWithoutFallback(language) }}</textarea>
+                                                    {% else %}
+                                                        <input type="text" class="form-control" name="fields[{{ field.getId() }}][{{ language }}]" id="field_{{ field.getId() }}_{{ loop.index }}" placeholder="{{ field.getTitle(language) }}" value="{{ field.getValueTextWithoutFallback(language) }}">
+                                                    {% endif %}
+                                                    {% if field.getSuffix() %}
+                                                        <div class="input-group-append"><div class="input-group-text">{{ field.getSuffix() }}</div></div>
+                                                    {% endif %}
+                                                </div>
+                                                {% if field.getHelpText() %}<small class="form-text text-muted">{{ field.getHelpText() }}</small>{% endif %}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>Darstellung ({{ language }})</label>
+                                                <input class="form-control" disabled value="{{ field.getValueDisplay(language) | raw }}" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            {% else %}
                             <div class="row">
                                 <div class="col-md-6">
 
@@ -348,6 +376,7 @@
 
                                 </div>
                             </div>
+                            {% endif %}
 
                         {% endfor %}
                     {% endfor %}
@@ -575,5 +604,4 @@
 
     </div>
 </div>
-
 

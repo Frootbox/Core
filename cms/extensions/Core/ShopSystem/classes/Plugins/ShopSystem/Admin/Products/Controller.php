@@ -320,7 +320,8 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
                 'createOnMiss' => true
             ]);
 
-            $newField->setValueText($field->getValueText());
+            $newField->setValueText($field->getValueTextWithoutFallback(DEFAULT_LANGUAGE));
+            $newField->setValueTextI18n($field->getValueTextI18n());
             $newField->updateMetrics();
             $newField->save();
         }
@@ -775,7 +776,15 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
                 'createOnMiss' => true
             ]);
 
-            $field->setValueText($value);
+            if (is_array($value)) {
+                $field->setValueText($value[DEFAULT_LANGUAGE] ?? '');
+                unset($value[DEFAULT_LANGUAGE]);
+                $field->setValueTextI18n(json_encode(array_filter($value, static fn($value) => $value !== ''), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+            }
+            else {
+                $field->setValueText($value);
+            }
+
             $field->updateMetrics();
             $field->save();
         }

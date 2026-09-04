@@ -1,6 +1,6 @@
 {# config
 
-title: Standard 1
+title: Standard 2
 variables:
     withContainer:
         type: bool
@@ -9,6 +9,7 @@ variables:
 /config #}
 
 {% set b = view.getViewhelper('Breadcrumb', { singleton: true }) %}
+{% set i = view.getViewhelper('Delegator', { object: plugin }) %}
 
 {{ b.addSection(reference.getTitle(), reference.getUri()) }}
 
@@ -21,18 +22,21 @@ variables:
 
 {{ view.addBreadcrumb(reference.getTitle(), reference.getUri()) }}
 
-<div class="plugin Core Images References ShowReference01">
+<div class="plugin Core Images References ShowReference02">
 
     {% if variables.withContainer %}<div class="container">{% endif %}
 
-        <div class="row">
-            <div class="col-md-12">
+        <div class="row justify-content-between">
+            <div class="col-md-5">
+                <picture class="fluid" data-editable data-skipempty="1" data-uid="{{ reference.getUid('image') }}">
+                    <img width="800" src="{{ i.getDummyImage({ width: 800, height: null }) }}" alt="" />
+                </picture>
+            </div>
+            <div class="col-md-6">
 
                 <h2 class="first main-title" data-editable data-uid="{{ reference.getUid('title') }}">{{ reference.getTitle }}</h2>
 
-                <div class="teaser-text" data-editable data-uid="{{ reference.getUid('teaser') }}"></div>
-
-                <div data-editable data-uid="{{ reference.getUid('text') }}"></div>
+                <div class="teaser-text" data-nowidgets data-editable data-uid="{{ reference.getUid('teaser') }}"></div>
 
             </div>
         </div>
