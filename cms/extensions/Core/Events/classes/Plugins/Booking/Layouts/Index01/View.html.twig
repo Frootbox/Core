@@ -143,10 +143,12 @@ variables:
                                 </div>
                             </div>
 
-                            <div class="form-group">
-                                <label for="company">Firma</label>
-                                <input type="text" class="form-control" id="company" name="owner[company]" placeholder="Firma">
-                            </div>
+                            {% block bookingOwnerCompany %}
+                                <div class="form-group">
+                                    <label for="company">Firma</label>
+                                    <input type="text" class="form-control" id="company" name="owner[company]" placeholder="Firma">
+                                </div>
+                            {% endblock %}
 
                             <div class="row">
                                 <div class="col-4">

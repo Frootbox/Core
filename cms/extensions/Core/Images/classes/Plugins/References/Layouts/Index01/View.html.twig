@@ -29,7 +29,9 @@ variables:
     withTagFilter:
         type: bool
         label: mit Tag-Filter
-
+    individualTeaserText:
+        type: bool
+        label: Teaser-Text von Detail-Seite entkoppeln
 
 /config #}
 
@@ -92,7 +94,7 @@ variables:
 
                                     {% if variables.withMagnifier %}<a href="{{ f.getFileByUid(reference.getUid('image')).getUriThumbnail() }}" data-fancybox="references-{{ plugin.getId() }}">{% endif %}
                                         <picture class="fluid" data-editable {% if variables.noImageDummy %}data-skipempty="1"{% endif %} data-uid="{{ reference.getUid('image') }}">
-                                                <img width="{{ variables.image_width }}" height="{{ variables.image_height }}" src="{{ i.getDummyImage({ width: variables.image_width, height: variables.image_height | default(300) }) }}" alt="" />
+                                            <img width="{{ variables.image_width }}" height="{{ variables.image_height }}" src="{{ i.getDummyImage({ width: variables.image_width, height: variables.image_height | default(300) }) }}" alt="" />
                                         </picture>
                                     {% if variables.withMagnifier %}</a>{% endif %}
 
@@ -103,7 +105,11 @@ variables:
                                     <h4 data-editable data-uid="{{ reference.getUid('title') }}">{{ reference.getTitle }}</h4>
 
                                     {% if not variables.skipTeaserText %}
-                                        <div data-nowidgets data-editable data-uid="{{ reference.getUid('teaser') }}"></div>
+                                        {% if variables.individualTeaserText %}
+                                            <div data-nowidgets data-editable data-uid="{{ reference.getUid('teaser-individual') }}"></div>
+                                        {% else %}
+                                            <div data-nowidgets data-editable data-uid="{{ reference.getUid('teaser') }}"></div>
+                                        {% endif %}
                                     {% endif %}
 
                                     {% if not variables.skipDetailsPage and reference.getUri() != "/" and reference.getUri() != "#" %}

@@ -332,7 +332,18 @@ class Block extends \Frootbox\Persistence\AbstractConfigurableRow
         $baseViewFile = null;
         $overrideViewFile = null;
 
+        $autoloadRefreshed = false;
+
         foreach ($extensions as $extension) {
+
+            $controllerClass = '\\Frootbox\\Ext\\' . $extension->getVendorId() . '\\' . $extension->getExtensionId() . '\\ExtensionController';
+
+            if (!class_exists($controllerClass) && !$autoloadRefreshed) {
+                // An extension may have been activated after the autoload cache was built.
+                $autoloadRefreshed = true;
+                $extensionsRepository->writeAutoloader($config);
+                require $config->get('filesRootFolder') . 'cache/system/autoload.php';
+            }
 
             $viewFile = $extension->getExtensionController()->getPath() . 'classes/Blocks/' . $this->getBlockId() . '/Block.html.twig';
 

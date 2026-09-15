@@ -399,7 +399,22 @@ trait Alias
 
                     $checkAlias->setAlias($aliasUri);
                     $checkAlias->setPayload(json_encode($alias->getPayload()));
+                    $checkAlias->setStatus($alias->getStatus() ?? 200);
+
+                    if ($checkAlias->getStatus() == 200) {
+                        $checkAlias->unsetConfig('target');
+                    }
+                    else {
+                        $aliasConfig = $alias->getData()['config'] ?? [];
+                        $aliasConfig = is_array($aliasConfig) ? $aliasConfig : json_decode($aliasConfig, true);
+
+                        if (array_key_exists('target', $aliasConfig ?? [])) {
+                            $checkAlias->addConfig([ 'target' => $aliasConfig['target'] ]);
+                        }
+                    }
+
                     $checkAlias->save();
+                    $alias = $checkAlias;
 
                     $this->setAlias($checkAlias);
                 }
@@ -423,6 +438,7 @@ trait Alias
                         $actualAlias = $aliasesRepository->fetchOne([
                             'where' => [
                                 'uid' => $alias->getUid(),
+                                'language' => $alias->getLanguage(),
                                 'status' => 200,
                             ],
                         ]);
@@ -435,23 +451,12 @@ trait Alias
 
                             $this->setAlias($alias);
 
-                            $result = $aliasesRepository->fetch([
-                                'where' => [
-                                    'uid' => $alias->getUid(),
-                                    'language' => $alias->getLanguage(),
-                                    new \Frootbox\Db\Conditions\NotEqual('id', $alias->getId()),
-                                ]
-                            ]);
-
-                            foreach ($result as $oldAlias) {
-                                $oldAlias->setStatus(301);
-                                $oldAlias->save();
-                            }
                         }
                         else {
 
                             if (preg_match('#^' . $checkAlias->getAlias() . '\-([0-9]+)$#', $actualAlias->getAlias(), $match)) {
-                                $this->setAlias($actualAlias);
+                                $alias = $actualAlias;
+                                $this->setAlias($alias);
                             }
                             else {
 
@@ -459,19 +464,6 @@ trait Alias
                                 $alias->setAlias($saveAliasUri);
                                 $alias = $aliasesRepository->persist($alias);
                                 $this->setAlias($alias);
-
-                                $result = $aliasesRepository->fetch([
-                                    'where' => [
-                                        'uid' => $alias->getUid(),
-                                        'language' => $alias->getLanguage(),
-                                        new \Frootbox\Db\Conditions\NotEqual('id', $alias->getId()),
-                                    ]
-                                ]);
-
-                                foreach ($result as $oldAlias) {
-                                    $oldAlias->setStatus(301);
-                                    $oldAlias->save();
-                                }
                             }
                         }
                     }
@@ -483,22 +475,23 @@ trait Alias
                 $alias->setAlias($aliasUri);
                 $alias = $aliasesRepository->persist($alias);
 
-                $result = $aliasesRepository->fetch([
-                    'where' => [
-                        'uid' => $alias->getUid(),
-                        'language' => $alias->getLanguage(),
-                        new \Frootbox\Db\Conditions\NotEqual('id', $alias->getId()),
-                    ]
-                ]);
-
-                foreach ($result as $oldAlias) {
-                    $oldAlias->setStatus(301);
-                    $oldAlias->save();
-                }
-
                 $this->setAlias($alias);
             }
 
+            // Keep all previous URLs pointing directly to the selected current alias.
+            $result = $aliasesRepository->fetch([
+                'where' => [
+                    'uid' => $alias->getUid(),
+                    'language' => $alias->getLanguage(),
+                    new \Frootbox\Db\Conditions\NotEqual('id', $alias->getId()),
+                ],
+            ]);
+
+            foreach ($result as $oldAlias) {
+                $oldAlias->setStatus(301);
+                $oldAlias->addConfig([ 'target' => $alias->getAlias() ]);
+                $oldAlias->save();
+            }
 
             parent::save();
 

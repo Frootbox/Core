@@ -106,26 +106,48 @@ class Page
 
         $thumbnail->render();
 
-        // Serve image
-        if (strpos($_SERVER['HTTP_ACCEPT'], 'image/webp') !== false and !empty($config->get('thumbnails.webp'))) {
+        // Open before sending headers: generation may fail or the cache may be cleared.
+        $cacheFile = $thumbnail->getCacheFile();
+        $stream = @fopen($cacheFile, 'rb');
 
-            if (function_exists('imagewebp')) {
-
-                $img = imagecreatefromjpeg($thumbnail->getCacheFile());
-                imagewebp($img, $thumbnail->getCacheFile() . '.webp', 80);
-                imagedestroy($img);
-            }
-
-            header('Content-type: image/webp');
-            readfile($thumbnail->getCacheFile() . '.webp');
+        if ($stream === false) {
+            error_log('Thumbnail output could not be opened: ' . $cacheFile);
+            http_response_code(500);
             exit;
         }
-        else {
-           header('Content-type: ' . $file->getType());
+
+        // Convert supported raster images in memory, avoiding partial WebP cache files.
+        if (strpos($_SERVER['HTTP_ACCEPT'] ?? '', 'image/webp') !== false
+            && !empty($config->get('thumbnails.webp'))
+            && function_exists('imagewebp')
+            && function_exists('imagecreatefromstring')
+            && in_array(strtolower(pathinfo($cacheFile, PATHINFO_EXTENSION)), ['jpg', 'jpeg', 'png'], true)) {
+
+            $imageData = stream_get_contents($stream);
+            $img = $imageData !== false ? @imagecreatefromstring($imageData) : false;
+
+            if ($img !== false) {
+                ob_start();
+                $converted = @imagewebp($img, null, 80);
+                $webp = ob_get_clean();
+                imagedestroy($img);
+
+                if ($converted && $webp !== false && $webp !== '') {
+                    fclose($stream);
+                    header('Vary: Accept', false);
+                    header('Content-Type: image/webp');
+                    echo $webp;
+                    exit;
+                }
+            }
+
+            rewind($stream);
         }
 
-
-        readfile($thumbnail->getCacheFile());
+        header('Vary: Accept', false);
+        header('Content-Type: ' . $file->getType());
+        fpassthru($stream);
+        fclose($stream);
         exit;
     }
 }

@@ -113,7 +113,13 @@ class Extension extends AbstractRow
         $className = '\\Frootbox\\Ext\\' . $this->getVendorId() . '\\' . $this->getExtensionId() . '\\ExtensionController';
 
         if (!class_exists($className)) {
-            unlink(FILES_DIR . 'cache/system/autoload.php');
+            $autoloadCache = FILES_DIR . 'cache/system/autoload.php';
+
+            if (is_file($autoloadCache)) {
+                @unlink($autoloadCache);
+            }
+
+            throw new \RuntimeException('Extension controller could not be loaded: ' . $className);
         }
 
         return new $className;

@@ -7,6 +7,8 @@
 
 namespace Frootbox;
 
+$performanceStarted = hrtime(true);
+
 try {
 
     ini_set('display_errors', 1);
@@ -23,6 +25,17 @@ try {
     require 'cms/classes/Front.php';
 
     $container = Front::init();
+
+    $configuration = $container->get(\Frootbox\Config\Config::class);
+    $performanceOptions = $configuration->get('performanceLogging');
+    $performance = new \Frootbox\PerformanceLogger(
+        $performanceOptions instanceof \Frootbox\Config\ConfigAccess
+            ? $performanceOptions->getData()
+            : (array) $performanceOptions,
+        $performanceStarted,
+        $_SERVER['DOCUMENT_ROOT'] ?? __DIR__
+    );
+    $performance->phase('routing');
 
     // Generate client request
     $requestTarget = str_replace(dirname($_SERVER['PHP_SELF']) . '/', '', $_SERVER['REQUEST_URI']);
@@ -332,6 +345,31 @@ try {
 
     define('MULTI_LANGUAGE', !empty($configuration->get('i18n.multiAliasMode')));
 
+    // Numeric config arrays are merged recursively, so removed languages can remain
+    // in the combined configuration. Prefer the unmerged customer configuration.
+    $configuredLanguages = $adminConfig['i18n']['languages'] ?? $configuration->get('i18n.languages');
+
+    $activeLanguages = $configuredLanguages instanceof \Frootbox\Config\ConfigAccess
+        ? $configuredLanguages->getData()
+        : (array) $configuredLanguages;
+
+    $restrictLanguages = !empty($activeLanguages);
+    $configuredDefaults = $adminConfig['i18n']['defaults'] ?? $configuration->get('i18n.defaults');
+    $configuredDefaultLanguage = $configuredDefaults[0] ?? null;
+    $fallbackLanguage = in_array($configuredDefaultLanguage, $activeLanguages, true)
+        ? $configuredDefaultLanguage
+        : ($activeLanguages[0] ?? 'de-DE');
+
+    $isActiveLanguage = static function (?string $language) use ($activeLanguages, $restrictLanguages): bool {
+        return !$restrictLanguages || empty($language) || in_array($language, $activeLanguages, true);
+    };
+
+    $activeLanguagePrefixes = array_map(fn (string $language): string => substr($language, 0, 2), $activeLanguages);
+    $requestLanguagePrefix = explode('/', trim($request, '/'))[0] ?? '';
+    $hasInactiveLanguagePrefix = $restrictLanguages
+        && preg_match('#^[a-z]{2}$#', $requestLanguagePrefix)
+        && !in_array($requestLanguagePrefix, $activeLanguagePrefixes, true);
+
     if (empty($request) or $request == '/') {
 
         // Fetch root alias
@@ -381,6 +419,11 @@ try {
             ]);
         }
 
+        // Do not keep formerly configured languages accessible through old aliases.
+        if ($alias and ($hasInactiveLanguagePrefix || !$isActiveLanguage($alias->getLanguage()))) {
+            $alias = null;
+        }
+
         if ($alias and $alias->getStatus() == 200 and empty($alias->getVisibility())) {
             // $alias = null;
         }
@@ -389,12 +432,27 @@ try {
 
             if (preg_match('#cache\/images#', $request)) {
 
-                $path = str_replace(dirname($_SERVER['SCRIPT_NAME']) . '/', '', $_SERVER['REQUEST_URI']) . '.xdata.json';
-                $json = file_get_contents(__DIR__ . $path);
+                $urlPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+                $basePath = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/');
+                $path = is_string($urlPath) ? $urlPath : '';
 
-                $request = json_decode($json, true);
+                if ($basePath !== '' && strpos($path, $basePath . '/') === 0) {
+                    $path = substr($path, strlen($basePath));
+                }
 
-                $query = http_build_query($request);
+                $metadataPath = __DIR__ . '/' . ltrim($path, '/') . '.xdata.json';
+                // Cache files may disappear between checking and reading them.
+                $json = is_file($metadataPath) && is_readable($metadataPath)
+                    ? @file_get_contents($metadataPath)
+                    : false;
+                $imageRequest = $json !== false ? json_decode($json, true) : null;
+
+                if (!is_array($imageRequest) || empty($imageRequest)) {
+                    http_response_code(404);
+                    exit;
+                }
+
+                $query = http_build_query($imageRequest);
 
                 $location = SERVER_PATH_PROTOCOL . 'static/Ext/Core/Images/Thumbnail/render?' . $query;
 
@@ -497,7 +555,32 @@ try {
     // Set language
     $language = ($alias and !empty($alias->getLanguage())) ? $alias->getLanguage() : $page->getLanguage();
 
+
     $language = !empty($_GET['forceLanguage']) ? $_GET['forceLanguage'] : $language;
+
+    if (!$isActiveLanguage($language)) {
+
+        $pagesRepository = $container->get(\Frootbox\Persistence\Repositories\Pages::class);
+        $page = $pagesRepository->fetchOne([
+            'where' => [
+                'type' => 'Error404',
+                'language' => $fallbackLanguage,
+            ],
+        ]);
+
+        if (!$page) {
+            http_response_code(404);
+            header('X-Robots-Tag: noindex, nofollow', true);
+            die('Die Seite wurde nicht gefunden.');
+        }
+
+        $alias = null;
+        $language = $fallbackLanguage;
+    }
+
+
+    $performance->context(['page_id' => $page->getId(), 'language' => $language]);
+    $performance->phase('page_setup');
 
     define('GLOBAL_LANGUAGE', $language);
     define('DEFAULT_LANGUAGE', $configuration->get('i18n.defaults')[0] ?? $configuration->get('i18n.languages')[0] ?? 'de-DE');
@@ -646,6 +729,8 @@ try {
         $view->addPath($configuration->get('pageRootFolder'));
     }
 
+    $performance->phase('layout_setup');
+
     // Get sockets config from cache
     $key = md5($_SERVER['REQUEST_URI']);
     $cacheFile = FILES_DIR . 'cache/system/sockets/' . $key . '.php';
@@ -720,7 +805,9 @@ try {
                 )
             ORDER BY orderId DESC';
 
+            $performance->phase('content_queries');
             $result = $contentElements->fetchByQuery($sql);
+            $performance->phase('content_render');
 
             $contentReplacements = [];
 
@@ -739,77 +826,85 @@ try {
                 }
 
 
-                switch ($contentElement->getType()) {
+                $elementStarted = hrtime(true);
+                $action = 'index';
+                try {
+                    switch ($contentElement->getType()) {
 
-                    case 'Plugin':
+                        case 'Plugin':
 
-                        // Extract plugins payload
-                        if (isset($alias)) {
-                            $payload =  $container->call([$alias, 'getPayloadData'], ['contentElement' => $contentElement]);
-                        }
-                        else {
-
-                            $injectedGetData = $get->get('p') ?? [ ];
-
-                            if (!empty($injectedGetData[$contentElement->getId()])) {
-                                $payload = $injectedGetData[$contentElement->getId()];
+                            // Extract plugins payload
+                            if (isset($alias)) {
+                                $payload =  $container->call([$alias, 'getPayloadData'], ['contentElement' => $contentElement]);
                             }
                             else {
-                                $payload = [];
-                            }
-                        }
 
-                        if (!empty($payload)) {
-                            $contentElement->setAttributes($payload);
-                        }
+                                $injectedGetData = $get->get('p') ?? [ ];
 
-
-                        // Generate action
-                        $action = $payload['action'] ?? 'index';
-                        $method = $action . 'Action';
-
-                        $contentElement->setCurrentAction($action);
-                        $contentElement->setPage($page);
-
-                        // Call plugin action
-                        if (method_exists($contentElement, $method)) {
-
-                            // Call action
-                            $result = $container->call([$contentElement, $method]);
-
-                            if (!empty($result)) {
-
-                                if ($result instanceof \Frootbox\View\ResponseRedirect) {
-                                    http_response_code(200);
-                                    header('Location: ' . $result->getTarget());
-                                    exit;
+                                if (!empty($injectedGetData[$contentElement->getId()])) {
+                                    $payload = $injectedGetData[$contentElement->getId()];
                                 }
                                 else {
+                                    $payload = [];
+                                }
+                            }
 
-                                    foreach ($result->getData() as $key => $value) {
-                                        $view->set($key, $value);
+                            if (!empty($payload)) {
+                                $contentElement->setAttributes($payload);
+                            }
+
+
+                            // Generate action
+                            $action = $payload['action'] ?? 'index';
+                            $method = $action . 'Action';
+
+                            $contentElement->setCurrentAction($action);
+                            $contentElement->setPage($page);
+
+                            // Call plugin action
+                            if (method_exists($contentElement, $method)) {
+
+                                // Call action
+                                $result = $container->call([$contentElement, $method]);
+
+                                if (!empty($result)) {
+
+                                    if ($result instanceof \Frootbox\View\ResponseRedirect) {
+                                        http_response_code(200);
+                                        header('Location: ' . $result->getTarget());
+                                        exit;
+                                    }
+                                    else {
+
+                                        foreach ($result->getData() as $key => $value) {
+                                            $view->set($key, $value);
+                                        }
                                     }
                                 }
                             }
-                        }
 
 
-                        // Render html
-                        $htmlFragment = $container->call([$contentElement, 'renderHtml'], [
-                            'action' => $action
-                        ]);
-                        break;
+                            // Render html
+                            $htmlFragment = $container->call([$contentElement, 'renderHtml'], [
+                                'action' => $action
+                            ]);
+                            break;
 
 
-                    case 'Text':
-                    case 'Grid':
+                        case 'Text':
+                        case 'Grid':
 
-                        $htmlFragment = $container->call([$contentElement, 'renderHtml'], [
-                            'action' => 'index',
-                            'order' => $loop
-                        ]);
+                            $htmlFragment = $container->call([$contentElement, 'renderHtml'], [
+                                'action' => 'index',
+                                'order' => $loop
+                            ]);
 
-                        break;
+                            break;
+                    }
+
+                }
+                finally {
+                    $performance->element((int) $contentElement->getId(), get_class($contentElement), $action, $elementStarted);
                 }
 
                 ++$loop;
@@ -884,6 +979,8 @@ try {
         }
     }
 
+    $performance->phase('layout_render');
+
     if ($layout !== null) {
         $html = $view->render($layout);
     }
@@ -894,6 +991,8 @@ try {
     foreach ($htmlSnippets as $snippet) {
         $html = str_replace($snippet['tagline'], $snippet['html'], $html);
     }
+
+    $performance->phase('html_processing');
 
     // Generate response
     $response = $container->get(\Frootbox\Http\Response::class);
@@ -931,6 +1030,8 @@ try {
 
     $response->setBody($html);;
 
+
+    $performance->phase('post_processing');
 
     // Initialize custom post routing
     if (!empty($routes = $configuration->get('postroutes'))) {
@@ -1020,6 +1121,7 @@ try {
 
     header('X-Frame-Options: ALLOW-FROM *');
 
+    $performance->phase('output');
     echo $html;
 }
 catch (\Frootbox\Exceptions\NotFound $exception) {

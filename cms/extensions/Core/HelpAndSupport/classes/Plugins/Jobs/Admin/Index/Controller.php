@@ -56,6 +56,7 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
      *
      */
     public function downloadJsonAction(
+        \Frootbox\Persistence\Content\Repositories\Texts $textsRepository,
         \Frootbox\Ext\Core\HelpAndSupport\Plugins\Jobs\Persistence\Repositories\Jobs $jobsRepository,
     ): void
     {
@@ -74,7 +75,7 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         ];
 
         foreach ($jobs as $job) {
-            $payload['jobs'][] = $this->getJobExportData($job);
+            $payload['jobs'][] = $this->getJobExportData($job, $textsRepository);
         }
 
         $filename = 'jobs-export-' . date('Y-m-d-H-i-s') . '.json';
@@ -101,6 +102,7 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
      */
     private function getJobExportData(
         \Frootbox\Ext\Core\HelpAndSupport\Plugins\Jobs\Persistence\Job $job,
+        \Frootbox\Persistence\Content\Repositories\Texts $textsRepository,
     ): array
     {
         return [
@@ -108,6 +110,7 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
             'title' => $job->getTitle(),
             'subtitle' => $job->getSubtitle(),
             'titles' => $job->getConfig('titles') ?? [],
+            'display' => $this->getDisplayExportData($job, $textsRepository),
             'locationId' => $job->getLocationId(),
             'location' => $this->getLocationExportData($job),
             'dateStart' => $job->getDataRaw('dateStart'),
@@ -141,6 +144,32 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     /**
      *
      */
+    private function getDisplayExportData(
+        \Frootbox\Ext\Core\HelpAndSupport\Plugins\Jobs\Persistence\Job $job,
+        \Frootbox\Persistence\Content\Repositories\Texts $textsRepository,
+    ): array
+    {
+        $language = $_SESSION['frontend']['language'] ?? DEFAULT_LANGUAGE;
+        $where = ['uid' => $job->getUid('title')];
+
+        if (MULTI_LANGUAGE) {
+            $where['language'] = $language;
+        }
+
+        $text = $textsRepository->fetchOne(['where' => $where]);
+
+        // Match the headline renderer's fallback for repository-based UIDs.
+        if (MULTI_LANGUAGE && !$text && $language !== DEFAULT_LANGUAGE) {
+            $text = $textsRepository->fetchOne(['where' => ['uid' => $job->getUid('title')]]);
+        }
+
+        return [
+            'title' => $text?->getConfig('headline') ?: $job->getTitle($language),
+            'subtitle' => $text ? ($text->getConfig('subtitle') ?: null) : $job->getSubtitle(),
+            'employmentLabel' => $text?->getConfig('supertitle') ?: null,
+        ];
+    }
+
     private function getLocationExportData(
         \Frootbox\Ext\Core\HelpAndSupport\Plugins\Jobs\Persistence\Job $job,
     ): ?array
