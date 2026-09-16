@@ -114,8 +114,11 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         $pickUpTime = $selfPickupTimeRepository->fetchById($get->get('PickUpTimeId'));
 
         // Update pickup-time
+        $pickUpTime->unsetConfig('Weekdays');
+
         $pickUpTime->setDateStart('2000-01-01 ' . $post->get('PickUpTimeStart'));
         $pickUpTime->setDateEnd('2000-01-01 ' . $post->get('PickUpTimeEnd'));
+
         $pickUpTime->addConfig([
             'LeadTime' => $post->get('LeadTime'),
             'Weekdays' => $post->get('Weekdays'),

@@ -131,6 +131,7 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
             'formId' => $job->getConfig('formId'),
             'tags' => $this->getTagsExportData($job),
             'texts' => $this->getTextsExportData($job),
+            'images' => $this->getImagesExportData($job),
             'visibility' => $job->getVisibility(),
             'isSticky' => (bool) $job->getIsSticky(),
             'orderId' => $job->getOrderId(),
@@ -210,6 +211,27 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         }
 
         return $tags;
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function getImagesExportData(
+        \Frootbox\Ext\Core\HelpAndSupport\Plugins\Jobs\Persistence\Job $job,
+    ): array
+    {
+        $images = [];
+
+        // Include the custom job header image used by customer layouts.
+        foreach ([ 'topimage' ] as $segment) {
+            $file = $job->getFileByUid($segment, [ 'fallbackLanguageDefault' => true ]);
+
+            if ($file !== null) {
+                $images[] = $file->getUriThumbnail();
+            }
+        }
+
+        return $images;
     }
 
     /**

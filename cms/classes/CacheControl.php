@@ -23,35 +23,7 @@ class CacheControl
     {
         $token = $this->config->get('statics.signing.token') ?? null;
 
-        function rrmdir($dir) {
-
-            if (is_dir($dir)) {
-
-                if (file_exists($dir . '.cachekeep')) {
-                    return;
-                }
-
-                $objects = scandir($dir);
-
-                foreach ($objects as $object) {
-
-                    if ($object == "." or $object == "..") {
-                        continue;
-                    }
-
-                    if (is_dir($dir . '/' . $object)) {
-                        rrmdir($dir . "/" . $object . '/');
-                    }
-                    else {
-                        unlink($dir . "/" . $object);
-                    }
-                }
-
-                @rmdir($dir);
-            }
-        }
-
-        rrmdir($this->config->get('filesRootFolder') . 'cache/');
+        $this->removeDirectory($this->config->get('filesRootFolder') . 'cache/');
 
         $cacheRevision = $this->config->get('statics.cache.revision') ?? 1;
 
@@ -74,5 +46,32 @@ class CacheControl
         }
 
         $this->configStatics->write();
+    }
+
+    /**
+     * Removes a directory tree without loading all entries into memory.
+     */
+    private function removeDirectory(string $directory): void
+    {
+        if (!is_dir($directory) || is_link($directory)) {
+            return;
+        }
+
+        $directory = rtrim($directory, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+
+        if (file_exists($directory . '.cachekeep')) {
+            return;
+        }
+
+        foreach (new \FilesystemIterator($directory, \FilesystemIterator::SKIP_DOTS) as $item) {
+            if ($item->isDir() && !$item->isLink()) {
+                $this->removeDirectory($item->getPathname());
+            }
+            else {
+                unlink($item->getPathname());
+            }
+        }
+
+        @rmdir($directory);
     }
 }

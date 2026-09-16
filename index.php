@@ -732,7 +732,14 @@ try {
     $performance->phase('layout_setup');
 
     // Get sockets config from cache
-    $key = md5($_SERVER['REQUEST_URI']);
+    // Socket positions are defined by the page layout, not by query parameters.
+    // Using REQUEST_URI here created a permanent cache file for every possible
+    // filter/tracking parameter combination.
+    $key = md5(implode('|', [
+        $page->getId(),
+        $page->getLayout(),
+        GLOBAL_LANGUAGE,
+    ]));
     $cacheFile = FILES_DIR . 'cache/system/sockets/' . $key . '.php';
 
     if (!file_exists($cacheFile)) {
