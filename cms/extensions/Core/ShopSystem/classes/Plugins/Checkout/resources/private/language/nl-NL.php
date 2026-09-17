@@ -75,6 +75,7 @@ return [
     'H4PaymentMethod' => 'Betaling',
 
     'LabelChoosePickupMonth' => 'Selecteer maand',
+    'LabelSelectedPickupDay' => 'Gekozen ophaaldag',
     'LabelPreferredPickupDate' => 'gewenste ophaaldag',
     'LabelPreferredPickupTime' => 'gewenste ophaaltijd',
     'LabelDate' => 'Datum',

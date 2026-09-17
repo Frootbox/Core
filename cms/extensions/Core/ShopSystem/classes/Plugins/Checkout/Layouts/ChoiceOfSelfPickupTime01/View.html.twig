@@ -30,6 +30,10 @@ variables:
 
                 <h2 class="first main-title" data-editable data-uid="{{ plugin.getUid('titleSelfPickupTime') }}">Abholzeit wählen</h2>
 
+                {% if PickupDay %}
+                    <p><strong>{{ "Core.ShopSystem.Plugins.Checkout.LabelSelectedPickupDay" | translate }}:</strong> {{ PickupDay | date('d.m.Y') }}</p>
+                {% endif %}
+
                 <div class="row">
                     <div class="col-md-6">
 

@@ -2667,6 +2667,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
         // $selfPickupTimes = !empty($this->getConfig('SelfPickupTimes')) ? explode("\n", $this->getConfig('SelfPickupTimes')) : [];
 
         return new Response([
+            'PickupDay' => $shopcart->getShipping('pickupDay'),
             'SelfPickupTimes' => $list,
         ]);
     }

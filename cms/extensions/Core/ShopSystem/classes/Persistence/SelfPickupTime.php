@@ -68,7 +68,8 @@ class SelfPickupTime extends \Frootbox\Persistence\AbstractAsset
 
         $weekdays = $this->getConfig('Weekdays');
 
-        if (empty($weekdays[$date->format('w')])) {
+        // Weekdays are stored with ISO-8601 numbering (1 = Monday, 7 = Sunday).
+        if (empty($weekdays[$date->format('N')])) {
             return false;
         }
 

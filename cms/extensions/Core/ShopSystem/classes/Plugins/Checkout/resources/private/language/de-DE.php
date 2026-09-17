@@ -83,6 +83,7 @@ return [
     'H4PaymentMethod' => 'Zahlungsart',
 
     'LabelChoosePickupMonth' => 'Monat wählen',
+    'LabelSelectedPickupDay' => 'Gewählter Abholtag',
     'LabelPreferredPickupDate' => 'gewünschter Abholtag',
     'LabelPreferredPickupTime' => 'gewünschte Abholzeit',
     'LabelDate' => 'Datum',
