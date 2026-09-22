@@ -6,6 +6,7 @@ autoLayout:
 /config #}
 
 {% set i = view.getViewhelper('Delegator', { object: plugin }) %}
+{% set a = view.getViewhelper('Assets') %}
 
 {{ i.injectScss({ path: 'Index08/public/standards.less'}) | raw }}
 {{ i.injectScript({ path: 'Index08/public/init.js'}) | raw }}
@@ -13,8 +14,8 @@ autoLayout:
 {% set years = i.getArticlesByYear({ limit: 2024 }) %}
 
 
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
-<script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+{{ a.import('https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css') | raw }}
+{{ a.import('https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js') | raw }}
 
 <div class="row">
     <div class="col-12 plugin Core News News Index08">
