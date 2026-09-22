@@ -17,6 +17,8 @@ class Session {
 
     protected $sessionName;
 
+    protected bool $secureCookies;
+
     /**
      * 
      */
@@ -30,6 +32,7 @@ class Session {
 
         // Set session name
         $this->sessionName = $config->get('session.name') ?? 'frootbox-cms';
+        $this->secureCookies = $config->get('session.secureCookies') !== false;
 
         if ($config->get('session.disableCookies')) {
             ini_set('session.use_trans_sid','1');
@@ -43,16 +46,15 @@ class Session {
 
         session_name($this->sessionName);
 
-        /*
-        session_set_cookie_params([
-            'lifetime' => 3600 * 48,
-            'path' => SERVER_PATH,
-            'domain' => $_SERVER['SERVER_NAME'],
-            'secure' => IS_SSL,
-            'httponly' => true,
-           // 'samesite' => 'Strict'
-        ]);
-*/
+        if (!$config->get('session.disableCookies')) {
+            session_set_cookie_params([
+                'lifetime' => 0,
+                'path' => '/',
+                'secure' => $this->secureCookies,
+                'httponly' => true,
+                'samesite' => 'Lax',
+            ]);
+        }
 
         // Start session
         if ($config->get('session.disableCookies')) {
@@ -80,6 +82,30 @@ class Session {
     {
 
         return $this->sessionName;
+    }
+
+    /**
+     * Delete the persistent auto-login cookie.
+     */
+    public function deleteAutoLoginCookie(): void
+    {
+        $this->setAutoLoginCookie('', $_SERVER['REQUEST_TIME'] - (3600 * 24 * 365));
+        unset($_COOKIE['fbxAutoLogin']);
+    }
+
+    /**
+     * Set the persistent auto-login cookie with the same security attributes as
+     * the session cookie.
+     */
+    public function setAutoLoginCookie(string $value, int $expires): void
+    {
+        setcookie('fbxAutoLogin', $value, [
+            'expires' => $expires,
+            'path' => '/',
+            'secure' => $this->secureCookies,
+            'httponly' => true,
+            'samesite' => 'Lax',
+        ]);
     }
 
     /**
@@ -127,7 +153,7 @@ class Session {
         unset($_SESSION['user']);
 
         // Remove auto-login cookie
-        setcookie('fbxAutoLogin', 'xx', $_SERVER['REQUEST_TIME'] - (3600 * 24 * 365), '/');
+        $this->deleteAutoLoginCookie();
 
         return $this;
     }

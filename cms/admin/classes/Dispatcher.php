@@ -63,7 +63,7 @@ class Dispatcher
                     }
                 }
                 else {
-                    setcookie('fbxAutoLogin', 'xxx', $_SERVER['REQUEST_TIME'] - (3600 * 24 * 365), '/');
+                    $session->deleteAutoLoginCookie();
                 }
             }
             catch ( \Frootbox\Exceptions\NotFound $e ) {
@@ -71,7 +71,7 @@ class Dispatcher
                 // Ignore any exceptions and move on
                 // but clean the autologin-cookie
 
-                setcookie('fbxAutoLogin', 'xxx', $_SERVER['REQUEST_TIME'] - (3600 * 24 * 365), '/');
+                $session->deleteAutoLoginCookie();
             }
         }
 

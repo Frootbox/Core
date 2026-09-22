@@ -1118,10 +1118,99 @@ try {
 
     if (!defined('EDITING') or !EDITING) {
 
-        $scriptSrc = !empty($configuration->get('contentSecurityPolicy.domains')) ? implode(' ', $configuration->get('contentSecurityPolicy.domains')->getData()) : '';
+        $contentSecurityPolicyEnabled = $configuration->get('contentSecurityPolicy.enabled');
 
-        // header("Content-Security-Policy: script-src * 'self' 'unsafe-inline' 'unsafe-hashes' 'unsafe-eval' " . $scriptSrc . " www.google.com cookieconsent.herrundfraupixel.de 'nonce-" . SCRIPT_NONCE . "'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'");
-        // header("Content-Security-Policy: script-src * 'self' 'unsafe-inline' 'unsafe-eval' " . $scriptSrc . " www.google.com cookieconsent.herrundfraupixel.de 'nonce-" . SCRIPT_NONCE . "'; base-uri 'self'; form-action 'self'; object-src 'none'");
+        if ($contentSecurityPolicyEnabled !== false) {
+
+            $contentSecurityPolicy = [
+                'default-src' => [ "'self'" ],
+                'base-uri' => [ "'self'" ],
+                'object-src' => [ "'none'" ],
+                'frame-ancestors' => [ "'self'" ],
+                'form-action' => [ "'self'" ],
+                'script-src' => [
+                    "'self'",
+                    "'nonce-" . SCRIPT_NONCE . "'",
+                    'https://maps.googleapis.com',
+                    'https://maps.gstatic.com',
+                    'https://cookieconsent.herrundfraupixel.de',
+                    'https://code.jquery.com',
+                    'https://cdnjs.cloudflare.com',
+                    'https://stackpath.bootstrapcdn.com',
+                ],
+                'style-src' => [
+                    "'self'",
+                    "'unsafe-inline'",
+                    'https://fonts.googleapis.com',
+                    'https://cdnjs.cloudflare.com',
+                    'https://stackpath.bootstrapcdn.com',
+                ],
+                'font-src' => [
+                    "'self'",
+                    'data:',
+                    'https://fonts.gstatic.com',
+                    'https://cdnjs.cloudflare.com',
+                ],
+                'img-src' => [ "'self'", 'data:', 'blob:', 'https:' ],
+                'media-src' => [ "'self'", 'blob:' ],
+                'frame-src' => [
+                    "'self'",
+                    'https://www.youtube.com',
+                    'https://www.youtube-nocookie.com',
+                    'https://www.google.com',
+                    'https://maps.google.com',
+                ],
+                'connect-src' => [
+                    "'self'",
+                    'https://maps.googleapis.com',
+                    'https://maps.gstatic.com',
+                ],
+                'worker-src' => [ "'self'", 'blob:' ],
+                'manifest-src' => [ "'self'" ],
+            ];
+
+            // Keep the former flat domain list working as additional script sources.
+            if (!empty($legacyDomains = $configuration->get('contentSecurityPolicy.domains'))) {
+                foreach ($legacyDomains->getData() as $domain) {
+                    if (is_string($domain) && !str_contains($domain, '://')) {
+                        $domain = 'https://' . $domain;
+                    }
+
+                    $contentSecurityPolicy['script-src'][] = $domain;
+                }
+            }
+
+            // Project-specific directives extend the defaults from localconfig.php.
+            if (!empty($configuredDirectives = $configuration->get('contentSecurityPolicy.directives'))) {
+                foreach ($configuredDirectives->getData() as $directive => $sources) {
+                    if (!preg_match('#^[a-z][a-z0-9-]*$#', $directive) || !is_array($sources)) {
+                        continue;
+                    }
+
+                    $contentSecurityPolicy[$directive] ??= [];
+                    $contentSecurityPolicy[$directive] = array_merge($contentSecurityPolicy[$directive], $sources);
+                }
+            }
+
+            $policy = [];
+
+            foreach ($contentSecurityPolicy as $directive => $sources) {
+                $sources = array_values(array_unique(array_filter($sources, function ($source) {
+                    return is_string($source) && $source !== '' && !preg_match('#[\\s;,]#', $source);
+                })));
+
+                if (!empty($sources)) {
+                    $policy[] = $directive . ' ' . implode(' ', $sources);
+                }
+            }
+
+            $headerName = $configuration->get('contentSecurityPolicy.reportOnly') === true
+                ? 'Content-Security-Policy-Report-Only'
+                : 'Content-Security-Policy';
+
+            header($headerName . ': ' . implode('; ', $policy));
+        }
+
         header('Strict-Transport-Security: max-age=31536000');
         header('X-Content-Type-Options: nosniff');
     }

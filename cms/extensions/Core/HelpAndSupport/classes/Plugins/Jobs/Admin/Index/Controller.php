@@ -114,6 +114,7 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
             'locationId' => $job->getLocationId(),
             'location' => $this->getLocationExportData($job),
             'dateStart' => $job->getDataRaw('dateStart'),
+            'startText' => $job->getConfig('start'),
             'start' => $job->getConfig('start'),
             'asSoonAsPossible' => !empty($job->getConfig('asSoonAsPossible')),
             'limitation' => $job->getConfig('limitation'),

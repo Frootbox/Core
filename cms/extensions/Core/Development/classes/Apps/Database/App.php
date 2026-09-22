@@ -94,7 +94,19 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
         $path = new \Frootbox\Filesystem\Directory($config->get('filesRootFolder') . 'tmp/');
         $path->make();
 
-        $sqlFile = $path->getPath() . 'sql-export.sql';
+        $sqlFile = tempnam($path->getPath(), 'sql-export-');
+
+        if ($sqlFile === false) {
+            throw new \RuntimeException('Could not create temporary export file.');
+        }
+
+        // Remove the potentially large temporary dump even if generation or
+        // transmission is interrupted.
+        register_shutdown_function(static function () use ($sqlFile): void {
+            if (is_file($sqlFile)) {
+                unlink($sqlFile);
+            }
+        });
 
         $settings = [
             'add-drop-table' => true
@@ -113,13 +125,24 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
 
         $dump->start($sqlFile);
 
+        // The application/framework may have active output buffers. Leaving
+        // them enabled would make readfile() retain the complete dump in PHP
+        // memory before it is sent to the client.
+        while (ob_get_level() > 0) {
+            ob_end_clean();
+        }
 
         http_response_code(200);
 
         header('Content-type: application/sql');
         header('Content-Disposition: attachment; filename="export-' . $config->get('database.schema') . '-' . date('Y-m-d-H-i-s') . '.sql"');
+        header('Content-Length: ' . filesize($sqlFile));
+        header('X-Content-Type-Options: nosniff');
 
-        readfile($sqlFile);
+        if (readfile($sqlFile) === false) {
+            throw new \RuntimeException('Could not stream database export.');
+        }
+
         exit;
     }
     

@@ -96,7 +96,10 @@ class Controller extends \Frootbox\Admin\Controller\AbstractController
             
             // Write permanent auto login cookie for one year
             // TODO Make this configurable later
-            setcookie('fbxAutoLogin', json_encode($payload), $_SERVER['REQUEST_TIME'] + (3600 * 24 * 365), '/');
+            $session->setAutoLoginCookie(
+                json_encode($payload),
+                $_SERVER['REQUEST_TIME'] + (3600 * 24 * 365)
+            );
         }
 
         // Auto backup after login
