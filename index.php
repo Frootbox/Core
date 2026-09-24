@@ -161,17 +161,17 @@ try {
     define('IS_WEBP', !empty($configuration->get('thumbnails.webp')));
 
 
-    // Initialize routing
+    // Check global access before custom routes can handle a request.
     $routes = [
-        [
-            'route' => \Frootbox\Ext\Core\System\Routing\StaticPagesRoute::class,
-        ],
+        [ 'route' => \Frootbox\Ext\Core\System\Routing\GlobalPasswordRoute::class ],
     ];
 
     // Initialize custom routing
     if (!empty($customRoutes = $configuration->get('routes'))) {
-        $routes = array_merge($customRoutes->getData(), $routes);
+        $routes = array_merge($routes, $customRoutes->getData());
     }
+
+    $routes[] = [ 'route' => \Frootbox\Ext\Core\System\Routing\StaticPagesRoute::class ];
 
     // Setup router
     $router = $container->make(\Frootbox\Routing\Router::class, [
