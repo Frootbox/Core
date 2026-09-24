@@ -879,19 +879,45 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
         // Fetch form
         $form = $formsRepository->fetchById($get->get('formId'));
 
-        // Fetch logs
-        $result = $logsRepository->fetch([
+        $itemsPerPage = 50;
+        $page = max(1, (int) $get->get('page'));
+
+        // Fetch only the current page of logs
+        $params = [
+            'calcFoundRows' => true,
             'where' => [
                 'parentId' => $form->getId(),
             ],
             'order' => [
                 'date DESC',
-            ]
-        ]);
+                'id DESC',
+            ],
+            'limit' => $itemsPerPage,
+            'page' => $page,
+        ];
+
+        $result = $logsRepository->fetch($params);
+        $total = $result->getTotal();
+        $pages = max(1, (int) $result->getPages());
+
+        if ($page > $pages) {
+            $page = $pages;
+            $params['page'] = $page;
+            $result = $logsRepository->fetch($params);
+        }
 
         return new Response('html', 200, [
             'form' => $form,
             'logs' => $result,
+            'pagination' => [
+                'page' => $page,
+                'pages' => $pages,
+                'firstPage' => max(1, $page - 2),
+                'lastPage' => min($pages, $page + 2),
+                'previousPage' => $page > 1 ? $page - 1 : null,
+                'nextPage' => $page < $pages ? $page + 1 : null,
+                'total' => $total,
+            ],
         ]);
     }
 
@@ -909,6 +935,7 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
         return new Response('html', 200, [
             'form' => $log->getForm(),
             'log' => $log,
+            'archivePage' => max(1, (int) $get->get('page')),
         ]);
     }
 

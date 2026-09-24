@@ -1130,9 +1130,12 @@ try {
                 'form-action' => [ "'self'" ],
                 'script-src' => [
                     "'self'",
+                    "'unsafe-eval'", // Required by the cookie consent script loader.
                     "'nonce-" . SCRIPT_NONCE . "'",
                     'https://maps.googleapis.com',
                     'https://maps.gstatic.com',
+                    'https://www.google.com/recaptcha/',
+                    'https://www.gstatic.com/recaptcha/',
                     'https://cookieconsent.herrundfraupixel.de',
                     'https://code.jquery.com',
                     'https://cdnjs.cloudflare.com',
@@ -1158,12 +1161,14 @@ try {
                     'https://www.youtube.com',
                     'https://www.youtube-nocookie.com',
                     'https://www.google.com',
+                    'https://recaptcha.google.com/recaptcha/',
                     'https://maps.google.com',
                 ],
                 'connect-src' => [
                     "'self'",
                     'https://maps.googleapis.com',
                     'https://maps.gstatic.com',
+                    'https://www.google.com/recaptcha/',
                 ],
                 'worker-src' => [ "'self'", 'blob:' ],
                 'manifest-src' => [ "'self'" ],

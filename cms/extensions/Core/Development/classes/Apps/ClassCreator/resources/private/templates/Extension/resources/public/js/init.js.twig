@@ -120,9 +120,13 @@ $(function ( ) {
         $('.autoset-height-md').each(function ( ) {
 
             if ($(window).width() > 420) {
-                var width = $(this).width();
-                var physicalWidth = $(this).data('physicalwidth-md');
-                var physicalHeight = $(this).data('physicalheight-md');
+                var width = $(this).width() || $(this).closest('.carousel-inner').width();
+                var physicalWidth = parseInt($(this).data('physicalwidth-md')) || parseInt($(this).data('physicalwidth'));
+                var physicalHeight = parseInt($(this).data('physicalheight-md')) || parseInt($(this).data('physicalheight'));
+
+                if (!width || !physicalWidth || !physicalHeight) {
+                    return;
+                }
 
                 var ratio = width / physicalWidth;
 

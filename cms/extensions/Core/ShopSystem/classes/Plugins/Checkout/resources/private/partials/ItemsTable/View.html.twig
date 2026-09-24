@@ -52,6 +52,8 @@
                                     <div class="customnote">{{ item.getCustomNote() | nl2br }}</div>
                                 {% endif %}
 
+                                {% block item_product_notice %}{% endblock %}
+
                             </td>
                             <td class="d-none d-md-table-cell"></td>
                         </tr>
@@ -80,6 +82,8 @@
                                 {% if item.getCustomNote() %}
                                     <div class="customnote">{{ item.getCustomNote() | nl2br }}</div>
                                 {% endif %}
+
+                                {{ block('item_product_notice') }}
 
                                 {% if item.getMinimumAge() %}
                                     <div class="minimum-age">Mindestsalter für den Verkauf dieses Artikels ist {{ item.getMinimumAge() }} Jahre!</div>

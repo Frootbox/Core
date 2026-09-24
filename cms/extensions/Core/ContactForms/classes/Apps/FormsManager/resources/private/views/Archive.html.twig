@@ -54,7 +54,7 @@
                         {% for log in logs %}
 
                             {% set sender = log.getSender() %}
-                            <tr data-log="{{ log.getId() }}" data-href="{{ app.getUri('archiveLog', { logId: log.getId() }) }}">
+                            <tr data-log="{{ log.getId() }}" data-href="{{ app.getUri('archiveLog', { logId: log.getId(), page: pagination.page }) }}">
                                 <td>
                                     <i class="far fa-user"></i>&nbsp;
                                     {{ sender.name }}
@@ -70,6 +70,58 @@
 
                         </tbody>
                     </table>
+
+                    <p class="text-muted">Seite {{ pagination.page }} von {{ pagination.pages }} · {{ pagination.total }} Anfragen</p>
+
+                    {% if pagination.pages > 1 %}
+                        <nav aria-label="Anfragen Seiten">
+                            <ul class="pagination flex-wrap">
+                                <li class="page-item {% if pagination.previousPage is empty %}disabled{% endif %}">
+                                    {% if pagination.previousPage is empty %}
+                                        <span class="page-link">Zurück</span>
+                                    {% else %}
+                                        <a class="page-link" href="{{ app.getUri('archive', { formId: form.getId(), page: pagination.previousPage }) }}">Zurück</a>
+                                    {% endif %}
+                                </li>
+
+                                {% if pagination.firstPage > 1 %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ app.getUri('archive', { formId: form.getId(), page: 1 }) }}">1</a>
+                                    </li>
+                                    {% if pagination.firstPage > 2 %}
+                                        <li class="page-item disabled"><span class="page-link">…</span></li>
+                                    {% endif %}
+                                {% endif %}
+
+                                {% for page in pagination.firstPage..pagination.lastPage %}
+                                    <li class="page-item {% if page == pagination.page %}active{% endif %}">
+                                        {% if page == pagination.page %}
+                                            <span class="page-link" aria-current="page">{{ page }}</span>
+                                        {% else %}
+                                            <a class="page-link" href="{{ app.getUri('archive', { formId: form.getId(), page: page }) }}">{{ page }}</a>
+                                        {% endif %}
+                                    </li>
+                                {% endfor %}
+
+                                {% if pagination.lastPage < pagination.pages %}
+                                    {% if pagination.lastPage < pagination.pages - 1 %}
+                                        <li class="page-item disabled"><span class="page-link">…</span></li>
+                                    {% endif %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ app.getUri('archive', { formId: form.getId(), page: pagination.pages }) }}">{{ pagination.pages }}</a>
+                                    </li>
+                                {% endif %}
+
+                                <li class="page-item {% if pagination.nextPage is empty %}disabled{% endif %}">
+                                    {% if pagination.nextPage is empty %}
+                                        <span class="page-link">Weiter</span>
+                                    {% else %}
+                                        <a class="page-link" href="{{ app.getUri('archive', { formId: form.getId(), page: pagination.nextPage }) }}">Weiter</a>
+                                    {% endif %}
+                                </li>
+                            </ul>
+                        </nav>
+                    {% endif %}
                 {% endif %}
 
             </div>
