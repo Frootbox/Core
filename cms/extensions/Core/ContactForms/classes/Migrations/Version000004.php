@@ -13,50 +13,24 @@ class Version000004 extends \Frootbox\AbstractMigration
      *
      */
     public function up(
-        \Frootbox\Ext\Core\ContactForms\Persistence\Repositories\Logs $logsRepository,
+        \Frootbox\Persistence\Repositories\Files $filesRepository,
         \Frootbox\Ext\Core\ContactForms\Persistence\Repositories\Forms $formsRepository,
     ): void
     {
         foreach ($formsRepository->fetch() as $form) {
 
-            // Fetch logs
-            $result = $logsRepository->fetch([
+            // Uploads belong to the form even if a submission's log data is damaged.
+            $files = $filesRepository->fetch([
                 'where' => [
-                    'parentId' => $form->getId(),
+                    'uid' => $form->getUid('fileuploads'),
                 ],
-                'order' => [
-                    'date DESC',
-                ]
             ]);
 
+            foreach ($files as $file) {
 
-            foreach ($result as $log) {
-
-                $groups = $log->getLogData()['formData'];
-
-                foreach ($groups as $group) {
-
-                    foreach ($group['fields'] as $field) {
-
-                        if ($field['type'] != 'Files') {
-                            continue;
-                        }
-
-                        $files = $log->getFiles($field);
-
-                        foreach ($files as $file) {
-
-                            $file->setIsPrivate(1);
-                            $file->save();
-                        }
-                    }
-                }
+                $file->setIsPrivate(1);
+                $file->save();
             }
         }
-
-
-
-
     }
-
 }

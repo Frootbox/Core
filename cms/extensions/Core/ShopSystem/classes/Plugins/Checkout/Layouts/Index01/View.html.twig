@@ -16,6 +16,7 @@ variables:
 {% set t = i.getTranslator() %}
 
 {{ i.injectScript({ path: 'Checkout01/public/init.js'}) | raw }}
+<script src="FILE:{{ plugin.getPath() }}resources/private/partials/ItemsTable/public/init.js"></script>
 
 {{ v.asset('EXT:Core/ShopSystem/icons/css/all.css') | raw }}
 

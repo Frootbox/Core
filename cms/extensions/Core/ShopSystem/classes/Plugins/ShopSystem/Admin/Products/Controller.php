@@ -692,6 +692,7 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
 
         $product->setPackagingUnit($post->get('packagingUnit'));
         $product->setPackagingSize($post->get('packagingSize'));
+        $product->setShippingWeightPerUnit($post->get('shippingWeightPerUnit'));
         $product->setMinimumAge($post->get('minimumAge'));
 
         $product->addConfig([

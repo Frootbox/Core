@@ -674,6 +674,20 @@ class Product extends \Frootbox\Persistence\AbstractConfigurableRow implements \
     }
 
     /**
+     * Get the shipping weight in kilograms for one unit entered in the cart.
+     */
+    public function getShippingWeightPerUnit(): ?float
+    {
+        $weight = $this->getConfig('shippingWeightPerUnit');
+
+        if ($weight === null or $weight === '') {
+            return null;
+        }
+
+        return (float) $weight / 1000;
+    }
+
+    /**
      *
      */
     public function getStocks(array $options): ?\Frootbox\Ext\Core\ShopSystem\Persistence\Stock
@@ -885,5 +899,28 @@ class Product extends \Frootbox\Persistence\AbstractConfigurableRow implements \
         $this->data['packagingSize'] = (float) $size * 1000;
 
         $this->changed['packagingSize'] = true;
+    }
+
+    /**
+     * Set the shipping weight for one cart unit. The CMS supplies kilograms;
+     * storing grams as an integer avoids floating-point rounding errors.
+     */
+    public function setShippingWeightPerUnit($weight): void
+    {
+        $this->unsetConfig('shippingWeightPerUnit');
+
+        if ($weight === null or trim((string) $weight) === '') {
+            return;
+        }
+
+        $weight = str_replace(',', '.', (string) $weight);
+
+        if (!is_numeric($weight) or (float) $weight <= 0) {
+            return;
+        }
+
+        $this->addConfig([
+            'shippingWeightPerUnit' => (int) round((float) $weight * 1000),
+        ]);
     }
 }
