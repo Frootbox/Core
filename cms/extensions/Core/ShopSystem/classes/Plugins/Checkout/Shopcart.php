@@ -781,7 +781,7 @@ class Shopcart
         }
 
         if (empty($_SESSION['cart']['uniqueId'])) {
-            $_SESSION['cart']['uniqueId'] = md5(microtime(true));
+            $_SESSION['cart']['uniqueId'] = bin2hex(random_bytes(16));
         }
 
         $this->uniqueId = $_SESSION['cart']['uniqueId'];

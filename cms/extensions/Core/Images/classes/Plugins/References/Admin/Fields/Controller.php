@@ -53,13 +53,16 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
     ): \Frootbox\Admin\Controller\Response
     {
         // Validate input
-        $post->require([ 'title' ]);
+        $post->require([ !empty($post->get('titles')) ? 'titles.' . DEFAULT_LANGUAGE : 'title' ]);
 
         // Insert new field
         $field = $fieldsRepository->insert(new \Frootbox\Ext\Core\Images\Plugins\References\Persistence\Field([
             'pageId' => $this->plugin->getPageId(),
             'pluginId' => $this->plugin->getId(),
-            'title' => $post->get('title'),
+            'title' => $post->get('titles')[DEFAULT_LANGUAGE] ?? $post->get('title'),
+            'config' => [
+                'titles' => array_filter($post->get('titles') ?? []),
+            ],
         ]));
 
         return self::getResponse('json', 200, [
@@ -129,10 +132,21 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
         \Frootbox\Ext\Core\Images\Plugins\References\Persistence\Repositories\Fields $fieldsRepository
     ): \Frootbox\Admin\Controller\Response
     {
+        // Validate the default title in both single- and multilingual mode.
+        $post->require([ !empty($post->get('titles')) ? 'titles.' . DEFAULT_LANGUAGE : 'title' ]);
+
         // Fetch field
         $field = $fieldsRepository->fetchById($get->get('fieldId'));
 
-        $field->setTitle($post->get('title'));
+        $field->setTitle($post->get('titles')[DEFAULT_LANGUAGE] ?? $post->get('title'));
+
+        if (!empty($post->get('titles'))) {
+            $field->unsetConfig('titles');
+            $field->addConfig([
+                'titles' => array_filter($post->get('titles')),
+            ]);
+        }
+
         $field->save();
 
         return self::getResponse('json', 200, [

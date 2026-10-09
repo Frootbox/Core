@@ -70,6 +70,47 @@ class Twig extends \Frootbox\GenericObject implements Interfaces\Engine {
 
 
 
+        // Format whole months as a German duration, e.g. 36 => "3 Jahre", 42 => "3 Jahre und 6 Monate".
+        $filter = new \Twig\TwigFilter('duration_months', function (?int $months): string {
+
+            if ($months === null || $months < 1) {
+                return '';
+            }
+
+            $years = intdiv($months, 12);
+            $remainingMonths = $months % 12;
+            $parts = [];
+
+            if ($years > 0) {
+                $parts[] = $years . ($years === 1 ? ' Jahr' : ' Jahre');
+            }
+
+            if ($remainingMonths > 0) {
+                $parts[] = $remainingMonths . ($remainingMonths === 1 ? ' Monat' : ' Monate');
+            }
+
+            return implode(' und ', $parts);
+        });
+        $this->twig->addFilter($filter);
+
+
+        // Display German international numbers with the domestic trunk prefix.
+        // Preserve existing spacing and leave other country codes unchanged.
+        $filter = new \Twig\TwigFilter('phone_format', function (?string $phone, ?string $areaCode = null): string {
+
+            $phone = trim($phone ?? '');
+
+            $phone = preg_replace('/^(?:0049|\+49)\s*(?:\(0\)\s*|0)?(?=[1-9])/', '0', $phone);
+
+            if ($areaCode !== null && preg_match('/^0[1-9][0-9]+$/', $areaCode)) {
+                $phone = preg_replace('/^' . preg_quote($areaCode, '/') . '\s*(?=[0-9])/', $areaCode . ' ', $phone);
+            }
+
+            return $phone;
+        });
+        $this->twig->addFilter($filter);
+
+
         $filter = new \Twig\TwigFilter('md5', function ($string) {
 
             return md5($string);

@@ -25,7 +25,7 @@
 
         </form>
 
-        <script>
+        <script nonce="{{ settings.nonce }}">
             const stripe = Stripe('{{ PublicKey }}');
             const clientSecret = "{{ ClientSecret }}";
 

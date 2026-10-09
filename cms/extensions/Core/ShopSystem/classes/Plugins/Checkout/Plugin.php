@@ -595,6 +595,7 @@ class Plugin extends \Frootbox\Persistence\AbstractPlugin
             'pageId' => $this->getPageId(),
             'state' => 'Booked',
             'title' => $shopcart->getPersonal('firstname') . ' ' . $shopcart->getPersonal('lastname'),
+            'uid' => $shopcart->getUniqueId(),
             'config' => [
                 'note' => $note,
                 'personal' => $shopcart->getPersonalData(),

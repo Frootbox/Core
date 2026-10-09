@@ -86,6 +86,9 @@ class Method extends \Frootbox\Ext\Core\ShopSystem\PaymentMethods\PaymentMethod
             $paymentIntent = $stripe->paymentIntents->create([
                 'amount' => $shopCart->getTotal() * 100,
                 'currency' => 'eur',
+                'metadata' => [
+                    'orderReference' => $shopCart->getUniqueId(),
+                ],
                 'customer' => $customer->id,
                 'capture_method' => 'automatic',
                 'payment_method_types' => [ $this->stripePaymentMethodType ],
@@ -98,6 +101,15 @@ class Method extends \Frootbox\Ext\Core\ShopSystem\PaymentMethods\PaymentMethod
 
             $paymentIntent = $stripe->paymentIntents->update($paymentIntent->id, [
                 'amount' => $shopCart->getTotal() * 100,
+            ]);
+        }
+
+        // Keep the reference on reused intents before the payment is confirmed.
+        if (($paymentIntent->metadata['orderReference'] ?? null) !== $shopCart->getUniqueId()) {
+            $paymentIntent = $stripe->paymentIntents->update($paymentIntent->id, [
+                'metadata' => [
+                    'orderReference' => $shopCart->getUniqueId(),
+                ],
             ]);
         }
 
@@ -157,6 +169,7 @@ class Method extends \Frootbox\Ext\Core\ShopSystem\PaymentMethods\PaymentMethod
         $paymentIntent = $stripe->paymentIntents->update($paymentIntent->id, [
             'metadata' => [
                 'orderNumber' => $shopCart->getOrderNumber(),
+                'orderReference' => $shopCart->getUniqueId(),
             ],
         ]);
 

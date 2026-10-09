@@ -27,7 +27,9 @@ class Extension extends AbstractRow
 
         foreach ($directory as $file) {
 
-            preg_match('#^Version([0-9]{2})([0-9]{2})([0-9]{2})\.php$#', $file, $match);
+            if (!preg_match('#^Version([0-9]{2})([0-9]{2})([0-9]{2})\.php$#', $file, $match)) {
+                continue;
+            }
 
             $version = (int) $match[1] . '.' . (int) $match[2] . '.' . (int) $match[3];
 

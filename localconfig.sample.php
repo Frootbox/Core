@@ -4,6 +4,23 @@
  */
 
 return [
+    'Ext' => [
+        'Core' => [
+            'System' => [
+                'Editables' => [
+                    'Block' => [
+                        // Restrict selection to block types already stored in the database.
+                        // Active template blocks remain available; SuperAdmins are exempt.
+                        'OnlyUsedBlocks' => false,
+                        // Additional allowed extensions (Vendor/Extension).
+                        'AllowedCategories' => [],
+                        // Additional allowed block types (Vendor/Extension/Block).
+                        'AllowedBlocks' => [],
+                    ],
+                ],
+            ],
+        ],
+    ],
     'database' => [
         'dbms' => 'mysql',
         'host' => 'localhost',

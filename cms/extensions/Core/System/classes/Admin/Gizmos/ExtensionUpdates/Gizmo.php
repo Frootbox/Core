@@ -34,7 +34,17 @@ class Gizmo extends \Frootbox\Admin\AbstractGizmo
 
         foreach ($result as $index => $extension) {
 
-            if (version_compare($extension->getVersion(), $extension->getExtensionController()->getConfig('version')) >= 0) {
+            $availableVersion = $extension->getExtensionController()->getConfig('version');
+
+            if (version_compare($extension->getVersion(), $availableVersion) >= 0) {
+                $result->removeByIndex($index);
+                continue;
+            }
+
+            // Releases without pending migrations only need their stored version updated.
+            if (empty($extension->getAvailableMigrations())) {
+                $extension->setVersion($availableVersion);
+                $extension->save();
                 $result->removeByIndex($index);
             }
         }

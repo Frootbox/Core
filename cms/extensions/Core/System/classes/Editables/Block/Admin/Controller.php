@@ -345,25 +345,31 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
         }
 
         $addToDefault = [];
+        $allowedCategories = [];
+        $allowedBlocks = [];
+        $onlyUsedBlocks = false;
 
-        if (!empty($_SESSION['user']['type']) && $_SESSION['user']['type'] == 'SuperAdmin') {
-            $allowedCategories = null;
+        if (($_SESSION['user']['type'] ?? null) !== 'SuperAdmin') {
+            $allowedCategories = $config->get('Ext.Core.System.Editables.Block.AllowedCategories')?->getData() ?? [];
+            $allowedBlocks = $config->get('Ext.Core.System.Editables.Block.AllowedBlocks')?->getData() ?? [];
+            $onlyUsedBlocks = (bool) $config->get('Ext.Core.System.Editables.Block.OnlyUsedBlocks');
         }
-        else {
-            $allowedCategories = $config->get('Ext.Core.System.Editables.Block.AllowedCategories');
 
-            if ($allowedCategories !== null) {
-                $allowedCategories = $allowedCategories->getData();
-            }
+        // Reuse this snapshot for the selection filter and the existing "Template" list.
+        $usedBlocks = $blocksRepository->fetch();
+        $usedBlockIds = [];
+
+        foreach ($usedBlocks as $block) {
+            $usedBlockIds[$block->getVendorId() . '/' . $block->getExtensionId() . '/' . $block->getBlockId()] = true;
         }
+
+        $restrictSelection = $onlyUsedBlocks || !empty($allowedCategories) || !empty($allowedBlocks);
 
         foreach ($result as $extension) {
 
             $extController = $extension->getExtensionController();
-
-            if ($extController->getType() != 'Template' && !empty($allowedCategories) && !in_array($extension->getVendorId() . '/' . $extension->getExtensionId(), $allowedCategories)) {
-                continue;
-            }
+            $extensionId = $extension->getVendorId() . '/' . $extension->getExtensionId();
+            $allowExtension = $extController->getType() == 'Template' || in_array($extensionId, $allowedCategories, true);
 
             ++$extLoop;
             $loopKey = $extController->getType() == 'Template' ? $extLoop + 200 : $extLoop + 100;
@@ -389,6 +395,14 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
                 }
 
                 if (!file_exists($dir->getPath() . $file . '/Block.html.twig')) {
+                    continue;
+                }
+
+                $blockId = $extensionId . '/' . $fileName;
+
+                if ($restrictSelection && !$allowExtension
+                    && !in_array($blockId, $allowedBlocks, true)
+                    && !($onlyUsedBlocks && isset($usedBlockIds[$blockId]))) {
                     continue;
                 }
 
@@ -527,7 +541,7 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
             }
         }
 
-        function isListedInTemplate(\Frootbox\Persistence\Content\Blocks\Block $block, array $list): bool
+        $isListedInTemplate = static function (\Frootbox\Persistence\Content\Blocks\Block $block, array $list): bool
         {
             if (empty($list)) {
                 return false;
@@ -541,13 +555,13 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
             }
 
             return false;
-        }
+        };
 
         $templateBlocks = $categories['Template']['blocks'] ?? [];
 
-        foreach ($blocksRepository->fetch() as $block) {
+        foreach ($usedBlocks as $block) {
 
-            if (!isListedInTemplate($block, $templateBlocks)) {
+            if (!$isListedInTemplate($block, $templateBlocks)) {
 
                 if (empty($blockDataCache[$block->getVendorId()][$block->getExtensionId()][$block->getBlockId()])) {
 
