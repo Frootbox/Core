@@ -6,6 +6,23 @@
 
 {{ front.addTab('Benutzerprofil', front.getUri('Session/Profile')) }}
 
+<script nonce="{{ settings.nonce }}">
+    $(function () {
+        $('.profile-password-toggle').on('click', function () {
+            const input = document.getElementById(this.getAttribute('aria-controls'));
+            const showPassword = input.type === 'password';
+            const label = showPassword ? 'Passwort verbergen' : 'Passwort anzeigen';
+
+            input.type = showPassword ? 'text' : 'password';
+            this.setAttribute('aria-label', label);
+            this.setAttribute('title', label);
+            this.innerHTML = showPassword
+                ? '<i class="far fa-eye-slash fa-fw" aria-hidden="true"></i>'
+                : '<i class="far fa-eye fa-fw" aria-hidden="true"></i>';
+        });
+    });
+</script>
+
 <h1>Benutzerprofil</h1>
 
 <br />
@@ -20,7 +37,14 @@
 
                     <div class="form-group">
                         <label for="recentPassword">aktuelles Passwort</label>
-                        <input type="password" class="form-control" id="recentPassword" name="recentPassword" placeholder="aktuelles Passwort" value="">
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="recentPassword" name="recentPassword" placeholder="aktuelles Passwort" value="" autocomplete="current-password">
+                            <div class="input-group-append">
+                                <button type="button" class="btn btn-outline-secondary profile-password-toggle" aria-controls="recentPassword" aria-label="Passwort anzeigen" title="Passwort anzeigen">
+                                    <i class="far fa-eye fa-fw" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="form-group">
@@ -30,7 +54,14 @@
 
                     <div class="form-group">
                         <label for="newPassword">neues Passwort</label>
-                        <input type="password" class="form-control" id="newPassword" name="newPassword" placeholder="neues Passwort" value="">
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="newPassword" name="newPassword" placeholder="neues Passwort" value="" autocomplete="new-password">
+                            <div class="input-group-append">
+                                <button type="button" class="btn btn-outline-secondary profile-password-toggle" aria-controls="newPassword" aria-label="Passwort anzeigen" title="Passwort anzeigen">
+                                    <i class="far fa-eye fa-fw" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
                     <button type="submit" class="btn btn-primary">Speichern</button>

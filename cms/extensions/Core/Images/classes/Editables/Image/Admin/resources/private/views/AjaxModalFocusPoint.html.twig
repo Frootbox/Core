@@ -1,0 +1,158 @@
+<div class="modal-header">
+    <h5 class="modal-title">Fokuspunkt bearbeiten</h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Schließen">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+
+{% if file and dimensions.width and dimensions.height and preview %}
+    {% set focusPoint = file.getConfig('focusPoint') %}
+
+    <style nonce="{{ settings.nonce }}">
+        #pictureFocusPointForm .focus-point-stage { position: relative; display: inline-block; line-height: 0; max-width: 100%; }
+        #pictureFocusPointForm .focus-point-image { display: block; width: auto; height: auto; max-width: 100%; max-height: 55vh; border: 0; border-radius: 0; padding: 0; margin: 0; cursor: crosshair; touch-action: none; }
+        #pictureFocusPointForm .focus-point-marker { position: absolute; width: 24px; height: 24px; margin: -12px 0 0 -12px; border: 3px solid white; border-radius: 50%; background: rgba(0, 0, 0, .35); box-shadow: 0 0 0 2px #222; pointer-events: none; }
+    </style>
+
+    <form id="pictureFocusPointForm" method="post" action="{{ controller.getActionUri('ajaxUpdateFocusPoint', { fileId: file.getId() }) }}">
+        <div class="modal-body">
+            <p id="pictureFocusPointHelp">Klicke auf das wichtigste Motiv im Bild oder verschiebe die Markierung. Dieser Punkt wird beim Zuschneiden des Bildes bevorzugt beibehalten.</p>
+            <div class="text-center mb-3">
+                <div class="focus-point-stage">
+                    <img class="focus-point-image" src="{{ preview }}" alt="{{ file.getName() }}" draggable="false" aria-describedby="pictureFocusPointHelp" />
+                    <span class="focus-point-marker" aria-hidden="true" hidden></span>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-6">
+                    <label for="pictureFocusPointX">Horizontal (Pixel)</label>
+                    <input id="pictureFocusPointX" class="form-control" type="number" name="position[x]" min="0" max="{{ dimensions.width - 1 }}" step="1" required value="{{ focusPoint.x ?? ((dimensions.width - 1) / 2)|round(0, 'floor') }}" />
+                </div>
+                <div class="form-group col-6">
+                    <label for="pictureFocusPointY">Vertikal (Pixel)</label>
+                    <input id="pictureFocusPointY" class="form-control" type="number" name="position[y]" min="0" max="{{ dimensions.height - 1 }}" step="1" required value="{{ focusPoint.y ?? ((dimensions.height - 1) / 2)|round(0, 'floor') }}" />
+                </div>
+            </div>
+            <input type="hidden" name="reset" value="{{ focusPoint ? '0' : '1' }}" />
+            <p class="small text-muted">Der Fokuspunkt gilt für alle Bildausschnitte dieser Datei.</p>
+            <div class="alert alert-danger focus-point-error" role="alert" hidden></div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary focus-point-reset">Zurücksetzen</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Abbrechen</button>
+            <button type="submit" class="btn btn-primary" disabled>Speichern</button>
+        </div>
+    </form>
+
+    <script nonce="{{ settings.nonce }}">
+        $(function () {
+            var form = $('#pictureFocusPointForm');
+            var image = form.find('.focus-point-image')[0];
+            var marker = form.find('.focus-point-marker');
+            var x = form.find('[name="position[x]"]');
+            var y = form.find('[name="position[y]"]');
+            var reset = form.find('[name="reset"]');
+            var error = form.find('.focus-point-error');
+            var submit = form.find('[type="submit"]');
+            var maxX = Number(x.attr('max'));
+            var maxY = Number(y.attr('max'));
+            var activePointer = null;
+
+            function drawMarker() {
+                marker.css({
+                    left: (maxX ? Number(x.val()) / maxX * 100 : 50) + '%',
+                    top: (maxY ? Number(y.val()) / maxY * 100 : 50) + '%'
+                }).prop('hidden', false);
+            }
+
+            function setPoint(event) {
+                var rect = image.getBoundingClientRect();
+                if (!rect.width || !rect.height) {
+                    return;
+                }
+                x.val(Math.round(Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width)) * maxX));
+                y.val(Math.round(Math.max(0, Math.min(1, (event.clientY - rect.top) / rect.height)) * maxY));
+                reset.val('0');
+                drawMarker();
+            }
+
+            image.addEventListener('pointerdown', function (event) {
+                if (!event.isPrimary || event.button !== 0) {
+                    return;
+                }
+                event.preventDefault();
+                activePointer = event.pointerId;
+                image.setPointerCapture(event.pointerId);
+                setPoint(event);
+            });
+            image.addEventListener('pointermove', function (event) {
+                if (activePointer === event.pointerId) {
+                    setPoint(event);
+                }
+            });
+            image.addEventListener('lostpointercapture', function () {
+                activePointer = null;
+            });
+
+            x.add(y).on('input change', function () {
+                reset.val('0');
+                if (x[0].validity.valid && y[0].validity.valid) {
+                    drawMarker();
+                }
+            });
+
+            form.find('.focus-point-reset').on('click', function () {
+                x.val(Math.floor(maxX / 2));
+                y.val(Math.floor(maxY / 2));
+                reset.val('1');
+                drawMarker();
+            });
+
+            function imageLoaded() {
+                if (image.naturalWidth) {
+                    drawMarker();
+                    submit.prop('disabled', false);
+                }
+            }
+            $(image).on('load', imageLoaded).on('error', function () {
+                error.text('Das Bild konnte nicht geladen werden. Bitte erneut versuchen.').prop('hidden', false);
+                submit.prop('disabled', true);
+            });
+            if (image.complete) {
+                if (image.naturalWidth) {
+                    imageLoaded();
+                }
+                else {
+                    $(image).trigger('error');
+                }
+            }
+
+            form.on('submit', function (event) {
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                if (submit.prop('disabled')) {
+                    return;
+                }
+                submit.prop('disabled', true);
+                error.prop('hidden', true);
+
+                $.ajax({
+                    url: form.attr('action'),
+                    type: 'POST',
+                    data: form.serialize(),
+                    success: function () {
+                        window.location.reload();
+                    },
+                    error: function () {
+                        error.text('Der Fokuspunkt konnte nicht gespeichert werden. Bitte erneut versuchen.').prop('hidden', false);
+                        submit.prop('disabled', false);
+                    }
+                });
+            });
+        });
+    </script>
+{% elseif file %}
+    <div class="modal-body">Für dieses Bild konnte keine Vorschau erstellt werden. Bitte prüfe, ob ImageMagick auf dem Server dieses Bildformat unterstützt.</div>
+{% else %}
+    <div class="modal-body">Bitte zuerst ein Bild hochladen. Für dieses Bild ist kein Fokuspunkt verfügbar.</div>
+{% endif %}

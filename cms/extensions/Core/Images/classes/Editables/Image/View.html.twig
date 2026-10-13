@@ -19,6 +19,8 @@
             }
 
             var uid = $(this).attr('data-uid');
+            var image = $(this).find('img[data-image-edited]').first();
+            var canEditFocusPoint = Number(image.attr('width')) > 0 && Number(image.attr('height')) > 0;
 
             if ($(this).parents('[data-href]').length) {
 
@@ -44,6 +46,7 @@
             $(this).attr('data-content', '<span class="options edit-mode">Bild' +
                 '&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;' +
                 '<a class="picture-edit" href="#' + uid + '"><i class="far fa-pencil"><\/i><\/a>&nbsp;&nbsp;&nbsp;' +
+                (canEditFocusPoint ? '|&nbsp;&nbsp;&nbsp;<a class="picture-focus-point" title="Fokuspunkt bearbeiten" aria-label="Fokuspunkt bearbeiten" href="#' + uid + '"><i class="far fa-crosshairs"><\/i><\/a>&nbsp;&nbsp;&nbsp;' : '') +
                 '|&nbsp;&nbsp;&nbsp;' +
                 '<a class="picture-delete" href="#' + uid + '"><i class="far fa-trash"><\/i><\/a>&nbsp;&nbsp;&nbsp;' +
                 '|&nbsp;&nbsp;&nbsp;' +
@@ -58,6 +61,37 @@
             });
 
             $(this).popover('show');
+        });
+
+        /**
+         * Open the focus point editor from the picture toolbar.
+         */
+        $(document).on('click', 'a.picture-focus-point', function (event) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            var uid = $(this).attr('href').substr(1);
+            var picture = $('picture[data-editable][data-uid]').filter(function () {
+                return $(this).attr('data-uid') === uid;
+            }).first();
+
+            fbxEditorOpenGenericModal('lg');
+
+            $.ajax({
+                url: "{{ settings.serverpath }}cms/admin/Editor/callEditable?{{ SID }}",
+                data: {
+                    method: 'ajaxModalFocusPoint',
+                    editable: 'Frootbox/Ext/Core/Images/Editables/Image',
+                    uid: uid,
+                    fallbackUid: picture.attr('data-fallback-uid')
+                },
+                success: function (html) {
+                    $('#fbxEditorGenericModal .modal-content').html(html);
+                },
+                error: function () {
+                    $('#fbxEditorGenericModal .modal-body').text('Der Fokuspunkt konnte nicht geladen werden. Bitte erneut versuchen.');
+                }
+            });
         });
 
         /**

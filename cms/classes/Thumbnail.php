@@ -121,7 +121,7 @@ class Thumbnail extends GenericObject
         
         $path = FILES_DIR . 'cache/images/';
 
-        if (empty($this->crop['x']) or empty($this->crop['y'])) {
+        if ($this->crop !== 'none' and (empty($this->crop['x']) or empty($this->crop['y']))) {
             $this->crop = null;
         }
 
@@ -169,6 +169,48 @@ class Thumbnail extends GenericObject
     }
 
     /**
+     * Full-size dimensions in the same orientation used when rendering.
+     * ImageMagick also supports source formats that getimagesize cannot read.
+     */
+    public function getDimensions(): array
+    {
+        if (!$this->exists()) {
+            return [];
+        }
+
+        $data = @getimagesize($this->getPath());
+        $width = (int) ($data[0] ?? 0);
+        $height = (int) ($data[1] ?? 0);
+
+        if (!$width or !$height) {
+            $prefix = $this->config->imagemagick->path ?? '/opt/local/bin/convert';
+            $command = $prefix . ' ' . escapeshellarg($this->getPath() . '[0]') . ' -format "%w %h" info: 2>/dev/null';
+            $output = shell_exec($command);
+
+            if (!preg_match('/^\s*(\d+)\s+(\d+)\s*$/', $output ?? '', $matches)) {
+                return [];
+            }
+
+            $width = (int) $matches[1];
+            $height = (int) $matches[2];
+        }
+
+        if ($width <= 0 or $height <= 0) {
+            return [];
+        }
+
+        $rotation = (($this->rotation % 360) + 360) % 360;
+        if ($rotation === 90 or $rotation === 270) {
+            [ $width, $height ] = [ $height, $width ];
+        }
+        elseif ($rotation !== 0 and $rotation !== 180) {
+            return [];
+        }
+
+        return [ 'width' => $width, 'height' => $height ];
+    }
+
+    /**
      * Compute the crop offset after the image has been resized to fill the
      * requested dimensions. The focus point uses pixels of the full-size,
      * rotated image.
@@ -187,22 +229,14 @@ class Thumbnail extends GenericObject
             return null;
         }
 
-        $imageData = @getimagesize($this->getPath());
+        $dimensions = $this->getDimensions();
 
-        if (empty($imageData[0]) or empty($imageData[1])) {
+        if (empty($dimensions)) {
             return null;
         }
 
-        $sourceWidth = (int) $imageData[0];
-        $sourceHeight = (int) $imageData[1];
-        $rotation = (($this->rotation % 360) + 360) % 360;
-
-        if ($rotation === 90 or $rotation === 270) {
-            [ $sourceWidth, $sourceHeight ] = [ $sourceHeight, $sourceWidth ];
-        }
-        elseif ($rotation !== 0 and $rotation !== 180) {
-            return null;
-        }
+        $sourceWidth = $dimensions['width'];
+        $sourceHeight = $dimensions['height'];
 
         $scale = max($targetWidth / $sourceWidth, $targetHeight / $sourceHeight);
         $resizedWidth = max($targetWidth, (int) round($sourceWidth * $scale));

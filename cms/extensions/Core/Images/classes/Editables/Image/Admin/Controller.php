@@ -19,6 +19,103 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
     }
 
     /**
+     * Edit the focus point of the same image that is rendered in the frontend.
+     */
+    public function ajaxModalFocusPoint(
+        \Frootbox\Http\Get $get,
+        \Frootbox\Ext\Core\Images\Persistence\Repositories\Images $files,
+        Config $config
+    ): Response
+    {
+        $options = [ 'fallbackLanguageDefault' => true, 'order' => 'orderId DESC' ];
+        $file = !empty($get->get('fileId'))
+            ? $files->fetchById($get->get('fileId'))
+            : $files->fetchByUid($get->get('uid'), $options);
+
+        if (!$file and !empty($get->get('fallbackUid'))) {
+            $file = $files->fetchByUid($get->get('fallbackUid'), $options);
+        }
+
+        $dimensions = [];
+        $preview = null;
+
+        if ($file) {
+            $thumbnail = $this->getFocusPointThumbnail($file, $config);
+            $dimensions = $thumbnail->getDimensions();
+
+            if ($dimensions) {
+                $path = $thumbnail->getCacheFilePath();
+                if (!is_file($path) or filesize($path) === 0) {
+                    $thumbnail->render();
+                }
+                if (is_file($path) and filesize($path) > 0) {
+                    $preview = PUBLIC_DIR . substr($path, strlen(FILES_DIR));
+                }
+            }
+        }
+
+        return self::getResponse('html', 200, [
+            'file' => $file,
+            'dimensions' => $dimensions,
+            'preview' => $preview,
+        ]);
+    }
+
+    private function getFocusPointThumbnail(\Frootbox\Persistence\File $file, Config $config): \Frootbox\Thumbnail
+    {
+        return new \Frootbox\Thumbnail([
+            'path' => $file->getPath(),
+            'rotation' => $file->getRotation(),
+            'width' => 1280,
+            'height' => 1280,
+            'crop' => 'none',
+            'type' => 'jpg',
+        ], $config->get('thumbnails'));
+    }
+
+    /**
+     * Store original-image pixel coordinates without changing image metadata.
+     */
+    public function ajaxUpdateFocusPoint(
+        \Frootbox\Http\Get $get,
+        \Frootbox\Http\Post $post,
+        \Frootbox\Ext\Core\Images\Persistence\Repositories\Images $files,
+        Config $config
+    ): Response
+    {
+        $file = $files->fetchById($get->get('fileId'));
+        $dimensions = $this->getFocusPointThumbnail($file, $config)->getDimensions();
+
+        if (empty($dimensions['width']) or empty($dimensions['height'])) {
+            throw new \Frootbox\Exceptions\RuntimeError('Die Bildmaße konnten nicht ermittelt werden.');
+        }
+
+        $focusPoint = null;
+
+        if ($post->get('reset') !== '1') {
+            $position = $post->get('position');
+
+            foreach ([ 'x' => 'width', 'y' => 'height' ] as $axis => $dimension) {
+                $value = is_array($position) ? ($position[$axis] ?? null) : null;
+                $coordinate = filter_var($value, FILTER_VALIDATE_INT, [
+                    'options' => [ 'min_range' => 0, 'max_range' => $dimensions[$dimension] - 1 ],
+                ]);
+
+                if ($coordinate === false) {
+                    throw new \Frootbox\Exceptions\RuntimeError('Bitte einen gültigen Fokuspunkt innerhalb des Bildes wählen.');
+                }
+
+                $focusPoint[$axis] = $coordinate;
+            }
+        }
+
+        $file->addConfig([ 'focusPoint' => $focusPoint ]);
+        $file->save();
+
+        return self::getResponse('json', 200, [ 'success' => true ]);
+    }
+
+    /**
      * Delete image
      */
     public function ajaxDelete (
@@ -219,13 +316,15 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
     public function ajaxModalEdit(
         \Frootbox\Http\Get $get,
         \Frootbox\Admin\View $view,
-        \Frootbox\Ext\Core\Images\Persistence\Repositories\Images $files
+        \Frootbox\Ext\Core\Images\Persistence\Repositories\Images $files,
+        Config $config
     ): Response
     {
         // Fetch file
         $file = $files->fetchByUid($get->get('uid'));
 
         $view->set('file', $file);
+        $view->set('dimensions', $file ? $this->getFocusPointThumbnail($file, $config)->getDimensions() : []);
 
         $view->set('get', $get);
 

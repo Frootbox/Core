@@ -30,7 +30,7 @@ class Page
             $length = $size;
             $start = 0;
             $end = $size - 1;
-            header('Content-type: video/mp4');
+            header('Content-Type: ' . $file->getType());
             header("Accept-Ranges: 0-$length");
             if (isset($_SERVER['HTTP_RANGE'])) {
                 $c_start = $start;

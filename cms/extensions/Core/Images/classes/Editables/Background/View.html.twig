@@ -19,6 +19,8 @@
 
             var uid = $(this).attr('data-uid');
             var element = $(this);
+            var focusFileId = window.matchMedia('(min-width: 768px)').matches && element.attr('data-focus-file-desktop')
+                ? element.attr('data-focus-file-desktop') : element.attr('data-focus-file');
 
             // Generate label
             var label = 'Hintergrund';
@@ -30,6 +32,7 @@
             $(this).attr('data-content', '<span class="options edit-mode">' + label +
                 '&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;' +
                 '<a class="images-background-edit" href="#' + uid + '"><i class="far fa-pencil"><\/i><\/a>&nbsp;&nbsp;&nbsp;' +
+                (focusFileId ? '|&nbsp;&nbsp;&nbsp;<a class="images-background-focus-point" title="Fokuspunkt bearbeiten" aria-label="Fokuspunkt bearbeiten" href="#' + focusFileId + '"><i class="far fa-crosshairs"><\/i><\/a>&nbsp;&nbsp;&nbsp;' : '') +
                 '|&nbsp;&nbsp;&nbsp;' +
                 '<a class="images-background-delete" href="#' + uid + '"><i class="far fa-trash"><\/i><\/a>&nbsp;&nbsp;&nbsp;' +
                 '|&nbsp;&nbsp;&nbsp;' +
@@ -47,6 +50,32 @@
             $(this).popover('show');
         });
 
+
+        /**
+         * Edit the focus of the background currently displayed at this breakpoint.
+         */
+        $(document).on('click', 'a.images-background-focus-point', function (event) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            var fileId = $(this).attr('href').substr(1);
+            fbxEditorOpenGenericModal('lg');
+
+            $.ajax({
+                url: "{{ settings.serverpath }}cms/admin/Editor/callEditable?{{ SID }}",
+                data: {
+                    method: 'ajaxModalFocusPoint',
+                    editable: 'Frootbox/Ext/Core/Images/Editables/Image',
+                    fileId: fileId
+                },
+                success: function (html) {
+                    $('#fbxEditorGenericModal .modal-content').html(html);
+                },
+                error: function () {
+                    $('#fbxEditorGenericModal .modal-body').text('Der Fokuspunkt konnte nicht geladen werden. Bitte erneut versuchen.');
+                }
+            });
+        });
 
         /**
          *

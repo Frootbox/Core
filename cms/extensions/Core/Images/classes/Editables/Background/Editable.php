@@ -22,16 +22,20 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
      */
     public function parse (
         $html,
-        \Frootbox\Persistence\Repositories\Files $files
+        \Frootbox\Persistence\Repositories\Files $files,
+        \Frootbox\Config\Config $config
     ): string
     {
         $injectedHtml = (string ) null;
 
         // Replace picture tags
         $crawler = \Wa72\HtmlPageDom\HtmlPageCrawler::create($html);
-        $crawler->filter('[data-type="Images/Background"][data-uid], [data-type="Images/Background"][data-file]')->each(function ( $element ) use ($files, &$injectedHtml) {
+        $crawler->filter('[data-type="Images/Background"][data-uid], [data-type="Images/Background"][data-file]')->each(function ( $element ) use ($files, $config, &$injectedHtml) {
 
             $uid = $element->getAttribute('data-uid');
+            $element->setAttribute('data-focus-file', '');
+            $element->setAttribute('data-focus-file-desktop', '');
+            $position = 'center';
 
             if (empty($uid)) {
 
@@ -99,7 +103,8 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
                     $width = $element->getAttribute('data-width') ?? null;
                     $height = $element->getAttribute('data-height') ?? null;
 
-                    $src = $file->getUri([ 'width' => $width, 'height' => $height ]);
+                    [ $src, $position ] = $this->getBackgroundImage($file, $width, $height, $config);
+                    $element->setAttribute('data-focus-file', $file->getId());
                 }
 
                 if (!empty($file->getCopyright())) {
@@ -120,7 +125,7 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
             */
 
             if (!empty($src)) {
-                $style .= 'background-image: url(' . $src . '); background-repeat: no-repeat; background-size: cover; background-position: center';
+                $style .= 'background-image: url(' . $src . '); background-repeat: no-repeat; background-size: cover; background-position: ' . $position . ';';
             }
 
             $element->setAttribute('style', $style);
@@ -157,7 +162,8 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
                 $width = $element->getAttribute('data-width-xl') ?? null;
                 $height = $element->getAttribute('data-height-xl') ?? null;
 
-                $src = $file->getUri([ 'width' => $width, 'height' => $height ]);
+                [ $src, $position ] = $this->getBackgroundImage($file, $width, $height, $config);
+                $element->setAttribute('data-focus-file-desktop', $file->getId());
 
                 $injectedHtml .= '<style>
                     @media (min-width: 768px) {
@@ -165,7 +171,7 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
                             background-image: url(' . $src . ') !important;
                             background-repeat: no-repeat;
                             background-size: cover;
-                            background-position: center;
+                            background-position: ' . $position . ' !important;
                         }
                     }
                 </style>';
@@ -180,5 +186,34 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
         $html = str_replace('</head>', $injectedHtml . '</head>', $html);
 
         return $html;
+    }
+
+    /**
+     * Let CSS cover the responsive element with the complete image, so the
+     * focus remains meaningful even when its aspect ratio changes.
+     */
+    private function getBackgroundImage(\Frootbox\Persistence\File $file, $width, $height, \Frootbox\Config\Config $config): array
+    {
+        $options = [ 'width' => $width, 'height' => $height ];
+        $position = 'center';
+        $focus = $file->getConfig('focusPoint');
+
+        if (isset($focus['x'], $focus['y']) and is_numeric($focus['x']) and is_numeric($focus['y'])) {
+            $thumbnail = new \Frootbox\Thumbnail([
+                'path' => $file->getPath(),
+                'rotation' => $file->getRotation(),
+                'type' => 'jpg',
+            ], $config->get('thumbnails'));
+            $dimensions = $thumbnail->getDimensions();
+
+            if ($dimensions) {
+                $x = max(0, min(100, 100 * $focus['x'] / max(1, $dimensions['width'] - 1)));
+                $y = max(0, min(100, 100 * $focus['y'] / max(1, $dimensions['height'] - 1)));
+                $position = round($x, 4) . '% ' . round($y, 4) . '%';
+                $options['crop'] = 'none';
+            }
+        }
+
+        return [ $file->getUri($options), $position ];
     }
 }

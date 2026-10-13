@@ -59,8 +59,6 @@
 
     {% if file %}
 
-        {% set dimensions = file.getDimensions() %}
-
         <div class="modal-body">
 
             <div class="row align-items-center">
@@ -69,7 +67,9 @@
                 </div>
                 <div class="col-9" style="line-height: 20px;">
                     <b>{{ file.getName() }}</b><br />
-                    {{ dimensions.width }}x{{ dimensions.height }} Pixel<br />
+                    {% if dimensions.width and dimensions.height %}
+                        {{ dimensions.width }}x{{ dimensions.height }} Pixel<br />
+                    {% endif %}
                     {{ file.getType() }}, {{ file.getSizeDisplay() }}
 
                     <br />

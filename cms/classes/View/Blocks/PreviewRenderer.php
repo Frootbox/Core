@@ -27,7 +27,7 @@ class PreviewRenderer
         // Generate block html
         $blockHtml = '<div data-blocks data-uid="' . $block->getUidRaw() . '"></div>';
 
-        // Inject scss variables
+        // Inject scss variables and shared element styles
         $result = $this->extensionRepository->fetch([
             'where' => [
                 'isactive' => 1,
@@ -35,6 +35,7 @@ class PreviewRenderer
         ]);
 
         $scss = (string) null;
+        $stylesheets = (string) null;
 
         foreach ($result as $extension) {
 
@@ -51,9 +52,16 @@ class PreviewRenderer
             if (file_exists($scssFile)) {
                 $scss .= PHP_EOL . file_get_contents($scssFile);
             }
+
+            $elementsFile = $path . 'resources/public/css/styles-elements.less';
+
+            if (file_exists($elementsFile)) {
+                // Keep the file context so relative asset URLs are resolved by the parser.
+                $stylesheets .= '<link type="text/css" rel="stylesheet/less" href="FILE:' . htmlspecialchars($elementsFile, ENT_QUOTES, 'UTF-8') . '" />' . PHP_EOL;
+            }
         }
 
-        $blockHtml = '<style type="text/less">' . $scss . PHP_EOL . '</style>' . PHP_EOL . $blockHtml;
+        $blockHtml = '<style type="text/less">' . $scss . PHP_EOL . '</style>' . PHP_EOL . $stylesheets . $blockHtml;
 
 
         if (!empty($block->getPageId())) {
