@@ -27,7 +27,7 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
     ): string
     {
         // Replace link tags
-        $crawler = \Wa72\HtmlPageDom\HtmlPageCrawler::create($html);
+        $crawler = \Frootbox\View\HtmlPageCrawler::create($html);
         $crawler->filter('[data-editable-link][data-uid]')->each(function ( $element ) use ($texts, $filesRepository, $pagesRepository, $db) {
 
             $uid = $element->getAttribute('data-uid');

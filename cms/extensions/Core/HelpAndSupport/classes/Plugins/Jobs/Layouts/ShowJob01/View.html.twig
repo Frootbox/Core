@@ -67,6 +67,30 @@ variables:
 
 {% endblock %}
 
+{% if plugin.getGlobalConfig('Google.StructuredData') %}
+    {% set p = view.getViewhelper('Partials', { plugin: plugin }) %}
+    {% set descriptionUids = [job.getUid('teaser')] %}
+
+    {% if variables.withTextAboveColumns %}
+        {% set descriptionUids = descriptionUids | merge([job.getUid('text-above-columns')]) %}
+    {% endif %}
+
+    {% for textField in ['text-tasks', 'text-profile', 'text-benefits'] %}
+        {% if variables.predefinedTextblocks >= loop.index %}
+            {% set descriptionUids = descriptionUids | merge([job.getUid(textField)]) %}
+        {% endif %}
+    {% endfor %}
+
+    {% for index in [1, 2] %}
+        {% if variables.predefinedGlobalTextblocks >= index %}
+            {% set descriptionUids = descriptionUids | merge([plugin.getUid('text-global-' ~ index)]) %}
+        {% endif %}
+    {% endfor %}
+
+    {% set descriptionUids = descriptionUids | merge([job.getUid('text-below')]) %}
+    {{ p.render('\\Frootbox\\Ext\\Core\\HelpAndSupport\\Plugins\\Jobs\\Partials\\GoogleJsonLd', { t: t, Job: job, DescriptionUids: descriptionUids }) | raw }}
+{% endif %}
+
 <div class="plugin Core HelpAndSupport Jobs ShowJob01">
 
     {% if variables.withTopBlocks %}

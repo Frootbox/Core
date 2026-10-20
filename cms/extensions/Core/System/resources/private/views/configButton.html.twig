@@ -169,11 +169,6 @@
     @-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
     @keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
 
-    #frootboxOnPageConfigModal {
-        font-size: 16px;
-        line-height: 20px;
-        font-family: Arial;
-    }
 </style>
 
 <div id="fbxConfigButton">
@@ -182,7 +177,7 @@
     <a class="frootbox-switch-off-editing" href="{{ alias.getAlias() }}"><i class="fa fa-power-off"></i></a>
 </div>
 
-<div class="modal fade" id="frootboxOnPageConfigModal" tabindex="-1" role="dialog" aria-labelledby="frootboxOnPageConfigModalLabel" aria-hidden="true">
+<div class="modal fade frootbox-editor-modal" id="frootboxOnPageConfigModal" tabindex="-1" role="dialog" aria-labelledby="frootboxOnPageConfigModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">

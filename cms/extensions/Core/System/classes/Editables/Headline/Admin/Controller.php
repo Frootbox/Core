@@ -6,6 +6,7 @@
 namespace Frootbox\Ext\Core\System\Editables\Headline\Admin;
 
 use Frootbox\Admin\Controller\Response;
+use Frootbox\View\InlineText;
 
 class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
 {
@@ -33,19 +34,25 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
             'createOnMiss' => true,
         ]);
 
-        $headline = '<span class="head">' . $post->get('headline') . '</span>';
+        $title = InlineText::sanitize($post->get('headline'));
+        $subtitle = InlineText::sanitize($post->get('subtitle'));
+        $supertitle = InlineText::sanitize($post->get('supertitle') ?? $text->getConfig('supertitle'));
+        $level = strtoupper((string) $post->get('headlineLevel'));
+        $level = in_array($level, ['H1', 'H2', 'H3', 'H4', 'H5', 'H6'], true) ? $level : null;
 
-        if (!empty($post->get('subtitle'))) {
-            $headline .= '<span class="subtitle">' . $post->get('subtitle') . '</span>';
+        $headline = '<span class="head">' . $title . '</span>';
+
+        if ($subtitle !== '') {
+            $headline .= '<span class="subtitle">' . $subtitle . '</span>';
         }
 
         $text->setText($headline);
 
         $text->addConfig([
-            'headline' => $post->get('headline'),
-            'subtitle' => $post->get('subtitle'),
-            'supertitle' => $post->get('supertitle'),
-            'level' => $post->get('headlineLevel'),
+            'headline' => $title,
+            'subtitle' => $subtitle,
+            'supertitle' => $supertitle,
+            'level' => $level,
             'elementId' => $post->get('elementId'),
             'style' => [
                 'textAlign' => $post->get('textAlign'),
@@ -66,10 +73,11 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
                 $row = $model->fetchById($match[2]);
 
                 if ($row->hasColumn('title')) {
-                    $row->setTitle($post->get('headline'));
+                    // Entity titles are also used in navigation and metadata.
+                    $row->setTitle(InlineText::plainText($title));
 
                     if ($row->hasColumn('subtitle')) {
-                        $row->setSubtitle($post->get('subtitle'));
+                        $row->setSubtitle(InlineText::plainText($subtitle));
                     }
 
                     $row->save();
@@ -84,7 +92,7 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
 
                 $row->addConfig([
                     'titles' => [
-                        $_SESSION['frontend']['language'] => $post->get('headline'),
+                        $_SESSION['frontend']['language'] => InlineText::plainText($title),
                     ],
                 ]);
 
@@ -95,10 +103,10 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
         return self::getResponse('json', 200, [
             'headline' => [
                 'subTitleAbove' => (!empty($configuration->get('Ext.Core.System.Editables.Headline.subtitleAbove'))),
-                'text' => nl2br($post->get('headline')),
-                'subtitle' => $post->get('subtitle'),
-                'supertitle' => $post->get('supertitle'),
-                'level' => $post->get('headlineLevel'),
+                'text' => nl2br($title),
+                'subtitle' => nl2br($subtitle),
+                'supertitle' => nl2br($supertitle),
+                'level' => $level,
             ],
         ]);
     }
@@ -118,6 +126,11 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
 
         return self::getResponse('plain', 200, [
             'text' => $text,
+            'fields' => [
+                'headline' => InlineText::sanitize($text ? ($text->getConfig('headline') ?? $get->get('headline')) : $get->get('headline')),
+                'supertitle' => InlineText::sanitize($text ? ($text->getConfig('supertitle') ?? $get->get('supertitle')) : $get->get('supertitle')),
+                'subtitle' => InlineText::sanitize($text ? ($text->getConfig('subtitle') ?? $get->get('subtitle')) : $get->get('subtitle')),
+            ],
         ]);
     }
 }

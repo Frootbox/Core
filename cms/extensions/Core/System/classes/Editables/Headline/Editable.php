@@ -32,7 +32,7 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
     ): string
     {
         // Initialize html crawler
-        $crawler = \Wa72\HtmlPageDom\HtmlPageCrawler::create($html);
+        $crawler = \Frootbox\View\HtmlPageCrawler::create($html);
         $crawler->filter('h1[data-editable][data-uid], h2[data-editable][data-uid], h3[data-editable][data-uid], h4[data-editable][data-uid], h5[data-editable][data-uid]')->each(function ( $element ) use ($texts, $configuration) {
 
             $uid = $element->getAttribute('data-uid');
@@ -76,7 +76,7 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
                 return;
             }
 
-            $headlineText = ($text and $text->getConfig('headline')) ? nl2br($text->getConfig('headline')) : $element->getInnerHtml();
+            $headlineText = ($text and $text->getConfig('headline') !== null) ? nl2br($text->getConfig('headline')) : $element->getInnerHtml();
             $headlineText = preg_replace("/\r/", "", $headlineText);
 
 
@@ -125,7 +125,7 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
             $template = '<header ' . $addedHtml . ' class="' . $classes . '" data-uid="' . $uid . '">';
 
             if ($text and !empty($text->getConfig('supertitle')) and empty($element->getAttribute('data-skipsupertitle'))) {
-                $template .= '<p class="supertitle super-title"><span>' . $text->getConfig('supertitle') . '</span></p>';
+                $template .= '<p class="supertitle super-title"><span>' . nl2br($text->getConfig('supertitle')) . '</span></p>';
             }
             elseif ((!$text or empty($text->getConfig('supertitle'))) and !empty($element->getAttribute('data-supertitle'))) {
                 $template .= '<p class="supertitle super-title"><span>' . $element->getAttribute('data-supertitle') . '</span></p>';

@@ -164,8 +164,6 @@ class Controller extends \Frootbox\Admin\AbstractPluginController
                 'where' => [ 'pluginId' => $this->plugin->getId() ],
                 'order' => [ 'orderId ASC' ]
             ]);
-
-            d($result);
         }
 
         $view->set('additives', $result);

@@ -29,7 +29,7 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
         return $html;
 
         // Initialize html crawler
-        $crawler = \Wa72\HtmlPageDom\HtmlPageCrawler::create($html);
+        $crawler = \Frootbox\View\HtmlPageCrawler::create($html);
         $crawler->filter('h1[data-editable][data-uid], h2[data-editable][data-uid], h3[data-editable][data-uid], h4[data-editable][data-uid], h5[data-editable][data-uid]')->each(function ( $element ) use ($texts, $configuration) {
 
             $uid = $element->getAttribute('data-uid');

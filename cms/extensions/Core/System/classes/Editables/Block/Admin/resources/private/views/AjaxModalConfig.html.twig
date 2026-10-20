@@ -138,6 +138,7 @@
 
             {% elseif variable.type == 'bool' %}
                 <div class="form-group form-check">
+                    <input type="hidden" name="variables[{{ variable.name }}]" value="0">
                     <input {% if variable.value %}checked{% endif %} name="variables[{{ variable.name }}]" type="checkbox" class="form-check-input" id="var__{{ variable.name }}">
                     <label class="form-check-label" for="var__{{ variable.name }}">{{ variable.label }}</label>
                 </div>

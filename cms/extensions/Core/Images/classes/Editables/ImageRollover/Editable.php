@@ -26,7 +26,7 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
         $counter = 0;
 
         // Replace picture tags
-        $crawler = \Wa72\HtmlPageDom\HtmlPageCrawler::create($html);
+        $crawler = \Frootbox\View\HtmlPageCrawler::create($html);
         $crawler->filter('picture[data-editable-rollover]')->each(function ( $element ) use ($files, &$counter) {
 
             $uid = $element->getAttribute('data-uid');

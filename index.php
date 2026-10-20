@@ -1018,7 +1018,7 @@ try {
 
     if (!preg_match('#<h1.*?>#', $html)) {
 
-        $crawler = \Wa72\HtmlPageDom\HtmlPageCrawler::create($html);
+        $crawler = \Frootbox\View\HtmlPageCrawler::create($html);
         $crawler->filter('header.h2.main-title')->first()->each(function($element) {
 
             $element->removeClass('h2');

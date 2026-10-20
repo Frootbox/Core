@@ -34,7 +34,7 @@ class HtmlParser
     protected function parseEditableTags(): void
     {
         // Replace editable tags
-        $crawler = \Wa72\HtmlPageDom\HtmlPageCrawler::create($this->html);
+        $crawler = \Frootbox\View\HtmlPageCrawler::create($this->html);
         $texts = $this->container->get(\Frootbox\Persistence\Content\Repositories\Texts::class);
         $files = $this->container->get(\Frootbox\Persistence\Repositories\Files::class);
 
@@ -248,10 +248,25 @@ class HtmlParser
         $this->html = str_replace('---', '&shy;', $this->html);
 
 
-        $crawler = \Wa72\HtmlPageDom\HtmlPageCrawler::create($this->html);
+        $crawler = \Frootbox\View\HtmlPageCrawler::create($this->html);
 
         $crawler->filter('a:not([tabindex])')->each(function ( $element ) {
             $element->setAttribute('tabindex', '0');
+        });
+
+        // Shared YouTube pages reject framing; normalize both active and consent-gated sources.
+        $crawler->filter('iframe[src], iframe[data-src]')->each(function ($element) {
+            foreach (['src', 'data-src'] as $attribute) {
+                $source = $element->getAttribute($attribute);
+
+                if ($source !== null) {
+                    $normalized = YoutubeEmbed::normalizeUrl($source);
+
+                    if ($normalized !== $source) {
+                        $element->setAttribute($attribute, $normalized);
+                    }
+                }
+            }
         });
 
         $this->html = $crawler->saveHTML();
@@ -325,7 +340,7 @@ class HtmlParser
         $css = (string) null;
         $styleFiles = [];
 
-        $crawler = \Wa72\HtmlPageDom\HtmlPageCrawler::create($html);
+        $crawler = \Frootbox\View\HtmlPageCrawler::create($html);
 
         $crawler->filter('link[rel="stylesheet"]')->each(function ( $element ) use (&$css, &$styleFiles, $configuration, $cacheRevision) {
 
@@ -440,7 +455,7 @@ class HtmlParser
         // Parse scss
         $scss = (string) null;
 
-        $crawler = \Wa72\HtmlPageDom\HtmlPageCrawler::create($html);
+        $crawler = \Frootbox\View\HtmlPageCrawler::create($html);
         $crawler->filter('link[rel="stylesheet/less"]')->each(function($element) use (&$scss, &$html, $configuration, $cacheRevision) {
 
             $href = $element->getAttribute('href');
@@ -596,7 +611,7 @@ class HtmlParser
         }
 
         // Combine css files
-        $crawler = \Wa72\HtmlPageDom\HtmlPageCrawler::create($html);
+        $crawler = \Frootbox\View\HtmlPageCrawler::create($html);
         $css = (string) null;
 
         $crawler->filter('link[href^="' . $configuration->get('publicCacheDir') . '"]')->each(function ( $element ) use (&$css, $configuration, $cacheRevision) {
@@ -659,7 +674,7 @@ class HtmlParser
         }
 
         // Compile javascript
-        $crawler = \Wa72\HtmlPageDom\HtmlPageCrawler::create($html);
+        $crawler = \Frootbox\View\HtmlPageCrawler::create($html);
 
         $minifier = new \Frootbox\View\Minifier\JsMinifier;
         $scripts = [ ];
@@ -703,7 +718,10 @@ class HtmlParser
                 $minifier->add(file_get_contents($localPath));
             }
             else {
-                $scripts[] = $localPath;
+                $scripts[] = [
+                    'path' => $localPath,
+                    'defer' => $element->getAttribute('defer') !== null,
+                ];
             }
 
             $tag = (string) $element;
@@ -739,25 +757,34 @@ class HtmlParser
             $html = '<script nonce="' . SCRIPT_NONCE . '" async src="' . $configuration->get('publicCacheDir') . $cacheFilePath . '"></script>' . PHP_EOL . $html;
         }
 
+        // Prepending to a fragment reverses insertion order; compensate so
+        // deferred dependencies execute in their original document order.
+        if (strpos($html, '</body>') === false) {
+            $scripts = array_reverse($scripts);
+        }
+
         foreach ($scripts as $script) {
 
-            $cacheFilePath = 'cache/public/' . $cacheRevision . '/js/' . rand(1000, 9999) . '-' . basename($script);
+            $cacheFilePath = 'cache/public/' . $cacheRevision . '/js/' . rand(1000, 9999) . '-' . basename($script['path']);
             $cacheFile = $configuration->filesRootFolder . $cacheFilePath;
             $file = new \Frootbox\Filesystem\File($cacheFile);
-            $file->setSource(file_get_contents($script));
+            $file->setSource(file_get_contents($script['path']));
             $file->write();
 
+            $scriptTag = '<script nonce="' . SCRIPT_NONCE . '" ' . ($script['defer'] ? 'defer' : 'async')
+                . ' data-untouched="1" src="' . $configuration->get('publicCacheDir') . $cacheFilePath . '"></script>' . PHP_EOL;
+
             if (strpos($html, '</body>') !== false) {
-                $html = str_replace('</body>', '<script async data-untouched="1" src="' . $configuration->get('publicCacheDir') . $cacheFilePath . '"></script>' . PHP_EOL . '</body>', $html);
+                $html = str_replace('</body>', $scriptTag . '</body>', $html);
             }
             else {
-                $html = '<script async data-untouched="1" src="' . $configuration->get('publicCacheDir') . $cacheFilePath . '"></script>' . PHP_EOL . $html;
+                $html = $scriptTag . $html;
             }
         }
 
 
         // Combine javascript
-        $crawler = \Wa72\HtmlPageDom\HtmlPageCrawler::create($html);
+        $crawler = \Frootbox\View\HtmlPageCrawler::create($html);
         $js = (string) null;
 
         $crawler->filter('script[src^="' . $configuration->get('publicCacheDir') . '"]')->each(function ( $element ) use (&$js, $configuration) {
@@ -838,7 +865,7 @@ class HtmlParser
         }
 
         // Parse direct file pointers in images
-        $crawler = \Wa72\HtmlPageDom\HtmlPageCrawler::create($html);
+        $crawler = \Frootbox\View\HtmlPageCrawler::create($html);
         $crawler->filter('img[src^="FILE:"]')->each(function ( $element ) use ($configuration, $cacheRevision) {
 
             $src = rawurldecode(substr($element->getAttribute('src'), 5));

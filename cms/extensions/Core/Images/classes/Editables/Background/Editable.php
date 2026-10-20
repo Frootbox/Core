@@ -29,7 +29,7 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
         $injectedHtml = (string ) null;
 
         // Replace picture tags
-        $crawler = \Wa72\HtmlPageDom\HtmlPageCrawler::create($html);
+        $crawler = \Frootbox\View\HtmlPageCrawler::create($html);
         $crawler->filter('[data-type="Images/Background"][data-uid], [data-type="Images/Background"][data-file]')->each(function ( $element ) use ($files, $config, &$injectedHtml) {
 
             $uid = $element->getAttribute('data-uid');

@@ -11,7 +11,8 @@ class View extends AbstractViewhelper
         'asset' => [
             'source',
             [ 'name' => 'type', 'default' => 'auto' ],
-            [ 'name' => 'untouched', 'default' => false ]
+            [ 'name' => 'untouched', 'default' => false ],
+            [ 'name' => 'defer', 'default' => false ]
         ],
         'imgUrl' => [
             'source'
@@ -48,7 +49,7 @@ class View extends AbstractViewhelper
     /**
      *
      */
-    public function assetAction($source, $type, $untouched, \Frootbox\Config\Config $config): string
+    public function assetAction($source, $type, $untouched, \Frootbox\Config\Config $config, bool $defer = false): string
     {
         if ($type == 'auto') {
             $type = $this->getAssetType($source);
@@ -60,7 +61,8 @@ class View extends AbstractViewhelper
 
         $attributes = (string) null;
 
-        if ($untouched) {
+        // Deferred dependencies must remain separate from the async bundle.
+        if ($untouched || ($type === 'script' && $defer)) {
             $attributes .= ' data-nocache="1" data-untouched="1" ';
         }
 
@@ -70,7 +72,7 @@ class View extends AbstractViewhelper
                 return '<link ' . $attributes .' rel="stylesheet" type="text/css" href="' . $source . '" />';
 
             case 'script':
-                return '<script nonce="' . SCRIPT_NONCE . '" ' . $attributes .' src="' . $source . '"></script>';
+                return '<script nonce="' . SCRIPT_NONCE . '" ' . ($defer ? 'defer ' : '') . $attributes .' src="' . $source . '"></script>';
 
             case 'scss':
                 return '<link ' . $attributes .' rel="stylesheet/less" type="text/css" href="' . $source . '" />';

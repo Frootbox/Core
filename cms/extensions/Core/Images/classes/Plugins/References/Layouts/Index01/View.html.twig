@@ -68,23 +68,25 @@ variables:
 
                 <div data-editable data-uid="{{ plugin.getUid('text') }}"></div>
 
-                {% if variables.withTagFilter %}
-                    {% set tags = plugin.getAvailableTags() %}
+                {% block TagFilter %}
+                    {% if variables.withTagFilter %}
+                        {% set tags = plugin.getAvailableTags() %}
 
-                    {% if tags.getCount() %}
-                        <div class="filter-bar btn-group d-none d-md-inline-flex" role="group" aria-label="Basic example">
-                            {% for tag in tags %}
-                                <button type="button" data-tag="{{ tag.getTag() }}" class="tag btn btn-primary">{{ tag.getTag() }}</button>
-                            {% endfor %}
-                        </div>
+                        {% if tags.getCount() %}
+                            <div class="filter-bar btn-group d-none d-md-inline-flex" role="group" aria-label="Basic example">
+                                {% for tag in tags %}
+                                    <button type="button" data-tag="{{ tag.getTag() }}" class="tag btn btn-primary">{{ tag.getTag() }}</button>
+                                {% endfor %}
+                            </div>
 
-                        <div class="filter-bar btn-group-vertical d-md-none" role="group" aria-label="Basic example">
-                            {% for tag in tags %}
-                                <button type="button" data-tag="{{ tag.getTag() }}" class="tag btn btn-primary">{{ tag.getTag() }}</button>
-                            {% endfor %}
-                        </div>
+                            <div class="filter-bar btn-group-vertical d-md-none" role="group" aria-label="Basic example">
+                                {% for tag in tags %}
+                                    <button type="button" data-tag="{{ tag.getTag() }}" class="tag btn btn-primary">{{ tag.getTag() }}</button>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
                     {% endif %}
-                {% endif %}
+                {% endblock %}
 
                 <div class="references row">
                     {% for reference in i.getReferences() %}

@@ -91,7 +91,7 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
     ): string
     {
         // Initialize html crawler
-        $crawler = \Wa72\HtmlPageDom\HtmlPageCrawler::create($html);
+        $crawler = \Frootbox\View\HtmlPageCrawler::create($html);
         $crawler->filter('[data-editable-video][data-uid]')->each(function ( $element ) use ($fileRepository, $textRepository, $configuration) {
 
             // Obtain uid

@@ -109,7 +109,8 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
         });
 
         $settings = [
-            'add-drop-table' => true
+            'add-drop-table' => true,
+            'default-character-set' => \Ifsnop\Mysqldump\Mysqldump::UTF8MB4,
         ];
 
         if (!empty($get->get('structureOnly'))) {
@@ -124,6 +125,7 @@ class App extends \Frootbox\Admin\Persistence\AbstractApp
         );
 
         $dump->start($sqlFile);
+        DumpNormalizer::normalizeFile($sqlFile);
 
         // The application/framework may have active output buffers. Leaving
         // them enabled would make readfile() retain the complete dump in PHP

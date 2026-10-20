@@ -26,20 +26,22 @@ variables:
 
     {% if variables.withContainer %}<div class="container">{% endif %}
 
-        <div class="row justify-content-between">
-            <div class="col-md-5">
-                <picture class="fluid" data-editable data-skipempty="1" data-uid="{{ reference.getUid('image') }}">
-                    <img width="800" src="{{ i.getDummyImage({ width: 800, height: null }) }}" alt="" />
-                </picture>
+        {% block ReferenceContent %}
+            <div class="row justify-content-between">
+                <div class="col-md-5">
+                    <picture class="fluid" data-editable data-skipempty="1" data-uid="{{ reference.getUid('image') }}">
+                        <img width="800" src="{{ i.getDummyImage({ width: 800, height: null }) }}" alt="" />
+                    </picture>
+                </div>
+                <div class="col-md-6">
+
+                    <h2 class="first main-title" data-editable data-uid="{{ reference.getUid('title') }}">{{ reference.getTitle }}</h2>
+
+                    <div class="teaser-text" data-nowidgets data-editable data-uid="{{ reference.getUid('teaser') }}"></div>
+
+                </div>
             </div>
-            <div class="col-md-6">
-
-                <h2 class="first main-title" data-editable data-uid="{{ reference.getUid('title') }}">{{ reference.getTitle }}</h2>
-
-                <div class="teaser-text" data-nowidgets data-editable data-uid="{{ reference.getUid('teaser') }}"></div>
-
-            </div>
-        </div>
+        {% endblock %}
 
     {% if variables.withContainer %}</div>{% endif %}
 

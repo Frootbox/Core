@@ -27,7 +27,7 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
     ): string
     {
         // Replace picture tags
-        $crawler = \Wa72\HtmlPageDom\HtmlPageCrawler::create($html);
+        $crawler = \Frootbox\View\HtmlPageCrawler::create($html);
         $crawler->filter('picture[data-editable]')->each(function ( $element ) use ($files, $config) {
 
             $uid = $element->getAttribute('data-uid');

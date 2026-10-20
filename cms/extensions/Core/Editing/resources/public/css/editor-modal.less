@@ -1,0 +1,307 @@
+// Shared scope for frontend editing dialogs, including AJAX-loaded contents.
+// ID + class specificity deliberately wins over ordinary website component rules.
+// Keep every rule inside this scope; do not reset icon fonts or preview images.
+.frootbox-editor-modal:is(#fbxEditorGenericModal, #frootboxOnPageConfigModal) {
+  --fbx-editor-color: #333;
+  --fbx-editor-background: #fff;
+  --fbx-editor-border: #dee2e6;
+  --fbx-editor-muted: #6c757d;
+  --fbx-editor-primary: #2980b9;
+  --fbx-editor-primary-hover: #20638f;
+
+  z-index: 10000;
+  color: var(--fbx-editor-color);
+  font: 400 16px/1.5 'Open Sans', Arial, sans-serif;
+  text-align: left;
+  text-shadow: none;
+  text-transform: none;
+  letter-spacing: normal;
+  color-scheme: light;
+
+  &, *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  .modal-content {
+    color: var(--fbx-editor-color);
+    background: var(--fbx-editor-background);
+    border: 1px solid var(--fbx-editor-border);
+    border-radius: 4px;
+    font: inherit;
+    text-align: left;
+  }
+
+  // Set text properties on the elements themselves: inherited modal colors
+  // alone cannot override a website's p, td, label or span selectors.
+  :where(div, span, p, ul, ol, li, dl, dt, dd, label, legend, table, thead, tbody, tfoot, tr, th, td, small, strong, b, em, h1, h2, h3, h4, h5, h6) {
+    color: inherit;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    text-shadow: none;
+    text-transform: none;
+    letter-spacing: normal;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    margin: 0 0 16px;
+    padding: 0;
+    border: 0;
+    font-size: 20px;
+    font-weight: 600;
+    font-style: normal;
+  }
+
+  .modal-title {
+    margin: 0;
+  }
+
+  p { margin: 0 0 16px; }
+  b, strong { font-weight: 700; }
+  small, .small { font-size: 80%; }
+
+  a {
+    color: var(--fbx-editor-primary);
+    font-family: inherit;
+    text-decoration: none;
+    text-shadow: none;
+    text-transform: none;
+    letter-spacing: normal;
+
+    &:hover { color: var(--fbx-editor-primary-hover); }
+  }
+
+  .modal-header, .modal-body, .modal-footer {
+    padding: 16px;
+    color: var(--fbx-editor-color);
+    background: var(--fbx-editor-background);
+  }
+
+  .modal-header { border-bottom: 1px solid var(--fbx-editor-border); }
+  .modal-footer { border-top: 1px solid var(--fbx-editor-border); }
+
+  .table {
+    width: 100%;
+    margin-bottom: 16px;
+    border-collapse: collapse;
+    color: var(--fbx-editor-color);
+    background: var(--fbx-editor-background);
+    font-size: 16px;
+
+    th, td {
+      padding: 12px;
+      border-top: 1px solid var(--fbx-editor-border);
+      color: inherit;
+      background: transparent;
+      vertical-align: top;
+      text-align: left;
+    }
+
+    thead, tbody, tfoot, tr { background: transparent; }
+    tr.dragging { background: #e9ecef; }
+  }
+
+  form { margin: 0; }
+  .form-group { margin-bottom: 16px; }
+  label { margin-bottom: 8px; }
+
+  .form-control {
+    display: block;
+    width: 100%;
+    height: auto;
+    padding: 6px 12px;
+    border: 1px solid #adb5bd;
+    border-radius: 4px;
+    color: var(--fbx-editor-color);
+    background: var(--fbx-editor-background);
+    font: inherit;
+    text-align: left;
+    text-transform: none;
+    letter-spacing: normal;
+    box-shadow: none;
+
+    &::placeholder { color: var(--fbx-editor-muted); opacity: 1; }
+    &:focus { border-color: var(--fbx-editor-primary); }
+    &:disabled, &[readonly] { background: #e9ecef; opacity: 1; }
+    &.is-invalid { border-color: #dc3545; }
+    &.is-valid { border-color: #28a745; }
+  }
+
+  textarea.form-control { height: auto; resize: vertical; }
+  textarea[data-headline-field][hidden] { display: none; }
+
+  .fbx-headline-toolbar {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 4px;
+
+    .btn[aria-pressed="true"] {
+      color: #fff;
+      background: var(--fbx-editor-primary);
+    }
+  }
+
+  .fbx-headline-input {
+    min-height: 62px;
+    margin: 0;
+    cursor: text;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    font-weight: 400;
+    font-style: normal;
+
+    &:focus { outline: 2px solid var(--fbx-editor-primary); outline-offset: 1px; }
+    &:empty::before { content: attr(data-placeholder); color: var(--fbx-editor-muted); pointer-events: none; }
+    &::after { display: none; }
+    strong, b { font-weight: 700; }
+    em, i { font-style: italic; }
+  }
+
+  .fbx-headline-toolbar em { font-style: italic; }
+  select.form-control { appearance: auto; }
+
+  input[type="checkbox"], input[type="radio"] {
+    appearance: auto;
+    width: auto;
+    height: auto;
+    accent-color: var(--fbx-editor-primary);
+  }
+
+  .btn, .close {
+    display: inline-block;
+    width: auto;
+    min-width: 0;
+    height: auto;
+    margin: 0;
+    padding: 6px 12px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    color: var(--fbx-editor-color);
+    background: #e9ecef;
+    font: inherit;
+    text-align: center;
+    text-decoration: none;
+    text-transform: none;
+    text-shadow: none;
+    letter-spacing: normal;
+    box-shadow: none;
+    cursor: pointer;
+
+    // Suppress decorative theme arrows without affecting Font Awesome icons.
+    &::before, &::after { display: none !important; }
+    i, svg { color: inherit; }
+  }
+
+  // Explicit variants preserve contrast in every state, including themes that
+  // style both button elements and links with .btn.
+  $editor-button-colors: (
+    primary: (var(--fbx-editor-primary), var(--fbx-editor-primary-hover), #fff),
+    secondary: (#6c757d, #545b62, #fff),
+    success: (#218838, #19692c, #fff),
+    danger: (#dc3545, #bd2130, #fff),
+    warning: (#ffc107, #d39e00, #212529),
+    info: (#117a8b, #0c5460, #fff),
+    light: (#f8f9fa, #dae0e5, #212529),
+    dark: (#343a40, #1d2124, #fff)
+  );
+
+  @each $variant, $colors in $editor-button-colors {
+    .btn-outline-#{$variant} {
+      color: nth($colors, 1);
+      background: var(--fbx-editor-background);
+      border-color: nth($colors, 1);
+
+      &:hover, &:focus, &:active, &.active {
+        color: nth($colors, 3);
+        background: nth($colors, 1);
+        border-color: nth($colors, 1);
+      }
+    }
+
+    // Solid variants come last: category buttons can have both classes.
+    .btn-#{$variant} {
+      color: nth($colors, 3);
+      background: nth($colors, 1);
+      border-color: nth($colors, 1);
+
+      &:hover, &:focus, &:active, &.active {
+        color: nth($colors, 3);
+        background: nth($colors, 2);
+        border-color: nth($colors, 2);
+      }
+    }
+  }
+
+  .btn-link {
+    color: var(--fbx-editor-primary);
+    background: transparent;
+    border-color: transparent;
+    &:hover { color: var(--fbx-editor-primary-hover); text-decoration: underline; }
+  }
+
+  .btn-sm { padding: 4px 8px; font-size: 14px; }
+  .btn-lg { padding: 8px 16px; font-size: 20px; }
+  .btn-block { display: block; width: 100%; }
+
+  .btn-group > .btn:not(:first-child) {
+    margin-left: -1px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+
+  .btn-group > .btn:not(:last-child) {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  .modal-footer > :not(:first-child) { margin-left: 4px; }
+  .modal-footer > :not(:last-child) { margin-right: 4px; }
+
+  .btn:disabled, .btn.disabled {
+    opacity: .65;
+    pointer-events: none;
+  }
+
+  .modal-header .close {
+    margin: -16px -16px -16px auto;
+    padding: 16px;
+    border: 0;
+    color: var(--fbx-editor-color);
+    background: transparent;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1;
+    opacity: .65;
+
+    &:hover, &:focus { color: #000; background: transparent; opacity: 1; }
+  }
+
+  a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+    outline: 2px solid var(--fbx-editor-primary);
+    outline-offset: 2px;
+  }
+
+  .nav {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    .nav-item { left: auto; margin: 0 0 -1px; padding: 0; list-style: none; }
+    .nav-link { padding: 8px 16px; color: var(--fbx-editor-primary); background: transparent; }
+    .nav-link.active { color: var(--fbx-editor-color); background: var(--fbx-editor-background); }
+  }
+
+  // Match Bootstrap's utility priority, but only inside editor dialogs.
+  .text-muted { color: var(--fbx-editor-muted) !important; }
+  .text-right { text-align: right !important; }
+  .text-center { text-align: center !important; }
+
+  .alert-danger { color: #721c24; background: #f8d7da; border-color: #f5c6cb; }
+  .alert-warning { color: #856404; background: #fff3cd; border-color: #ffeeba; }
+  .alert-success { color: #155724; background: #d4edda; border-color: #c3e6cb; }
+  .alert-info { color: #0c5460; background: #d1ecf1; border-color: #bee5eb; }
+
+  .xicon.visibility-0, .xicon.fa-traffic-light-stop { color: #dc3545; }
+  .xicon.visibility-1, .xicon.fa-traffic-light-slow { color: #b36b00; }
+  .xicon.visibility-2, .xicon.fa-traffic-light-go { color: #218838; }
+}

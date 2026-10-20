@@ -159,36 +159,31 @@
 
             fbxEditorOpenGenericModal();
 
-            if (headline[0].tagName == 'HEADER') {
-                headlineText = headline.find('h1, h2, h3, h4, h5, h6').first().text();
+            var wrapper = headline.filter('header').first();
+            if (!wrapper.length) { wrapper = headline.first(); }
+            var title = wrapper.is('header') ? wrapper.find('h1, h2, h3, h4, h5, h6').first() : wrapper;
+            var titleContent = title.find('.head').first();
+            if (!titleContent.length) {
+                titleContent = title.clone();
+                titleContent.find('.subtitle, .supertitle').remove();
             }
-            else {
-                headlineText = headline.find('.head').length > 0 ? headline.find('.head').text() : headline.text();
-            }
-
-            console.log(typeof headline.data('skipsupertitle'));
 
             $.ajax({
                 url: "{{ settings.serverpath }}cms/admin/Editor/callEditable",
                 data: {
                     method: 'ajaxModalEdit',
                     editable: 'Frootbox/Ext/Core/System/Editables/Headline',
-                    headlineTag: headline.prop("tagName"),
+                    headlineTag: title.prop("tagName"),
                     uid: uid,
-                    headline: headlineText,
-                    supertitle: headline.find('.supertitle').text(),
-                    skipSuperTitle: (typeof headline.data('skipsupertitle') != "undefined" ? 1 : 0),
-                    subtitle: headline.find('.subtitle').text()
+                    headline: titleContent.html(),
+                    supertitle: wrapper.find('.supertitle').first().html(),
+                    skipSuperTitle: (typeof wrapper.data('skipsupertitle') != "undefined" ? 1 : 0),
+                    subtitle: wrapper.find('.subtitle').first().html()
                 },
                 success: function ( html ) {
 
                     $('#fbxEditorGenericModal .modal-content').html(html);
 
-                    $('#headline').focus();
-
-                    if ($('#fbxEditorGenericModal .modal-content #headline').val().length == 0) {
-                        $('#fbxEditorGenericModal .modal-content #headline').val(headline.text());
-                    }
                 }
             });
 

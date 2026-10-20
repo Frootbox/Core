@@ -29,7 +29,7 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
         \Frootbox\View\Engines\Interfaces\Engine $view
     ): string
     {
-        $crawler = \Wa72\HtmlPageDom\HtmlPageCrawler::create($html);
+        $crawler = \Frootbox\View\HtmlPageCrawler::create($html);
         $crawler->filter('[data-blocks][data-uid]')->each(function ( $element ) use (&$html, $view) {
 
             $uid = $element->getAttribute('data-uid');
@@ -68,7 +68,7 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
     ): string
     {
         // Parse blocks
-        $crawler = \Wa72\HtmlPageDom\HtmlPageCrawler::create($html);
+        $crawler = \Frootbox\View\HtmlPageCrawler::create($html);
         $blocks = $container->get(\Frootbox\Persistence\Content\Repositories\Blocks::class);
 
         $loops = [];
