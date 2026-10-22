@@ -19,6 +19,28 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
     }
 
     /**
+     * Re-render opted-in images with their normal renderer, including metadata
+     * and desktop background styles, without changing legacy refresh actions.
+     */
+    public function ajaxInlineRefresh(
+        \Frootbox\Http\Post $post,
+        \DI\Container $container
+    ): Response
+    {
+        $editable = match ($post->get('type')) {
+            'image' => new \Frootbox\Ext\Core\Images\Editables\Image\Editable(),
+            'background' => new \Frootbox\Ext\Core\Images\Editables\Background\Editable(),
+            default => throw new \Frootbox\Exceptions\InputInvalid('Unbekannter Bildtyp.'),
+        };
+
+        $html = $container->call([$editable, 'parse'], [
+            'html' => '<html><head></head><body>' . $post->get('snippet') . '</body></html>',
+        ]);
+
+        return self::getResponse('json', 200, ['html' => $html]);
+    }
+
+    /**
      * Edit the focus point of the same image that is rendered in the frontend.
      */
     public function ajaxModalFocusPoint(

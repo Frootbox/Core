@@ -1,0 +1,9 @@
+<script nonce="{{ settings.nonce }}">
+(function () {
+    if (window.frootboxInlineImages) return;
+    window.frootboxInlineImages = true;
+    const serverpath = {{ settings.serverpath | json_encode | raw }};
+    const sessionQuery = {{ SID | json_encode | raw }};
+    {% include 'cms/extensions/Core/Images/classes/Editables/Shared/inline-upload.js' %}
+})();
+</script>

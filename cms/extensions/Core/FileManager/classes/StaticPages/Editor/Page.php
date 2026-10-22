@@ -177,6 +177,21 @@ class Page
             throw new \Frootbox\Exceptions\InputInvalid($message);
         }
 
+        // Inline image uploads are opt-in. Validate before replacing any file;
+        // the general file uploader keeps its existing supported file types.
+        $inlineImage = $get->get('inlineImage') === '1';
+        if ($inlineImage) {
+            $image = @getimagesize($_FILES['file']['tmp_name']);
+            $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/avif'];
+            if (!$image || !in_array($image['mime'], $allowedTypes, true)) {
+                throw new \Frootbox\Exceptions\InputInvalid('Bitte ein gültiges JPG-, PNG-, GIF-, WebP- oder AVIF-Bild hochladen.');
+            }
+            if (empty($get->get('uid'))) {
+                throw new \Frootbox\Exceptions\InputInvalid('Die Bildzuordnung fehlt.');
+            }
+            $_FILES['file']['type'] = $image['mime'];
+        }
+
         $folder = $folders->fetchOne([
             'where' => [
                 'title' => 'Uploads vom Bearbeitungsmodus',
@@ -220,7 +235,9 @@ class Page
                 'where' => $where,
             ]);
 
-            $result->map('delete');
+            if (!$inlineImage) {
+                $result->map('delete');
+            }
         }
 
         // Insert file
@@ -235,6 +252,10 @@ class Page
             'language' => $_SESSION['frontend']['language'] ?? GLOBAL_LANGUAGE,
         ]));
 
+        // Keep the previous image intact if storing the replacement fails.
+        if ($inlineImage && empty($get->get('multiple'))) {
+            $result->map('delete');
+        }
 
         if (!empty($get->get('setFirst'))) {
 

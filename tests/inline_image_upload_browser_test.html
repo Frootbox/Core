@@ -1,0 +1,42 @@
+<!doctype html>
+<!-- Serve the repository root locally and open this file in a desktop browser (>=768px). Upload and refresh requests are mocked; no files are stored. --><html><head><meta charset="utf-8"><title>Inline Upload Integration Check</title><style>body{font:16px sans-serif;margin:30px} .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px} .image{height:190px;background:#ddd} picture{display:block} img{width:100%;height:190px;object-fit:cover} #results{white-space:pre-wrap;margin-top:40px}</style></head><body><h1>Inline Upload Integration Check</h1><div class="grid"><div class="image" data-inline-upload data-type="Images/Background" data-uid="hero"></div><picture data-editable data-inline-upload data-uid="picture"><img alt="Placeholder"></picture><div class="image" data-type="Images/Background" data-uid="legacy">Legacy — no dropzone</div></div><pre id="results">Tests running…</pre>
+<script>
+const serverpath='/', sessionQuery='';
+const requests=[]; let fail=false; let fetchFail=false;
+window.XMLHttpRequest=class {
+ constructor(){this.upload={};}
+ open(method,url){this.url=url;}
+ setRequestHeader(){}
+ send(body){requests.push({url:this.url,body});setTimeout(()=>{this.status=fail?500:200;this.responseText=fail?'not JSON':'{}';this.onload();},10);}
+};
+window.fetch=async (url,options)=>{
+ const params=options.body;const doc=new DOMParser().parseFromString(params.get('snippet'),'text/html');const el=doc.body.firstElementChild;
+ if(el.tagName==='PICTURE'){el.querySelector('img').setAttribute('data-image-edited','true');el.querySelector('img').src='data:image/gif;base64,R0lGODlhAQABAIAAAERERAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==';}
+ else {el.style.backgroundImage='linear-gradient(45deg,#aac,#dde)';el.dataset.focusFile='1';}
+ return {ok:!fetchFail,json:async()=>({html:'<html><head><style>.test-style{color:red}</style></head><body>'+el.outerHTML+'</body></html>'})};
+};
+</script><script src="../cms/extensions/Core/Images/classes/Editables/Shared/inline-upload.js"></script><script>
+const wait=()=>new Promise(r=>setTimeout(r,80));
+const output=[];
+function check(v,m){if(!v)throw Error(m);output.push('PASS '+m);}
+function drop(el,files){const data=new DataTransfer();files.forEach(f=>data.items.add(f));el.dispatchEvent(new DragEvent('drop',{bubbles:true,cancelable:true,dataTransfer:data}));}
+const file=new File(['test'],'sample.png',{type:'image/png'});
+window.addEventListener('load',async()=>{try{
+ await wait();check(document.querySelectorAll('.fbx-inline-upload').length===2,'Only opted-in elements get dropzones');
+ check(document.querySelectorAll('.fbx-inline-empty').length===2,'Empty picture and background have visible dropzones');
+ drop(document.querySelector('[data-uid="legacy"]'),[file]);await wait();check(requests.length===0,'Legacy drop does not upload');
+ drop(document.querySelector('[data-uid="hero"]'),[file,file]);await wait();check(requests.length===0,'Multiple files rejected');
+ drop(document.querySelector('[data-uid="hero"]'),[new File(['text'],'text.txt',{type:'text/plain'})]);await wait();check(requests.length===0,'Non-image rejected');
+ drop(document.querySelector('[data-uid="hero"]'),[file]);await wait();check(requests.length===1&&new URL(requests[0].url).searchParams.get('uid')==='hero','Background upload uses existing UID');
+ check(document.querySelector('[data-uid="hero"]').dataset.focusFile==='1','Background refreshed in place');
+ drop(document.querySelector('[data-uid="hero"]'),[file]);await wait();check(requests.length===2,'Replacement remains uploadable after refresh');
+ const hero=document.querySelector('[data-uid="hero"]');hero.dataset.focusFileDesktop='2';drop(hero,[file]);await wait();check(new URL(requests[2].url).searchParams.get('uid')==='hero-desktop','Visible desktop variant targeted');
+ drop(document.querySelector('[data-uid="picture"]'),[file]);await wait();check(!!document.querySelector('picture img[data-image-edited]'),'Picture refreshed in place');
+ const input=document.querySelectorAll('.fbx-inline-upload input')[1];const data=new DataTransfer();data.items.add(file);input.files=data.files;input.dispatchEvent(new Event('change'));await wait();check(requests.length===5,'File chooser uploads');
+ fail=true;drop(document.querySelector('[data-uid="picture"]'),[file]);await wait();check([...document.querySelectorAll('[role="status"]')].some(x=>x.textContent.includes('Unerwartete Antwort')),'Upload errors visible');check(!document.querySelector('.fbx-inline-upload button:disabled'),'Failure re-enables controls');
+ fail=false;fetchFail=true;drop(document.querySelector('[data-uid="picture"]'),[file]);await wait();check([...document.querySelectorAll('[role="status"]')].some(x=>x.textContent.includes('Seite neu laden')),'Refresh failure distinguished from upload failure');
+ check(document.querySelectorAll('.fbx-inline-upload').length===2,'No duplicate overlays after replacement');
+ document.querySelector('[data-uid="picture"]').remove();await wait();check(document.querySelectorAll('.fbx-inline-upload').length===1,'Removed elements clean up their overlay');
+ output.push('ALL CHECKS PASSED');
+ }catch(e){output.push('FAIL '+e.message);}document.querySelector('#results').textContent=output.join('\n');});
+</script></body></html>
