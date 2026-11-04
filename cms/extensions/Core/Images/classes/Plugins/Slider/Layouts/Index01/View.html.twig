@@ -111,7 +111,7 @@ variables:
 
                     {% for file in images %}
                         <div class="carousel-item {% if loop.index == 1 %}active{% endif %}">
-                            <div class="image catch-lazy-background" data-backgroundclass="slide-background-{{ file.getId() }}" data-copyright="{{ file.getCopyright() }}" style="background-position: center; background-size: cover; width: 100%;">
+                            <div class="image catch-lazy-background" data-backgroundclass="slide-background-{{ file.getId() }}" data-frootbox-ai="{{ file.getAiLabelType() }}" data-copyright="{{ file.getCopyright() }}" style="background-position: center; background-size: cover; width: 100%;">
                             </div>
                         </div>
                     {% endfor %}

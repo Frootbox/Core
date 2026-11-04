@@ -71,7 +71,7 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
             }
 
             $html = '<picture class="fluid">
-                            <img data-default="' . $default . '" width="' . $width . '" src="' . $src . '" alt="' . $alt . '" />
+                            <img data-frootbox-ai="' . ($file ? $file->getAiLabelType() : '0') . '" data-default="' . $default . '" width="' . $width . '" src="' . $src . '" alt="' . $alt . '" />
                         </picture>';
 
             if ($file and $file->getConfig('magnifier')) {
@@ -91,6 +91,6 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
 
         $html = $crawler->saveHTML();
 
-        return $html;
+        return \Frootbox\View\AiImageLabel::render($html);
     }
 }

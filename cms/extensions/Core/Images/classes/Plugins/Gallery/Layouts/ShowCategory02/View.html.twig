@@ -70,7 +70,7 @@ variables:
                             <div class="{{ colClass }}">
                                 <a href="{{ file.getUriThumbnail() }}" data-fancybox="gallery">
                                     <picture class="fluid" data-fileid="{{ file.getId() }}">
-                                        <img src="{{ file.getUriThumbnail({ width: variables.image_width, height: variables.image_height }) }}" alt="" />
+                                        <img data-frootbox-ai="{{ file.getAiLabelType() }}" src="{{ file.getUriThumbnail({ width: variables.image_width, height: variables.image_height }) }}" alt="" />
 
                                         {% if file.getConfig('caption') %}
                                             <span class="caption">{{ file.getConfig('caption') }}</span>

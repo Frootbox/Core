@@ -35,6 +35,8 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
             $uid = $element->getAttribute('data-uid');
             $element->setAttribute('data-focus-file', '');
             $element->setAttribute('data-focus-file-desktop', '');
+            $element->setAttribute('data-frootbox-ai', '0');
+            $element->setAttribute('data-frootbox-ai-desktop', '0');
             $position = 'center';
 
             if (empty($uid)) {
@@ -91,6 +93,8 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
 
             if ($file) {
 
+                $element->setAttribute('data-frootbox-ai', empty($file->getConfig('backgroundColor')) ? $file->getAiLabelType() : 0);
+                $element->setAttribute('data-frootbox-ai-desktop', $element->getAttribute('data-frootbox-ai'));
                 $element->setAttribute('role', 'img');
                 $element->setAttribute('aria-label', $file->getAlt());
 
@@ -152,6 +156,8 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
                     }
                 }
 
+                $element->setAttribute('data-frootbox-ai-desktop', $file->getAiLabelType());
+
                 $customClass = 'bg-file-' . $file->getId();
 
                 $classes = $element->getAttribute('class');
@@ -185,7 +191,7 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
 
         $html = str_replace('</head>', $injectedHtml . '</head>', $html);
 
-        return $html;
+        return \Frootbox\View\AiImageLabel::render($html);
     }
 
     /**

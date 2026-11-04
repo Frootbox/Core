@@ -68,7 +68,8 @@ variables:
 
                                 {% if not variables.noCategoryAutoImage %}
                                     <picture class="fluid">
-                                        <img width="{{ variables.image_width }}" height="{{ variables.image_height }}" src="{{ c.getDefaultImage({ width: variables.image_width, height: variables.image_height }) }}" alt="" />
+                                        {% set defaultImage = c.getDefaultImageFile() %}
+                                        <img data-frootbox-ai="{{ defaultImage.getAiLabelType() }}" width="{{ variables.image_width }}" height="{{ variables.image_height }}" src="{{ defaultImage ? defaultImage.getUriThumbnail({ width: variables.image_width, height: variables.image_height }) : c.getDefaultImage({ width: variables.image_width, height: variables.image_height }) }}" alt="" />
                                     </picture>
                                 {% else %}
                                     <picture class="fluid" data-editable data-uid="{{ category.getUid('image')}}">
@@ -93,7 +94,7 @@ variables:
                         <div class="image">
                             <a href="{{ file.getUriThumbnail() }}" data-fancybox="gallery">
                                 <picture class="fluid" data-fileid="{{ file.getId() }}">
-                                    <img src="{{ file.getUriThumbnail({ width: variables.image_width, height: variables.image_height }) }}" alt="{{ file.getAlt() }}" />
+                                    <img data-frootbox-ai="{{ file.getAiLabelType() }}" src="{{ file.getUriThumbnail({ width: variables.image_width, height: variables.image_height }) }}" alt="{{ file.getAlt() }}" />
                                 </picture>
                             </a>
                             <div data-editable data-uid="{{ file.getUid('teaser-text') }}"></div>

@@ -317,6 +317,8 @@ class HtmlParser
         foreach ($nonStructural as $editable) {
             $this->html = $this->container->call([ $editable, 'parse' ], [ 'html' => $this->html ]);
         }
+
+        $this->html = AiImageLabel::render($this->html);
     }
 
     /**

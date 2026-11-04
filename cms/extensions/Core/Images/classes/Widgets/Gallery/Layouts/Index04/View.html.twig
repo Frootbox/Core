@@ -32,7 +32,7 @@ variables:
 
             {% for image in images %}
                 <div class="carousel-item {% if loop.first %}active{% endif %}">
-                    <img width="{{ widget.getImageWidth }}" height="{{ widget.getImageHeight }}" class="img-fluid" src="{{ image.getUri({ width: widget.getImageWidth, height: widget.getImageHeight }) }}" alt="{{ image.getAlt() }}" />
+                    <img data-frootbox-ai="{{ image.getAiLabelType() }}" width="{{ widget.getImageWidth }}" height="{{ widget.getImageHeight }}" class="img-fluid" src="{{ image.getUri({ width: widget.getImageWidth, height: widget.getImageHeight }) }}" alt="{{ image.getAlt() }}" />
                 </div>
             {% endfor %}
 

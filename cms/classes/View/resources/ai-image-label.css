@@ -1,0 +1,16 @@
+.frootbox-ai-image { position: relative; isolation: isolate; display: inline-block; max-width: 100%; vertical-align: top; }
+.frootbox-ai-image > picture { display: block; }
+.frootbox-ai-image > img, .frootbox-ai-image > picture > img { vertical-align: top; }
+:where(.frootbox-ai-background) { position: relative; }
+.frootbox-ai-label {
+    position: absolute; right: 8px; bottom: 8px; z-index: 2;
+    display: block; padding: 3px 6px; border-radius: 3px;
+    background: #222; color: #fff; font: normal 12px/1.4 sans-serif;
+    letter-spacing: normal; text-transform: none; text-align: center;
+    max-width: calc(100% - 16px); box-sizing: border-box; pointer-events: none;
+}
+.frootbox-ai-desktop-only { display: none; }
+@media (min-width: 768px) {
+    .frootbox-ai-desktop-only { display: block; }
+    .frootbox-ai-mobile-only { display: none; }
+}

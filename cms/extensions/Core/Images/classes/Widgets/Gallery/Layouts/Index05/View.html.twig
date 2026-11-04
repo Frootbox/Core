@@ -14,7 +14,7 @@
             {% if not widget.getConfig('noMagnifier') %}
                 <a href="{{ image.getUriThumbnail() }}" data-fancybox="gallery">
             {% endif %}
-                <img {% if widget.getImageWidth() > 0 %}width="{{ widget.getImageWidth() }}"{% endif %} {% if widget.getImageHeight() > 0 %}height="{{ widget.getImageHeight() }}"{% endif %} src="{{ image.getUri({ width: widget.getImageWidth, height: widget.getImageHeight }) }}" alt="{{ image.getAlt() }}" />
+                <img data-frootbox-ai="{{ image.getAiLabelType() }}" {% if widget.getImageWidth() > 0 %}width="{{ widget.getImageWidth() }}"{% endif %} {% if widget.getImageHeight() > 0 %}height="{{ widget.getImageHeight() }}"{% endif %} src="{{ image.getUri({ width: widget.getImageWidth, height: widget.getImageHeight }) }}" alt="{{ image.getAlt() }}" />
                 {% if image.getTitleReal %}
                     {{ image.getTitleReal }}
                 {% endif %}

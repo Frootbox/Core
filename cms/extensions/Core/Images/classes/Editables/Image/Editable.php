@@ -92,7 +92,7 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
 
                 // $alt = !empty($file->getConfig('caption')) ? strip_tags($file->getConfig('caption')) : $file->getName();
                 $html = '<div class="ext-core-images-image">
-                    <img data-image-edited="true" ' . (!empty($file->getConfig('isPresentationOnly')) ? 'role="presentation"' : '') . ' data-default="' . $default . '" class="' . $class . '" src="' . $file->getUriThumbnail($payload) . '" ' . ($payload['height'] ? 'height="' . $payload['height'] . '"' : '') . ' ' . ($payload['width'] ? 'width="' . $payload['width'] . '"' : '') . ' alt="' . $file->getAlt(default: $element->getAttribute('data-alt')) . '" />
+                    <img data-frootbox-ai="' . $file->getAiLabelType() . '" data-image-edited="true" ' . (!empty($file->getConfig('isPresentationOnly')) ? 'role="presentation"' : '') . ' data-default="' . $default . '" class="' . $class . '" src="' . $file->getUriThumbnail($payload) . '" ' . ($payload['height'] ? 'height="' . $payload['height'] . '"' : '') . ' ' . ($payload['width'] ? 'width="' . $payload['width'] . '"' : '') . ' alt="' . $file->getAlt(default: $element->getAttribute('data-alt')) . '" />
                 ';
 
                 if (!empty($file->getConfig('caption')) and (!empty($element->attr('data-caption')) or !empty($config->get('Ext.Core.Images.Editables.Image.Caption')))) {
@@ -118,6 +118,6 @@ class Editable extends \Frootbox\AbstractEditable implements \Frootbox\Ext\Core\
 
         });
 
-        return $crawler->saveHTML();
+        return \Frootbox\View\AiImageLabel::render($crawler->saveHTML());
     }
 }

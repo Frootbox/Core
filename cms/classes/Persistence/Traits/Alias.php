@@ -43,6 +43,7 @@ trait Alias
     {
         // Update alias
         $sections = $this->getNewAliases();
+        $generatedAliases = [];
 
         foreach ($sections as $section => $aliases) {
 
@@ -51,6 +52,7 @@ trait Alias
                 $alias->setItemModel($this->getModelClass());
                 $alias->setItemId($this->getId());
                 $alias->setSection($section);
+                $generatedAliases[] = $alias;
 
                 // Get target page
                 if (empty($alias->getPageId())) {
@@ -59,7 +61,7 @@ trait Alias
             }
         }
 
-        return $aliases ?? [];
+        return $generatedAliases;
     }
 
     /**
@@ -193,41 +195,33 @@ trait Alias
         \Frootbox\Persistence\Alias $alias,
     ): string
     {
-        $checkPayload = json_encode($alias->getPayload());
-
         for ($i = 0; $i <= 30; ++$i) {
-
             $checkUri = ($i == 0 ? $aliasUri : $aliasUri . '-' . $i);
-
-            $result = $aliasesRepository->fetchOne([
-                'where' => [
-                    'alias' => $checkUri
-                ],
+            $existing = $aliasesRepository->fetchOne([
+                'where' => [ 'alias' => $checkUri ],
             ]);
 
-            // No alias found, uri is save
-            if (empty($result)) {
-                break;
-            }
-
-            // Old alias found, drop and re-use
-            if ($result->getStatus() == 301) {
-                $result->delete();
-                break;
-            }
-
-            // If payload matches and item matches, alias can be used
-            if ($alias->getUid() == $result->getUid())
-            if ($result->getItemModel() == $alias->getItemModel() and $result->getItemId() == $alias->getItemId() and $result->getPayload() == $checkPayload) {
-                break;
+            // The router resolves paths globally, regardless of language.
+            if ($existing === null or $existing->getStatus() == 301 or $this->isSameAlias($existing, $alias)) {
+                return $checkUri;
             }
         }
 
-        if ($i == 30) {
-            throw new \Frootbox\Exceptions\RuntimeError('Could not create alias.');
-        }
+        throw new \Frootbox\Exceptions\RuntimeError('Could not create alias.');
+    }
 
-        return $checkUri;
+    /**
+     * A UID alone is not enough: language and section identify the current URL.
+     * Legacy records without a UID remain reserved until explicitly migrated.
+     */
+    protected function isSameAlias(\Frootbox\Persistence\Alias $existing, \Frootbox\Persistence\Alias $alias): bool
+    {
+        return !empty($existing->getUid())
+            and $existing->getUid() == $alias->getUid()
+            and $existing->getItemModel() == $alias->getItemModel()
+            and $existing->getItemId() == $alias->getItemId()
+            and $existing->getLanguage() == $alias->getLanguage()
+            and $existing->getSection() == $alias->getSection();
     }
 
     /**
@@ -378,105 +372,71 @@ trait Alias
                 throw new \Exception("Alias UID missing for model " . $alias->getItemModel());
             }
 
-            // Check if alias exists
+            // Reserve paths globally, including records without a UID.
             $checkAlias = $aliasesRepository->fetchOne([
-                'where' => [
-                    'alias' => $aliasUri,
-                    'language' => $alias->getLanguage(),
-                ],
+                'where' => [ 'alias' => $aliasUri ],
             ]);
 
-            if ($checkAlias) {
+            if ($checkAlias !== null and $checkAlias->getStatus() != 301 and !$this->isSameAlias($checkAlias, $alias)) {
+                // Keep an existing suffixed URL stable while the base path is occupied.
+                $actualAlias = $aliasesRepository->fetchOne([
+                    'where' => [
+                        'uid' => $alias->getUid(),
+                        'language' => $alias->getLanguage(),
+                        'status' => 200,
+                    ],
+                ]);
 
-                if (empty($checkAlias->getUid())) {
-
-                    // Occupy check alias
-                    $checkAlias->setUid($alias->getUid());
-                    $checkAlias->save();
-                }
-
-                if ($checkAlias->getUid() == $alias->getUid()) {
-
-                    $checkAlias->setAlias($aliasUri);
-                    $checkAlias->setPayload(json_encode($alias->getPayload()));
-                    $checkAlias->setStatus($alias->getStatus() ?? 200);
-
-                    if ($checkAlias->getStatus() == 200) {
-                        $checkAlias->unsetConfig('target');
-                    }
-                    else {
-                        $aliasConfig = $alias->getData()['config'] ?? [];
-                        $aliasConfig = is_array($aliasConfig) ? $aliasConfig : json_decode($aliasConfig, true);
-
-                        if (array_key_exists('target', $aliasConfig ?? [])) {
-                            $checkAlias->addConfig([ 'target' => $aliasConfig['target'] ]);
-                        }
-                    }
-
-                    $checkAlias->save();
-                    $alias = $checkAlias;
-
-                    $this->setAlias($checkAlias);
+                if ($actualAlias !== null
+                    and $this->isSameAlias($actualAlias, $alias)
+                    and preg_match('#^' . preg_quote($aliasUri, '#') . '\-([0-9]+)$#', $actualAlias->getAlias())) {
+                    $aliasUri = $actualAlias->getAlias();
                 }
                 else {
+                    $aliasUri = $this->getSaveUri($aliasUri, $aliasesRepository, $alias);
+                }
 
-                    // Re-use old 301 alias
-                    if ($checkAlias->getStatus() == 301) {
+                $checkAlias = $aliasesRepository->fetchOne([
+                    'where' => [ 'alias' => $aliasUri ],
+                ]);
+            }
 
-                        // Remove old alias
-                        $checkAlias->delete();
+            if ($checkAlias !== null and $this->isSameAlias($checkAlias, $alias)) {
+                // Reactivate our own historical URL, preserving its SEO configuration.
+                $checkAlias->setPageId($alias->getPageId());
+                $checkAlias->setPayload(json_encode($alias->getPayload()));
+                $checkAlias->setStatus($alias->getStatus() ?? 200);
 
-                        // Persist new alias
-                        $alias->setAlias($aliasUri);
-                        $alias = $aliasesRepository->persist($alias);
+                if ($checkAlias->getStatus() == 200) {
+                    $checkAlias->unsetConfig('target');
+                }
+                else {
+                    $aliasConfig = $alias->getData()['config'] ?? [];
+                    $aliasConfig = is_array($aliasConfig) ? $aliasConfig : json_decode($aliasConfig, true);
 
-                        $this->setAlias($alias);
-                    }
-                    else {
-
-                        // Check of actual alias can stay
-                        $actualAlias = $aliasesRepository->fetchOne([
-                            'where' => [
-                                'uid' => $alias->getUid(),
-                                'language' => $alias->getLanguage(),
-                                'status' => 200,
-                            ],
-                        ]);
-
-                        if (empty($actualAlias)) {
-
-                            $saveAliasUri = $this->getSaveUri($aliasUri, $aliasesRepository, $alias);
-                            $alias->setAlias($saveAliasUri);
-                            $alias = $aliasesRepository->persist($alias);
-
-                            $this->setAlias($alias);
-
-                        }
-                        else {
-
-                            if (preg_match('#^' . $checkAlias->getAlias() . '\-([0-9]+)$#', $actualAlias->getAlias(), $match)) {
-                                $alias = $actualAlias;
-                                $this->setAlias($alias);
-                            }
-                            else {
-
-                                $saveAliasUri = $this->getSaveUri($aliasUri, $aliasesRepository, $alias);
-                                $alias->setAlias($saveAliasUri);
-                                $alias = $aliasesRepository->persist($alias);
-                                $this->setAlias($alias);
-                            }
-                        }
+                    if (array_key_exists('target', $aliasConfig ?? [])) {
+                        $checkAlias->addConfig([ 'target' => $aliasConfig['target'] ]);
                     }
                 }
+
+                $checkAlias->save();
+                $alias = $checkAlias;
             }
             else {
+                // Only historical redirects may be recycled for another owner.
+                if ($checkAlias !== null) {
+                    if ($checkAlias->getStatus() != 301) {
+                        throw new \Frootbox\Exceptions\RuntimeError('Alias is already reserved.');
+                    }
+                    $checkAlias->delete();
+                }
 
-                // Persist new alias
                 $alias->setAlias($aliasUri);
+                $alias->setStatus($alias->getStatus() ?? 200);
                 $alias = $aliasesRepository->persist($alias);
-
-                $this->setAlias($alias);
             }
+
+            $this->setAlias($alias);
 
             // Keep all previous URLs pointing directly to the selected current alias.
             $result = $aliasesRepository->fetch([
@@ -488,6 +448,10 @@ trait Alias
             ]);
 
             foreach ($result as $oldAlias) {
+                if (!$this->isSameAlias($oldAlias, $alias)) {
+                    continue;
+                }
+
                 $oldAlias->setStatus(301);
                 $oldAlias->addConfig([ 'target' => $alias->getAlias() ]);
                 $oldAlias->save();
@@ -530,184 +494,6 @@ trait Alias
                     ]);
 
                     if (!empty($nalias)) {
-                        // $nalias->setVisibility($this->getVisibility() > 1 ? 1 : 0);
-                        $nalias->setVisibility($this->getVisibility());
-                        $nalias->save();
-                    }
-                }
-            }
-
-            continue;
-            // Update existing alias
-            if (
-                !empty($newAlias = $this->getAlias($alias->getSection(), $alias->getLanguage())) or
-                ($this instanceof \Frootbox\Persistence\Page and $this->getParentId() == 0)
-            )
-            {
-                if ($aliasUri != $newAlias) {
-
-                    d('OLD ' . $aliasUri . ' - NEW ' . $newAlias);
-                    d("UPDATE ALIAS URI");
-
-                    $saveAliasUri = $this->getSaveUri($aliasUri, $aliasesRepository, $alias);
-
-                    // Mark old alias as dead
-                    $result = $aliasesRepository->fetch([
-                        'where' => [
-                            'alias' => $newAlias,
-                            'language' => $alias->getLanguage(),
-                        ],
-                        'limit' => 1
-                    ]);
-
-                    if ($result->getCount() > 0) {
-
-                        // Mark old aliases moved permanently
-                        foreach ($result as $oldAlias) {
-
-                            // Copy config from old aliasses
-                            if (!empty($oldAlias->getConfig('seo'))) {
-
-                                $alias->addConfig([
-                                    'seo' => $oldAlias->getConfig('seo')
-                                ]);
-                            }
-
-                            // Remove alais or mark old alias as redirected
-                            $aliasCreateDate = new \DateTime($oldAlias->getDate());
-                            $diff = $aliasCreateDate->diff(new \DateTime('now'));
-
-                            if ($diff->d >= 1) {
-                                $oldAlias->setStatus(301);
-                                $oldAlias->addConfig([
-                                    'target' => $saveAliasUri
-                                ]);
-
-                                $oldAlias->save();
-                            }
-                            else {
-                                $oldAlias->delete();
-                            }
-                        }
-                    }
-
-                    // Insert new alias
-                    $alias->setAlias($saveAliasUri);
-                    $alias = $aliasesRepository->insert($alias);
-
-                    $this->setAlias($alias);
-
-                    parent::save();
-                }
-                // Check if payload of old alias needs to be updated
-                else {
-
-                    $result = $aliasesRepository->fetch([
-                        'where' => [
-                            'alias' => (!empty($newAlias) ? $newAlias : ''),
-                            'language' => $alias->getLanguage(),
-                        ],
-                        'limit' => 1
-                    ]);
-
-                    $oldAlias = $result->current();
-
-                    if (!$oldAlias) {
-
-                        // Insert new alias
-                        $saveAliasUri = $this->getSaveUri($aliasUri, $aliasesRepository, $alias);
-
-
-                        $alias->setAlias($saveAliasUri);
-                        $alias = $aliasesRepository->insert($alias);
-
-                        $this->setAlias($alias);
-
-                        parent::save();
-                    }
-                    else {
-
-                        $xdata = $alias->getData();
-
-                        $oldAlias->setPayload(json_encode($alias->getPayload()));
-
-                        if (!empty($xdata['config'])) {
-                            $oldAlias->addConfig($xdata['config']);
-
-                        }
-                        else {
-                            $oldAlias->unsetConfig('target');
-                        }
-
-                        $oldAlias->setStatus($alias->getStatus() ?? 200);
-                        $oldAlias->setLanguage($alias->getLanguage());
-
-                        $oldAlias->save();
-
-
-                        $alias->setAlias($aliasUri);
-                        $this->setAlias($alias);
-
-                        parent::save();
-                    }
-                }
-
-            } // Create new alias
-            else {
-
-                $saveAliasUri = $this->getSaveUri($aliasUri, $aliasesRepository, $alias);
-
-                $alias->setAlias($saveAliasUri);
-
-                $alias->unset('virtualDirectory');
-
-                $alias = $aliasesRepository->insert($alias);
-
-                $alias->unset('virtualDirectory');
-
-                // Set alias
-                $this->setAlias($alias);
-
-                parent::save();
-            }
-
-
-            if ($this->hasColumn('visibility')) {
-
-                if (!empty($alias) and ((is_int($this->getVisibility()) and $this->getVisibility() < 2) or $this->getVisibility() == 'Moderated' or $this->getVisibility() == 'Locked')) {
-
-                    $nalias = $aliasesRepository->fetchOne([
-                        'where' => [
-                            'alias' => $this->getAlias($alias->getSection(), $alias->getLanguage()),
-                        ]
-                    ]);
-
-                    if (!empty($nalias) and $nalias->hasColumn('visibility')) {
-                        $nalias->setVisibility(0);
-                        $nalias->save();
-                    }
-                } elseif (!empty($alias) and ($this->getVisibility() == 'Public' or $this->getVisibility() == 'Hidden' or $this->getVisibility() === 2)) {
-
-                    $nalias = $aliasesRepository->fetchOne([
-                        'where' => [
-                            'alias' => $this->getAlias($alias->getSection(), $alias->getLanguage()),
-                        ]
-                    ]);
-
-                    if (!empty($nalias) and $nalias->hasColumn('visibility')) {
-                        $nalias->setVisibility(2);
-                        $nalias->save();
-                    }
-                } else {
-
-                    $nalias = $aliasesRepository->fetchOne([
-                        'where' => [
-                            'alias' => $this->getAlias($alias->getSection(), $alias->getLanguage()),
-                        ]
-                    ]);
-
-                    if (!empty($nalias)) {
-
                         // $nalias->setVisibility($this->getVisibility() > 1 ? 1 : 0);
                         $nalias->setVisibility($this->getVisibility());
                         $nalias->save();

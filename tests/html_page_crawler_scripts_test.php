@@ -229,3 +229,13 @@ foreach (['<!doctype html><html><head></head><body>' . $orderedAssets . '</body>
     }
 }
 echo "Script dependencies: defer, source order, nonce and async compatibility in pages and fragments PASS\n";
+
+// Direct template images must receive disclosures and usable bundled assets.
+$parser = new \Frootbox\View\HtmlParser('<html><head></head><body><a data-fancybox="gallery"><img data-frootbox-ai="1" src="/image.jpg" alt="Landscape"></a></body></html>', $container);
+$html = $parser->parse($config, new \Frootbox\Payload(), $container, new ScriptTestTranslatorFactory(), new ScriptTestPages());
+$crawler = HtmlPageCrawler::create($html);
+checkScripts($crawler->filter('[data-frootbox-ai-label]')->count() === 1, 'Final page must include one AI disclosure');
+checkScripts(!str_contains($html, 'FILE:'), 'AI assets must go through the regular asset pipeline');
+$bundlePath = str_replace(SERVER_PATH_PROTOCOL . 'files/', $temp, $crawler->filter('script[src]')->getAttribute('src'));
+checkScripts(is_file($bundlePath) && str_contains(file_get_contents($bundlePath), 'frootboxAiLightboxInstalled'), 'AI lightbox integration must be bundled');
+echo "AI full HTML pipeline: direct images, disclosure and bundled lightbox integration PASS\n";

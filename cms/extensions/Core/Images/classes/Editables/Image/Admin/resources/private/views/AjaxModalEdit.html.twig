@@ -34,10 +34,10 @@
                 data: $(this).serialize(),
                 type: 'POST',
                 success: function ( response ) {
-
-                    $('picture[data-uid="' + response.uid + '"] img').attr('src', response.src);
-
                     $('#fbxEditorGenericModal').modal('hide');
+                    // Metadata can affect every use of this file, including
+                    // backgrounds and lightboxes. Re-render through the server.
+                    window.location.reload();
                 },
                 error: function ( xhr ) {
                     alert(xhr.responseText);
@@ -164,6 +164,16 @@
             <div class="form-group form-check">
                 <input type="checkbox" class="form-check-input" id="isPresentationOnly" name="isPresentationOnly" {% if file.getConfig('isPresentationOnly') %}checked{% endif %}>
                 <label class="form-check-label" for="isPresentationOnly">Bild dient rein dekorativen Zwecken</label>
+            </div>
+
+            <div class="form-group form-check">
+                <input type="checkbox" class="form-check-input" id="isAiGenerated" name="isAiGenerated" {% if file.getIsAiGenerated() %}checked{% endif %}>
+                <label class="form-check-label" for="isAiGenerated">Bild wurde mit KI generiert</label>
+            </div>
+
+            <div class="form-group form-check">
+                <input type="checkbox" class="form-check-input" id="isAiEdited" name="isAiEdited" {% if file.getIsAiEdited() %}checked{% endif %}>
+                <label class="form-check-label" for="isAiEdited">Bild wurde mit KI bearbeitet</label>
             </div>
 
         {% endif %}

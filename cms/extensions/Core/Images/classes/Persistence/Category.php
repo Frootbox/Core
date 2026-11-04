@@ -67,31 +67,31 @@ class Category extends \Frootbox\Persistence\Category
         $height = 200
     ): string
     {
-        foreach ($this->getOffspring() as $category) {
+        $file = $this->getDefaultImageFile($filesRepository);
 
+        return $file ? $file->getUriThumbnail(['width' => $width, 'height' => $height])
+            : $this->getDummyImage($width, $height, $payload, $configStatics, $filesRepository);
+    }
+
+    /** The source file is also needed for disclosure metadata in category teasers. */
+    public function getDefaultImageFile(
+        \Frootbox\Persistence\Repositories\Files $filesRepository
+    ): ?\Frootbox\Persistence\File
+    {
+        foreach ($this->getOffspring() as $category) {
             $files = $filesRepository->fetch([
-                'where' => [
-                    'uid' => $category->getUid('images')
-                ],
-                'order' => [ 'orderId DESC' ],
+                'where' => ['uid' => $category->getUid('images')],
+                'order' => ['orderId DESC'],
                 'limit' => 1,
             ]);
-
             if ($files->getCount() > 0) {
-
-                $file = $files->current();
-
-                return $file->getUriThumbnail([
-                    'width' => $width,
-                    'height' => $height
-                ]);
+                return $files->current();
             }
         }
-
-        return $this->getDummyImage($width, $height, $payload, $configStatics, $filesRepository);
+        return null;
     }
-    
-    
+
+
     /**
      * 
      */

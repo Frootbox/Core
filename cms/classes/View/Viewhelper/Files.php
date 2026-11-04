@@ -9,6 +9,7 @@ namespace Frootbox\View\Viewhelper;
 class Files extends AbstractViewhelper
 {
     protected $arguments = [
+        'getAiImageAttributes' => [ 'file' ],
         'getFileById' => [
             'fileId',
         ],
@@ -33,6 +34,12 @@ class Files extends AbstractViewhelper
             'size',
         ]
     ];
+
+    /** Apply to an img or background container in custom Twig layouts (|raw). */
+    public function getAiImageAttributesAction(?\Frootbox\Persistence\File $file = null): string
+    {
+        return \Frootbox\View\AiImageLabel::attributes($file);
+    }
 
     /**
      * @param string $fileId

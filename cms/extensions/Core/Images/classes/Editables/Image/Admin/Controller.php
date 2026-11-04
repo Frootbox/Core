@@ -310,6 +310,8 @@ class Controller extends \Frootbox\Ext\Core\Editing\Editables\AbstractController
             }
 
             $file->setCopyright($post->get('copyright'));
+            $file->setIsAiGenerated($post->getBoolean('isAiGenerated'));
+            $file->setIsAiEdited($post->getBoolean('isAiEdited'));
 
             $file->addConfig([
                 'width' => $post->get('width'),

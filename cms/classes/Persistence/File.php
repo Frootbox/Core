@@ -19,6 +19,17 @@ class File extends AbstractRow
 
     protected $forceThumbmailFromPath = false;
 
+    /** Disclosure state: generated takes precedence over edited. */
+    public function getAiLabelType(): string
+    {
+        if ($this->getIsAiGenerated()) {
+            return '1';
+        }
+
+        return $this->getIsAiEdited() ? 'edited' : '0';
+    }
+
+
     /**
      * 
      */

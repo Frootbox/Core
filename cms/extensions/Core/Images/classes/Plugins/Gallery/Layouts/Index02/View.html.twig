@@ -37,7 +37,7 @@ title: Standard
                         <div class="col-3">
                             <a href="{{ file.getUriThumbnail() }}" data-fancybox="gallery">
                                 <picture class="fluid">
-                                    <img src="{{ file.getUriThumbnail({ width: 600, height: 400 }) }}" alt="" />
+                                    <img data-frootbox-ai="{{ file.getAiLabelType() }}" src="{{ file.getUriThumbnail({ width: 600, height: 400 }) }}" alt="" />
                                 </picture>
                             </a>
                         </div>

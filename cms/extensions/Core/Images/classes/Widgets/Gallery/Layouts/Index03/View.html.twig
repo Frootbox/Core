@@ -35,7 +35,7 @@ title: Thumbnail-Karussell
                         <div class="col-3">
                             <a href="{{ image.getUriThumbnail() }}" data-fancybox="gallery">
                                 <picture class="fluid" data-editable data-uid="{{ event.getUid('image') }}">
-                                    <img {% if widget.getImageWidth > 0 %}width="{{ widget.getImageWidth }}"{% endif %} height="{{ widget.getImageHeight }}" src="{{ image.getUri({ width: widget.getImageWidth, height: widget.getImageHeight }) }}" alt="{{ image.getAlt() }}" />
+                                    <img data-frootbox-ai="{{ image.getAiLabelType() }}" {% if widget.getImageWidth > 0 %}width="{{ widget.getImageWidth }}"{% endif %} height="{{ widget.getImageHeight }}" src="{{ image.getUri({ width: widget.getImageWidth, height: widget.getImageHeight }) }}" alt="{{ image.getAlt() }}" />
                                 </picture>
                             </a>
                         </div>

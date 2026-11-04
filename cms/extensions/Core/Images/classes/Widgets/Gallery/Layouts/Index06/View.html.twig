@@ -32,7 +32,7 @@ title: Thumbnail-Karussell
         {% for image in images %}
             <div style="padding: 20px;">
                 <div style="height: 70px; line-height: 70px; text-align: center;">
-                    <img style="display: inline;" height="70" src="{{ image.getUri({ width: null, height: 70 }) }}" alt="{{ image.getAlt() }}" />
+                    <img data-frootbox-ai="{{ image.getAiLabelType() }}" style="display: inline;" height="70" src="{{ image.getUri({ width: null, height: 70 }) }}" alt="{{ image.getAlt() }}" />
                 </div>
             </div>
         {% endfor %}
