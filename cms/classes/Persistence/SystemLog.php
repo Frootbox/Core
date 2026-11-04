@@ -23,16 +23,21 @@ class SystemLog extends \Frootbox\Persistence\AbstractRow
     {
         $data = $this->getLogData();
 
-        $entity = new $data[2];
+        $className = $data[2] ?? null;
+
+        if (!isset($data[0]) || !is_string($className) || !is_subclass_of($className, \Frootbox\Db\Row::class)) {
+            return null;
+        }
 
         try {
+            $entity = new $className();
 
             $repository = $this->getDb()->getRepository($entity->getModelClass());
             $entity = $repository->fetchById($data[0]);
 
             return $entity;
         }
-        catch (\Exception $e) {
+        catch (\Throwable $e) {
             return null;
         }
     }

@@ -22,7 +22,7 @@
         <tbody>
             {% for log in logs %}
                 {% set entity = log.getEntity() %}
-                <tr  data-href="{{ entity.getUri() }}" data-target="_blank">
+                <tr{% if entity %} data-href="{{ entity.getUri() }}" data-target="_blank"{% endif %}>
                     <td>{{ log.getDate() | date('d.m.Y H:i') }} Uhr</td>
                     <td>{{ t.translate(log.getCode(), log.getLogData()) | raw }}</td>
                 </tr>
