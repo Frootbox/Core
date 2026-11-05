@@ -1,6 +1,6 @@
 # Core/FrootboxDe
 
-Verbindet eine Website mit Frootbox 1 mit frootbox.de (`https://account.frootbox.de`).
+Verbindet eine Website mit Frootbox 1 mit frootbox.de (`https://hub.frootbox.de`).
 Eine Agentur sieht dort alle ihre Websites an einem Ort: erreichbar, Zertifikat,
 Backup, Platz und Versionen. Die Extension spricht dasselbe Protokoll
 „frootbox.de Connect v1“ wie Frootbox 2 (`documentation/concepts/hub.md` im Repo
@@ -10,7 +10,7 @@ Marketplace sind nicht für Frootbox 1, die Anmeldung über frootbox.de kommt sp
 ## Voraussetzungen
 
 - PHP ab 8.2 mit `sodium` und `curl`
-- PHP darf Anfragen nach außen schicken (zu `account.frootbox.de`)
+- PHP darf Anfragen nach außen schicken (zu `hub.frootbox.de`)
 - Der Ordner mit `localconfig.php` ist für PHP beschreibbar
 
 ## Installation

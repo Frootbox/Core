@@ -46,7 +46,7 @@ foreach ([
     'https://kunde.test' => true,
     'https://intranet' => true,
     'https://www.example.org' => false,
-    'https://account.frootbox.de' => false,
+    'https://hub.frootbox.de' => false,
     'https://93.184.216.34' => false,
 ] as $url => $local) {
     check(HubAddress::isLocal($url) === $local, 'Unexpected for ' . $url);

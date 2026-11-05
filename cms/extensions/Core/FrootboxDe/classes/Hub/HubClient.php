@@ -10,7 +10,7 @@ namespace Frootbox\Ext\Core\FrootboxDe\Hub;
  */
 class HubClient
 {
-    public const DEFAULT_URL = 'https://account.frootbox.de';
+    public const DEFAULT_URL = 'https://hub.frootbox.de';
 
     public function __construct(
         private readonly \Frootbox\Config\Config $config,
@@ -18,7 +18,7 @@ class HubClient
 
     /**
      * The hub from "Ext.Core.FrootboxDe.hubUrl" in localconfig.php, by
-     * default account.frootbox.de; http only for a hub on this computer.
+     * default hub.frootbox.de; http only for a hub on this computer.
      */
     public function url(): string
     {
