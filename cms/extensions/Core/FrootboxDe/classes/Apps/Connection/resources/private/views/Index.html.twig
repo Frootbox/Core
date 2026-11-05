@@ -1,0 +1,158 @@
+{{ front.addTab('frootbox.de', app.getUri('index')) }}
+
+<h2>frootbox.de</h2>
+
+<p>Mit frootbox.de sieht eine Agentur alle ihre Websites an einem Ort: erreichbar, Zertifikat, Backup, Platz und Versionen. Die Website entscheidet, was frootbox.de darf. Gesendet wird erst nach dem Verbinden, und nur die Werte unten.</p>
+
+{% if message %}<div class="alert alert-success">{{ message }}</div>{% endif %}
+{% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+
+{% if not allowed %}
+
+    <div class="alert alert-info">Die Verbindung zu frootbox.de verwalten nur SuperAdmins.</div>
+
+{% else %}
+
+    {% if details.state == 'connected' %}
+
+        <div class="card">
+            <div class="card-body">
+                <h3>Verbunden <span class="badge badge-success">aktiv</span></h3>
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">Organisation</dt>
+                    <dd class="col-sm-8">{{ details.organization ?: '–' }}</dd>
+                    <dt class="col-sm-4">Verbunden seit</dt>
+                    <dd class="col-sm-8">{{ details.connectedAt ? details.connectedAt | date('d.m.Y H:i') ~ ' Uhr' : '–' }}</dd>
+                    <dt class="col-sm-4">frootbox.de</dt>
+                    <dd class="col-sm-8"><a href="{{ details.hubUrl }}" target="_blank" rel="noopener">{{ details.hubUrl }}</a></dd>
+                    <dt class="col-sm-4">Verbindung</dt>
+                    <dd class="col-sm-8"><code>{{ details.connectionId }}</code></dd>
+                    <dt class="col-sm-4">Status</dt>
+                    <dd class="col-sm-8">
+                        {% if details.status %}
+                            frootbox.de liest <code>{{ details.statusUrl }}</code>,
+                            {% if details.lastPoll %}zuletzt am {{ details.lastPoll | date('d.m.Y H:i') }} Uhr{% else %}noch nie{% endif %}.
+                        {% else %}
+                            abgeschaltet
+                        {% endif %}
+                    </dd>
+                </dl>
+            </div>
+        </div>
+
+        <div class="card mt-3">
+            <div class="card-body">
+                <h3>Was frootbox.de darf</h3>
+                <form action="{{ app.getUri('switch') }}" method="post">
+                    <input type="hidden" name="token" value="{{ token }}">
+                    <div class="form-group form-check">
+                        <input type="checkbox" class="form-check-input" id="frootboxDeStatus" name="status" value="1" {% if details.status %}checked{% endif %}>
+                        <label class="form-check-label" for="frootboxDeStatus">Status lesen</label>
+                        <small class="form-text text-muted">Abschalten macht den Zugang von frootbox.de sofort ungültig.</small>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Speichern</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card mt-3">
+            <div class="card-body">
+                <h3>Trennen</h3>
+                <p>Löscht den Zugang und vergisst die Schlüssel von frootbox.de, auch wenn frootbox.de gerade nicht erreichbar ist.</p>
+                <form action="{{ app.getUri('disconnect') }}" method="post">
+                    <input type="hidden" name="token" value="{{ token }}">
+                    <button type="submit" class="btn btn-danger">Verbindung trennen</button>
+                </form>
+            </div>
+        </div>
+
+    {% else %}
+
+        {% if details.hint %}<div class="alert alert-warning">{{ details.hint }}</div>{% endif %}
+
+        {% if details.state == 'pending' %}
+
+            <div class="card">
+                <div class="card-body">
+                    <h3>Anfrage offen</h3>
+                    {% if returned.code and returned.request == details.requestId %}
+                        <p>frootbox.de hat die Verbindung bestätigt. Zum Abschluss löst die Website den Code ein.</p>
+                        <form action="{{ app.getUri('complete') }}" method="post">
+                            <input type="hidden" name="token" value="{{ token }}">
+                            <input type="hidden" name="request" value="{{ returned.request }}">
+                            <input type="hidden" name="code" value="{{ returned.code }}">
+                            <button type="submit" class="btn btn-primary">Verbindung abschließen</button>
+                        </form>
+                    {% else %}
+                        <p>Die Anfrage gilt bis {{ details.requestExpiresAt | date('H:i') }} Uhr. Auf frootbox.de anmelden, Organisation wählen und bestätigen.</p>
+                        <p><a class="btn btn-primary" href="{{ details.requestUrl }}">Weiter zu frootbox.de</a></p>
+                    {% endif %}
+                </div>
+            </div>
+
+        {% endif %}
+
+        <div class="card{% if details.state == 'pending' %} mt-3{% endif %}">
+            <div class="card-body">
+                <h3>Verbinden</h3>
+                <p>Öffnet frootbox.de. Dort mit dem eigenen Konto anmelden, Organisation wählen und bestätigen, dann geht es hierher zurück.</p>
+                <form action="{{ app.getUri('connect') }}" method="post">
+                    <input type="hidden" name="token" value="{{ token }}">
+                    <div class="form-group form-check">
+                        <input type="checkbox" class="form-check-input" id="frootboxDeConnectStatus" name="status" value="1" checked>
+                        <label class="form-check-label" for="frootboxDeConnectStatus">frootbox.de darf den Status lesen</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary" {% if details.hint %}disabled{% endif %}>Mit frootbox.de verbinden</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card mt-3">
+            <div class="card-body">
+                <h3>Mit Code verbinden</h3>
+                <p>Einen Code erzeugen Inhaber und Admins auf frootbox.de unter „Websites“. Er gilt 15 Minuten.</p>
+                <form action="{{ app.getUri('complete') }}" method="post">
+                    <input type="hidden" name="token" value="{{ token }}">
+                    <div class="form-group">
+                        <label for="frootboxDeCode">Code</label>
+                        <input type="text" class="form-control" id="frootboxDeCode" name="code" placeholder="XXXX-XXXX" autocomplete="off" required>
+                    </div>
+                    <div class="form-group form-check">
+                        <input type="checkbox" class="form-check-input" id="frootboxDeCodeStatus" name="status" value="1" checked>
+                        <label class="form-check-label" for="frootboxDeCodeStatus">frootbox.de darf den Status lesen</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary" {% if details.hint %}disabled{% endif %}>Code einlösen</button>
+                </form>
+            </div>
+        </div>
+
+    {% endif %}
+
+    <div class="card mt-3">
+        <div class="card-body">
+            <h3>Was frootbox.de sieht</h3>
+            <p>Genau dieses Dokument liest frootbox.de, wenn der Status eingeschaltet ist. Keine Namen, E-Mail-Adressen, Inhalte oder Adressen von Seiten. Werte mit <code>null</code> kennt Frootbox 1 nicht, frootbox.de zeigt sie als „nicht verfügbar“.</p>
+            <pre class="mb-0">{{ document }}</pre>
+        </div>
+    </div>
+
+    <div class="card mt-3">
+        <div class="card-body">
+            <h3>Schlüssel</h3>
+            <dl class="row mb-0">
+                <dt class="col-sm-4">Öffentlicher Schlüssel</dt>
+                <dd class="col-sm-8">{% if details.publicKey %}<code>{{ details.publicKey }}</code>{% else %}entsteht beim ersten Verbinden{% endif %}</dd>
+                <dt class="col-sm-4">Datei</dt>
+                <dd class="col-sm-8"><code>{{ details.file }}</code><br><small class="text-muted">Gehört zu dieser Installation, nicht zum Inhalt. Eine Kopie der Website auf einem anderen Server darf sie nicht mitnehmen.</small></dd>
+            </dl>
+            {% if details.state != 'connected' and details.publicKey %}
+                <form action="{{ app.getUri('disconnect') }}" method="post" class="mt-3">
+                    <input type="hidden" name="token" value="{{ token }}">
+                    <input type="hidden" name="forgetKey" value="1">
+                    <button type="submit" class="btn btn-outline-danger btn-sm">Schlüssel vergessen</button>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+
+{% endif %}

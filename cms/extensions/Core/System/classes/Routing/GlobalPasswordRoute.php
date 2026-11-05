@@ -29,6 +29,11 @@ class GlobalPasswordRoute extends \Frootbox\Routing\AbstractRoute
 
         $requestPath = trim($this->request->getRequestTarget(), '/');
         $loginPath = 'global-password';
+
+        // frootbox.de signs its calls and reads the status with a token of its own (Core/FrootboxDe).
+        if (str_starts_with($requestPath, '.well-known/frootbox/')) {
+            return;
+        }
         $authorized = hash_equals(
             hash('sha256', $hash),
             (string) ($_SESSION['globalPassword']['authorizedHash'] ?? '')

@@ -21,7 +21,12 @@ if (($argv[1] ?? '') === 'child') {
     $config = new \Frootbox\Config\Config();
     $hash = password_hash('example', PASSWORD_DEFAULT);
     $config->append(['globalPassword' => [ 'enabled' => $mode !== 'disabled', 'hash' => $hash ]]);
-    $request = (new \Frootbox\Http\ClientRequest())->setRequestTarget($mode === 'form' ? 'global-password' : 'private');
+    $target = match ($mode) {
+        'form' => 'global-password',
+        'frootboxDe' => '.well-known/frootbox/status',
+        default => 'private',
+    };
+    $request = (new \Frootbox\Http\ClientRequest())->setRequestTarget($target);
     $route = new \Frootbox\Ext\Core\System\Routing\GlobalPasswordRoute($request, $config);
     $session = (new ReflectionClass(\Frootbox\Session::class))->newInstanceWithoutConstructor();
 
@@ -42,6 +47,8 @@ foreach ([
     'authorized' => 'passed',
     'form' => 'Passwort erforderlich',
     'api' => 'Passwort erforderlich.',
+    // frootbox.de signs its calls and has a token of its own.
+    'frootboxDe' => 'passed',
 ] as $mode => $expected) {
     $process = proc_open([PHP_BINARY, __FILE__, 'child', $mode], [1 => ['pipe', 'w'], 2 => ['pipe', 'w']], $pipes);
     $output = stream_get_contents($pipes[1]);
