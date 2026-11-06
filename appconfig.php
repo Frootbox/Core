@@ -5,6 +5,20 @@
 
 return [
     'config.file' => CORE_DIR . 'localconfig.php',
+    \Frootbox\AI\AgentInterface::class => function ($c) {
+        // Provider extensions supply an implementation; the website chooses one.
+        $class = $c->get(\Frootbox\Config\Config::class)->get('ai.agent');
+
+        if (empty($class)) {
+            return $c->get(\Frootbox\AI\UnavailableAgent::class);
+        }
+
+        if (!is_string($class) || !is_a($class, \Frootbox\AI\AgentInterface::class, true)) {
+            throw new \RuntimeException('Der konfigurierte KI-Agent muss Frootbox\\AI\\AgentInterface implementieren.');
+        }
+
+        return $c->get($class);
+    },
     \Frootbox\Db\Dbms\Interfaces\Dbms::class => function ( $c ) {
 
         $class = '\Frootbox\Db\Dbms\\' . ucfirst($c->get(\Frootbox\Config\Config::class)->get('database.dbms'));
