@@ -15,9 +15,17 @@ Marketplace sind nicht für Frootbox 1, die Anmeldung über frootbox.de kommt sp
 
 ## Installation
 
-Unter „Erweiterungen“ `Core/FrootboxDe` installieren und danach „Neu laden“, damit
-die Route zu den übrigen Routen kommt. Die App „frootbox.de“ erscheint in der
-Seitenleiste, nur für SuperAdmins.
+1. Den Kern vollständig hochladen, `index.php` und `cms/` immer zusammen. Eine neue
+   `index.php` ohne die passenden Klassen in `cms/classes/` legt die ganze Website
+   lahm.
+2. Unter „Erweiterungen“ `Core/FrootboxDe` installieren.
+3. Danach neu laden: das Sync-Symbol (zwei kreisende Pfeile) oben neben der
+   Überschrift, es meldet „Konfiguration wurde neu geladen.“ Erst damit kommt die
+   Route zu den übrigen Routen.
+4. Prüfen: `GET /.well-known/frootbox/status` antwortet mit 401 und
+   `application/problem+json`, nicht mit der 404-Seite der Website.
+
+Die App „frootbox.de“ erscheint in der Seitenleiste, nur für SuperAdmins.
 
 ## Verbinden
 
